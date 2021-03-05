@@ -1,0 +1,35 @@
+# Ignore Every Thing
+*
+
+
+
+# Directories
+!*/
+#./RavenEngine/ThirdParty/
+#./RavenEngine/Source
+#/Intermediate/
+/RavenEngine/Build/
+/RavenEngine/.vs/
+
+
+# Project and git
+!.gitignore
+!*.sln
+!*.bat
+!*.vcxproj
+!*.filters
+!*.user
+!*.natvis
+
+
+# Source
+!*.cpp
+!*.cc
+!*.h
+!*.hpp
+!*.txt
+!*.glsl
+!*.vert
+!*.frag
+!*.geom
+

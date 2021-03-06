@@ -10,6 +10,7 @@
 #/Intermediate/
 /RavenEngine/Build/
 /RavenEngine/.vs/
+!/RavenEngine/Dependencies/*
 
 
 # Project and git
@@ -20,7 +21,6 @@
 !*.filters
 !*.user
 !*.natvis
-
 
 # Source
 !*.cpp

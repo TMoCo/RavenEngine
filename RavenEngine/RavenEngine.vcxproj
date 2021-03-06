@@ -72,23 +72,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\Build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Build\$(Configuration)\Intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Build\$(Configuration)\Intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\Build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Build\$(Configuration)\Intermediate</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\Build\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\Build\$(Configuration)\Intermediate</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,9 +111,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,9 +128,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,9 +145,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\glew-2.1.0\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\glfw-3.3.3\include;$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,7 +159,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Engine.cpp" />
+    <ClCompile Include="Source\IModule.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Render\RenderModule.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Source\vendors\imgui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Engine.h" />
+    <ClInclude Include="Source\IModule.h" />
+    <ClInclude Include="Source\Render\RenderModule.h" />
+    <ClInclude Include="Source\vendors\imgui\imconfig.h" />
+    <ClInclude Include="Source\vendors\imgui\imgui.h" />
+    <ClInclude Include="Source\vendors\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Source\vendors\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Source\vendors\imgui\imgui_internal.h" />
+    <ClInclude Include="Source\vendors\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Source\vendors\imgui\imstb_textedit.h" />
+    <ClInclude Include="Source\vendors\imgui\imstb_truetype.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,6 +8,7 @@
 
 
 
+/** Modules Types. */
 enum EModuleType
 {
 	MT_Render,
@@ -18,15 +19,19 @@ enum EModuleType
 
 
 
-
+/**
+ * Interface for modules in the engine.
+ */
 class IModule
 {
-private:
-	friend class Engine;
+public:
+	/** Virtual Destruct. */
+	virtual ~IModule() { }
 
-	virtual void Load() = 0;
-	virtual void Update() = 0;
+	/** Called by the engine to initialize the module. */
+	virtual void Initialize() = 0;
+
+	/** Called by the engine to destory the module. */
 	virtual void Destroy() = 0;
-
 };
 

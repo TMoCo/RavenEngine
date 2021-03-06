@@ -8,20 +8,37 @@
 
 
 
+/**
+ *
+ */
 class RenderModule : public IModule
 {
 public:
-	virtual void Load();
-	virtual void Update();
-	virtual void Destroy();
+	/** Construct. */
+	RenderModule();
 
-	static EModuleType GetType()
-	{
-		return MT_Render;
-	}
+	/** Destruct. */
+	~RenderModule();
+
+	/** Return the type of the module. */
+	static EModuleType GetModuleType() { return MT_Render; }
+
+
+	/** */
+	inline void Example() { }
+
+private:
+	/** Module Initialize. */
+	virtual void Initialize() override;
+
+	/** Module Destroy. */
+	virtual void Destroy() override;
+
+	
+public:
+	/** Update the render. */
+	void Update();
 
 };
-
-
 
 

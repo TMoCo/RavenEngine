@@ -13,9 +13,6 @@
 
 
 
-GLFWwindow* Engine::wnd = nullptr;
-std::array<IModule*, MT_MAX> Engine::modules;
-
 
 
 
@@ -54,10 +51,12 @@ void Engine::Initialize()
   glfwWindowHint(GLFW_DOUBLEBUFFER, 8);
   glfwWindowHint(GLFW_SAMPLES, 0);
 
-  wnd = glfwCreateWindow(1280, 1024, "Title", nullptr, nullptr);
+  glfw_window = glfwCreateWindow(1280, 1024, "Title", nullptr, nullptr);
 
-  glfwMakeContextCurrent(wnd);
+  glfwMakeContextCurrent(glfw_window);
 
+
+  // Module
   LoadModules();
 
 }
@@ -69,7 +68,7 @@ int Engine::Run()
   static double enginetime = 0;
 
   // Main Loop...
-  while (!glfwWindowShouldClose(wnd))
+  while (!glfwWindowShouldClose(glfw_window))
   {
     glfwPollEvents();
 
@@ -78,6 +77,7 @@ int Engine::Run()
     enginetime = glfwGetTime();
 
   
+    //
     GetModule<RenderModule>()->Update();
 
 
@@ -85,22 +85,34 @@ int Engine::Run()
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glfwSwapBuffers(wnd);
+    glfwSwapBuffers(glfw_window);
   }
 
+
+
+  // Clean Up..
+  DestoryModules();
 
   return 0;
 }
 
 
 
+
 void Engine::LoadModules()
 {
   // Create...
-  modules[MT_Render] = new RenderModule();
+  CreateModule<RenderModule>();
 
 
-  // Loading...
-  modules[MT_Render]->Load();
+  // Initialize - Here order matter.
+  InitializeModule<RenderModule>();
 }
 
+
+
+void Engine::DestoryModules()
+{
+  // Destroy - Here order matter.
+  DestroyModule<RenderModule>();
+}

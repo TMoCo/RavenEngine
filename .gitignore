@@ -2,6 +2,11 @@
 *
 
 
+/bin/
+/bin-int/
+/build/
+
+
 
 # Directories
 !*/

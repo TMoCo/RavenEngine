@@ -1,2 +1,4 @@
 C:\Users\Tommy\Documents\COMP4\5530MGroupProject\GameEngine\hpg_group_project\RavenEngine\x64\Debug\RavenEngine.exe
 C:\Users\Tommy\Documents\COMP4\5530MGroupProject\GameEngine\hpg_group_project\RavenEngine\x64\Debug\RavenEngine.pdb
+F:\Dev\Uni\Year4\Group Project\hpg_group_project\RavenEngine\x64\Debug\RavenEngine.exe
+F:\Dev\Uni\Year4\Group Project\hpg_group_project\RavenEngine\x64\Debug\RavenEngine.pdb

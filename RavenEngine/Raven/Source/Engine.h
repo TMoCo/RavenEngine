@@ -1,13 +1,15 @@
 //
 
-
-
 #pragma once
+
 
 #include "IModule.h"
 
 
 #include <array>
+
+
+
 
 
 struct GLFWwindow;
@@ -16,49 +18,70 @@ struct GLFWwindow;
 
 
 
-
 /**
- *
+ * Engine:
+ *		- 
  */
 class Engine
 {
 public:
-  /** */
+  /** Constructor. */
 	Engine();
 
-public:
-	/** */
+	/** Destructor. */
 	~Engine();
 
-	/** */
+	/** Return the Engine Singleton. */
 	static Engine& Get();
 
-	/** */
-	virtual void Initialize();
+	/** Initialize the Engine. */
+  virtual void Initialize();
 
-	/** */
-	int32_t Run();
+	/** Run the Engine. */
+	int Run();
 
-	/** */
-	template<class ModuleType>
-	inline ModuleType* GetModule()
+
+	/** Static function returns the Module of type Module Type. */
+	template<class TModule>
+	static inline TModule* GetModule()
 	{
-		return static_cast<ModuleType*>( modules[ ModuleType::GetType() ] );
+		return static_cast<TModule*>( Get().engineModules[TModule::GetModuleType() ] );
 	}
 
 private:
-	/** */
+	/** Create a the module and store it in the engine modules list. */
+	template<class TModule>
+	inline void CreateModule()
+	{
+		engineModules[ TModule::GetModuleType() ] = new TModule();
+	}
+
+	/** Initialize a module. */
+	template<class TModule>
+	inline void InitializeModule()
+	{
+		engineModules[ TModule::GetModuleType() ]->Initialize();
+	}
+
+	/** Destroy a module. */
+	template<class TModule>
+	inline void DestroyModule()
+	{
+		engineModules[ TModule::GetModuleType() ]->Destroy();
+	}
+
+	/** Load required modules. */
 	void LoadModules();
 
-
-
+	/** Destory all loaded modules. */
+	void DestoryModules();
 
 private:
-	GLFWwindow* wnd;
+	/** The GLFW Window created. */
+	GLFWwindow* glfw_window;
 
-	//
-	std::array<IModule*, MT_MAX> modules;
-
+	/** List of all the modules in the engine. */
+	std::array<IModule*, MT_MAX> engineModules;
 };
 
 Engine* CreateEngine();

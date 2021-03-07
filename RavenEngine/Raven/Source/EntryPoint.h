@@ -12,7 +12,11 @@ int main(int argc, char** argv)
 	Raven::Console::Init();
 	Engine::Get().Initialize();
 
-	//Engine::GetModule<RenderModule>()->Destroy();
+
+	// Example how to access modules from engine.
+	Engine::GetModule<RenderModule>()->Example();
+
 
 	return Engine::Get().Run();
 }
+

@@ -9,23 +9,32 @@
 
 
 
-
-void RenderModule::Load()
+RenderModule::RenderModule()
 {
-	glewInit();
-
-
 
 }
 
 
-void RenderModule::Update()
+RenderModule::~RenderModule()
+{
+
+}
+
+
+
+void RenderModule::Initialize()
 {
 
 }
 
 
 void RenderModule::Destroy()
+{
+
+}
+
+
+void RenderModule::Update()
 {
 
 }

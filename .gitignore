@@ -2,14 +2,14 @@
 
 
 
-/bin/
-/bin-int/
-/build/
+bin/
+bin-int/
+build/
 
 
 
 # Directories
-!*/
+
 
 #./RavenEngine/ThirdParty/
 #./RavenEngine/Source

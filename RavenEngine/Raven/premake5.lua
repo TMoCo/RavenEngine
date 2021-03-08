@@ -8,9 +8,9 @@ project "RavenEngine"
 	editandcontinue "Off"
 
 	if Arch == "x64" then
-		postbuildcommands { "powershell Copy-Item "..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/x64/glew32.dll "..root_dir.."/gameProject/" }
+		postbuildcommands { "powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/x64/glew32.dll' '"..root_dir.."/gameProject/'" }
 	else
-		postbuildcommands { "powershell Copy-Item "..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/Win32/glew32.dll "..root_dir.."/gameProject/" }
+		postbuildcommands { "powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/win32/glew32.dll' '"..root_dir.."/gameProject/'"}
 	end
 	
 	postbuildmessage "Copying dependencies..."

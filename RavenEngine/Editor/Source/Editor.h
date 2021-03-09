@@ -1,8 +1,24 @@
+
+#pragma once
 #include "Engine.h"
+#include "EditorWindow.h"
 
-class Editor : public Engine 
+namespace Raven 
 {
-public:
-	void Initialize() override;
-};
 
+	class Editor : public Engine
+	{
+	public:
+		void Initialize() override;
+		void OnImGui() override;
+	private:
+		void DrawMenu();
+		void BeginDockSpace();
+		void EndDockSpace();
+		std::vector<std::unique_ptr<EditorWindow>> editorWindows;
+	};
+
+
+
+
+};

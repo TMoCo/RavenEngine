@@ -76,9 +76,6 @@ int Engine::Run()
     enginetime = glfwGetTime();
 
   
-    //
-    GetModule<RenderModule>()->Update();
-
 
     // Draw..
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -101,11 +98,11 @@ int Engine::Run()
 void Engine::LoadModules()
 {
   // Create...
-  CreateModule<RenderModule>();
+  CreateModule<Raven::RenderModule>();
 
 
   // Initialize - Here order matter.
-  InitializeModule<RenderModule>();
+  InitializeModule<Raven::RenderModule>();
 }
 
 
@@ -113,5 +110,5 @@ void Engine::LoadModules()
 void Engine::DestoryModules()
 {
   // Destroy - Here order matter.
-  DestroyModule<RenderModule>();
+  DestroyModule<Raven::RenderModule>();
 }

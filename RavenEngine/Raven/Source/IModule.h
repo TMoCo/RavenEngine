@@ -15,6 +15,7 @@ enum EModuleType
 	MT_ImGui,
 	MT_Window,
 	MT_SceneManager,
+	MT_ResourceManager,
 	MT_MAX
 };
 

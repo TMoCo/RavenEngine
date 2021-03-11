@@ -6,6 +6,9 @@
 
 namespace Raven 
 {
+
+	class ResourceManager;
+
 	// the type of loader (for each type of resource)
 	enum class ELoaderType {
 		LT_Image,
@@ -20,8 +23,8 @@ namespace Raven
 	{
 	public:
 		// constructor always needs to know which loader type the loader is
-		ILoader(ELoaderType initType) 
-			: type(initType) {}
+		ILoader(ResourceManager& initResourceManager, ELoaderType initType) 
+			: resourceManager(initResourceManager), type(initType) {}
 
 		// delete copy constructors
 		ILoader(const ILoader&) = delete;
@@ -35,5 +38,6 @@ namespace Raven
 
 	protected:
 		ELoaderType type;
+		ResourceManager resourceManager;
 	};
 }

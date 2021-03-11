@@ -13,8 +13,11 @@ namespace Raven
 	class ResourceManager : public IModule
 	{
 	public:
-		ResourceManager();
-		~ResourceManager();
+		ResourceManager() = default;
+	
+		// inherited from IModule, must be over ridden
+		virtual void Initialize() override;
+		virtual void Destroy() override;
 
 		// resources are obtained by passing their path as keys for the unordered map
 		Resource* GetResource(const std::string& path);

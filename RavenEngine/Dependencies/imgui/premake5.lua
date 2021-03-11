@@ -18,6 +18,7 @@ project "imgui"
 		"imstb_textedit.h",
 		"imstb_truetype.h",
 		"imgui_demo.cpp",
+		"IconsMaterialDesignIcons.h",
 		"imgui_impl_opengl3.cpp",
 		"imgui_impl_opengl3.h",
 		"imgui_impl_glfw.cpp",

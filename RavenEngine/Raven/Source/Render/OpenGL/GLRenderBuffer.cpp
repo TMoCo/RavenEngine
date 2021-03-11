@@ -10,6 +10,7 @@ using namespace Raven;
 
 GLRenderBuffer::GLRenderBuffer()
 	: id(0)
+	, format(EGLFormat::None)
 {
 
 }
@@ -25,11 +26,17 @@ GLRenderBuffer::~GLRenderBuffer()
 }
 
 
-GLRenderBuffer* GLRenderBuffer::Create(EGLTexture format, int width, int height)
+GLRenderBuffer* GLRenderBuffer::Create(EGLFormat format, int width, int height)
 {
 	GLRenderBuffer* rd = new GLRenderBuffer();
+	rd->format = format;
+	rd->width = width;
+	rd->height = height;
 
 	glGenRenderbuffers(1, &rd->id);
+	glBindRenderbuffer(GL_RENDERBUFFER, rd->id);
+	glRenderbufferStorage(GL_RENDERBUFFER, (GLENUM)format, width, height);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 	return rd;
 }
@@ -47,7 +54,7 @@ void GLRenderBuffer::Unbind()
 }
 
 
-void GLRenderBuffer::UpdateStorage(EGLTexture format, int width, int height)
+void GLRenderBuffer::UpdateStorage(EGLFormat format, int width, int height)
 {
 	glRenderbufferStorage(GL_RENDERBUFFER, (GLENUM)format, width, height);
 }

@@ -42,6 +42,7 @@ void GLFrameBuffer::Attach(EGLAttachment attachment, int level, GLTexture* tex, 
 {
 	GLAttachmentData data;
 	data.level = level;
+	data.target = attachment;
 	data.layer = layer;
 	data.texRef = tex;
 	data.rdBufferRef = nullptr;
@@ -54,6 +55,7 @@ void GLFrameBuffer::Attach(EGLAttachment attachment, GLRenderBuffer* tex)
 {
 	GLAttachmentData data;
 	data.level = 0;
+	data.target= attachment;
 	data.layer = 0;
 	data.texRef = nullptr;
 	data.rdBufferRef = tex;
@@ -126,6 +128,8 @@ void GLFrameBuffer::Update()
 
 	}
 
+
+
 	// Validate Completion of Framebuffer.
 	ValidateStatus();
 
@@ -176,4 +180,68 @@ void GLFrameBuffer::ValidateStatus()
 		LOGW("GLFrameBuffer Status INCOMPLETE_LAYER_TARGETS.");
 		break;
 	}
+}
+
+
+void GLFrameBuffer::Bind(EGLFrameBuffer target)
+{
+	glBindFramebuffer((GLENUM)target, id);
+}
+
+
+void GLFrameBuffer::Unbind(EGLFrameBuffer target)
+{
+	glBindFramebuffer((GLENUM)target, 0);
+}
+
+
+void GLFrameBuffer::Blit(GLFrameBuffer* fb, EGLBufferMask mask, EGLFilter filter, const FBBlitViewport& src, const FBBlitViewport& dst)
+{
+	Blit(fb, EGLAttachment::None, EGLAttachment::None, mask, filter, src, dst);
+}
+
+
+void GLFrameBuffer::Blit(GLFrameBuffer* fb, EGLAttachment readAttachment, EGLAttachment drawAttachment, EGLBufferMask mask, EGLFilter filter, const FBBlitViewport& src, const FBBlitViewport& dst)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb != nullptr ? fb->id : 0);
+
+	if (fb != nullptr)
+	{
+		if (drawAttachment != EGLAttachment::None)
+			glDrawBuffer((GLENUM)drawAttachment);
+	}
+
+
+	if (readAttachment != EGLAttachment::None)
+		glReadBuffer((GLENUM)readAttachment);
+
+
+	glBlitFramebuffer(
+		// SRC
+		src.x0, src.y0,
+		src.x1, src.y1,
+		
+		// DST
+		dst.x0, dst.y0,
+		dst.x1, dst.y1,
+		
+		// MASK; COLOR, DEPTH or STENCIL
+		(GLENUM)mask,
+		(GLENUM)filter
+	);
+
+
+	// Reset...
+	if (readAttachment != EGLAttachment::None)
+		glReadBuffer((GLENUM)EGLAttachment::Color0);
+	
+	if (fb != nullptr)
+	{
+		if (drawAttachment != EGLAttachment::None)
+			glDrawBuffer((GLENUM)drawAttachment);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }

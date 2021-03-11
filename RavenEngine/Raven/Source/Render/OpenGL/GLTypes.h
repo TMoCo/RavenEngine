@@ -114,7 +114,7 @@ namespace Raven
 
 
 	// OpenGL Texture Filters.
-	enum class EGLFilter : GLINT
+	enum class EGLFilter : GLENUM
 	{
 		Nearest = 0x2600,
 		Linear = 0x2601,
@@ -123,7 +123,7 @@ namespace Raven
 
 
 	// OpenGL Texture Wrap.
-	enum class EGLWrap : GLINT
+	enum class EGLWrap : GLENUM
 	{
 		Repeat = 0x2901,
 		Mirror = 0x8370,
@@ -135,6 +135,8 @@ namespace Raven
 	// OpenGL Attachments Types.
 	enum class EGLAttachment : GLENUM
 	{
+		None = 0,
+
 		Color0 = 0x8CE0,
 		Color1 = 0x8CE1,
 		Color2 = 0x8CE2,
@@ -147,6 +149,26 @@ namespace Raven
 		Color9 = 0x8CE9,
 		Depth  = 0x8D00,
 		DepthStencil = 0x821A
+	};
+
+
+	// FrameBuffer targets.
+	enum class EGLFrameBuffer : GLENUM
+	{
+		// Both Read and Draw.
+		Framebuffer = 0x8D40,
+
+		Read = 0x8CA8,
+		Draw = 0x8CA9
+	};
+
+
+	// FrameBuffer targets.
+	enum class EGLBufferMask : GLENUM
+	{
+		Color   = 0x00004000,
+		Depth   = 0x00000100,
+		Stencil = 0x00000400
 	};
 
 }

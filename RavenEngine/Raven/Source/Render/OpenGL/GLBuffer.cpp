@@ -34,7 +34,9 @@ GLBuffer::~GLBuffer()
 GLBuffer* GLBuffer::Create(EGLBufferType type, int size, EGLBufferUsage usage)
 {
 	GLBuffer* buffer = new GLBuffer();
+	buffer->type = type;
 	buffer->usage = usage;
+	buffer->size = size;
 
 
 	glGenBuffers(1, &buffer->id);
@@ -46,10 +48,13 @@ GLBuffer* GLBuffer::Create(EGLBufferType type, int size, EGLBufferUsage usage)
 }
 
 
-GLBuffer* GLBuffer::Create(EGLBufferType type, int size, void* data, EGLBufferUsage usage)
+GLBuffer* GLBuffer::Create(EGLBufferType type, int size, const void* data, EGLBufferUsage usage)
 {
 	GLBuffer* buffer = new GLBuffer();
+	buffer->type = type;
 	buffer->usage = usage;
+	buffer->size = size;
+
 
 	glGenBuffers(1, &buffer->id);
 	glBindBuffer((GLENUM)type, buffer->id);
@@ -70,7 +75,7 @@ void GLBuffer::UpdateData(int dataSize, void* data)
 }
 
 
-void GLBuffer::UpdateSubData(int dataSize, int offset, void* data)
+void GLBuffer::UpdateSubData(int dataSize, int offset, const void* data)
 {
 	// TODO:: Assert on data size exceeding the allocated size.
 	// check(size <= dataSize)

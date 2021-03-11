@@ -41,6 +41,32 @@ namespace Raven
 	};
 
 
+	// Viewport used by frame buffer blit operation.
+	struct FBBlitViewport
+	{
+		// Viewport x0->x1 and y0 -> y1
+		int x0;
+		int x1;
+		int y0;
+		int y1;
+
+		// Default Construct - Uninitialized
+		FBBlitViewport()
+		{
+
+		}
+
+		// Construct.
+		FBBlitViewport(int ix0, int iy0, int ix1, int iy1)
+			: x0(ix0)
+			, x1(ix1)
+			, y0(iy0)
+			, y1(iy1)
+		{
+
+		}
+	};
+
 
 
 	//
@@ -74,6 +100,20 @@ namespace Raven
 
 		// Update the OpenGL framebuffer and its attachments.
 		void Update();
+
+		// Bind this frame buffer.
+		void Bind(EGLFrameBuffer target);
+
+		// Unbind this frame buffer.
+		void Unbind(EGLFrameBuffer target);
+
+		// Blit this framebuffer into another framebuffer.
+		// @param fb: the framebuffer to blit into, if null will blit into default framebuffer
+		void Blit(GLFrameBuffer* fb, EGLBufferMask mask, EGLFilter filter, const FBBlitViewport& src, const FBBlitViewport& dst);
+
+		// Blit this framebuffer into another framebuffer, for a specific color attachment.
+		// @param fb: the framebuffer to blit into, if null will blit into default framebuffer
+		void Blit(GLFrameBuffer* fb, EGLAttachment readAttachment, EGLAttachment drawAttachment, EGLBufferMask mask, EGLFilter filter, const FBBlitViewport& src, const FBBlitViewport& dst);
 
 	private:
 		// Validate framebuffer status.

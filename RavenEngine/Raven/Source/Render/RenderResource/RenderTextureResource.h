@@ -17,7 +17,7 @@ namespace Raven
 
 	//
 	//
-	class RenderTextureResource
+	class RenderTextureResource : public IRenderResource
 	{
 	public:
 		// Construct.

@@ -31,7 +31,6 @@ namespace Raven
 
 		// Attribute Offset .
 		int offset;
-
 	};
 
 
@@ -53,9 +52,9 @@ namespace Raven
 		// Create a vertex array.
 		static GLVertexArray* Create();
 
-		//
-		//
-		//
+		// Build a Vertex Array by binding vertex buffer to vertex shader input/attributes.
+		// @param data: attibute description data used for binding.
+		// @param elementBuffer: optional element buffer to bind, pass null if you don't want element buffer.
 		void Build(const std::vector<GLVABuildAttribData>& data, const GLBuffer* elementBuffer);
 
 		// Bind this vertex array.

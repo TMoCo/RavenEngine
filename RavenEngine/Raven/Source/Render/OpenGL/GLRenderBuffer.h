@@ -21,13 +21,13 @@ namespace Raven
 
 	public:
 		// Destruct. 
-		GLRenderBuffer();
+		~GLRenderBuffer();
 
 		// Return the opengl id of the buffer.
 		inline GLUINT GetID() const { return id; }
 
 		// Create a render buffer with format, width and height.
-		static GLRenderBuffer* Create(EGLTexture format, int width, int height);
+		static GLRenderBuffer* Create(EGLFormat format, int width, int height);
 
 		// Bind the render buffer.
 		void Bind();
@@ -36,7 +36,7 @@ namespace Raven
 		void Unbind();
 
 		// Update RenderBuffer storage.
-		void UpdateStorage(EGLTexture format, int width, int height);
+		void UpdateStorage(EGLFormat format, int width, int height);
 
 	private:
 		// OpenGL Object ID.

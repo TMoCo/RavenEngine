@@ -66,6 +66,9 @@ int Engine::Run()
 {
   static double enginetime = 0;
 
+  Raven::RenderModule* renderer = GetModule<Raven::RenderModule>();
+
+
   // Main Loop...
   while (!glfwWindowShouldClose(glfw_window))
   {
@@ -77,9 +80,12 @@ int Engine::Run()
 
   
 
-    // Draw..
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+
+    // Rendering...
+    renderer->BeginRender();
+    renderer->Render();
+    renderer->EndRender();
+
 
     glfwSwapBuffers(glfw_window);
   }

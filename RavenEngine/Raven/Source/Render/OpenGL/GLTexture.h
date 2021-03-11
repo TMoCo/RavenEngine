@@ -33,15 +33,15 @@ namespace Raven
 		static GLTexture* Create2D(EGLFormat format, int width, int height, EGLFilter filter = EGLFilter::Nearest, EGLWrap wrap = EGLWrap::ClampToEdge);
 
 		// Create a texture and copy the data of the image.
-		static GLTexture* Create2D(EGLFormat format, int width, int height, void* data, EGLFilter filter = EGLFilter::Nearest, EGLWrap wrap = EGLWrap::ClampToEdge);
+		static GLTexture* Create2D(EGLFormat format, int width, int height, const void* data, EGLFilter filter = EGLFilter::Nearest, EGLWrap wrap = EGLWrap::ClampToEdge);
 
 		// Update Texture data depending on its type
 		// Note: this assume that the texture is currently bounded.
-		void UpdateTexData(int level, int newWidth, int newHeight, void* data);
+		void UpdateTexData(int level, int newWidth, int newHeight, const void* data);
 
 	  // Update Texture data depending on its type and with multiple layers
 		// Note: this assume that the texture is currently bounded.
-		void UpdateTexData(int level, int newWidth, int newHeight, int numLayers, void* data);
+		void UpdateTexData(int level, int newWidth, int newHeight, int numLayers, const void* data);
 
 		// Update Texture parameters
 	  // Note: this assume that the texture is currently bounded.
@@ -72,6 +72,8 @@ namespace Raven
 		// Return texture format.
 		inline EGLFilter GetFilter() const { return filter; }
 
+		// Bind this texture and set it as active for TEXTURE(i)
+		void Active(int i);
 
 	private:
 		// OpenGL Object ID.

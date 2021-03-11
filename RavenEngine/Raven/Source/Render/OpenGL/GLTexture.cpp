@@ -52,6 +52,8 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, EGLFilte
 	tex->format = format;
 	tex->width = width;
 	tex->height = height;
+	tex->filter = filter;
+	tex->wrap = wrap;
 	glGenTextures(1, &tex->id);
 
 	tex->Bind();
@@ -63,7 +65,7 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, EGLFilte
 }
 
 
-GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, void* data, EGLFilter filter, EGLWrap wrap)
+GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, const void* data, EGLFilter filter, EGLWrap wrap)
 {
 	GLTexture* tex = new GLTexture();
 
@@ -71,6 +73,8 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, void* da
 	tex->format = format;
 	tex->width = width;
 	tex->height = height;
+	tex->filter = filter;
+	tex->wrap = wrap;
 	glGenTextures(1, &tex->id);
 
 	tex->Bind();
@@ -82,7 +86,7 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, void* da
 }
 
 
-void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, void* data)
+void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, const void* data)
 {
 	width = newWidth;
 	height = newHeight;
@@ -109,7 +113,7 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, void* data
 }
 
 
-void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLayers, void* data)
+void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLayers, const void* data)
 {
 	width = newWidth;
 	height = newHeight;
@@ -215,4 +219,11 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 		break;
 	}
 
+}
+
+
+void GLTexture::Active(int i)
+{
+	glBindTexture((GLENUM)type, id);
+	glActiveTexture(GL_TEXTURE0 + i);
 }

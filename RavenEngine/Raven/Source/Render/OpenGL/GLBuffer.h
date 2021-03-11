@@ -30,22 +30,22 @@ namespace Raven
 		static GLBuffer* Create(EGLBufferType type, int size, EGLBufferUsage usage);
 
 		// Create a new GLBuffer with data. 
-		static GLBuffer* Create(EGLBufferType type, int size, void* data, EGLBufferUsage usage);
+		static GLBuffer* Create(EGLBufferType type, int size, const void* data, EGLBufferUsage usage);
 
 		// Reallocate and update new data for the buffer.
 		void UpdateData(int dataSize, void* data);
 
 		// Update buffer with a new data.
-		void UpdateSubData(int dataSize, int offset, void* data);
+		void UpdateSubData(int dataSize, int offset, const void* data);
 
 		// Return the current size of the buffer.
-		inline int GetSize() { return size; }
+		inline int GetSize() const { return size; }
 
 		// Return the current type of the buffer.
-		inline EGLBufferType GetType() { return type; }
+		inline EGLBufferType GetType() const { return type; }
 
 		// Return the current usage of the buffer.
-		inline EGLBufferUsage GetUsage() { return usage; }
+		inline EGLBufferUsage GetUsage() const { return usage; }
 
 		// Return the opengl id of the buffer.
 		inline GLUINT GetID() const { return id; }

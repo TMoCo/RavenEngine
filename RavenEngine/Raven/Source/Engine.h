@@ -7,14 +7,11 @@
 
 
 #include <array>
-
-
-
-
-
-struct GLFWwindow;
-
-
+#include <queue>
+#include <mutex>
+#include <future>
+#include <condition_variable>
+#include <functional>
 
 
 
@@ -35,7 +32,7 @@ public:
 	static Engine& Get();
 
 	/** Initialize the Engine. */
-  virtual void Initialize();
+	virtual void Initialize();
 
 	/** Run the Engine. */
 	int Run();
@@ -48,12 +45,21 @@ public:
 		return static_cast<TModule*>( Get().engineModules[TModule::GetModuleType() ] );
 	}
 
+
+	//MainThread Operation
+	std::future<bool> Post(const std::function<bool()>& callback);
+
+
+protected:
+	virtual void OnImGui();
+	virtual void OnUpdate(float dt);
+	virtual void OnRender();
 private:
 	/** Create a the module and store it in the engine modules list. */
-	template<class TModule>
-	inline void CreateModule()
+	template<class TModule,typename...Args>
+	inline void CreateModule( Args&&... args)
 	{
-		engineModules[ TModule::GetModuleType() ] = new TModule();
+		engineModules[ TModule::GetModuleType() ] = new TModule(std::forward<Args>(args)...);
 	}
 
 	/** Initialize a module. */
@@ -76,9 +82,14 @@ private:
 	/** Destory all loaded modules. */
 	void DestoryModules();
 
+
+
+
 private:
-	/** The GLFW Window created. */
-	GLFWwindow* glfw_window;
+
+	//main thread --call Post to post callback to main-thread if you are in other threads.
+	std::queue<std::pair<std::promise<bool>, std::function<bool()>>> executeQueue;
+	std::mutex executeMutex;
 
 	/** List of all the modules in the engine. */
 	std::array<IModule*, MT_MAX> engineModules;

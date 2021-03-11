@@ -90,7 +90,7 @@ namespace Raven
 	{
 		localMatrix = glm::translate(glm::mat4(1), localPosition);
 		localMatrix *= glm::mat4_cast(localOrientation);
-		localMatrix *= localScale;
+		localMatrix = glm::scale(localMatrix,localScale);
 		dirty = false;
 		hasUpdated = true;
 	}

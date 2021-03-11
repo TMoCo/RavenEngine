@@ -56,12 +56,12 @@ namespace Raven
 	
 
 	protected:
-		glm::mat4 localMatrix = glm::identity<glm::mat4>();
-		glm::mat4 worldMatrix = glm::identity<glm::mat4>();
+		glm::mat4 localMatrix = glm::mat4(1);
+		glm::mat4 worldMatrix = glm::mat4(1);
 
-		glm::vec3 localPosition = glm::identity<glm::vec3>();
-		glm::vec3 localScale = glm::identity<glm::vec3>();
-		glm::quat localOrientation = glm::identity<glm::quat>();
+		glm::vec3 localPosition = {};
+		glm::vec3 localScale = {};
+		glm::quat localOrientation = {};
 
 		bool hasUpdated = false;
 		bool dirty = false;

@@ -7,8 +7,10 @@
 #include "Render/RenderModule.h"
 #include "ImGui/ImGuiEngine.h"
 #include "Scene/SceneManager.h"
-#include <GLFW/glfw3.h>
+#include "Scene/Scene.h"
 
+
+#include <GLFW/glfw3.h>
 #include <memory>
 
 
@@ -87,7 +89,7 @@ void Engine::OnImGui()
 void Engine::OnUpdate(float dt)
 {
 	GetModule<RenderModule>()->Update();
-
+	GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 }
 
 void Engine::OnRender()

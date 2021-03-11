@@ -71,6 +71,7 @@ namespace Raven {
 
 	void Scene::OnClean()
 	{
+
 	}
 
 	void Scene::OnUpdate(float dt)

@@ -23,6 +23,8 @@ project "imgui"
 		"imgui_impl_opengl3.h",
 		"imgui_impl_glfw.cpp",
 		"imgui_impl_glfw.h",
+		"ImGuizmo.h",
+		"ImGuizmo.cpp",
 		"ImGuiEnttEditor.hpp"
 	}
 

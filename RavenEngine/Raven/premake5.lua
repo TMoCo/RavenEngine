@@ -29,7 +29,7 @@ project "RavenEngine"
 
 	includedirs
 	{
-		"Source/"
+		"Source/",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glew}",
 		"%{IncludeDir.stb}",

@@ -132,10 +132,10 @@ namespace Raven
 		}
 		else
 		{
-			auto prev_hierarchy = registry.try_get<Hierarchy>(hierarchy.prev);
-			if (prev_hierarchy != nullptr)
+			auto prevHierarchy = registry.try_get<Hierarchy>(hierarchy.prev);
+			if (prevHierarchy != nullptr)
 			{
-				prev_hierarchy->next = hierarchy.next;
+				prevHierarchy->next = hierarchy.next;
 			}
 			if (hierarchy.next != entt::null)
 			{

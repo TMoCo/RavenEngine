@@ -14,6 +14,7 @@ namespace Raven
 		std::string name;
 	};
 
+
 	struct ActiveComponent
 	{
 		bool active = true;
@@ -33,7 +34,9 @@ namespace Raven
 		inline auto First() const {return first;}
 
 		// Return true if current entity is an ancestor of current entity
-		bool Compare(const entt::registry& registry, const entt::entity& entity) const;
+		//seems that the entt as a reference could have a bug....
+		//TODO 
+		bool Compare(const entt::registry& registry, entt::entity entity) const;
 		void Reset();
 
 

@@ -30,6 +30,16 @@ project "RavenEngine"
 	includedirs
 	{
 		"Source/"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glew}",
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.Dependencies}",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.cereal}",
+		"%{IncludeDir.Raven}",
+		"%{IncludeDir.OpenFBX}",
+		"%{IncludeDir.glm}",
 	}
 
 	sysincludedirs

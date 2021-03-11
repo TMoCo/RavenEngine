@@ -22,13 +22,15 @@ project "imgui"
 		"imgui_impl_opengl3.cpp",
 		"imgui_impl_opengl3.h",
 		"imgui_impl_glfw.cpp",
-		"imgui_impl_glfw.h"
+		"imgui_impl_glfw.h",
+		"ImGuiEnttEditor.hpp"
 	}
 
 	sysincludedirs
 	{
 		"../glfw/include/",
-		"../glew-2.1.0/include/"
+		"../glew-2.1.0/include/",
+		"../entt/"
 	}
 
 	filter "system:windows"

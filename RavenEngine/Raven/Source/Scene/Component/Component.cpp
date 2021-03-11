@@ -9,7 +9,7 @@ namespace Raven
 	Hierarchy::Hierarchy()
 	{
 	}
-	bool Hierarchy::Compare(const entt::registry& registry, const entt::entity & rhs) const
+	bool Hierarchy::Compare(const entt::registry& registry, entt::entity rhs) const
 	{
 		if (rhs == entt::null || rhs == parent || rhs == prev)
 		{

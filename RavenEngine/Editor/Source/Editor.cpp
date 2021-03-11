@@ -6,6 +6,8 @@
 #include "AssetsWindow.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+#include "Scene/Component/Component.h"
+#include "Scene/Component/Transform.h"
 #include <imgui_internal.h>
 #include <imgui.h>
 
@@ -22,6 +24,9 @@ namespace Raven
 		editorWindows.emplace_back(std::make_unique<AssetsWindow>());
 
 		GetModule<SceneManager>()->AddScene(new Scene("Test"));
+
+		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
+		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 
 	}
 
@@ -45,6 +50,14 @@ namespace Raven
 	void Editor::SetCopiedEntity(const entt::entity& selectedNode,bool cut) 
 	{
 		copiedNode = selectedNode;
+	}
+
+	void Editor::OnSceneCreated(Scene* scene)
+	{
+		for (auto & w : editorWindows)
+		{
+			w->OnSceneCreated(scene);
+		}
 	}
 
 	void Editor::DrawMenu()
@@ -158,6 +171,6 @@ namespace Raven
 	}
 };
 
-Engine * CreateEngine() {
+Raven::Engine* CreateEngine() {
 	return new Raven::Editor();
 }

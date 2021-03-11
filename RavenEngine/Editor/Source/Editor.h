@@ -18,6 +18,9 @@ namespace Raven
 		inline auto& GetCopiedEntity() const  { return copiedNode; }
 		inline auto IsCutCopyEntity() const { return cutCopyEntity; }
 		inline auto& GetComponentIconMap() const { return iconMap; }
+		inline auto& GetComponentIconMap(){ return iconMap; }
+
+		void OnSceneCreated(Scene* scene) override;
 
 	private:
 		void DrawMenu();

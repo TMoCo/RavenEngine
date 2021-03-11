@@ -5,18 +5,18 @@
 #include "Render/RenderModule.h"
 #include "Logger/Console.h"
 
-extern Engine * CreateEngine();
+extern Raven::Engine * CreateEngine();
 
 int main(int argc, char** argv) 
 {
 	Raven::Console::Init();
-	Engine::Get().Initialize();
+	Raven::Engine::Get().Initialize();
 
 
 	// Example how to access modules from engine.
-	Engine::GetModule<RenderModule>()->Example();
+	Raven::Engine::GetModule<RenderModule>()->Example();
 
 
-	return Engine::Get().Run();
+	return Raven::Engine::Get().Run();
 }
 

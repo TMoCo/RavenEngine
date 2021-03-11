@@ -22,6 +22,13 @@
 
 namespace Raven 
 {
+	enum class EditorState
+	{
+		Paused,
+		Play,
+		Next,
+		Preview
+	};
 
 	class Scene;
 	class Engine
@@ -55,6 +62,10 @@ namespace Raven
 		std::future<bool> Post(const std::function<bool()>& callback);
 
 		virtual void OnSceneCreated(Scene* scene);
+
+
+		inline auto GetEditorState() const { return state; }
+		inline auto SetEditorState(EditorState state) { this->state = state; }
 
 	protected:
 		virtual void OnImGui();
@@ -99,6 +110,9 @@ namespace Raven
 
 		/** List of all the modules in the engine. */
 		std::array<IModule*, MT_MAX> engineModules;
+
+		EditorState state = EditorState::Preview;
+
 	};
 };
 Raven::Engine* CreateEngine();

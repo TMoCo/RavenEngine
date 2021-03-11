@@ -8,6 +8,8 @@
 #include "Scene/SceneManager.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
+#include "ImGui/ImGuiHelpers.h"
+#include <ImGuizmo.h>
 #include <imgui_internal.h>
 #include <imgui.h>
 
@@ -27,7 +29,7 @@ namespace Raven
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
-
+		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 	}
 
 	void Editor::OnImGui()
@@ -60,6 +62,11 @@ namespace Raven
 		}
 	}
 
+	void Editor::OnImGuizmo()
+	{
+
+	}
+
 	void Editor::DrawMenu()
 	{
 		if (ImGui::BeginMainMenuBar())
@@ -75,6 +82,79 @@ namespace Raven
 				}
 				ImGui::EndMenu();
 			}
+
+			ImGui::SameLine((ImGui::GetWindowContentRegionMax().x / 2.0f) - (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.7f, 0.0f));
+
+			if (Engine::Get().GetEditorState() == EditorState::Next)
+				Engine::Get().SetEditorState(EditorState::Paused);
+
+			bool selected;
+			{
+				selected = Engine::Get().GetEditorState() == EditorState::Play;
+				if (selected)
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+				if (ImGui::Button(ICON_MDI_PLAY))
+				{
+					Engine::Get().SetEditorState(selected ? EditorState::Preview : EditorState::Play);
+
+					selectedNode = entt::null;
+					if (selected)
+						LoadCachedScene();
+					else
+					{
+						CacheScene();
+						Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->OnInit();
+					}
+				}
+
+
+				ImGuiHelper::Tooltip("Play");
+
+
+				if (selected)
+					ImGui::PopStyleColor();
+			}
+
+			ImGui::SameLine();
+
+			{
+				selected = Engine::Get().GetEditorState() == EditorState::Paused;
+				if (selected)
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+				if (ImGui::Button(ICON_MDI_PAUSE))
+					Engine::Get().SetEditorState(selected ? EditorState::Play : EditorState::Paused);
+
+				ImGuiHelper::Tooltip("Pause");
+
+
+				if (selected)
+					ImGui::PopStyleColor();
+			}
+
+			ImGui::SameLine();
+
+			{
+				selected = Engine::Get().GetEditorState() == EditorState::Next;
+				if (selected)
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+				if (ImGui::Button(ICON_MDI_STEP_FORWARD))
+					Engine::Get().SetEditorState(EditorState::Next);
+
+
+				ImGuiHelper::Tooltip("Next");
+
+				if (selected)
+					ImGui::PopStyleColor();
+			}
+
+			ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 240.0f);
+			ImGui::PopStyleColor();
+
 			ImGui::EndMainMenuBar();
 		}
 	}
@@ -168,6 +248,16 @@ namespace Raven
 	void Editor::EndDockSpace()
 	{
 		ImGui::End();
+	}
+
+	void Editor::LoadCachedScene()
+	{
+		//load from disk
+	}
+
+	void Editor::CacheScene()
+	{
+		//Serialize the scene
 	}
 };
 

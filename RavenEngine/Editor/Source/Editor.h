@@ -22,15 +22,29 @@ namespace Raven
 
 		void OnSceneCreated(Scene* scene) override;
 
+		inline auto GetImGuizmoOperation() const { return imGuizmoOperation; }
+		inline auto SetImGuizmoOperation(uint32_t imGuizmoOperation) { this->imGuizmoOperation = imGuizmoOperation; }
+
 	private:
+		void OnImGuizmo();
 		void DrawMenu();
 		void BeginDockSpace();
 		void EndDockSpace();
+
+		void LoadCachedScene();
+		void CacheScene();
+
 		std::vector<std::unique_ptr<EditorWindow>> editorWindows;
 		entt::entity selectedNode = entt::null;
 		entt::entity copiedNode = entt::null;
 		bool cutCopyEntity = false;
 		std::unordered_map<size_t, const char*> iconMap;
-	};
+
+		uint32_t imGuizmoOperation = 0;
+
+		bool snapGuizmo = false;
+
+
+};
 
 };

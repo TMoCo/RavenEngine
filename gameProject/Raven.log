@@ -1,1 +1,5 @@
-[05:22:33] [trace] MAPLE: Raven::Scene::OnInit
+[20:09:02] [error] MAPLE: this is a message,1,2,3
+[20:09:02] [critical] MAPLE: this is a message,1,2,3
+[20:09:02] [warning] MAPLE: this is a message,1,2,3
+[20:09:02] [info] MAPLE: this is a message,1,2,3
+[20:09:02] [trace] MAPLE: this is a message,1,2,3

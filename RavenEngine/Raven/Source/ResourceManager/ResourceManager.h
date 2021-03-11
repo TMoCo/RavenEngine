@@ -29,15 +29,18 @@ namespace Raven
 		// resources are obtained by passing their path as keys for the unordered map
 		IResource* GetResource(const std::string& path);
 
-		// returns true if the resource is already in the resource
+		// returns true if the resource is already in the resource register
 		bool HasResource(const std::string& id);
+
+		// add a resource to the resourceMap
+		bool AddResource(const std::string& id, std::unique_ptr<IResource*>);
 
 	private:
 		// add a loader of a certain type
 		void AddLoader(std::unique_ptr<ILoader> loader);
 
 		// for now the resource register maps an id to the resource in heap memory
-		std::unordered_map<std::string, IResource*> resourceMap;
+		std::unordered_map<std::string, std::unique_ptr<IResource*>> resourceMap;
 
 		// a vector containing the resource loaders used
 		std::vector<std::unique_ptr<ILoader>> loaders;

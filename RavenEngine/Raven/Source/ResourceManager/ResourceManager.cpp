@@ -2,20 +2,15 @@
 
 #include "ResourceManager.h"
 #include "ResourceManager/Loaders/ILoader.h"
+#include "ResourceManager/Loaders/ImageLoader.h"
 
-// for obj loading
-#define TINYOBJLOADER_IMPLEMENTATION 
-#include <tinyobjloader/tiny_obj_loader.h>
-
-// for image loading
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
 
 namespace Raven {
 
 	void ResourceManager::Initialize()
 	{
 		std::cout << "Initialised the resource manager" << '\n';
+		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
 	}
 
 	void ResourceManager::Destroy()
@@ -28,21 +23,29 @@ namespace Raven {
 	{
 		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
 		{
+			std::cout << "Added a loader of type " << ILoader::TypeToString(loader->GetType()) << '\n';
 			loaders.push_back(std::move(loader));
+			std::cout << '\n';
 		}
 	}
 
-	IResource* ResourceManager::GetResource(const std::string& path) 
+	IResource* ResourceManager::GetResource(const std::string& id) 
 	{
-		if (!HasResource(path))
+		auto resourceIter = resourceMap.find(id); // a key/value pair iterator
+		if (resourceIter == resourceMap.end())
 		{
 			return nullptr;
+		}
+		else
+		{
+			return resourceIter->second;
 		}
 	}
 
 	bool ResourceManager::HasResource(const std::string& id)
 	{
-		return resourceMap.find(id) == resourceMap.end();
+		// true if a key exists
+		return resourceMap.count(id);
 	}
 
 	/*

@@ -7,8 +7,9 @@ namespace Raven
 {
 	class ImageLoader : public ILoader
 	{
+	public:
 		ImageLoader(ResourceManager& initResourceManager);
 
-		bool LoadAsset(const std::string& path);
+		bool LoadAsset(const std::string& path) override;
 	};
 }

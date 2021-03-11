@@ -1,0 +1,5 @@
+[19:31:17] [error] MAPLE: this is a message,1,2,3
+[19:31:17] [critical] MAPLE: this is a message,1,2,3
+[19:31:17] [warning] MAPLE: this is a message,1,2,3
+[19:31:17] [info] MAPLE: this is a message,1,2,3
+[19:31:17] [trace] MAPLE: this is a message,1,2,3

@@ -5,6 +5,7 @@
 
 #include "Window/Window.h"
 #include "Render/RenderModule.h"
+#include "ResourceManager/ResourceManager.h"
 #include "ImGui/ImGuiEngine.h"
 #include "Scene/SceneManager.h"
 #include <GLFW/glfw3.h>
@@ -97,6 +98,7 @@ void Engine::OnRender()
 void Engine::LoadModules()
 {
   // Create...
+	CreateModule<Raven::ResourceManager>();
 	CreateModule<RenderModule>();
 	CreateModule<Raven::ImGuiEngine>();
 	CreateModule<Raven::Window>("Raven");
@@ -104,6 +106,7 @@ void Engine::LoadModules()
 
 
   // Initialize - Here order matter.
+	InitializeModule<Raven::ResourceManager>();
 	InitializeModule<Raven::Window>();
 	InitializeModule<RenderModule>();
 	InitializeModule<Raven::ImGuiEngine>();
@@ -117,6 +120,7 @@ void Engine::DestoryModules()
 {
   // Destroy - Here order matter.
   DestroyModule<RenderModule>();
+  DestroyModule<Raven::ResourceManager>();
 }
 
 std::future<bool> Engine::Post(const std::function<bool()>& callback)

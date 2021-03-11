@@ -18,8 +18,6 @@ namespace Raven
 		size_t height;
 		size_t width;
 
-		void* data;
-
 		TextureRenderResource* renderResource;
 	};
 }

@@ -6,8 +6,7 @@
 
 namespace Raven
 {
-	ImageLoader::ImageLoader(ResourceManager& initResouceManager) 
-		: ILoader(initResouceManager, ELoaderType::LT_Image) {}
+	ImageLoader::ImageLoader(ResourceManager& initResouceManager) : ILoader(initResouceManager, ELoaderType::LT_Image) {}
 
 	bool ImageLoader::LoadAsset(const std::string& path)
 	{

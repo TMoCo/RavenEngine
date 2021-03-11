@@ -14,7 +14,7 @@ namespace Raven
 		//RT_Audio
 	};
 
-	// the base resource class
+	// the base resource class, interface that contais a resource's data and metadata
 	class IResource
 	{
 		// static factory method

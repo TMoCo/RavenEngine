@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
 
 	// Example how to access modules from engine.
-	Engine::GetModule<RenderModule>()->Example();
+	//Engine::GetModule<RenderModule>()->Example();
 
 
 	return Engine::Get().Run();

@@ -7,7 +7,7 @@ namespace Raven
 	class SceneLoader : ILoader
 	{
 	public:
-		SceneLoader();
+		SceneLoader(ResourceManager& initResourceManager);
 
 		bool LoadAsset(const std::string& path);
 	};

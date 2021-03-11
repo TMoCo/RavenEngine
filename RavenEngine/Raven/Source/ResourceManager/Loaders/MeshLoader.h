@@ -6,7 +6,7 @@ namespace Raven
 {
 	class MeshLoader : public ILoader
 	{
-		MeshLoader();
+		MeshLoader(ResourceManager& initResourceManager);
 
 		bool LoadAsset(const std::string& path);
 	};

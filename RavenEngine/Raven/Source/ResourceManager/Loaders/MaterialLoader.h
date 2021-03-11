@@ -7,7 +7,7 @@ namespace Raven
 	class MaterialLoader : ILoader
 	{
 	public:
-		MaterialLoader();
+		MaterialLoader(ResourceManager& initResourceManager);
 
 		bool LoadAsset(const std::string& path);
 	};

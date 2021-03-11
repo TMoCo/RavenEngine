@@ -1,12 +1,13 @@
 #pragma once
 
-#include "ILoader.h"
+#include "ResourceManager/Loaders/ILoader.h"
+#include "ResourceManager/ResourceManager.h"
 
 namespace Raven
 {
 	class ImageLoader : public ILoader
 	{
-		ImageLoader();
+		ImageLoader(ResourceManager& initResourceManager);
 
 		bool LoadAsset(const std::string& path);
 	};

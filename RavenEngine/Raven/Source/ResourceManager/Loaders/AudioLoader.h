@@ -7,7 +7,7 @@ namespace Raven
 	class AudioLoader : ILoader
 	{
 	public:
-		AudioLoader();
+		AudioLoader(ResourceManager& initResourceManager);
 
 		bool LoadAsset(const std::string& path);
 	};

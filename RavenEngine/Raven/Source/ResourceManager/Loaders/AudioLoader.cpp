@@ -2,7 +2,8 @@
 
 namespace Raven
 {
-	AudioLoader::AudioLoader() : ILoader(ELoaderType::LT_Audio) {}
+	AudioLoader::AudioLoader(ResourceManager& initResourceManager) 
+		: ILoader(initResourceManager, ELoaderType::LT_Audio) {}
 
 	bool AudioLoader::LoadAsset(const std::string& path)
 	{

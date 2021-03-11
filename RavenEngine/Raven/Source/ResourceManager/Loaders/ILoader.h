@@ -2,6 +2,8 @@
 
 #include <string>
 
+//#include "ResourceManager/ResourceManager.h"
+
 // the base loader class 
 
 namespace Raven 
@@ -23,21 +25,26 @@ namespace Raven
 	{
 	public:
 		// constructor always needs to know which loader type the loader is
-		ILoader(ResourceManager& initResourceManager, ELoaderType initType) 
-			: resourceManager(initResourceManager), type(initType) {}
+		ILoader(ResourceManager& initResourceManager, ELoaderType initType)
+			: resourceManager(&initResourceManager), type(initType) {}
 
 		// delete copy constructors
-		ILoader(const ILoader&) = delete;
+		//ILoader(const ILoader&) = delete;
+		//ILoader& operator=(const ILoader&) = delete;
+		
+		//ILoader(const ILoader&&) = delete;
+		//ILoader& operator=(const ILoader&&) = delete;
+
 
 		virtual ~ILoader() = default;
 
 		// the type of loader
-		auto GetType() const noexcept { return type; }
+		inline auto GetType() const noexcept { return type; }
 
 		virtual bool LoadAsset(const std::string& path);
 
 	protected:
-		ELoaderType type;
-		ResourceManager resourceManager;
+		const ELoaderType type;
+		const ResourceManager* resourceManager;
 	};
 }

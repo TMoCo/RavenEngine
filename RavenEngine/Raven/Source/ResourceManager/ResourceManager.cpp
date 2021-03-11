@@ -1,6 +1,7 @@
-#include "ResourceManager.h"
-
 #include <iostream>
+
+#include "ResourceManager.h"
+#include "ResourceManager/Loaders/ILoader.h"
 
 // for obj loading
 #define TINYOBJLOADER_IMPLEMENTATION 
@@ -12,18 +13,40 @@
 
 namespace Raven {
 
-	ResourceManager::ResourceManager()
+	void ResourceManager::Initialize()
 	{
+		std::cout << "Initialised the resource manager" << '\n';
+	}
+
+	void ResourceManager::Destroy()
+	{
+		std::cout << "Destroyed the resource manager" << std::endl;
 
 	}
 
-	ResourceManager::~ResourceManager()
+	void ResourceManager::AddLoader(std::unique_ptr<ILoader> loader)
 	{
-
+		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
+		{
+			loaders.push_back(std::move(loader));
+		}
 	}
 
-	// load an obj file from a specified path
+	IResource* ResourceManager::GetResource(const std::string& path) 
+	{
+		if (!HasResource(path))
+		{
+			return nullptr;
+		}
+	}
 
+	bool ResourceManager::HasResource(const std::string& id)
+	{
+		return resourceMap.find(id) == resourceMap.end();
+	}
+
+	/*
+	* // load an obj file from a specified path
 	bool ResourceManager::LoadOBJ(const std::string& path)
 	{
 		tinyobj::attrib_t attributes;
@@ -53,11 +76,5 @@ namespace Raven {
 		}
 		return true;
 	}
-
-	// load a image from a specified path
-
-	bool ResourceManager::LoadImage(const std::string& path)
-	{
-
-	}
+	*/
 }

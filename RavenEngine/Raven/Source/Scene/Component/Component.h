@@ -47,10 +47,10 @@ namespace Raven
 		//adjust the parent 
 		static void Reparent(entt::entity entity, entt::entity parent, entt::registry& registry, Hierarchy& hierarchy);
 
-		entt::entity parent;
-		entt::entity first;
-		entt::entity next;
-		entt::entity prev;
+		entt::entity parent = entt::null;
+		entt::entity first = entt::null;
+		entt::entity next = entt::null;
+		entt::entity prev = entt::null;
 	};
 
 };

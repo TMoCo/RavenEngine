@@ -37,6 +37,16 @@ namespace Raven
 		Engine::OnImGui();
 	}
 
+	void Editor::SetSelected(const entt::entity& node)
+	{
+		selectedNode = node;
+	}
+
+	void Editor::SetCopiedEntity(const entt::entity& selectedNode,bool cut) 
+	{
+		copiedNode = selectedNode;
+	}
+
 	void Editor::DrawMenu()
 	{
 		if (ImGui::BeginMainMenuBar())

@@ -4,14 +4,15 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Scene.h"
+#include "Entity/Entity.h"
 #include "Entity/EntityManager.h"
-
+#include "SceneGraph.h"
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
 		:name(initName)
 	{
-		entityManager = std::make_shared<EntityManager>(this);
+	
 	}
 
 	entt::registry& Scene::GetRegistry()
@@ -38,9 +39,34 @@ namespace Raven {
 		entityManager->Create();
 	}
 
+	void Scene::DuplicateEntity(const Entity& entity, const Entity& parent)
+	{
+		Entity newEntity = entityManager->Create();
+		
+		if (parent)
+			newEntity.SetParent(parent);
+
+		CopyComponents(entity, newEntity);
+	}
+
+	void Scene::DuplicateEntity(const Entity& entity)
+	{
+		Entity newEntity = entityManager->Create();
+		//COPY¡£¡£
+		CopyComponents(entity,newEntity);
+	}
+
+	void Scene::CopyComponents(const Entity& from, const Entity& to)
+	{
+		LOGW("Not implementation {0}", __FUNCTION__);
+	}
+
 	void Scene::OnInit()
 	{
 		LOGV("{0}", __FUNCTION__);
+		entityManager = std::make_shared<EntityManager>(this);
+		sceneGraph = std::make_shared<SceneGraph>();
+		sceneGraph->Init(entityManager->GetRegistry());
 	}
 
 	void Scene::OnClean()
@@ -49,6 +75,7 @@ namespace Raven {
 
 	void Scene::OnUpdate(float dt)
 	{
+		sceneGraph->Update(entityManager->GetRegistry());
 	}
 
 };

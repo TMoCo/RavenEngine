@@ -67,7 +67,7 @@ namespace Raven
 		return children;
 	}
 
-	bool Entity::IsParent(Entity potentialParent)
+	bool Entity::IsParent(const Entity & potentialParent) const 
 	{
 		auto nodeHierarchyComponent = scene->GetRegistry().try_get<Hierarchy>(entityHandle);
 		if (nodeHierarchyComponent)

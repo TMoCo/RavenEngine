@@ -20,7 +20,7 @@ namespace Raven
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::StyleColorsDark();
 
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows

@@ -31,6 +31,14 @@ project "Game"
 	includedirs
 	{
 		"../RavenEngine/Raven/Source",
+		"%{IncludeDir.Glew}",
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.cereal}",
+		"%{IncludeDir.Raven}",
+		"%{IncludeDir.OpenFBX}",
+		"%{IncludeDir.glm}",
 	}
 
 	links

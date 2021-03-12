@@ -35,13 +35,19 @@ namespace Raven
 		// returns true if the resource is already in the resource register
 		bool HasResource(const std::string& id);
 
-		// tell manager to laoad a resource of a given type at a given path
+		// tell manager to load a resource of a given type at a given path, need resource type to select loader
 		bool LoadResource(const std::string& path, EResourceType type);
+
+		void RemoveResource(const std::string& id);
 
 		// add a resource to the resourceMap
 		bool AddResource(const std::string& id, Texture2D* resource);
 
+		// loops over the register entries and deletes the values, then removes the entries
+		void FlushResourceRegister();
+
 	private:
+
 		// add a loader of a certain type
 		template <class TLoader>
 		void AddLoader(std::unique_ptr<TLoader> loader);
@@ -50,7 +56,6 @@ namespace Raven
 		void RemoveLoader(const TLoader* loader);
 
 		ILoader* GetLoader(ELoaderType type);
-
 
 		// for now the resource registers map an id to the resource in heap memory (may wish to convert to unique_ptr later)
 		// later there will be a few registers containing resource families 

@@ -55,15 +55,10 @@ int Engine::Run()
 	
 	if (GetModule<Raven::ResourceManager>()->HasResource(imagePath))
 	{
-		std::cout << "Resource is in registry\n";
+		std::cout << "Resource is in registry!\n";
 		Raven::Texture2D* loaded = GetModule<Raven::ResourceManager>()->GetResource(imagePath);
 		std::cout << "w: " << loaded->width << " h: " << loaded->height << '\n';
 	}
-	else
-	{
-		std::cout << "error somwhere...\n";
-	}
-
 
 
 	static double enginetime = 0;
@@ -93,6 +88,14 @@ int Engine::Run()
 	
 	win->SwapBuffers();
 	}
+
+	GetModule<Raven::ResourceManager>()->RemoveResource(imagePath);
+
+	if (!GetModule<Raven::ResourceManager>()->HasResource(imagePath))
+	{
+		std::cout << "removed resource\n";
+	}
+
 	// Clean Up..
 	DestoryModules();
 	return 0;

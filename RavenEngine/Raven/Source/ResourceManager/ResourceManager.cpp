@@ -74,6 +74,25 @@ namespace Raven {
 		}
 	}
 
+	void ResourceManager::RemoveResource(const std::string& id)
+	{
+		// free the resource
+		delete textures[id];
+		// then remove entry from register
+		textures.erase(id);
+	}
+
+	void ResourceManager::FlushResourceRegister()
+	{
+		// explicitly delete all dynamic resources
+		for (auto& resource : textures)
+		{
+			delete resource.second;
+		}
+		// then clear the map
+		textures.clear();
+	}
+
 	//
 	// Resource management
 	//

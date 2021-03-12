@@ -11,11 +11,16 @@ namespace Raven
 	bool ImageLoader::LoadAsset(const std::string& path)
 	{
 		// check that the resource is already in the resource register
+		if (resourceManager->HasResource(path))
+		{
+			return true; // already loaded, return true for now
+		}
 
 		int width;
 		int height;
 
 		// add the resource to the resource registry
+		//AddResource(path, )
 
 		return true;
 	}

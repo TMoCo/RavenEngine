@@ -3,13 +3,13 @@
 #include <string>
 #include <iostream>
 
-//#include "ResourceManager/ResourceManager.h"
+#include "Utilities/Core.h"
+#include "ResourceManager/Resources/IResource.h"
 
 // the base loader class 
 
 namespace Raven 
 {
-
 	class ResourceManager;
 
 	// the type of loader (for each type of resource)
@@ -24,12 +24,13 @@ namespace Raven
 	// base loader class interface
 	class ILoader 
 	{
+
 	public:
 		// constructor always needs to know which loader type the loader is
 		ILoader(ResourceManager& initResourceManager, ELoaderType initType)
 			: resourceManager(&initResourceManager), type(initType) {}
 
-		ILoader() = delete;
+		ILoader()		   = delete;
 		virtual ~ILoader() = default;
 
 		// the type of loader
@@ -54,11 +55,20 @@ namespace Raven
 			}
 		}
 
+	protected:
 		// must be overridden
 		virtual bool LoadAsset(const std::string& path) = 0;
 
-	protected:
+		// loader can add a resource via the resource manager (is its friend)
+		bool AddResource(const std::string& id, IResource* resource)
+		{
+			//return resourceManager->AddResource(id, );
+		}
+
+
 		const ELoaderType type;
-		const ResourceManager* resourceManager;
+		ResourceManager* resourceManager;
+
+		NOCOPYABLE(ILoader);
 	};
 }

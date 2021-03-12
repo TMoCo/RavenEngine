@@ -47,36 +47,40 @@ void Engine::Initialize()
 
 int Engine::Run()
 {
-	  static double enginetime = 0;
+	const std::string imagePath = "C:\\Users\\Tommy\\Pictures"; // test path for image loading
 
-	  auto win = GetModule<Raven::Window>();
+	GetModule<Raven::ResourceManager>()->LoadResource(imagePath, Raven::EResourceType::RT_Image);
 
-	  // Main Loop...
-	  while (!win->ShouldClose())
-	  {
-		//need to be refactored
-		win->PollEvent();
-		GetModule<Raven::ImGuiEngine>()->Prepare();
+	static double enginetime = 0;
 
-		// Draw..
-		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		//time could be refactor with chrono
-		double dt = glfwGetTime() - enginetime;
-		enginetime = glfwGetTime();
+	auto win = GetModule<Raven::Window>();
 
-		GetModule<Raven::SceneManager>()->Apply();
+	// Main Loop...
+	while (!win->ShouldClose())
+	{
+	//need to be refactored
+	win->PollEvent();
+	GetModule<Raven::ImGuiEngine>()->Prepare();
 
-		OnUpdate(dt);
-		OnRender();//To be modified by Renderer.
-		OnImGui();
-		GetModule<Raven::ImGuiEngine>()->Render();
+	// Draw..
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	//time could be refactor with chrono
+	double dt = glfwGetTime() - enginetime;
+	enginetime = glfwGetTime();
+
+	GetModule<Raven::SceneManager>()->Apply();
+
+	OnUpdate(dt);
+	OnRender();//To be modified by Renderer.
+	OnImGui();
+	GetModule<Raven::ImGuiEngine>()->Render();
 	
-		win->SwapBuffers();
-	  }
-	  // Clean Up..
-	  DestoryModules();
-	  return 0;
+	win->SwapBuffers();
+	}
+	// Clean Up..
+	DestoryModules();
+	return 0;
 }
 
 
@@ -111,7 +115,6 @@ void Engine::LoadModules()
 	InitializeModule<RenderModule>();
 	InitializeModule<Raven::ImGuiEngine>();
 	InitializeModule<Raven::SceneManager>();
-
 }
 
 

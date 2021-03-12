@@ -2,8 +2,6 @@
 
 namespace Raven
 {
-	class Texture2D;
-
 	// enum for distinguishing between resource types
 	enum class EResourceType
 	{
@@ -14,19 +12,18 @@ namespace Raven
 		//RT_Audio
 	};
 
-	// the base resource class, interface that contais a resource's data and metadata
+	// the base resource class, inherited by resources. Basic resource info (type)
 	class IResource
 	{
-		// static factory method
-		static IResource* CreateResource(EResourceType initType);
-
-	protected:
+	public:
 		IResource(EResourceType initType) : type(initType) {}
 
-		inline EResourceType GetType()  const noexcept { return type; }
+		inline EResourceType GetType() const noexcept { return type; }
 
-		// where resource data goes, for now just its type 
+	protected:
 		const EResourceType type;
+
+		NOCOPYABLE(IResource);
 	};
 
 

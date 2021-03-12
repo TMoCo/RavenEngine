@@ -7,6 +7,10 @@
 
 namespace Raven {
 
+	//
+	// IModule methods
+	//
+
 	void ResourceManager::Initialize()
 	{
 		std::cout << "Initialised the resource manager" << '\n';
@@ -15,24 +19,58 @@ namespace Raven {
 
 	void ResourceManager::Destroy()
 	{
+		// TODO: Clean up resource manager
 		std::cout << "Destroyed the resource manager" << std::endl;
-
 	}
+
+
+	//
+	// Loader management
+	//
 
 	void ResourceManager::AddLoader(std::unique_ptr<ILoader> loader)
 	{
 		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
 		{
-			std::cout << "Added a loader of type " << ILoader::TypeToString(loader->GetType()) << '\n';
 			loaders.push_back(std::move(loader));
-			std::cout << '\n';
+			std::cout << "Added a loader of type " << ILoader::TypeToString(loaders.rbegin()->get()->GetType()) << '\n';
 		}
 	}
 
-	IResource* ResourceManager::GetResource(const std::string& id) 
+	void ResourceManager::RemoveLoader(const ILoader* loader)
 	{
-		auto resourceIter = resourceMap.find(id); // a key/value pair iterator
-		if (resourceIter == resourceMap.end())
+		// loop over the loaders, finding the loader we want to remove
+		const auto iter = std::find_if(loaders.begin(), loaders.end(), [loader](const auto& ownedLoader) noexcept { return loader == ownedLoader.get(); });
+		// check the iterator isn't at the end, means we found a loader to remove
+		if (iter != loaders.end())
+		{
+			loaders.erase(iter);
+		}
+	}
+
+	//
+	// Resource management
+	//
+	
+	bool ResourceManager::LoadResource(const std::string& path, EResourceType type)
+	{
+		// TODO: Add loader logic
+		// choose appropriate loader
+		switch (type)
+		{
+		case Raven::EResourceType::RT_Image:
+
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+
+	Texture2D* ResourceManager::GetResource(const std::string& id) 
+	{
+		auto resourceIter = textures.find(id); // a key/value pair iterator
+		if (resourceIter == textures.end())
 		{
 			return nullptr;
 		}
@@ -45,39 +83,18 @@ namespace Raven {
 	bool ResourceManager::HasResource(const std::string& id)
 	{
 		// true if a key exists
-		return resourceMap.count(id);
+		return textures.count(id);
 	}
 
-	/*
-	* // load an obj file from a specified path
-	bool ResourceManager::LoadOBJ(const std::string& path)
+	bool ResourceManager::AddResource(const std::string& id, Texture2D* resource)
 	{
-		tinyobj::attrib_t attributes;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string err;
-
-		if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &err, path.c_str())) 
+		switch (resource->GetType())
 		{
-			std::cerr << err << std::endl;
+		case EResourceType::RT_Image:
+			textures.insert(std::make_pair(id, resource));
+			return true;
+		default:
 			return false;
 		}
-
-		// loop over the shapes (one shape = one mesh)
-		for (size_t shape = 0; shape < shapes.size(); shape++)
-		{
-			// loop over the faces
-			for (size_t face = 0; face < shapes[shape].mesh.num_face_vertices.size(); face++)
-			{
-				size_t faceVertices = shapes[shape].mesh.num_face_vertices[face];
-				// loop over the face's vertices
-				for (size_t vertex = 0; vertex < faceVertices; vertex++)
-				{
-					// create vertices here
-				}
-			}
-		}
-		return true;
 	}
-	*/
 }

@@ -15,9 +15,9 @@ namespace Raven
 	public:
 		Texture2D() : IResource(EResourceType::RT_Image) {}
 
-		size_t height;
-		size_t width;
+		size_t height = 0;
+		size_t width  = 0;
 
-		TextureRenderResource* renderResource;
+		TextureRenderResource* renderResource = nullptr;
 	};
 }

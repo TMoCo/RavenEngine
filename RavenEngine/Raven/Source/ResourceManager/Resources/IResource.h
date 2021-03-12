@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utilities/Core.h"
+
 namespace Raven
 {
 	// enum for distinguishing between resource types

@@ -18,7 +18,8 @@ namespace Raven
 		LT_Mesh,
 		LT_Material,
 		LT_Scene,
-		LT_Audio
+		LT_Audio,
+		LT_MAX
 	};
 
 	// base loader class interface
@@ -55,16 +56,12 @@ namespace Raven
 			}
 		}
 
-	protected:
 		// must be overridden
 		virtual bool LoadAsset(const std::string& path) = 0;
 
+	protected:
 		// loader can add a resource via the resource manager (is its friend)
-		bool AddResource(const std::string& id, IResource* resource)
-		{
-			//return resourceManager->AddResource(id, );
-		}
-
+		//virtual bool AddResource(const std::string& id, IResource* resource) = 0;
 
 		const ELoaderType type;
 		ResourceManager* resourceManager;

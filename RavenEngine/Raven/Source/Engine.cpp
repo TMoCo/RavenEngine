@@ -47,9 +47,24 @@ void Engine::Initialize()
 
 int Engine::Run()
 {
-	const std::string imagePath = "C:\\Users\\Tommy\\Pictures"; // test path for image loading
+	const std::string imagePath = "C:\\Users\\Tommy\\Pictures\\SML2_Wario_500.png"; // test path for image loading (500 x 500)
 
 	GetModule<Raven::ResourceManager>()->LoadResource(imagePath, Raven::EResourceType::RT_Image);
+
+	// check that the resource is in the registry
+	
+	if (GetModule<Raven::ResourceManager>()->HasResource(imagePath))
+	{
+		std::cout << "Resource is in registry\n";
+		Raven::Texture2D* loaded = GetModule<Raven::ResourceManager>()->GetResource(imagePath);
+		std::cout << "w: " << loaded->width << " h: " << loaded->height << '\n';
+	}
+	else
+	{
+		std::cout << "error somwhere...\n";
+	}
+
+
 
 	static double enginetime = 0;
 

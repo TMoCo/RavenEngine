@@ -8,6 +8,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity/EntityManager.h"
 #include "Scene/Entity/Entity.h"
+#include "Scene/Component/Light.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
 #include <imgui_internal.h>
@@ -210,6 +211,12 @@ namespace Raven
 
 			std::string icon = ICON_MDI_CUBE_OUTLINE;
 			auto& iconMap = editor.GetComponentIconMap();
+
+			if (registry.has<Light>(node))
+			{
+				if (iconMap.find(typeid(Light).hash_code()) != iconMap.end())
+					icon = iconMap[typeid(Light).hash_code()];
+			}
 
 			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entt::to_integral(node), nodeFlags, (icon + " %s").c_str(), doubleClicked ? "" : (name).c_str());
 

@@ -7,7 +7,10 @@
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Scene/Component/Component.h"
+#include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
+#include "Core/Camera.h"
+#include "ImGui/ImGuiHelpers.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Editor.h"
 
@@ -69,6 +72,55 @@ namespace MM
 		ImGui::PopStyleVar();
 	}
 
+	template<>
+	void ComponentEditorWidget<Light>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& light = reg.get<Light>(e);
+		light.OnImGui();
+	}
+
+
+	template<>
+	void ComponentEditorWidget<Camera>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& camera = reg.get<Camera>(e);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+
+		float aspect = camera.GetAspectRatio();
+		
+		if (ImGuiHelper::Property("Aspect", aspect, 0.0f, 10.0f))
+			camera.SetAspectRatio(aspect);
+
+		float fov = camera.GetFov();
+		if (ImGuiHelper::Property("Fov", fov, 1.0f, 120.0f))
+			camera.SetFov(fov);
+
+		float near = camera.GetNear();
+		if (ImGuiHelper::Property("Near", near, 0.0f, 10.0f))
+			camera.SetNear(near);
+
+		float far = camera.GetFar();
+		if (ImGuiHelper::Property("Far", far, 10.0f, 10000.0f))
+			camera.SetFar(far);
+
+		float scale = camera.GetScale();
+		if (ImGuiHelper::Property("Scale", scale, 0.0f, 1000.0f))
+			camera.SetScale(scale);
+
+		bool ortho = camera.IsOrthographic();
+		if (ImGuiHelper::Property("Orthograhic", ortho))
+			camera.SetOrthographic(ortho);
+
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
+
+	}
 };
 
 namespace Raven
@@ -149,6 +201,8 @@ namespace Raven
 	}
 
 		TRIVIAL_COMPONENT(Transform);
+		TRIVIAL_COMPONENT(Light);
+		TRIVIAL_COMPONENT(Camera);
 		init = true;
 	}
 

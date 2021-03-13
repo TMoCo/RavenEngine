@@ -8,6 +8,9 @@
 #include "Scene/SceneManager.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/Light.h"
+#include "Core/Camera.h"
+
 #include "ImGui/ImGuiHelpers.h"
 #include <ImGuizmo.h>
 #include <imgui_internal.h>
@@ -29,6 +32,9 @@ namespace Raven
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
+		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
+		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
+
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 	}
 

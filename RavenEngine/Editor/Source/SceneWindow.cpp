@@ -147,8 +147,6 @@ namespace Raven
 			ImGui::EndPopup();
 		}
 
-
-
 		ImGui::PopStyleColor();
 		ImGui::Unindent();
 	}

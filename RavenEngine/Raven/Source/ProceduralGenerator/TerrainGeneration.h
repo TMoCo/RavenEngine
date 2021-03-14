@@ -1,6 +1,9 @@
 #pragma once
 
 #include "IModule.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/noise.hpp>
+#include "Logger/Console.h"
 
 namespace Raven {
 
@@ -23,6 +26,9 @@ namespace Raven {
 
 		// destroy module
 		virtual void Destroy() override;
+
+		// create noise
+		void Noise();
 
 	
 	};

@@ -7,6 +7,7 @@
 #include "Render/RenderModule.h"
 #include "ImGui/ImGuiEngine.h"
 #include "Scene/SceneManager.h"
+#include "GUI/GUIModule.h"
 #include <GLFW/glfw3.h>
 
 #include <memory>
@@ -81,7 +82,6 @@ int Engine::Run()
 
 void Engine::OnImGui()
 {
-
 }
 
 void Engine::OnUpdate(float dt)
@@ -101,6 +101,7 @@ void Engine::LoadModules()
 	CreateModule<Raven::ImGuiEngine>();
 	CreateModule<Raven::Window>("Raven");
 	CreateModule<Raven::SceneManager>();
+	CreateModule<Raven::GUIModule>();
 
 
   // Initialize - Here order matter.
@@ -108,6 +109,7 @@ void Engine::LoadModules()
 	InitializeModule<RenderModule>();
 	InitializeModule<Raven::ImGuiEngine>();
 	InitializeModule<Raven::SceneManager>();
+	InitializeModule<Raven::GUIModule>();
 
 }
 
@@ -116,6 +118,7 @@ void Engine::LoadModules()
 void Engine::DestoryModules()
 {
   // Destroy - Here order matter.
+  DestroyModule<Raven::GUIModule>();
   DestroyModule<RenderModule>();
 }
 

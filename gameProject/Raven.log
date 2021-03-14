@@ -1,7 +1,5 @@
-[18:50:23] [error] MAPLE: Generate terrain
-[18:50:23] [error] MAPLE: 0.0
-[18:50:23] [error] MAPLE: this is a message,1,2,3
-[18:50:23] [critical] MAPLE: this is a message,1,2,3
-[18:50:23] [warning] MAPLE: this is a message,1,2,3
-[18:50:23] [info] MAPLE: this is a message,1,2,3
-[18:50:23] [trace] MAPLE: this is a message,1,2,3
+[20:58:21] [error] MAPLE: this is a message,1,2,3
+[20:58:21] [critical] MAPLE: this is a message,1,2,3
+[20:58:21] [warning] MAPLE: this is a message,1,2,3
+[20:58:21] [info] MAPLE: this is a message,1,2,3
+[20:58:21] [trace] MAPLE: this is a message,1,2,3

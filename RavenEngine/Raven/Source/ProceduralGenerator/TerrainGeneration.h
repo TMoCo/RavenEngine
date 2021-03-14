@@ -3,6 +3,7 @@
 #include "IModule.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
+#include <glew-2.1.0/include/GL/glew.h>
 #include "Logger/Console.h"
 
 namespace Raven {

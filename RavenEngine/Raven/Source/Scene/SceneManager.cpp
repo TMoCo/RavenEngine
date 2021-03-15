@@ -56,6 +56,9 @@ namespace Raven
 		{
 			if (currentScene != nullptr)
 				return;
+			if (allScenes.empty()) { 
+				AddScene(new Scene("default"));
+			}
 		}
 
 		if (currentScene == nullptr && allScenes.size() > 0) 

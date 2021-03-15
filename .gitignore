@@ -6,8 +6,8 @@ bin/
 bin-int/
 build/
 
-gameProject/Raven.log
-gameProject/imgui.ini
+./gameProject/Raven.log
+./gameProject/imgui.ini
 
 # Directories
 

@@ -2,15 +2,24 @@
 
 
 #include "Engine.h"
-
+#include "Window/Window.h"
+#include "RenderDebug.h"
 #include "OpenGL/GLContext.h"
+
+#include "RenderObjects/RenderScene.h"
+#include "Render/RenderObjects/RenderTerrain.h"
+#include "Render/RenderResource/RenderRscTerrain.h"
+#include "Render/RenderResource/RenderRscMaterial.h"
+#include "Render/RenderResource/RenderRscShader.h"
+#include "Render/RenderObjects/RenderTerrain.h"
+
+
 #include "OpenGL/GLShader.h"
 #include "OpenGL/GLFrameBuffer.h"
 #include "OpenGL/GLVertexArray.h"
 #include "OpenGL/GLRenderBuffer.h"
 #include "OpenGL/GLTexture.h"
 
-#include "RenderResource/RenderMeshResource.h"
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
@@ -27,21 +36,21 @@ using namespace Raven;
 
 
 
-// ~Testing.....
-GLShader* phongShader = nullptr;
+
+
+// ~TESTING-------------------------------------------------------
 GLFrameBuffer* fbo = nullptr;
 GLRenderBuffer* colorTarget = nullptr;
 GLRenderBuffer* depthTarget = nullptr;
 
-RenderMeshResource* meshRSC = nullptr;
-std::vector<unsigned int> indices;
-std::vector<glm::vec3> verts;
+RenderRscTerrain* terrainRsc = nullptr;
+RenderTerrain* terrain = nullptr;
+RenderRscShader* terrainShader = nullptr;
+RenderRscMaterial* terrainMaterail = nullptr;
 
-char* texData;
-GLTexture* tex;
+static float camRot = 0.0f;
 
-// ~Testing.....
-
+// ~TESTING-------------------------------------------------------
 
 
 
@@ -51,7 +60,7 @@ GLTexture* tex;
 RenderModule::RenderModule()
 	: isRendering(false)
 {
-
+	rdebug.reset(new RenderDebug());
 }
 
 
@@ -64,199 +73,185 @@ RenderModule::~RenderModule()
 
 void RenderModule::Initialize()
 {
-	glewInit();
-	context.reset( new GLContext() );
+	// Load OpenGL Extensions.
+	auto result = glewInit();
+	RAVEN_ASSERT(result == 0, "Render - Faield to initialize glew.");
 
-	//..............................
-	// ~Testing.....................
+	// OpenGL Context...
+	context = std::make_unique<GLContext>();
+	context->SetGLFWContext( Engine::GetModule<Window>()->GetNativeWindow() );
 
+	// We are only using one context, so make it current.
+	context->MakeCurrent(); 
 
-	// Build Testing Shader.
-	phongShader = GLShader::Create("Phong_Shader");
-	phongShader->SetSource(EGLShaderStage::Vertex, R"(
-
-#version 330 core 
-
-layout(location = 0) in vec3 inPositions;
-
-uniform mat4 view;
-uniform mat4 proj;
-
-out vec2 uv;
-
-void main()
-{
-	gl_Position = proj * view * vec4(inPositions, 1.0);
-	uv = inPositions.xz * 0.5 + 0.5;
-}
-
-	)");
+	// Setup Render Debug.
+	rdebug->Setup();
 
 
-	phongShader->SetSource(EGLShaderStage::Fragment, R"(
-
-#version 330 core
-
-out vec4 fragColor;
-
-in vec2 uv;
-uniform float time;
-uniform sampler2D tex;
-
-void main()
-{
-	fragColor = texture(tex, uv);
-}
-
-	)");
-
-	phongShader->Build();
-
-
-	// Build Testing Mesh.
-	verts = {
-		glm::vec3(-1.0f, 0.0f,-1.0f),
-		glm::vec3( 1.0f, 0.0f,-1.0f),
-		glm::vec3( 1.0f, 0.0f, 1.0f),
-		glm::vec3(-1.0f, 0.0f, 1.0f),
-
-	  glm::vec3(-1.0f, 1.4f,-1.0f),
-		glm::vec3( 1.0f, 1.4f,-1.0f),
-		glm::vec3( 1.0f, 1.4f, 1.0f),
-		glm::vec3(-1.0f, 1.4f, 1.0f)
-	};
-
-	indices = {
-		0, 1, 2,
-		0, 2, 3,
-
-		4, 5, 6,
-		4, 6, 7,
-	};
-
-	meshRSC = new RenderMeshResource();
-	meshRSC->Load(verts, indices);
-
-
-
-	// Framebuffer
-	colorTarget = GLRenderBuffer::Create(EGLFormat::RGBA, 512, 512);
-	depthTarget = GLRenderBuffer::Create(EGLFormat::Depth32, 512, 512);
+	// ~TESTING-------------------------------------------------------
+	colorTarget = GLRenderBuffer::Create(EGLFormat::RGBA, 820, 820);
+	depthTarget = GLRenderBuffer::Create(EGLFormat::Depth32, 820, 820);
 
 	fbo = GLFrameBuffer::Create();
 	fbo->Attach(EGLAttachment::Color0, colorTarget);
 	fbo->Attach(EGLAttachment::Depth, depthTarget);
 	fbo->Update();
 
-	
-	texData = new char[512 * 512 * 3];
-	for (int y = 0; y < 512; ++y)
+
+	unsigned char* heigtData = new unsigned char[1024 * 1024];
+
+	for (int x = 0; x < 1024; ++x)
 	{
-		float fy = (float)y / 511.0f;
-
-		for (int x = 0; x < 512; ++x)
+		for (int y = 0; y < 1024; ++y)
 		{
-			float fx = (float)x / 511.0f;
+			float fx = x / (float)(1024 - 1);
+			float fy = y / (float)(1024 - 1);
 
-			float nfx = fx * 2.0f - 1.0f;
-			float nfy = fy * 2.0f - 1.0f;
+			float sx = cos(fx * 20.f) * 0.5f + 0.5f;
+			float sy = sin(fy * 20.f) * 0.5f + 0.5f;
+			float height = sx + sy;
+			height = height * 0.5f;
 
-			nfx *= 10.0f;
-			nfy *= 15.0f;
-			float r = glm::sqrt(nfx * nfx + nfy * nfy);
-			r = glm::abs(glm::sin(r));
-
-			r = r + 0.2f;
-
-			texData[(x + y * 512) * 3 + 0] = (char)((1.0f - r) * 255.0f);
-			texData[(x + y * 512) * 3 + 1] = (char)((1.0f - r) * 255.0f);
-			texData[(x + y * 512) * 3 + 2] = (char)(r * 255.0f);
+			heigtData[x + y * 1024] = height * 255;
 		}
 	}
 
-	tex = GLTexture::Create2D(EGLFormat::RGB, 512, 512, texData, EGLFilter::TriLinear, EGLWrap::Repeat);
 
-	tex->Bind();
-	tex->GenerateMipmaps();
-	tex->Unbind();
+	glm::vec2 terrainScale = glm::vec2(1000.0f);
 
-	// ~Testing......
-	//..............................
+	terrainRsc = new RenderRscTerrain();
+	terrainRsc->LoadHeightMap(1024, 1024, heigtData);
+	terrainRsc->GenerateTerrain(100, terrainScale);
+	delete heigtData;
 
 
+	terrainShader = new RenderRscShader();
+	terrainShader->Load(ERenderShaderType::Terrain, "TerrainShader");
+
+	terrainMaterail = new RenderRscMaterial(terrainShader);
+
+	terrain = new RenderTerrain();
+	terrain->SetHeight(200.0f);
+	terrain->SetTerrainRsc(terrainRsc);
+	terrain->SetWorldMatrix( glm::translate(glm::vec3(terrainScale.x, 0.0f, terrainScale.y) * -0.5f) );
+	terrain->SetNormalMatrix(glm::mat4(1.0f));
+	terrain->SetMaterial(terrainMaterail);
+
+	// ~TESTING-------------------------------------------------------
 
 }
 
 
 void RenderModule::Destroy()
 {
+	//
+	rdebug->Destroy();
+
+
+	delete terrain;
+	delete terrainRsc;
+	delete terrainShader;
+	delete terrainMaterail;
+	delete fbo;
+	delete colorTarget;
+	delete depthTarget;
+}
+
+
+void RenderModule::Update(float dt)
+{
+	// ~TESTING-------------------------------------------------------
+	// Debug Drawing...
+	static float debugtime = 0.0f;
+	debugtime += dt;
+	camRot += dt;
+
+
+	if (debugtime > 0.1f)
+	{
+		static glm::vec3 pos;
+		pos.x = (rand() / (float)RAND_MAX);
+		pos.y = (rand() / (float)RAND_MAX);
+		pos.z = (rand() / (float)RAND_MAX);
+
+		pos = pos * 2.0f - 1.0f;
+		pos = pos * 2.5f;
+
+		// Random Yellow Boxes
+		GetDebug()->DrawBox(glm::vec3(pos), glm::vec3(rand() / RAND_MAX + 0.5f),
+			glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+
+		debugtime = 0.0f;
+	}
+
+	// Green Box
+	GetDebug()->DrawBox(glm::vec3(0.0f), glm::vec3(5.0f),
+		glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 1.0f);
+
+	// ~TESTING-------------------------------------------------------
+
+	rdebug->Update(dt);
 
 }
 
 
 void RenderModule::BeginRender()
 {
+	RAVEN_ASSERT(!isRendering, "Render - Trying to begin render before EndRender().");
 	isRendering = true;
 
+	// ~TESTING-------------------------------------------------------
+
+
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * abs(sin(camRot * 0.3f)) * 1000.0f + 1.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.01f, 10000.0f);
+
+
+
+
+	// ~TESTING-------------------------------------------------------
+
+
+	// 
+	rscene = std::make_shared<RenderScene>();
+	rscene->SetView(view);
+	rscene->SetProjection(proj);
+	rscene->Build(terrain);
+	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );
 }
 
 
 void RenderModule::Render()
 {
-  //..............................
-	// ~Testing.....................
-  
-	// Compute DeltaTime for each frame...
-	static auto lastTime = std::chrono::high_resolution_clock::now();
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float dt = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - lastTime).count();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime.time_since_epoch()).count();
-	lastTime = currentTime;
+	RAVEN_ASSERT(isRendering, "Render - Trying to render before BeginRender().");
 
 	fbo->Bind(EGLFrameBuffer::Framebuffer);
-
-	glViewport(0, 0, 512, 512);
-	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
+	glViewport(0 ,0, 820, 820);
+	glScissor(0, 0, 820, 820);
+	glClearColor(0.1f, 0.1f, 0.4f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 
-	static float i = 0;
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	rscene->Draw(ERSceneBatch::Opaque);
 
-	glm::vec3 eye = 
-		glm::rotate(time, glm::vec3(0.0f, 1.0f, 0.0f)) 
-		* glm::vec4(4.0f, glm::sin(time) * 9.0f, 4.0f, 1.0f);
-
-	glm::mat4 view = glm::lookAt(eye, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f);
-
-	phongShader->Use();
-	phongShader->SetUniform("view", view);
-	phongShader->SetUniform("proj", proj);
-
-	phongShader->SetUniform("time", time);
-	phongShader->SetUniform("tex", 0);
-
-	tex->Active(0);
-
-	meshRSC->GetArray()->Bind();
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
-	meshRSC->GetArray()->Unbind();
-
-	fbo->Unbind(EGLFrameBuffer::Framebuffer);
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	rscene->Draw(ERSceneBatch::Debug);
 
 	fbo->Blit(
-		nullptr, // Default Framebuffer.
-		EGLBufferMask::Color, // Color Mask Bit. 
-		EGLFilter::Nearest, // Filter.
-		FBBlitViewport(0, 0, 512, 512), // Src Viewport.
-		FBBlitViewport(0, 0, 512, 512)  // Dst Viewport.
+		nullptr,													// Default Framebuffer.
+		EGLBufferMask::Color,							// Color Mask Bit. 
+		EGLFilter::Nearest,								// Filter.
+		FBBlitViewport(0, 0, 820, 820),		// Src Viewport.
+		FBBlitViewport(0, 0, 820, 820)		// Dst Viewport.
 	);
 
-	// ~Testing.....................
-	//..............................
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
@@ -264,4 +259,13 @@ void RenderModule::EndRender()
 {
 	isRendering = false;
 
+	// Cleanup Render Data...
+	rscene->Clear();
+
+}
+
+
+RenderSurface RenderModule::GetRequiredRenderSurface()
+{
+	return GLContext::GetSurface();
 }

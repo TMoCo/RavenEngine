@@ -17,16 +17,17 @@ namespace Raven
 
 	//
 	//
-	class RenderTextureResource : public IRenderResource
+	class RenderRscTexture : public IRenderResource
 	{
 	public:
 		// Construct.
-		RenderTextureResource();
+		RenderRscTexture();
 
 		// Destruct.
-		~RenderTextureResource();
+		~RenderRscTexture();
 
-		
+		//
+		void LoadTexture();
 
 	private:
 		// The OpenGL Texture.

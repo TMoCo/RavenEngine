@@ -3,7 +3,11 @@
 
 
 
+#include "Utilities/Core.h"
 #include "IModule.h"
+#include "RenderSurface.h"
+
+
 #include <memory>
 
 
@@ -13,11 +17,13 @@
 namespace Raven
 {
 	class GLContext;
+	class RenderScene;
+	class RenderDebug;
 
 
 
-	//
-	//
+	// RenderModule:
+	//		- The Engine Render Manager.
 	//
 	class RenderModule : public IModule
 	{
@@ -31,7 +37,16 @@ namespace Raven
 		// Return the type of the module.
 		static EModuleType GetModuleType() { return MT_Render; }
 
+		// Return the required render surface by the renderer.
+		static RenderSurface GetRequiredRenderSurface();
+
+		// Return render debug.
+		inline RenderDebug* GetDebug() { return rdebug.get(); }
+
 	public:
+		// Update render.
+		void Update(float dt);
+
 		// Beging and Prepare the render
 		void BeginRender();
 
@@ -48,13 +63,18 @@ namespace Raven
 		// Module Destroy.
 		virtual void Destroy() override;
 
-
 	private:
 		// The context of the render.
 		std::unique_ptr<GLContext> context;
 
-		//
+		// if true the engine currently rendering.
 		bool isRendering;
+
+		// 
+		std::shared_ptr<RenderScene> rscene;
+
+		// Render Debug, used for debug drawing.
+		std::unique_ptr<RenderDebug> rdebug;
 	};
 
 }

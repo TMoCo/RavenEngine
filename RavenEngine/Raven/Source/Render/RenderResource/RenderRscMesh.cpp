@@ -1,4 +1,4 @@
-#include "RenderMeshResource.h"
+#include "RenderRscMesh.h"
 
 
 
@@ -12,7 +12,7 @@ using namespace Raven;
 
 
 
-RenderMeshResource::RenderMeshResource()
+RenderRscMesh::RenderRscMesh()
 	: vertexArray(nullptr)
 	, vertexBuffer(nullptr)
 	, indexBuffer(nullptr)
@@ -21,7 +21,7 @@ RenderMeshResource::RenderMeshResource()
 }
 
 
-RenderMeshResource::~RenderMeshResource()
+RenderRscMesh::~RenderRscMesh()
 {
 	if (vertexArray != nullptr)
 		delete vertexArray;
@@ -34,7 +34,7 @@ RenderMeshResource::~RenderMeshResource()
 }
 
 
-void RenderMeshResource::Load(const std::vector<glm::vec3>& verts, const std::vector<unsigned int>& indices)
+void RenderRscMesh::Load(const std::vector<glm::vec3>& verts, const std::vector<unsigned int>& indices)
 {
 	vertexBuffer = GLBuffer::Create(
 		EGLBufferType::Array, 

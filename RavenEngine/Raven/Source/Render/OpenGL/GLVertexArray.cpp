@@ -73,13 +73,13 @@ void GLVertexArray::Build(const std::vector<GLVABuildAttribData>& data, const GL
 }
 
 
-void GLVertexArray::Bind()
+void GLVertexArray::Bind() const
 {
 	glBindVertexArray(id);
 }
 
 
-void GLVertexArray::Unbind()
+void GLVertexArray::Unbind() const
 {
 	glBindVertexArray(0);
 }

@@ -3,52 +3,36 @@
 
 
 
+#include "Render/RenderSurface.h"
+
+
+// Forward Declaration...
+struct GLFWwindow;
+
+
+
 
 namespace Raven
 {
 
-	// Forward Declare
-	struct GLFWwindow;
-
-
-
-	//
-	struct GLSurface
-	{
-		int majorVersion;
-		int minorVersion;
-		bool coreProfile;
-
-		int redBits;
-		int greenBits;
-		int blueBits;
-		int alphaBits;
-
-		bool doubleBuffer;
-		int samples;
-	};
-
-
-
-
-	//
-	//
-	//
+	// OpenGL Context.
 	class GLContext
 	{
 	public:
-		//
+		// Construct.
 		GLContext();
 
-		//
+		// Set the glfw context. 
 		void SetGLFWContext(GLFWwindow* context);
 
-		//
-		static GLSurface GetSurface();
+		// Return the required surface by the render
+		static RenderSurface GetSurface();
 
+		// Make this context current.
+		void MakeCurrent();
 
 	private:
-		//
+		// The glfw window used to create the context.
 		GLFWwindow* glfw_context;
 	};
 

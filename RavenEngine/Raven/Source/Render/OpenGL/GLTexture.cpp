@@ -227,3 +227,15 @@ void GLTexture::Active(int i)
 	glBindTexture((GLENUM)type, id);
 	glActiveTexture(GL_TEXTURE0 + i);
 }
+
+
+void GLTexture::SetFilter(EGLFilter value)
+{
+	filter = value;
+}
+
+
+void GLTexture::SetWrap(EGLWrap value)
+{
+	wrap = value;
+}

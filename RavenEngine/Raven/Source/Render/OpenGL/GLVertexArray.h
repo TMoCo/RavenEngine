@@ -58,10 +58,10 @@ namespace Raven
 		void Build(const std::vector<GLVABuildAttribData>& data, const GLBuffer* elementBuffer);
 
 		// Bind this vertex array.
-		void Bind();
+		void Bind() const;
 
 		// Unbind any currently bounded vertex array.
-		void Unbind();
+		void Unbind() const;
 
 		// Return the opengl id.
 		inline GLUINT GetID() const { return id; }

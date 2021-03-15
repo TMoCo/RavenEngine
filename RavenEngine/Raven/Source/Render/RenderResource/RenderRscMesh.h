@@ -4,10 +4,12 @@
 
 
 
-#include "IRenderResource.h"
+#include "RenderRscPrimitive.h"
 
 #include "glm/vec3.hpp"
 #include <vector>
+
+
 
 
 
@@ -20,14 +22,14 @@ namespace Raven
 
 	//
 	//
-	class RenderMeshResource : public IRenderResource
+	class RenderRscMesh : public RenderRscPrimitive
 	{
 	public:
 		// Construct.
-		RenderMeshResource();
+		RenderRscMesh();
 
 		// Destruct.
-		~RenderMeshResource();
+		~RenderRscMesh();
 
 		//
 		void Load(const std::vector<glm::vec3>& verts, const std::vector<unsigned int>& indices);

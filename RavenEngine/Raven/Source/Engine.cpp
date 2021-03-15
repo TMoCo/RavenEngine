@@ -55,7 +55,7 @@ int Engine::Run()
 	  {
 		//need to be refactored
 		win->PollEvent();
-		GetModule<Raven::ImGuiEngine>()->Prepare();
+		//GetModule<Raven::ImGuiEngine>()->Prepare();
 
 		// Draw..
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -69,7 +69,6 @@ int Engine::Run()
 		OnUpdate(dt);
 		OnRender();//To be modified by Renderer.
 		OnImGui();
-		GetModule<Raven::ImGuiEngine>()->Render();
 	
 		win->SwapBuffers();
 	  }
@@ -86,7 +85,7 @@ void Engine::OnImGui()
 
 void Engine::OnUpdate(float dt)
 {
-
+	GetModule<Raven::RenderModule>()->Update(dt);
 
 }
 

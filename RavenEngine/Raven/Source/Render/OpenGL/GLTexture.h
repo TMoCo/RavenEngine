@@ -75,6 +75,12 @@ namespace Raven
 		// Bind this texture and set it as active for TEXTURE(i)
 		void Active(int i);
 
+		// Set texture sampling filter.
+		void SetFilter(EGLFilter value);
+
+		// Set texture wrap mode.
+		void SetWrap(EGLWrap value);
+
 	private:
 		// OpenGL Object ID.
 		GLUINT id;

@@ -4,6 +4,7 @@
 
 #include "ImageLoader.h"
 
+
 namespace Raven
 {
 	ImageLoader::ImageLoader(ResourceManager& initResouceManager) : ILoader(initResouceManager, ELoaderType::LT_Image) {}
@@ -19,9 +20,9 @@ namespace Raven
 		std::cout << "Will load: " << path << '\n';
 		// the test file is 500 by 500 pixels
 
-		int width;
-		int height;
-		int channelsInFile;
+		int width		   = 0;
+		int height		   = 0;
+		int channelsInFile = 0;
 
 		// unique pointer containing data from a file, with the deleter provided by stbi
 		std::unique_ptr<stbi_uc, std::function<void(void*)>> fromFile (stbi_load(path.c_str(), &width, &height, &channelsInFile, STBI_default), stbi_image_free);

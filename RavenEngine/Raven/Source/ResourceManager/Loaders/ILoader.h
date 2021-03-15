@@ -6,6 +6,10 @@
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h"
 
+// for serialization
+#include "cereal/archives/json.hpp"
+#include "cereal/archives/binary.hpp"
+
 // the base loader class 
 
 namespace Raven 
@@ -15,7 +19,7 @@ namespace Raven
 	// the type of loader (for each type of resource)
 	enum class ELoaderType {
 		LT_Image,
-		LT_Mesh,
+		LT_Model,
 		LT_Material,
 		LT_Scene,
 		LT_Audio,
@@ -43,8 +47,8 @@ namespace Raven
 			{
 			case ELoaderType::LT_Image:
 				return "Type: Image Loader.";
-			case ELoaderType::LT_Mesh:
-				return "Type: Mesh Loader.";
+			case ELoaderType::LT_Model:
+				return "Type: Model Loader.";
 			case ELoaderType::LT_Material:
 				return "Type: Material Loader.";
 			case ELoaderType::LT_Scene:
@@ -58,6 +62,8 @@ namespace Raven
 
 		// must be overridden
 		virtual bool LoadAsset(const std::string& path) = 0;
+
+		//virtual bool LoadSerialized(const std::string& path, bool binary = false) = 0;
 
 	protected:
 		// loader can add a resource via the resource manager (is its friend)

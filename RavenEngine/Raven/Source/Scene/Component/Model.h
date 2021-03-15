@@ -6,5 +6,8 @@
 
 namespace Raven
 {
-
+	class Model
+	{
+		
+	};
 };

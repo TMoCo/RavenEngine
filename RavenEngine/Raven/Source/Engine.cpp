@@ -95,19 +95,26 @@ namespace Raven
 		GetModule<RenderModule>()->Update(dt);
 	}
 
-void Engine::OnRender()
-{
-	Raven::RenderModule* renderer = GetModule<Raven::RenderModule>();
+	void Engine::OnRender()
+	{
+		Raven::RenderModule* renderer = GetModule<Raven::RenderModule>();
+	
+		// The Scene To Render.
+		Scene* scene = GetModule<Raven::SceneManager>()->GetCurrentScene();
 
-	// Prepare Rendering...
-	renderer->BeginRender();
-
-	// Render...
-	renderer->Render();
-
-	// Render Cleanup...
-	renderer->EndRender();
-}
+		// TODO: Better Sync between render, window and targets.
+		glm::ivec2 extent = GetModule<Window>()->GetFramebufferSize();
+		bool blitToWindow = true;
+	
+		// Prepare Rendering...
+		renderer->BeginRender(scene, blitToWindow, extent);
+	
+		// Render...
+		renderer->Render();
+	
+		// Render Cleanup...
+		renderer->EndRender();
+	}
 
 	void Engine::LoadModules()
 	{

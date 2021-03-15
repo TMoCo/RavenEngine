@@ -15,6 +15,7 @@ namespace Raven
 {
 	class RenderPrimitive;
 	class RenderTerrain;
+	class Scene;
 
 
 
@@ -41,8 +42,8 @@ namespace Raven
 		// Destruct. 
 		~RenderScene();
 
-		//
-		void Build(RenderTerrain* terrain);
+		// Build Render scene data form a scene.
+		void Build(RenderTerrain* terrain, Scene* scene);
 
 		// Set scene view.
 		void SetView(const glm::mat4& mtx);
@@ -61,7 +62,7 @@ namespace Raven
 
 	private:
 		//
-		void TraverseScene();
+		void TraverseScene(Scene* scene);
 
 		// Return batch of a batchtype.
 		inline RenderBatch& GetBatch(ERSceneBatch batchType) { return batches[(uint32_t)batchType]; }
@@ -76,6 +77,8 @@ namespace Raven
 		// Main Project.
 		glm::mat4 projection;
 		
+		//
+		std::vector<RenderPrimitive*> dynamicPrimitive;
 	};
 
 

@@ -45,7 +45,7 @@ RenderDebug::RenderDebug()
 
 RenderDebug::~RenderDebug()
 {
-
+	debugDrawList.clear();
 }
 
 
@@ -81,11 +81,7 @@ void RenderDebug::Destroy()
 		delete resources[i];
 	}
 
-	//
-	for (auto& db : debugDrawList)
-	{
-		delete db.primitive;
-	}
+	debugDrawList.clear();
 
 }
 

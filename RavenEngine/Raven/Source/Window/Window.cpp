@@ -55,6 +55,14 @@ namespace Raven
 		glfwGetWindowContentScale(glfwWindow, &x, &y);
 		return {x,y};
 	}
+
+	glm::ivec2 Window::GetFramebufferSize()
+	{
+		glm::ivec2 size;
+		glfwGetFramebufferSize(glfwWindow, &size.x, &size.y);
+		return size;
+	}
+
 	void Window::PollEvent()
 	{
 		glfwPollEvents();

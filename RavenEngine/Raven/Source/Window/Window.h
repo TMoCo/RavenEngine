@@ -8,6 +8,8 @@
 #include <memory>
 #include "IModule.h"
 
+#include "glm/vec2.hpp"
+
 
 
 struct GLFWwindow;
@@ -24,6 +26,7 @@ namespace Raven
 		inline auto GetNativeWindow() { return glfwWindow; }
 
 		std::pair<float, float> GetWindowScale();
+		glm::ivec2 GetFramebufferSize();
 
 		void PollEvent();
 		bool ShouldClose();

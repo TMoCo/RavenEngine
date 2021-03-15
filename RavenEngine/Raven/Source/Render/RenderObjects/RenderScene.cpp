@@ -7,6 +7,11 @@
 
 #include "Render/OpenGL/GLShader.h"
 
+#include "Scene/Scene.h"
+#include "Scene/Component/Model.h"
+#include "Scene/Component/Transform.h"
+#include <entt/entt.hpp>
+
 #include "GL/glew.h"
 
 
@@ -28,14 +33,12 @@ RenderScene::~RenderScene()
 }
 
 
-void RenderScene::Build(RenderTerrain* terrain)
+void RenderScene::Build(RenderTerrain* terrain, Scene* scene)
 {
 	GetBatch(ERSceneBatch::Opaque).Add(terrain);
 
-
 	//
-	TraverseScene();
-
+	TraverseScene(scene);
 }
 
 
@@ -63,7 +66,7 @@ void RenderScene::AddDebugPrimitives(const std::vector<RenderPrimitive*>& primit
 }
 
 
-void RenderScene::TraverseScene()
+void RenderScene::TraverseScene(Scene* scene)
 {
 
 }
@@ -76,6 +79,12 @@ void RenderScene::Clear()
 		batch.Clear();
 	}
 
+	for (auto& prim : dynamicPrimitive)
+	{
+		delete prim;
+	}
+
+	dynamicPrimitive.clear();
 }
 
 

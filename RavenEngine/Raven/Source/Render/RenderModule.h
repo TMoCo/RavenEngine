@@ -7,6 +7,8 @@
 #include "IModule.h"
 #include "RenderSurface.h"
 
+#include "glm/vec2.hpp"
+
 
 #include <memory>
 
@@ -19,7 +21,8 @@ namespace Raven
 	class GLContext;
 	class RenderScene;
 	class RenderDebug;
-
+	class Scene;
+	class GLTexture;
 
 
 	// RenderModule:
@@ -43,12 +46,15 @@ namespace Raven
 		// Return render debug.
 		inline RenderDebug* GetDebug() { return rdebug.get(); }
 
+		// Return the final render texture target of the scene.
+		GLTexture* GetSceneRT();
+
 	public:
 		// Update render.
 		void Update(float dt);
 
 		// Beging and Prepare the render
-		void BeginRender();
+		void BeginRender(Scene* scene, bool blit, const glm::ivec2& extent);
 
 		// Render
 		void Render();

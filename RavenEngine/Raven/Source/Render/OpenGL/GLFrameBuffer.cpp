@@ -75,7 +75,6 @@ void GLFrameBuffer::Update()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 
-
 	// Attachments...
 	for (const auto& data : attachments)
 	{
@@ -95,7 +94,6 @@ void GLFrameBuffer::Update()
 					att.texRef->GetID(),
 					att.level
 				);
-
 			}
 			else if (texType == EGLTexture::CubeMap)
 			{

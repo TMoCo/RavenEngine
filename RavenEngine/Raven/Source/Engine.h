@@ -91,6 +91,7 @@ namespace Raven
 		inline void DestroyModule()
 		{
 			engineModules[TModule::GetModuleType()]->Destroy();
+			delete engineModules[ TModule::GetModuleType() ];
 		}
 
 		/** Load required modules. */

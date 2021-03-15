@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "Utilities/StringUtils.h"
 #include "Scene/Scene.h"
+#include "Engine.h"
 
 namespace Raven 
 {
@@ -68,6 +69,9 @@ namespace Raven
 			currentScene = allScenes.back().get();
 			currentScene->OnInit();
 		}
+
+		Engine::Get().OnSceneCreated(currentScene);
+
 		switchingScenes = false;
 	}
 

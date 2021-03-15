@@ -28,7 +28,9 @@ namespace Raven
 		glfwWindowHint(GLFW_DOUBLEBUFFER, 8);
 		glfwWindowHint(GLFW_SAMPLES, 0);
 
-		glfwWindow = glfwCreateWindow(1280, 1024, title.c_str(), nullptr, nullptr);
+	//	glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+
+		glfwWindow = glfwCreateWindow(1280, 720, title.c_str(), nullptr, nullptr);
 
 		glfwMakeContextCurrent(glfwWindow);
 		glewInit();//opengl loader init;
@@ -38,6 +40,12 @@ namespace Raven
 	void Window::Destroy()
 	{
 		glfwDestroyWindow(glfwWindow);
+	}
+	std::pair<float, float> Window::GetWindowScale()
+	{
+		float x, y;
+		glfwGetWindowContentScale(glfwWindow, &x, &y);
+		return {x,y};
 	}
 	void Window::PollEvent()
 	{

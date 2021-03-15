@@ -19,81 +19,101 @@
  * Engine:
  *		- 
  */
-class Engine
+
+namespace Raven 
 {
-public:
-  /** Constructor. */
-	Engine();
-
-	/** Destructor. */
-	~Engine();
-
-	/** Return the Engine Singleton. */
-	static Engine& Get();
-
-	/** Initialize the Engine. */
-	virtual void Initialize();
-
-	/** Run the Engine. */
-	int Run();
-
-
-	/** Static function returns the Module of type Module Type. */
-	template<class TModule>
-	static inline TModule* GetModule()
+	enum class EditorState
 	{
-		return static_cast<TModule*>( Get().engineModules[TModule::GetModuleType() ] );
-	}
+		Paused,
+		Play,
+		Next,
+		Preview
+	};
 
-
-	//MainThread Operation
-	std::future<bool> Post(const std::function<bool()>& callback);
-
-
-protected:
-	virtual void OnImGui();
-	virtual void OnUpdate(float dt);
-	virtual void OnRender();
-private:
-	/** Create a the module and store it in the engine modules list. */
-	template<class TModule,typename...Args>
-	inline void CreateModule( Args&&... args)
+	class Scene;
+	class Engine
 	{
-		engineModules[ TModule::GetModuleType() ] = new TModule(std::forward<Args>(args)...);
-	}
+	public:
+		/** Constructor. */
+		Engine();
 
-	/** Initialize a module. */
-	template<class TModule>
-	inline void InitializeModule()
-	{
-		engineModules[ TModule::GetModuleType() ]->Initialize();
-	}
+		/** Destructor. */
+		~Engine();
 
-	/** Destroy a module. */
-	template<class TModule>
-	inline void DestroyModule()
-	{
-		engineModules[ TModule::GetModuleType() ]->Destroy();
-	}
+		/** Return the Engine Singleton. */
+		static Engine& Get();
 
-	/** Load required modules. */
-	void LoadModules();
+		/** Initialize the Engine. */
+		virtual void Initialize();
 
-	/** Destory all loaded modules. */
-	void DestoryModules();
+		/** Run the Engine. */
+		int Run();
 
 
+		/** Static function returns the Module of type Module Type. */
+		template<class TModule>
+		static inline TModule* GetModule()
+		{
+			return static_cast<TModule*>(Get().engineModules[TModule::GetModuleType()]);
+		}
 
 
-private:
+		//MainThread Operation
+		std::future<bool> Post(const std::function<bool()>& callback);
 
-	//main thread --call Post to post callback to main-thread if you are in other threads.
-	std::queue<std::pair<std::promise<bool>, std::function<bool()>>> executeQueue;
-	std::mutex executeMutex;
+		virtual void OnSceneCreated(Scene* scene);
 
-	/** List of all the modules in the engine. */
-	std::array<IModule*, MT_MAX> engineModules;
+
+		inline auto GetEditorState() const { return state; }
+		inline auto SetEditorState(EditorState state) { this->state = state; }
+
+	protected:
+		virtual void OnImGui();
+		virtual void OnUpdate(float dt);
+		virtual void OnRender();
+	private:
+		/** Create a the module and store it in the engine modules list. */
+		template<class TModule, typename...Args>
+		inline void CreateModule(Args&&... args)
+		{
+			engineModules[TModule::GetModuleType()] = new TModule(std::forward<Args>(args)...);
+		}
+
+		/** Initialize a module. */
+		template<class TModule>
+		inline void InitializeModule()
+		{
+			engineModules[TModule::GetModuleType()]->Initialize();
+		}
+
+		/** Destroy a module. */
+		template<class TModule>
+		inline void DestroyModule()
+		{
+			engineModules[TModule::GetModuleType()]->Destroy();
+		}
+
+		/** Load required modules. */
+		void LoadModules();
+
+		/** Destory all loaded modules. */
+		void DestoryModules();
+
+	
+
+
+	private:
+
+		//main thread --call Post to post callback to main-thread if you are in other threads.
+		std::queue<std::pair<std::promise<bool>, std::function<bool()>>> executeQueue;
+		std::mutex executeMutex;
+
+		/** List of all the modules in the engine. */
+		std::array<IModule*, MT_MAX> engineModules;
+
+		EditorState state = EditorState::Preview;
+
+	};
 };
-
-Engine* CreateEngine();
+Raven::Engine* CreateEngine();
 

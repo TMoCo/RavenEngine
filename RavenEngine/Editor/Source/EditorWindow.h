@@ -15,6 +15,7 @@ namespace Raven
 	public:
 		virtual ~EditorWindow() = default;
 		virtual void OnImGui()  = 0;
+		virtual void OnSceneCreated(Scene* scene) {}
 	public:
         inline auto& GetTitle() const { return title; }
         inline auto IsActive() const { return active; }

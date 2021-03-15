@@ -2,22 +2,10 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 
-#pragma  once
-#include <string>
-#include <imgui.h>
-#include <memory>
+#pragma once
 
-#include "EditorWindow.h"
-
-namespace Raven 
+namespace Maple 
 {
-	class AssetsWindow : public EditorWindow
-	{
-	public:
-		AssetsWindow();
-		virtual void OnImGui() override;
 
-		
 
-	};
 };

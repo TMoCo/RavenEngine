@@ -10,6 +10,7 @@
 #include "GUI/GUIModule.h"
 #include <GLFW/glfw3.h>
 #include "Scene/Scene.h"
+#include "Devices/Input.h"
 #include <memory>
 
 
@@ -56,6 +57,8 @@ namespace Raven
 		{
 			//need to be refactored
 			win->PollEvent();
+			Input::GetInput()->ResetPressed();
+
 			GetModule<Raven::ImGuiEngine>()->Prepare();
 
 			// Draw..
@@ -72,7 +75,7 @@ namespace Raven
 			OnImGui();
 			GetModule<Raven::ImGuiEngine>()->Render();
 
-
+	
 			win->SwapBuffers();
 		}
 		// Clean Up..
@@ -86,9 +89,9 @@ namespace Raven
 
 	}
 
-
 	void Engine::OnUpdate(float dt)
 	{
+		eventDispatcher.DispatchEvents();
 		GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 
 		// Update Render...
@@ -124,6 +127,8 @@ namespace Raven
 		CreateModule<Raven::Window>("Raven");
 		CreateModule<Raven::SceneManager>();
 		CreateModule<Raven::GUIModule>();
+
+		Input::Create();
 
 
 		// Initialize - Here order matter.

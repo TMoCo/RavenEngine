@@ -23,6 +23,9 @@ namespace Raven
 		static EModuleType GetModuleType() { return MT_Window; }
 		virtual void Initialize() override;
 		virtual void Destroy() override;
+
+		void InitEventsCallback();
+
 		inline auto GetNativeWindow() { return glfwWindow; }
 
 		std::pair<float, float> GetWindowScale();

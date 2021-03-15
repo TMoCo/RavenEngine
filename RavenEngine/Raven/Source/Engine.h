@@ -13,7 +13,7 @@
 #include <condition_variable>
 #include <functional>
 
-
+#include "Event/EventDispatcher.h"
 
 /**
  * Engine:
@@ -67,6 +67,8 @@ namespace Raven
 		inline auto GetEditorState() const { return state; }
 		inline auto SetEditorState(EditorState state) { this->state = state; }
 
+		inline auto& GetEventDispatcher() { return eventDispatcher; }
+
 	protected:
 		virtual void OnImGui();
 		virtual void OnUpdate(float dt);
@@ -113,6 +115,8 @@ namespace Raven
 		std::array<IModule*, MT_MAX> engineModules;
 
 		EditorState state = EditorState::Preview;
+
+		EventDispatcher eventDispatcher;
 
 	};
 };

@@ -74,7 +74,7 @@ namespace Raven
 
 		bool IsActive();
 		void SetActive(bool isActive);
-		void SetParent(Entity& entity);
+		void SetParent(const Entity& entity);
 		Entity GetParent();
 		std::vector<Entity> GetChildren();
 		bool IsParent(const Entity & potentialParent) const;

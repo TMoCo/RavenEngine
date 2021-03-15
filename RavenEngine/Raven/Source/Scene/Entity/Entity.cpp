@@ -18,7 +18,7 @@ namespace Raven
 		GetOrAddComponent<ActiveComponent>().active = isActive;
 	}
 
-	void Entity::SetParent(Entity& entity)
+	void Entity::SetParent(const Entity& entity)
 	{
 		bool acceptable = false;
 		auto hierarchyComponent = TryGetComponent<Hierarchy>();

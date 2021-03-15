@@ -6,7 +6,7 @@
 
 void RavenGame::Initialize()
 {
-	Engine::Initialize();
+	Raven::Engine::Initialize();
 	//init code here for game 
 	/*LOGE("this is a message,{0},{1},{2}", 1, 2, 3);
 	LOGC("this is a message,{0},{1},{2}", 1, 2, 3);
@@ -16,9 +16,9 @@ void RavenGame::Initialize()
 }
 
 void RavenGame::OnImGui() {
-	Engine::OnImGui();
+	Raven::Engine::OnImGui();
 }
 
-Engine* CreateEngine() {
+Raven::Engine* CreateEngine() {
 	return new RavenGame();
 }

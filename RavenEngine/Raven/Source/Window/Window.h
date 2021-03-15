@@ -23,6 +23,8 @@ namespace Raven
 		virtual void Destroy() override;
 		inline auto GetNativeWindow() { return glfwWindow; }
 
+		std::pair<float, float> GetWindowScale();
+
 		void PollEvent();
 		bool ShouldClose();
 		void SwapBuffers();

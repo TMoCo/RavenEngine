@@ -5,14 +5,15 @@
 #include "Render/RenderModule.h"
 #include "Logger/Console.h"
 
-extern Engine * CreateEngine();
+extern Raven::Engine * CreateEngine();
 
 int main(int argc, char** argv) 
 {
 	Raven::Console::Init();
-	Engine::Get().Initialize();
+	Raven::Engine::Get().Initialize();
 
 
-	return Engine::Get().Run();
+
+	return Raven::Engine::Get().Run();
 }
 

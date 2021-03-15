@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
 // This file is part of the Raven Game Engine			                    //
-
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma  once
@@ -21,6 +20,12 @@ namespace Raven
 		void DrawFilter();
 		void DragEntity();
 		void DrawNode(const entt::entity & node, entt::registry& registry);
-		ImGuiTextFilter hierarchyFilter;;
+		bool IsParentOfEntity(entt::entity entity, entt::entity child, entt::registry& registry);
+		void DestroyEntity(entt::entity entity, entt::registry& registry);
+		ImGuiTextFilter hierarchyFilter;
+		entt::entity doubleClickedEntity =  entt::null;
+		entt::entity droppedEntity = entt::null;
+		entt::entity recentDroppedEntity = entt::null;
+
 	};
 };

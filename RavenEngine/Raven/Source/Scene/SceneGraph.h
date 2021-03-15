@@ -13,7 +13,8 @@ namespace Raven
 {
 	class SceneGraph final
 	{
-		SceneGraph();
+	public:
+		SceneGraph() = default;
 		~SceneGraph() = default;
 
 		void Init(entt::registry & registry);

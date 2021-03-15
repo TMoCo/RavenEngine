@@ -36,6 +36,8 @@ namespace Raven
 		glfwWindowHint(GLFW_SAMPLES, surface.samples);
 		glfwWindowHint(GLFW_DOUBLEBUFFER, surface.doubleBuffer ? GLFW_TRUE : GLFW_FALSE);
 
+		//	glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+
 		// Create Window...
 		glfwWindow = glfwCreateWindow(1280, 820, title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(glfwWindow);
@@ -46,6 +48,12 @@ namespace Raven
 	void Window::Destroy()
 	{
 		glfwDestroyWindow(glfwWindow);
+	}
+	std::pair<float, float> Window::GetWindowScale()
+	{
+		float x, y;
+		glfwGetWindowContentScale(glfwWindow, &x, &y);
+		return {x,y};
 	}
 	void Window::PollEvent()
 	{

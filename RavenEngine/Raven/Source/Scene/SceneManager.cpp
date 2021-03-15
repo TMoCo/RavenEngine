@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "Utilities/StringUtils.h"
 #include "Scene/Scene.h"
+#include "Engine.h"
 
 namespace Raven 
 {
@@ -55,6 +56,9 @@ namespace Raven
 		{
 			if (currentScene != nullptr)
 				return;
+			if (allScenes.empty()) { 
+				AddScene(new Scene("default"));
+			}
 		}
 
 		if (currentScene == nullptr && allScenes.size() > 0) 
@@ -68,6 +72,9 @@ namespace Raven
 			currentScene = allScenes.back().get();
 			currentScene->OnInit();
 		}
+
+		Engine::Get().OnSceneCreated(currentScene);
+
 		switchingScenes = false;
 	}
 

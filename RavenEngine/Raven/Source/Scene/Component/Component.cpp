@@ -5,15 +5,11 @@ namespace Raven
 	Hierarchy::Hierarchy(entt::entity p)
 		:parent(p)
 	{
-		first = entt::null;
-		next = entt::null;
-		prev = entt::null;
 	}
 	Hierarchy::Hierarchy()
 	{
-		Reset();
 	}
-	bool Hierarchy::Compare(const entt::registry& registry, const entt::entity & rhs) const
+	bool Hierarchy::Compare(const entt::registry& registry, entt::entity rhs) const
 	{
 		if (rhs == entt::null || rhs == parent || rhs == prev)
 		{
@@ -49,7 +45,7 @@ namespace Raven
 		auto& hierarchy = registry.get<Hierarchy>(entity);
 		if (hierarchy.parent != entt::null) 
 		{
-			auto& parentHierarchy = registry.get_or_emplace<Hierarchy>(hierarchy.parent);
+ 			auto& parentHierarchy = registry.get_or_emplace<Hierarchy>(hierarchy.parent);
 
 			if (parentHierarchy.first == entt::null)
 			{
@@ -136,10 +132,10 @@ namespace Raven
 		}
 		else
 		{
-			auto prev_hierarchy = registry.try_get<Hierarchy>(hierarchy.prev);
-			if (prev_hierarchy != nullptr)
+			auto prevHierarchy = registry.try_get<Hierarchy>(hierarchy.prev);
+			if (prevHierarchy != nullptr)
 			{
-				prev_hierarchy->next = hierarchy.next;
+				prevHierarchy->next = hierarchy.next;
 			}
 			if (hierarchy.next != entt::null)
 			{

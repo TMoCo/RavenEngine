@@ -10,7 +10,6 @@
 
 namespace Raven
 {
-	class Scene;
 	class Entity
 	{
 	public:
@@ -19,7 +18,7 @@ namespace Raven
 
 		Entity(entt::entity handle, Scene* s)
 			: entityHandle(handle)
-			, scene(scene)
+			, scene(s)
 		{
 		}
 
@@ -75,10 +74,10 @@ namespace Raven
 
 		bool IsActive();
 		void SetActive(bool isActive);
-		void SetParent(Entity& entity);
+		void SetParent(const Entity& entity);
 		Entity GetParent();
 		std::vector<Entity> GetChildren();
-		bool IsParent(Entity potentialParent);
+		bool IsParent(const Entity & potentialParent) const;
 
 		inline operator entt::entity() const {return entityHandle; }
 		inline operator uint32_t() const { return (uint32_t)entityHandle; }

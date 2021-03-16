@@ -12,6 +12,9 @@
 namespace Raven
 {
 	class EntityManager;
+	class Entity;
+	class SceneGraph;
+
 	class Scene 
 	{
 	public:
@@ -22,6 +25,7 @@ namespace Raven
 		virtual void OnClean();
 		virtual void OnUpdate(float dt);
 
+		inline auto& getEntityManager() { return entityManager; }
 		inline auto& GetName() const { return name; };
 		inline void SetName(const std::string& name) { this->name = name; }
 
@@ -31,13 +35,22 @@ namespace Raven
 		virtual void Serialize(const std::string& filePath, bool binary = false);
 		virtual void Load(const std::string& filePath, bool binary = false);
 
-		void CreateEntity();
+		Entity CreateEntity();
+		Entity CreateEntity(const std::string & name);
+
+		void DuplicateEntity(const Entity& entity, const Entity& parent);
+		void DuplicateEntity(const Entity& entity);
+
 
 	private:
+		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
 		std::string name;
 		uint32_t width = 0;
 		uint32_t height = 0;
 		NOCOPYABLE(Scene);
+
+		void CopyComponents(const Entity& from, const Entity& to );
+
 	};
 };

@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
 // This file is part of the Raven Game Engine			                    //
-
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -13,6 +12,7 @@ namespace Raven
 	{
 		std::string name;
 	};
+
 
 	struct ActiveComponent
 	{
@@ -33,7 +33,9 @@ namespace Raven
 		inline auto First() const {return first;}
 
 		// Return true if current entity is an ancestor of current entity
-		bool Compare(const entt::registry& registry, const entt::entity& entity) const;
+		//seems that the entt as a reference could have a bug....
+		//TODO 
+		bool Compare(const entt::registry& registry, entt::entity entity) const;
 		void Reset();
 
 
@@ -47,10 +49,10 @@ namespace Raven
 		//adjust the parent 
 		static void Reparent(entt::entity entity, entt::entity parent, entt::registry& registry, Hierarchy& hierarchy);
 
-		entt::entity parent;
-		entt::entity first;
-		entt::entity next;
-		entt::entity prev;
+		entt::entity parent = entt::null;
+		entt::entity first = entt::null;
+		entt::entity next = entt::null;
+		entt::entity prev = entt::null;
 	};
 
 };

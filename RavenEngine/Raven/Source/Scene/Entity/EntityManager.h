@@ -12,7 +12,7 @@ namespace Raven
 	class EntityManager final
 	{
 	public:
-		EntityManager(Scene* scene) : scene(scene)
+		EntityManager(Scene* initScene) : scene(initScene)
 		{
 		};
 

@@ -20,17 +20,25 @@ namespace Raven
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::StyleColorsDark();
 
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 		ImGuiStyle& style = ImGui::GetStyle();
+
+
+		//auto scale = Engine::Get().GetModule<Window>()->GetWindowScale();
+
+		//style.ScaleAllSizes(std::max(scale.first, scale.second));
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
-		io.Fonts->AddFontDefault();
+		ImFontConfig config;
+		//config.SizePixels = 13.f * std::max(scale.first, scale.second);
+
+		io.Fonts->AddFontDefault(&config);
 		AddIcon();
 		ImGui_ImplGlfw_InitForOpenGL(Engine::Get().GetModule<Window>()->GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 330");
@@ -57,7 +65,7 @@ namespace Raven
 	void ImGuiEngine::AddIcon()
 	{
 		ImGuiIO& io = ImGui::GetIO();
-
+		auto scale = Engine::Get().GetModule<Window>()->GetWindowScale();
 		static const ImWchar icons_ranges[] = { ICON_MIN_MDI, ICON_MAX_MDI, 0 };
 		ImFontConfig icons_config;
 		// merge in icons from Font Awesome
@@ -66,10 +74,9 @@ namespace Raven
 		icons_config.GlyphOffset.y = 1.0f;
 		icons_config.OversampleH = icons_config.OversampleV = 1;
 		icons_config.PixelSnapH = true;
-		icons_config.SizePixels = 13.0f * 1.0f;
+		icons_config.SizePixels = 18.f;
 
 		io.Fonts->AddFontFromMemoryCompressedTTF(MaterialDesign_compressed_data, MaterialDesign_compressed_size, 16, &icons_config, icons_ranges);
-
 	}
 
 };

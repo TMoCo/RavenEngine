@@ -19,7 +19,11 @@ namespace Raven
 		virtual void OnImGui()  ;
 		virtual void Resize(uint32_t width, uint32_t height);
 	private:
+		void DrawToolBar();
 		uint32_t width;
 		uint32_t height;
+
+	
+
 	};
 };

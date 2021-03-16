@@ -34,9 +34,14 @@ namespace Raven {
 	{
 	}
 
-	void Scene::CreateEntity()
+	Raven::Entity Scene::CreateEntity()
 	{
-		entityManager->Create();
+		return entityManager->Create();
+	}
+
+	Raven::Entity Scene::CreateEntity(const std::string& name)
+	{
+		return entityManager->Create(name);
 	}
 
 	void Scene::DuplicateEntity(const Entity& entity, const Entity& parent)

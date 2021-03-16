@@ -9,6 +9,8 @@
 #include "Scene/Entity/EntityManager.h"
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
+#include "Core/Camera.h"
+#include "Scene/Component/Transform.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
 #include <imgui_internal.h>
@@ -38,6 +40,15 @@ namespace Raven
 				{
 					scene->CreateEntity();
 				}
+
+				if (ImGui::Selectable("Add Camera"))
+				{
+					auto entity = scene->CreateEntity("Camera");
+					entity.AddComponent<Camera>();
+					entity.GetOrAddComponent<Transform>();
+				}
+
+
 				ImGui::EndPopup();
 			}
 			DrawName();
@@ -217,6 +228,14 @@ namespace Raven
 				if (iconMap.find(typeid(Light).hash_code()) != iconMap.end())
 					icon = iconMap[typeid(Light).hash_code()];
 			}
+			else if (registry.has<Camera>(node))
+			{
+				if (iconMap.find(typeid(Camera).hash_code()) != iconMap.end())
+					icon = iconMap[typeid(Camera).hash_code()];
+			}
+
+
+
 
 			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entt::to_integral(node), nodeFlags, (icon + " %s").c_str(), doubleClicked ? "" : (name).c_str());
 

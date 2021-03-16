@@ -35,7 +35,8 @@ namespace Raven
 		virtual void Serialize(const std::string& filePath, bool binary = false);
 		virtual void Load(const std::string& filePath, bool binary = false);
 
-		void CreateEntity();
+		Entity CreateEntity();
+		Entity CreateEntity(const std::string & name);
 
 		void DuplicateEntity(const Entity& entity, const Entity& parent);
 		void DuplicateEntity(const Entity& entity);

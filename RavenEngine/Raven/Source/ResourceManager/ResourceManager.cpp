@@ -3,9 +3,13 @@
 #include "ResourceManager.h"
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/Loaders/ImageLoader.h"
+#include "ResourceManager/Loaders/ModelLoader.h"
 
 
 namespace Raven {
+
+	const std::string testTexture("C:\\Users\\Tommy\\Pictures\\SML2_Wario_500.png"); // it's-a me, Wario!
+	const std::string testMesh("C:\\Users\\Tommy\\Documents\\COMP4\\5822HighPerformanceGraphics\\A1\\HPGA1VulkanTutorial\\phongShading\\assets\\models\\mallard.obj"); // duck from cw1
 
 	//
 	// IModule methods
@@ -15,18 +19,31 @@ namespace Raven {
 	{
 		std::cout << "Initialised the resource manager" << '\n';
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
+		AddLoader(std::make_unique<ModelLoader>(*this));
+
+		std::cout << ILoader::TypeToString(GetLoader<ImageLoader>(ELoaderType::LT_Image)->GetType()) << '\n';
+		LoadResource(testTexture, EResourceType::RT_Image);
+		Texture2D* tex = GetResource<Texture2D>(testTexture);
+		std::cout << IResource::TypeToString(tex->GetType()) << "\nheight: " << tex->height << " width: " << tex->width << std::endl;
+		LoadResource(testMesh, EResourceType::RT_Mesh);
+		std::cout << resources.size() << std::endl;
+		Mesh* mesh = GetResource<Mesh>(testMesh);
+		if (mesh)
+			std::cout << IResource::TypeToString(mesh->GetType()) << "\nvertices: " << mesh->verts.size() << " indices: " << mesh->indices.size() << std::endl;
+
 	}
 
 	void ResourceManager::Destroy()
 	{
+		FlushResourceRegister();
 		// TODO: Clean up resource manager
 		std::cout << "Destroyed the resource manager" << std::endl;
 	}
 
-
 	//
 	// Loader management
 	//
+
 	template <class TLoader>
 	void ResourceManager::AddLoader(std::unique_ptr<TLoader> loader)
 	{
@@ -49,17 +66,19 @@ namespace Raven {
 		}
 	}
 
-	ILoader* ResourceManager::GetLoader(ELoaderType type)
+	template <class TLoader>
+	TLoader* ResourceManager::GetLoader(ELoaderType type)
 	{
+		// 
 		const auto iter = std::find_if(loaders.begin(), loaders.end(), [type](const auto& ownedLoader) noexcept { return ownedLoader->GetType() == type; });
 		if (iter != loaders.end())
 		{
-			return iter->get();
+			return static_cast<TLoader*>(iter->get());
 		}
 	}
 
 	//
-	// Resource loading
+	// Resource loading and management
 	// 
 
 	bool ResourceManager::LoadResource(const std::string& path, EResourceType type)
@@ -68,7 +87,9 @@ namespace Raven {
 		switch (type)
 		{
 		case EResourceType::RT_Image:
-			return GetLoader(ELoaderType::LT_Image)->LoadAsset(path); // adds a resource to the register
+			return GetLoader<ImageLoader>(ELoaderType::LT_Image)->LoadAsset(path); // adds a resource to the register
+		case EResourceType::RT_Mesh:
+			return GetLoader<ModelLoader>(ELoaderType::LT_Model)->LoadAsset(path);
 		default:
 			return false;
 		}
@@ -77,48 +98,49 @@ namespace Raven {
 	void ResourceManager::RemoveResource(const std::string& id)
 	{
 		// free the resource
-		delete textures[id];
+		delete resources[id];
 		// then remove entry from register
-		textures.erase(id);
+		resources.erase(id);
 	}
 
 	void ResourceManager::FlushResourceRegister()
 	{
 		// explicitly delete all dynamic resources
-		for (auto& resource : textures)
+		for (auto& resource : resources)
 		{
 			delete resource.second;
 		}
 		// then clear the map
-		textures.clear();
-	}
-
-	//
-	// Resource management
-	//
-	
-	Texture2D* ResourceManager::GetResource(const std::string& id) 
-	{
-		auto resourceIter = textures.find(id); // a key/value pair iterator
-		if (resourceIter == textures.end())
-		{
-			return nullptr;
-		}
-		else
-		{
-			return resourceIter->second;
-		}
+		resources.clear();
 	}
 
 	bool ResourceManager::HasResource(const std::string& id)
 	{
 		// true if a key exists
-		return textures.count(id);
+		return resources.count(id);
 	}
 
-	bool ResourceManager::AddResource(const std::string& id, Texture2D* resource)
+	bool ResourceManager::AddResource(const std::string& id, IResource* resource)
 	{
-		textures.insert(std::make_pair(id, resource));
+		resources.insert(std::make_pair(id, resource));
 		return true;
+	}
+
+	//
+	// Resource getting
+	//
+
+	template<class TResource>
+	TResource* ResourceManager::GetResource(const std::string& id)
+	{
+		auto resourceIter = resources.find(id); // a key/value pair iterator
+		if ((resourceIter == resources.end()))
+		{
+			return nullptr;
+		}
+		else
+		{
+			return dynamic_cast<TResource*>(resourceIter->second);
+		}
 	}
 }

@@ -1,6 +1,8 @@
 #include "ModelLoader.h"
-#include "ResourceManager/Resources/Model.h"
+#include "ResourceManager/Resources/Mesh.h"
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include <tinyobjloader/tiny_obj_loader.h>
 #include <glm/glm.hpp>
 
 namespace Raven
@@ -10,6 +12,7 @@ namespace Raven
 
 	bool ModelLoader::LoadAsset(const std::string& path)
 	{
+        std::cout << "loading model" << std::endl;
         // setup variables to get model info
         tinyobj::attrib_t attrib; // contains all the positions, normals, textures and faces
         std::vector<tinyobj::shape_t> shapes; // all the separate objects and their faces
@@ -23,13 +26,10 @@ namespace Raven
         }
 
         // TODO: Put model in memory manager
-        Model* model = new Model();
+        Mesh* mesh = new Mesh();
 
         // combine all the shapes into a single model (shape = mesh)
-        for (const auto& shape : shapes) {
-
-            Mesh* mesh = new Mesh();
-
+        for (const auto& shape : shapes){
             for (const auto& index : shape.mesh.indices) {
                 // set vertex data
                 mesh->verts.push_back(glm::vec3(
@@ -48,8 +48,9 @@ namespace Raven
 
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
-            model->meshes.push_back(mesh);
         }
+
+        resourceManager->AddResource(path, mesh);
 		return true;
 	}
 }

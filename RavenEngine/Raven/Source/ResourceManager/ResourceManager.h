@@ -11,12 +11,14 @@
 #include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/Resources/Texture2D.h"
+#include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/Resources/Terrain.h"
 
 namespace Raven
 {
 	class ResourceManager : public IModule
 	{
-		//friend class ILoader; // ILoader is a friend of the resource manager, it can add to the resource register on load
+		friend class ILoader; // ILoader is a friend of the resource manager, it can add to the resource register on load
 
 	public:
 		ResourceManager() = default;
@@ -28,42 +30,71 @@ namespace Raven
 
 		static EModuleType GetModuleType() { return MT_ResourceManager; }
 
+		//
+		// Obtain resources:
+		//
 
 		// resources are obtained by passing their path as keys for the unordered map
-		Texture2D* GetResource(const std::string& path);
+		template<class TResource>
+		TResource* GetResource(const std::string& path);
 
-		// returns true if the resource is already in the resource register
-		bool HasResource(const std::string& id);
+		//
+		// Change the resource register
+		//
 
 		// tell manager to load a resource of a given type at a given path, need resource type to select loader
 		bool LoadResource(const std::string& path, EResourceType type);
 
-		void RemoveResource(const std::string& id);
+		// returns true if the resource is already in the resource register
+		bool HasResource(const std::string& id);
 
-		// add a resource to the resourceMap
-		bool AddResource(const std::string& id, Texture2D* resource);
+		// add and remove return true on success
+		bool AddResource(const std::string& id, IResource* resource);
+
+		void RemoveResource(const std::string& id);
 
 		// loops over the register entries and deletes the values, then removes the entries
 		void FlushResourceRegister();
+		
+		// may be needed later in threaded application?
+		inline bool IsLoadingScene() const { return loadingResource; }
+
+		inline void SetLoading(bool loading) { loadingResource = loading; }
+
 
 	private:
+		// cast the resource pointer to the right resource type (basically same as dynamic cast...)
+		template<class TResource>
+		inline TResource* CastTo(IResource* resource) 
+		{
+			if (TResource->GetType() != resource->GetType()) // check that we can cast to desired resource type
+			{
+				//throw std::runtime_error("Bad resource cast!");
+				return nullptr;
+			}
+			return static_cast<TResource*>(resource);
+		}
 
-		// add a loader of a certain type
+		// add and remove loader of a certain type
 		template <class TLoader>
 		void AddLoader(std::unique_ptr<TLoader> loader);
 
 		template <class TLoader>
 		void RemoveLoader(const TLoader* loader);
 
-		ILoader* GetLoader(ELoaderType type);
+		// get a loader of type T
+		template <class TLoader>
+		TLoader* GetLoader(ELoaderType type);
 
 		// for now the resource registers map an id to the resource in heap memory (may wish to convert to unique_ptr later)
 		// later there will be a few registers containing resource families 
 		// eg: ResourceFamily Image -> Texture2D, Texture3D, CubeMap, Material (as a texture?...)
-		std::unordered_map<std::string, Texture2D*> textures; // for now we just have Texture2D, so get that working first
+		std::unordered_map<std::string, IResource*> resources; // for now we just have Texture2D, so get that working first
 
 		// an array containing the resource loaders used
 		std::vector<std::unique_ptr<ILoader>> loaders;
+
+		bool loadingResource = false;
 
 		NOCOPYABLE(ResourceManager); // delete copy constructor and = operator
 	};

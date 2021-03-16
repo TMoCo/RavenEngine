@@ -7,6 +7,13 @@
 #include "Entity/Entity.h"
 #include "Entity/EntityManager.h"
 #include "SceneGraph.h"
+
+#include <fstream>
+
+// for serialization
+#include "cereal/archives/json.hpp"
+#include "cereal/archives/binary.hpp"
+
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
@@ -57,7 +64,7 @@ namespace Raven {
 	void Scene::DuplicateEntity(const Entity& entity)
 	{
 		Entity newEntity = entityManager->Create();
-		//COPY¡£¡£
+		//COPY
 		CopyComponents(entity,newEntity);
 	}
 

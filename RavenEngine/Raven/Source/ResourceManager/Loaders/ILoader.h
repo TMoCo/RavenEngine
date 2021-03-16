@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Utilities/Core.h"
-#include "ResourceManager/Resources/IResource.h"
+//#include "ResourceManager/Resources/IResource.h"
 
 // for serialization
 #include "cereal/archives/json.hpp"
@@ -63,11 +63,7 @@ namespace Raven
 		// must be overridden
 		virtual bool LoadAsset(const std::string& path) = 0;
 
-		//virtual bool LoadSerialized(const std::string& path, bool binary = false) = 0;
-
 	protected:
-		// loader can add a resource via the resource manager (is its friend)
-		//virtual bool AddResource(const std::string& id, IResource* resource) = 0;
 
 		const ELoaderType type;
 		ResourceManager* resourceManager;

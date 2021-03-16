@@ -123,6 +123,7 @@ namespace Raven
 	void Engine::LoadModules()
 	{
 		// Create...
+		CreateModule<Raven::ResourceManager>();
 		CreateModule<Raven::RenderModule>();
 		CreateModule<Raven::ImGuiEngine>();
 		CreateModule<Raven::Window>("Raven");
@@ -134,6 +135,7 @@ namespace Raven
 
 		// Initialize - Here order matter.
 		InitializeModule<Raven::Window>();
+		InitializeModule<Raven::ResourceManager>();
 		InitializeModule<Raven::RenderModule>();
 		InitializeModule<Raven::ImGuiEngine>();
 		InitializeModule<Raven::SceneManager>();
@@ -150,6 +152,7 @@ namespace Raven
 		DestroyModule<SceneManager>();
 		DestroyModule<GUIModule>();
 		DestroyModule<ImGuiEngine>();
+		DestroyModule<ResourceManager>();
 		DestroyModule<Window>();
 	}
 

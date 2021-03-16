@@ -3,16 +3,16 @@
 #include "glm/glm.hpp"
 
 #include "ResourceManager/Resources/IResource.h"
-#include "Render/RenderResource/RenderRscMesh.h"
+#include "Render/RenderResource/RenderRscTerrain.h"
 
 namespace Raven
 {
-	class Mesh : public IResource
+	class Terrain : public IResource
 	{
 	public:
-		Mesh() : IResource(EResourceType::RT_Mesh) {}
+		Terrain() : IResource(EResourceType::RT_Terrain) {}
 		// TODO: free data on destruction
-		virtual ~Mesh() = default;
+		virtual ~Terrain() = default;
 
 		std::vector<glm::vec3> verts;
 		std::vector<glm::vec3> normals;
@@ -20,8 +20,8 @@ namespace Raven
 
 		std::vector<uint32_t> indices;
 
-		RenderRscMesh* renderResource = nullptr; // interface with renderer
+		RenderRscTerrain* renderResource = nullptr; // interface with renderer
 
-		NOCOPYABLE(Mesh);
+		NOCOPYABLE(Terrain);
 	};
 }

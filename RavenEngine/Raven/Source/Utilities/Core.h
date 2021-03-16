@@ -11,7 +11,6 @@
 		}															\
 	}	
 
-
 #define NOCOPYABLE(Type)								\
     Type(const Type&) = delete;							\
     Type& operator=(const Type&) = delete;

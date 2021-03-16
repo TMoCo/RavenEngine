@@ -6,6 +6,8 @@
 #include "IconsMaterialDesignIcons.h"
 #include "SceneWindow.h"
 #include "ImGui/ImGuiHelpers.h"
+#include "Render/RenderModule.h"
+#include "Render/OpenGL/GLTexture.h"
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 #include "Logger/Console.h"
@@ -30,6 +32,27 @@ namespace Raven
 
 		DrawToolBar();
 
+		auto sceneViewSize = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin() - offset / 2.0f;// - offset * 0.5f;
+		auto sceneViewPosition = ImGui::GetWindowPos() + offset;
+
+		sceneViewSize.x -= static_cast<int>(sceneViewSize.x) % 2 != 0 ? 1.0f : 0.0f;
+		sceneViewSize.y -= static_cast<int>(sceneViewSize.y) % 2 != 0 ? 1.0f : 0.0f;
+
+		Resize(static_cast<uint32_t>(sceneViewSize.x), static_cast<uint32_t>(sceneViewSize.y));
+		auto previewTexture = Engine::GetModule<RenderModule>()->GetSceneRT();
+		ImGui::Image((ImTextureID)previewTexture->GetID(), { sceneViewSize.x, sceneViewSize.y},{1,1}, {0,0});
+
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = sceneViewPosition;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		bool updateCamera = ImGui::IsMouseHoveringRect(minBound, maxBound);
+
+		if (updateCamera)
+		{
+		
+
+		}
 
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -48,6 +71,13 @@ namespace Raven
 			this->width = width;
 			this->height = height;
 		}
+
+		if (resized) 
+		{
+			auto previewTexture = Engine::GetModule<RenderModule>()->GetSceneRT();
+			//previewTexture->re
+		}
+		
 	}
 
 	void SceneWindow::DrawToolBar()

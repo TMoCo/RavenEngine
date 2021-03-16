@@ -10,6 +10,6 @@ namespace Raven
 	public:
 		ImageLoader(ResourceManager& initResourceManager);
 
-		bool LoadAsset(const std::string& path) override;
+		bool virtual LoadAsset(const std::string& path) override;
 	};
 }

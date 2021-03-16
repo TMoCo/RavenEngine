@@ -9,6 +9,6 @@ namespace Raven
 	public:
 		MaterialLoader(ResourceManager& initResourceManager);
 
-		bool LoadAsset(const std::string& path);
+		bool virtual LoadAsset(const std::string& path);
 	};
 }

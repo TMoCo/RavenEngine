@@ -8,36 +8,22 @@
 
 namespace Raven {
 
-	const std::string testTexture("C:\\Users\\Tommy\\Pictures\\SML2_Wario_500.png"); // it's-a me, Wario!
-	const std::string testMesh("C:\\Users\\Tommy\\Documents\\COMP4\\5822HighPerformanceGraphics\\A1\\HPGA1VulkanTutorial\\phongShading\\assets\\models\\mallard.obj"); // duck from cw1
-
 	//
 	// IModule methods
 	//
 
 	void ResourceManager::Initialize()
 	{
-		std::cout << "Initialised the resource manager" << '\n';
+		LOGV("Initialised the resource manager");
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
 		AddLoader(std::make_unique<ModelLoader>(*this));
-
-		std::cout << ILoader::TypeToString(GetLoader<ImageLoader>(ELoaderType::LT_Image)->GetType()) << '\n';
-		LoadResource(testTexture, EResourceType::RT_Image);
-		Texture2D* tex = GetResource<Texture2D>(testTexture);
-		std::cout << IResource::TypeToString(tex->GetType()) << "\nheight: " << tex->height << " width: " << tex->width << std::endl;
-		LoadResource(testMesh, EResourceType::RT_Mesh);
-		std::cout << resources.size() << std::endl;
-		Mesh* mesh = GetResource<Mesh>(testMesh);
-		if (mesh)
-			std::cout << IResource::TypeToString(mesh->GetType()) << "\nvertices: " << mesh->verts.size() << " indices: " << mesh->indices.size() << std::endl;
-
 	}
 
 	void ResourceManager::Destroy()
 	{
-		FlushResourceRegister();
 		// TODO: Clean up resource manager
-		std::cout << "Destroyed the resource manager" << std::endl;
+		FlushResourceRegister();
+		LOGV("Destroyed the resource manager");
 	}
 
 	//
@@ -50,7 +36,7 @@ namespace Raven {
 		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
 		{
 			loaders.push_back(std::move(loader));
-			std::cout << "Added a loader of type " << ILoader::TypeToString(loaders.rbegin()->get()->GetType()) << '\n';
+			LOGV("Added a loader of type " + ILoader::TypeToString(loaders.rbegin()->get()->GetType()));
 		}
 	}
 
@@ -69,11 +55,16 @@ namespace Raven {
 	template <class TLoader>
 	TLoader* ResourceManager::GetLoader(ELoaderType type)
 	{
-		// 
+		// loop over loaders, finding the type of loader requested
 		const auto iter = std::find_if(loaders.begin(), loaders.end(), [type](const auto& ownedLoader) noexcept { return ownedLoader->GetType() == type; });
-		if (iter != loaders.end())
+		if (iter == loaders.end())
 		{
-			return static_cast<TLoader*>(iter->get());
+			return nullptr;
+		}
+		else
+		{
+			// cast to desired loader type
+			return dynamic_cast<TLoader*>(iter->get());
 		}
 	}
 

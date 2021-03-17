@@ -25,10 +25,10 @@ For each resource type, there is an associated loader. They are managed by the r
 Sample use cases
 
 * Load a 2D Texture:
-'''c++
+```c++
 LoadResource<Texture2D>(path);
-'''
+```
 * Get a Mesh resource pointer
-'''c++
+```c++
 Mesh* mesh = GetResource<Mesh>(id);
-'''
+```

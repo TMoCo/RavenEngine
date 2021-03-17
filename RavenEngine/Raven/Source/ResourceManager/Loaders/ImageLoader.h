@@ -10,6 +10,10 @@ namespace Raven
 	public:
 		ImageLoader(ResourceManager& initResourceManager);
 
-		bool virtual LoadAsset(const std::string& path) override;
+		inline static auto Type() { return ELoaderType::LT_Image; }
+
+		virtual bool LoadAsset(const std::string& path) override;
+
+		virtual bool LoadOnGPU() override { return true; }
 	};
 }

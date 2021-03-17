@@ -18,9 +18,10 @@ namespace Raven
 	class IResource
 	{
 	public:
-		IResource(EResourceType initType) : type(initType) {}
+		IResource(EResourceType initType, bool render=false) : type(initType), isRenderable(render), onGPU(false) {}
 		virtual ~IResource() = default;
 
+		// string from given resource type
 		inline static std::string TypeToString(EResourceType type)
 		{
 			switch (type)
@@ -38,12 +39,16 @@ namespace Raven
 			default:
 				return "Resource type not recognised";
 			}
-		}
+		} // 
 
-		inline EResourceType GetType() const noexcept { return type; }
+		inline auto GetType() const noexcept { return type; }
+
+		inline auto IsOnGPU() const noexcept { return onGPU; } // query if a resource was loaded on to GPU
 
 	protected:
 		const EResourceType type;
+		const bool isRenderable;
+		bool onGPU;
 
 		NOCOPYABLE(IResource);
 	};

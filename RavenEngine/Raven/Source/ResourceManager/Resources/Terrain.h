@@ -10,9 +10,11 @@ namespace Raven
 	class Terrain : public IResource
 	{
 	public:
-		Terrain() : IResource(EResourceType::RT_Terrain) {}
+		Terrain() : IResource(EResourceType::RT_Terrain, true) {}
 		// TODO: free data on destruction
 		virtual ~Terrain() = default;
+
+		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
 		std::vector<glm::vec3> verts;
 		std::vector<glm::vec3> normals;

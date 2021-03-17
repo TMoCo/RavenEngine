@@ -11,6 +11,10 @@ namespace Raven
 	public:
 		ModelLoader(ResourceManager& initResourceManager);
 
+		inline static auto Type() { return ELoaderType::LT_Model; }
+
 		bool virtual LoadAsset(const std::string& path) override;
+
+		virtual bool LoadOnGPU() override { return true; }
 	};
 }

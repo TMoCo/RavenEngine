@@ -10,9 +10,11 @@ namespace Raven
 	class Mesh : public IResource
 	{
 	public:
-		Mesh() : IResource(EResourceType::RT_Mesh) {}
+		Mesh() : IResource(EResourceType::RT_Mesh, true) {}
 		// TODO: free data on destruction
 		virtual ~Mesh() = default;
+
+		inline static EResourceType Type() noexcept { return EResourceType::RT_Mesh; } // return the resource type
 
 		std::vector<glm::vec3> verts;
 		std::vector<glm::vec3> normals;

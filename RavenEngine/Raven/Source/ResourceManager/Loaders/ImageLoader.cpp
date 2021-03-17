@@ -24,6 +24,7 @@ namespace Raven
 		int height		   = 0;
 		int channelsInFile = 0;
 
+
 		// unique pointer containing data from a file, with the deleter provided by stbi
 		std::unique_ptr<stbi_uc, std::function<void(void*)>> fromFile (stbi_load(path.c_str(), &width, &height, &channelsInFile, STBI_default), stbi_image_free);
 

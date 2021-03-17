@@ -28,7 +28,7 @@ namespace Raven
 		virtual void Initialize() override;
 		virtual void Destroy() override;
 
-		static EModuleType GetModuleType() { return MT_ResourceManager; }
+		static EModuleType GetModuleType() { return EModuleType::MT_ResourceManager; }
 
 		//
 		// Obtain resources:
@@ -43,13 +43,14 @@ namespace Raven
 		//
 
 		// tell manager to load a resource of a given type at a given path, need resource type to select loader
-		bool LoadResource(const std::string& path, EResourceType type);
+		template<class TResource>
+		bool LoadResource(const std::string& path);
 
 		// returns true if the resource is already in the resource register
 		bool HasResource(const std::string& id);
 
-		// add and remove return true on success
-		bool AddResource(const std::string& id, IResource* resource);
+		// add and remove resources
+		void AddResource(const std::string& id, IResource* resource);
 
 		void RemoveResource(const std::string& id);
 
@@ -67,7 +68,7 @@ namespace Raven
 		template<class TResource>
 		inline TResource* CastTo(IResource* resource) 
 		{
-			if (TResource->GetType() != resource->GetType()) // check that we can cast to desired resource type
+			if (TResource::IsATypeOf() != resource->GetType()) // check that we can cast to desired resource type
 			{
 				//throw std::runtime_error("Bad resource cast!");
 				return nullptr;
@@ -84,7 +85,7 @@ namespace Raven
 
 		// get a loader of type T
 		template <class TLoader>
-		TLoader* GetLoader(ELoaderType type);
+		TLoader* GetLoader();
 
 		// for now the resource registers map an id to the resource in heap memory (may wish to convert to unique_ptr later)
 		// later there will be a few registers containing resource families 

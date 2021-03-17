@@ -9,6 +9,10 @@ namespace Raven
 	public:
 		AudioLoader(ResourceManager& initResourceManager);
 
-		bool virtual LoadAsset(const std::string& path);
+		inline static auto Type() { return ELoaderType::LT_Audio; }
+
+		bool AudioLoader::LoadAsset(const std::string& path);
+
+		virtual bool LoadOnGPU() override { return true; }
 	};
 }

@@ -38,7 +38,7 @@ namespace Raven
 		ILoader()		   = delete;
 		virtual ~ILoader() = default;
 
-		// the type of loader
+		// the type of an instantiated loader
 		inline auto GetType() const noexcept { return type; }
 
 		inline static std::string TypeToString(ELoaderType type)
@@ -61,7 +61,9 @@ namespace Raven
 		}
 
 		// must be overridden
-		virtual bool LoadAsset(const std::string& path) = 0;
+		virtual bool LoadAsset(const std::string& path) = 0; // load asset from a file (non serialized)
+
+		virtual bool LoadOnGPU() = 0; // load data to gpu using graphics api
 
 	protected:
 

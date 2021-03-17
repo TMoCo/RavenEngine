@@ -9,6 +9,10 @@ namespace Raven
 	public:
 		MaterialLoader(ResourceManager& initResourceManager);
 
+		inline static auto Type() { return ELoaderType::LT_Material; }
+
 		bool virtual LoadAsset(const std::string& path);
+
+		virtual bool LoadOnGPU() override { return true; }
 	};
 }

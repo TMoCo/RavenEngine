@@ -13,7 +13,7 @@
 namespace Raven
 {
 	// one byte = 8 bits
-	using byte = uint8_t;
+	typedef uint8_t byte;
 
 	class Texture2D : public IResource
 	{
@@ -39,7 +39,6 @@ namespace Raven
 		byte* data; // image data should be sizeof(byte) * height * width)
 
 		RenderRscTexture* renderResource = nullptr; // interface with renderer
-
 		NOCOPYABLE(Texture2D);
 	};
 }

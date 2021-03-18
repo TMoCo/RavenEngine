@@ -5,6 +5,10 @@
 #include "ResourceManager/Loaders/ImageLoader.h"
 #include "ResourceManager/Loaders/ModelLoader.h"
 
+#include "ResourceManager/Resources/Model.h"
+#include "ResourceManager/Resources/Texture2D.h"
+#include "ResourceManager/Resources/Terrain.h"
+
 
 namespace Raven {
 
@@ -12,6 +16,7 @@ namespace Raven {
 	// IModule methods
 	//
 	std::string t("C:\\Users\\Tommy\\Pictures\\SML2_Wario_500.png");
+	std::string m("C:\\Users\\Tommy\\Documents\\COMP4\\5530MGroupProject\\Assets\\sockets.obj");
 
 	void ResourceManager::Initialize()
 	{
@@ -20,13 +25,21 @@ namespace Raven {
 		AddLoader(std::make_unique<ModelLoader>(*this));
 
 		if (LoadResource<Texture2D>(t))
-			LOGV("loaded resource");
+			LOGV("Loaded texture");
 
 		Texture2D* tex = GetResource<Texture2D>(t);
 		if (tex)
 		{
-			LOGV("got resource");
-			std::cout << tex->width << ' ' << tex->height << '\n';
+			LOGV("Got resource");
+		}
+
+		if (LoadResource<Model>(m))
+			LOGV("Loaded model");
+
+		Model* mdl = GetResource<Model>(t);
+		if (mdl)
+		{
+			LOGV("Got resource with " + std::to_string(mdl->GetMeshes()->size()) + " meshes");
 		}
 	}
 

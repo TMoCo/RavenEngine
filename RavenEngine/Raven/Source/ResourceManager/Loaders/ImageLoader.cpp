@@ -2,7 +2,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include "ImageLoader.h"
+#include "ResourceManager/Loaders/ImageLoader.h"
+#include "ResourceManager/Resources/Texture2D.h"
 
 
 namespace Raven
@@ -16,8 +17,6 @@ namespace Raven
 		{
 			return true; // already loaded, return true for now
 		}
-
-		std::cout << "Will load: " << path << '\n';
 
 		int width		   = 0;
 		int height		   = 0;

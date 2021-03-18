@@ -1,6 +1,7 @@
-#include "ModelLoader.h"
-#include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/Loaders/ModelLoader.h"
 #include "ResourceManager/Resources/Model.h"
+#include "ResourceManager/Resources/Mesh.h"
+
 #include "Utilities/StringUtils.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -40,37 +41,50 @@ namespace Raven
             return false;
         }
 
-        // The model class, just a container for mesh resources and to easily access the meshes
+        // The model class, just a container for mesh resources to easily access the meshes
         Model* model = new Model();
-
         // loop over the shapes in the model
-        for (size_t i = 0; i < shapes.size(); i++)
+        for (const auto& shape : shapes)
         {
             // one shape = one mesh
             Mesh* mesh = new Mesh();
             // resize the mesh data
-            for (const auto& index : shapes[i].mesh.indices)
+            for (const auto& index : shape.mesh.indices)
             {
-                // set vertex data
+                // set vertex data 
                 mesh->verts.push_back(glm::vec3(
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]));
+                // check that normals and texcoords exist, add accordingly
+                if (index.normal_index == -1)
+                {
+                    mesh->normals.push_back(glm::vec3(0.0f));
+                }
+                else
+                {
 
-                mesh->normals.push_back(glm::vec3(
-                    attrib.normals[3 * index.normal_index + 0],
-                    attrib.normals[3 * index.normal_index + 1],
-                    attrib.normals[3 * index.normal_index + 2]));
-
-                mesh->texCoords.push_back(glm::vec2(
-                    attrib.texcoords[2 * index.texcoord_index + 0],
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]));
-
+                    mesh->normals.push_back(glm::vec3(
+                        attrib.normals[3 * index.normal_index + 0],
+                        attrib.normals[3 * index.normal_index + 1],
+                        attrib.normals[3 * index.normal_index + 2]));
+                }
+                if (index.texcoord_index == -1)
+                {
+                    mesh->texCoords.push_back(glm::vec2(0.0f));
+                }
+                else
+                {
+                    mesh->texCoords.push_back(glm::vec2(
+                        attrib.texcoords[2 * index.texcoord_index + 0],
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]));
+                }
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
             model->AddMesh(mesh);
         }
-        resourceManager->AddResource(path, model); // path 
+        // TODO: process Material data
+        resourceManager->AddResource(path, model); // file path is resource id
         return true;
     }
 }

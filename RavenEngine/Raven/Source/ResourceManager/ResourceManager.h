@@ -10,9 +10,7 @@
 #include "IModule.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Loaders/ILoader.h"
-#include "ResourceManager/Resources/Texture2D.h"
-#include "ResourceManager/Resources/Mesh.h"
-#include "ResourceManager/Resources/Terrain.h"
+
 
 namespace Raven
 {

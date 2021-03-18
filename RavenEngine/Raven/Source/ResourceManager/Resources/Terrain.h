@@ -16,11 +16,7 @@ namespace Raven
 
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
-		std::vector<glm::vec3> verts;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec2> texCoords;
-
-		std::vector<uint32_t> indices;
+		Texture2D* heightMap;
 
 		RenderRscTerrain* renderResource = nullptr; // interface with renderer
 

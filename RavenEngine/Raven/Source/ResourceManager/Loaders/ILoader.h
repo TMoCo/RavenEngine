@@ -1,16 +1,21 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include <string>
 #include <iostream>
 
 #include "Utilities/Core.h"
-//#include "ResourceManager/Resources/IResource.h"
 
 // for serialization
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
 
-// the base loader class 
+//
+// The base loader class 
+//
 
 namespace Raven 
 {
@@ -66,7 +71,6 @@ namespace Raven
 		virtual bool LoadOnGPU() = 0; // load data to gpu using graphics api
 
 	protected:
-
 		const ELoaderType type;
 		ResourceManager* resourceManager;
 

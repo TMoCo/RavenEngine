@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "glm/glm.hpp"
@@ -5,6 +9,10 @@
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/RenderRscTerrain.h"
+
+//
+// A class for a Terrain, with height map and other features to come later
+//
 
 namespace Raven
 {
@@ -35,7 +43,7 @@ namespace Raven
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
 		Texture2D* heightMap; // store heights in a texture
-		// is a mesh so also has verts, normals, texCoords, indices
+		// is a mesh so also has verts, normals, texCoords, indices... 
 
 		RenderRscTerrain renderRscTerrain; // interface with renderer
 

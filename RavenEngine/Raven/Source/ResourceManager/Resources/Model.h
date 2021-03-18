@@ -1,7 +1,15 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Resources/Mesh.h"
+
+//
+// A class for 3D models and their related data such as meshes, and later materials
+//
 
 namespace Raven
 {

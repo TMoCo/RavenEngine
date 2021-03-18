@@ -1,7 +1,15 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/ResourceManager.h"
+
+//
+// A class for loading image data
+//
 
 namespace Raven
 {

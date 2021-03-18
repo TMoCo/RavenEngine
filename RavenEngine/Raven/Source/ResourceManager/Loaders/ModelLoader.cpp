@@ -1,12 +1,16 @@
-#include "ResourceManager/Loaders/ModelLoader.h"
-#include "ResourceManager/Resources/Model.h"
-#include "ResourceManager/Resources/Mesh.h"
-
-#include "Utilities/StringUtils.h"
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <glm/glm.hpp>
+
+#include "Utilities/StringUtils.h"
+
+#include "ResourceManager/Loaders/ModelLoader.h"
+#include "ResourceManager/Resources/Model.h"
+#include "ResourceManager/Resources/Mesh.h"
 
 namespace Raven
 {

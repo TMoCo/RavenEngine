@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include <stdint.h> // uint8_t
@@ -45,7 +49,7 @@ namespace Raven
 		size_t height; // image dimensions
 		size_t width;
 		
-		byte* data; // image data should be sizeof(byte) * height * width)
+		byte* data; // image data should be sizeof(byte) * height * width
 
 		RenderRscTexture renderRscTexture; // interface with renderer
 		NOCOPYABLE(Texture2D);

@@ -21,13 +21,10 @@ For each resource type, there is an associated loader. They are managed by the r
 
 ## Using the module
 
-Sample use cases
-
-* Load a 2D Texture:
+* Load a model from a file:
 ```c++
-LoadResource<Texture2D>(path);
-```
-* Get a Mesh resource pointer
-```c++
-Mesh* mesh = GetResource<Mesh>(id);
+std::string path("path/to/model");
+LoadResource<Model>(path);
+Model* model = GetResource<Model>(path);
+std::cout << model->meshes->size(); // will return the number of meshes in model!
 ```

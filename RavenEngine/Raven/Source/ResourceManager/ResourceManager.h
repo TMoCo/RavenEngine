@@ -2,12 +2,13 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 
-/**
+/*
 * The resource manager module takes care of providing the resources consumed by the 
 * game engine, making sure that only a single copy of any data is ever created. It also
 * handles the loading and unloading of resources from disc to RAM and from RAM to GPU.
-* A resource registry, an unordered map stores pointers to resources that are loaded from files. 
-* Loading of files is handled by Loader classes, stored in a vector. Each loader implements 
+* The resource registry, an unordered map, stores pointers to resources that are loaded from files. 
+* The resources are stored in a key / value pair where the key is the string of the resource's path.
+* The loading of files is handled by Loader classes, stored in a vector. Each loader implements 
 * a LoadAsset function that loads an asset of the type handled by the loader into the resource
 * register.
 */

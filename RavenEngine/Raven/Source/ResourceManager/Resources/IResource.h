@@ -1,3 +1,13 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
+/*
+* The IResource class serves as the base class for all Resources that can go in the
+* resource register in the ResourceManager module. Each derived resource is identifiable
+* by an enum value. 
+*/
+
 #pragma once
 
 #include "Utilities/Core.h"
@@ -16,11 +26,15 @@ namespace Raven
 		RT_Audio
 	};
 
-	// the base resource class, inherited by resources. Basic resource info (type)
+	//
+	// The base resource class, pointers of which are stored in the resource register
+	//
+
 	class IResource
 	{
 	public:
-		IResource(EResourceType initType, bool render=false) : type(initType), isRenderable(render), onGPU(false) {}
+		IResource(EResourceType initType, bool render=false) : 
+			type(initType), isRenderable(render), onGPU(false) {}
 		virtual ~IResource() = default;
 
 		// string from given resource type

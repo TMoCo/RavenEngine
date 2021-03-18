@@ -1,8 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Resources/Shader.h"
 #include "Render/RenderResource/RenderRscMaterial.h"
+
+//
+// A class for storing material properties and the shader the material applies to
+//
 
 namespace Raven
 {

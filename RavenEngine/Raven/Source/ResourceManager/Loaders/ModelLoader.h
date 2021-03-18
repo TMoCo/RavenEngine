@@ -15,6 +15,8 @@ namespace Raven
 
 		bool virtual LoadAsset(const std::string& path) override;
 
+		bool LoadOBJ(const std::string& path);
+
 		virtual bool LoadOnGPU() override { return true; }
 	};
 }

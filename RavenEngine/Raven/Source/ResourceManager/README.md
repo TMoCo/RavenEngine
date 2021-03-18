@@ -12,9 +12,8 @@ The resources are stored in a map as a key/value pair where the key is the resou
 
 ## Resources
 
-So far there are four resources that can be loaded: images (Texture2D), meshes (Mesh), materials (Material) and shaders (Shader). To load a resource, you need to tell the resource manager which type 
+So far there are four resources that can be loaded: images (`Texture2D`), meshes (`Mesh`), materials (`Material`) and shaders (`Shader`). To load a resource, you need to tell the resource manager which type 
 of resource is being loaded so that it can use the appropriate loader for that resource.
-
 
 ## Loaders
 

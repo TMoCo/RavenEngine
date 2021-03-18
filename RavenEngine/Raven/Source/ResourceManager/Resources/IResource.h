@@ -8,9 +8,11 @@ namespace Raven
 	enum class EResourceType
 	{
 		RT_Image,
+		RT_Model,
 		RT_Mesh,
 		RT_Terrain,
 		RT_Material,
+		RT_Shader,
 		RT_Audio
 	};
 

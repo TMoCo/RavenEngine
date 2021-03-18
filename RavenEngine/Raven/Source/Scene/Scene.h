@@ -32,7 +32,7 @@ namespace Raven
 		void SetSize(uint32_t w, uint32_t h);
 		entt::registry& GetRegistry();
 
-		virtual void Serialize(const std::string& filePath, bool binary = false);
+		virtual void Save(const std::string& filePath, bool binary = false);
 		virtual void Load(const std::string& filePath, bool binary = false);
 
 		Entity CreateEntity();

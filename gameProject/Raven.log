@@ -1,9 +1,8 @@
-[16:08:58] [trace] MAPLE: Initialised the resource manager
-[16:08:58] [trace] MAPLE: Added a loader of type Type: Image Loader.
-[16:08:58] [trace] MAPLE: Added a loader of type Type: Model Loader.
-[16:08:58] [trace] MAPLE: loaded resource
-[16:08:58] [trace] MAPLE: good type, casting...
-[16:08:58] [trace] MAPLE: got resource
-[16:08:58] [trace] MAPLE: good type, casting...
-[16:08:59] [trace] MAPLE: Raven::Scene::OnInit
-[16:09:02] [trace] MAPLE: Destroyed the resource manager
+[14:36:38] [trace] MAPLE: Initialised the resource manager
+[14:36:38] [trace] MAPLE: Added a loader of type Type: Image Loader.
+[14:36:38] [trace] MAPLE: Added a loader of type Type: Model Loader.
+[14:36:39] [trace] MAPLE: loaded resource
+[14:36:39] [trace] MAPLE: good type, casting...
+[14:36:39] [trace] MAPLE: got resource
+[14:36:39] [trace] MAPLE: Raven::Scene::OnInit
+[14:36:40] [trace] MAPLE: Destroyed the resource manager

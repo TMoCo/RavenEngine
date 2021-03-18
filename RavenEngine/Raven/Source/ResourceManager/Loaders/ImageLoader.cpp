@@ -18,12 +18,10 @@ namespace Raven
 		}
 
 		std::cout << "Will load: " << path << '\n';
-		// the test file is 500 by 500 pixels
 
 		int width		   = 0;
 		int height		   = 0;
 		int channelsInFile = 0;
-
 
 		// unique pointer containing data from a file, with the deleter provided by stbi
 		std::unique_ptr<stbi_uc, std::function<void(void*)>> fromFile (stbi_load(path.c_str(), &width, &height, &channelsInFile, STBI_default), stbi_image_free);
@@ -35,17 +33,23 @@ namespace Raven
 			break;
 		}
 
+		// no data...
+		if (!fromFile.get())
+		{
+			return false;
+		}
+
+		// create a new array of pixel data, Texture2D takes care of deleting the data
+		byte* data = new byte[static_cast<size_t>(width * height)];
+		memcpy(data, fromFile.get(), static_cast<size_t>(width * height) * sizeof(byte));
+
 		// TODO: create the texture resource using a custom allocator
 		// for now, do everything on the big ugly heap >:^(
-		Texture2D* imageResource = new Texture2D(static_cast<size_t>(width), static_cast<size_t>(height));
-		// create a new array of pixel data
-		uint8_t* data = new uint8_t[width * height];
-		memcpy(data, fromFile.get(), width * height * sizeof(uint8_t));
-		imageResource->data = data;
+		Texture2D* imageResource = new Texture2D(static_cast<size_t>(width), static_cast<size_t>(height), data);
 
 		// add the resource to the resource registry
 		resourceManager->AddResource(path, imageResource);
 
-		return true;
+		return true; // smart pointer frees image data out of scope
 	}
 }

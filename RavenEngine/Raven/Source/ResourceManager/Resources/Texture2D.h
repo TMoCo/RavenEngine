@@ -12,20 +12,31 @@
 
 namespace Raven
 {
+	// one byte = 8 bits
+	using byte = uint8_t;
+
 	class Texture2D : public IResource
 	{
 	public:
-		Texture2D(size_t initWidth, size_t initHeight) : IResource(EResourceType::RT_Image, true),
-			width(initHeight), height(initHeight) {}
-		// TODO: free data on destruction
-		virtual ~Texture2D() = default;
+		Texture2D(size_t initWidth, size_t initHeight, byte* initData = nullptr) : IResource(EResourceType::RT_Image, true),
+			width(initHeight), height(initHeight), data(initData) {}
 
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } // return the resource type
+		inline virtual ~Texture2D()
+		{
+			if (data)
+			{
+				// TODO: free data from memory manager when implemented
+				delete[] data; // delete array of texture data
+			}
+		}
+
+		// return the resource type
+		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } 
 
 		size_t height; // image dimensions
 		size_t width;
 		
-		uint8_t* data = nullptr; // image data (sizeof(uint8_t) * height * width))
+		byte* data; // image data should be sizeof(byte) * height * width)
 
 		RenderRscTexture* renderResource = nullptr; // interface with renderer
 

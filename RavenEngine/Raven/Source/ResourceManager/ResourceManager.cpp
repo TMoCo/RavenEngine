@@ -35,7 +35,6 @@ namespace Raven {
 		// TODO: Clean up resource manager
 		FlushResourceRegister();
 		loaders.clear(); // removes the loaders
-		std::cout << loaders.size() << " " << resources.size() << '\n';
 		LOGV("Destroyed the resource manager");
 	}
 
@@ -94,7 +93,7 @@ namespace Raven {
 		{
 		case EResourceType::RT_Image:
 			return GetLoader<ImageLoader>()->LoadAsset(path); // adds a resource to the register
-		case EResourceType::RT_Mesh:
+		case EResourceType::RT_Model:
 			return GetLoader<ModelLoader>()->LoadAsset(path);
 		default:
 			return false;

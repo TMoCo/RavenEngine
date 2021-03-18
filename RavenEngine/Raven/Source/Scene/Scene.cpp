@@ -33,8 +33,10 @@ namespace Raven {
 		height = h;
 	}
 
-	void Scene::Serialize(const std::string& filePath, bool binary)
+	void Scene::Save(const std::string& filePath, bool binary)
 	{
+		// loop through the scene and serialize each entity and its components
+
 	}
 
 	void Scene::Load(const std::string& filePath, bool binary)

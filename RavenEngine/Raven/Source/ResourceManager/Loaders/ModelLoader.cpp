@@ -36,7 +36,8 @@ namespace Raven
 
         // load the model, show error if not
         if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path.c_str())) {
-            throw std::runtime_error(err);
+            LOGE(err);
+            return false;
         }
 
         // The model class, just a container for mesh resources and to easily access the meshes

@@ -17,8 +17,8 @@ namespace Raven
 
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Model; } // return the resource type
 
-		// return pointer to a mesh resource
-		inline Mesh* GetMesh(size_t index)
+		// return shared pointer to a mesh resource
+		inline std::shared_ptr<Mesh> GetMesh(size_t index)
 		{
 			if (index > meshes.size())
 			{
@@ -37,11 +37,11 @@ namespace Raven
 
 		inline void AddMesh(Mesh* mesh)
 		{
-			meshes.push_back(mesh);
+			meshes.push_back(std::shared_ptr<Mesh>(mesh));
 		}
 
 	private:
-		std::vector<Mesh*> meshes;
+		std::vector<std::shared_ptr<Mesh>> meshes;
 
 		NOCOPYABLE(Model);
 	};

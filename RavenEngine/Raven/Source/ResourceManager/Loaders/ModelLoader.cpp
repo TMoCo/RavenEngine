@@ -56,6 +56,7 @@ namespace Raven
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]));
+
                 // check that normals and texcoords exist, add accordingly
                 if (index.normal_index == -1)
                 {
@@ -69,6 +70,7 @@ namespace Raven
                         attrib.normals[3 * index.normal_index + 1],
                         attrib.normals[3 * index.normal_index + 2]));
                 }
+
                 if (index.texcoord_index == -1)
                 {
                     mesh->texCoords.push_back(glm::vec2(0.0f));
@@ -79,6 +81,7 @@ namespace Raven
                         attrib.texcoords[2 * index.texcoord_index + 0],
                         1.0f - attrib.texcoords[2 * index.texcoord_index + 1]));
                 }
+
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
             model->AddMesh(mesh);

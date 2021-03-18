@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
+/**
+* The resource manager module takes care of providing the resources consumed by the 
+* game engine, making sure that only a single copy of any data is ever created. It also
+* handles the loading and unloading of resources from disc to RAM and from RAM to GPU.
+* A resource registry, an unordered map stores pointers to resources that are loaded from files. 
+* Loading of files is handled by Loader classes, stored in a vector. Each loader implements 
+* a LoadAsset function that loads an asset of the type handled by the loader into the resource
+* register.
+*/
+
 #pragma once
 
 #include <string>		 // file path as a string
@@ -22,7 +36,7 @@ namespace Raven
 		ResourceManager() = default;
 		virtual ~ResourceManager() override {};
 	
-		// inherited from IModule, must be over-ridden
+		// inherited from IModule, must be overridden
 		virtual void Initialize() override;
 		virtual void Destroy() override;
 
@@ -36,18 +50,17 @@ namespace Raven
 		template<class TResource>
 		TResource* GetResource(const std::string& path);
 
-		//
-		// Change the resource register
-		//
-
-		// tell manager to load a resource of a given type at a given path, need resource type to select loader
-		template<class TResource>
-		bool LoadResource(const std::string& path);
-
 		// returns true if the resource is already in the resource register
 		bool HasResource(const std::string& id);
 
-		// add and remove resources
+		//
+		// Change the resource register:
+		//
+
+		// tell manager to load a resource of a given type at a given path, need to specify resource type to select appropriate loader
+		template<class TResource>
+		bool LoadResource(const std::string& path);
+
 		void AddResource(const std::string& id, IResource* resource);
 
 		void RemoveResource(const std::string& id);
@@ -66,7 +79,7 @@ namespace Raven
 		template<class TResource>
 		inline TResource* CastTo(IResource* resource) 
 		{
-			if (TResource::IsATypeOf() != resource->GetType()) // check that we can cast to desired resource type
+			if (TResource::Type() != resource->GetType()) // check that we can cast to desired resource type
 			{
 				//throw std::runtime_error("Bad resource cast!");
 				return nullptr;
@@ -85,10 +98,8 @@ namespace Raven
 		template <class TLoader>
 		TLoader* GetLoader();
 
-		// for now the resource registers map an id to the resource in heap memory (may wish to convert to unique_ptr later)
-		// later there will be a few registers containing resource families 
-		// eg: ResourceFamily Image -> Texture2D, Texture3D, CubeMap, Material (as a texture?...)
-		std::unordered_map<std::string, IResource*> resources; // for now we just have Texture2D, so get that working first
+		// for now the resource registers map an id to the resource in heap memory
+		std::unordered_map<std::string, IResource*> resources;
 
 		// an array containing the resource loaders used
 		std::vector<std::unique_ptr<ILoader>> loaders;

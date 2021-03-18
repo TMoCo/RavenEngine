@@ -21,13 +21,13 @@ namespace Raven
 	{
 	public:
 		// Construct.
-		RenderRscTexture();
+		RenderRscTexture() {}
 
 		// Destruct.
-		~RenderRscTexture();
+		~RenderRscTexture() {}
 
 		//
-		void LoadTexture();
+		void LoadTexture() {}
 
 	private:
 		// The OpenGL Texture.

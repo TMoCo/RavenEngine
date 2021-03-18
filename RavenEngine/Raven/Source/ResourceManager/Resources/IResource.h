@@ -38,6 +38,8 @@ namespace Raven
 				return "Type: Material.";
 			case EResourceType::RT_Audio:
 				return "Type: Audio.";
+			case EResourceType::RT_Model:
+				return "Type: Model";
 			default:
 				return "Resource type not recognised";
 			}
@@ -45,7 +47,7 @@ namespace Raven
 
 		inline auto GetType() const noexcept { return type; }
 
-		inline auto IsOnGPU() const noexcept { return onGPU; } // query if a resource was loaded on to GPU
+		inline auto IsOnGPU() const noexcept { return onGPU; } // query if a resource is loaded on to GPU
 
 	protected:
 		const EResourceType type;

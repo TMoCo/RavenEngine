@@ -36,7 +36,7 @@ namespace Raven {
 		if (LoadResource<Model>(m))
 			LOGV("Loaded model");
 
-		Model* mdl = GetResource<Model>(t);
+		Model* mdl = GetResource<Model>(m);
 		if (mdl)
 		{
 			LOGV("Got resource with " + std::to_string(mdl->GetMeshes()->size()) + " meshes");
@@ -154,6 +154,8 @@ namespace Raven {
 	TResource* ResourceManager::GetResource(const std::string& id)
 	{
 		auto resourceIter = resources.find(id); // a key/value pair iterator
+		LOGV("Type1: " + IResource::TypeToString(TResource::Type()));
+		LOGV("Type2: " + IResource::TypeToString(resourceIter->second->GetType()));
 		if ((resourceIter == resources.end()) || ((TResource::Type() != resourceIter->second->GetType())) ) // check IResource pointer is of right type
 		{
 			return nullptr;

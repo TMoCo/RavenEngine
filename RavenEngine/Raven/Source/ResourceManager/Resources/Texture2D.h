@@ -30,6 +30,15 @@ namespace Raven
 			}
 		}
 
+		inline void LoadOnGpu()
+		{
+			if (!onGPU)
+			{
+				renderRscTexture.LoadTexture(); // call interface method
+				onGPU = true;
+			}
+		}
+
 		// return the resource type
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } 
 
@@ -38,7 +47,7 @@ namespace Raven
 		
 		byte* data; // image data should be sizeof(byte) * height * width)
 
-		RenderRscTexture* renderResource = nullptr; // interface with renderer
+		RenderRscTexture renderRscTexture; // interface with renderer
 		NOCOPYABLE(Texture2D);
 	};
 }

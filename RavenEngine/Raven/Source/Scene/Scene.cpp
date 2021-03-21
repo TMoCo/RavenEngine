@@ -7,6 +7,11 @@
 #include "Entity/Entity.h"
 #include "Entity/EntityManager.h"
 #include "SceneGraph.h"
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Light.h"
+#include "ResourceManager/Resources/Model.h"
+
+#include "Core/Camera.h"
 
 #include <fstream>
 
@@ -79,8 +84,14 @@ namespace Raven {
 	{
 		LOGV("{0}", __FUNCTION__);
 		entityManager = std::make_shared<EntityManager>(this);
+		
+		entityManager->AddDependency<Camera, Transform>();
+		entityManager->AddDependency<Model, Transform>();
+		entityManager->AddDependency<Light, Transform>();
+		
 		sceneGraph = std::make_shared<SceneGraph>();
 		sceneGraph->Init(entityManager->GetRegistry());
+
 	}
 
 	void Scene::OnClean()

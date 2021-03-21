@@ -144,7 +144,19 @@ void RenderScene::Build(Scene* scene)
 
 
 	// Lights...
-	auto lightsEttView = scene->getEntityManager()->GetEntitiesWithType<Light>();
+	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
+
+
+	for (auto entity : lightsEttView)
+	{
+		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
+		if (light.type != (int32_t)LightType::DirectionalLight)
+			continue;
+	}
+
+
+/*
+
 	if (!lightsEttView.Empty())
 	{
 		Light* dirLight = nullptr;
@@ -159,7 +171,7 @@ void RenderScene::Build(Scene* scene)
 		}
 
 		// Light Data...
-	}
+	}*/
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);

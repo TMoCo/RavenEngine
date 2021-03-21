@@ -64,11 +64,10 @@ namespace Raven
 		inline auto IsOnGPU() const noexcept { return onGPU; } // query if a resource is loaded on to GPU
 
 	protected:
-		const EResourceType type;
-		const bool isRenderable;
+		//remove const qualifier because it could have influence on type-traits
+		EResourceType type;
+		bool isRenderable;
 		bool onGPU;
-
-		NOCOPYABLE(IResource);
 	};
 
 

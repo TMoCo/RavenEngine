@@ -72,6 +72,8 @@ namespace Raven
 		ImGui::TextUnformatted("Light Type");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
+	
+
 		if (ImGui::BeginMenu(LightTypeToString(LightType(int32_t(type))).c_str()))
 		{
 			if (ImGui::MenuItem("Directional Light", "", static_cast<int>(type) == 0, true))
@@ -88,6 +90,7 @@ namespace Raven
 			}
 			ImGui::EndMenu();
 		}
+
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();

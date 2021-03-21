@@ -35,7 +35,7 @@ namespace MM
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
-		if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 3, 0.05f))
+		if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.05))
 		{
 			transform.SetLocalPosition(position);
 		}
@@ -46,7 +46,7 @@ namespace MM
 		ImGui::TextUnformatted("Rotation");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation), 3, 0.05f))
+		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),5))
 		{
 			float pitch = std::min(rotation.x, 89.9f);
 			pitch = std::max(pitch, -89.9f);
@@ -59,7 +59,7 @@ namespace MM
 		ImGui::TextUnformatted("Scale");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat3("##Scale", glm::value_ptr(scale), 3, 0.05f))
+		if (ImGui::DragFloat3("##Scale", glm::value_ptr(scale), 0.05))
 		{
 			transform.SetLocalScale(scale);
 		}

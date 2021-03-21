@@ -42,7 +42,5 @@ namespace Raven
 		std::vector<uint32_t> indices;
 
 		RenderRscMesh renderRscMesh; // interface with renderer (default constructor)
-
-		NOCOPYABLE(Mesh);
 	};
 }

@@ -18,7 +18,7 @@ namespace Raven
 	public:
 		Model() : IResource(EResourceType::RT_Model, true) {}
 
-		inline virtual ~Model()
+		~Model()
 		{
 			meshes.clear(); // calls the deleters for mesh objects
 		}
@@ -65,7 +65,5 @@ namespace Raven
 
 	private:
 		std::vector<std::shared_ptr<Mesh>> meshes;
-
-		NOCOPYABLE(Model);
 	};
 }

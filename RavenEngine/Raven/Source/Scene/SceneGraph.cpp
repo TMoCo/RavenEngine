@@ -4,6 +4,7 @@
 
 #include "SceneGraph.h"
 #include "Component/Component.h"
+#include "Component/Transform.h"
 
 namespace Raven 
 {
@@ -24,13 +25,57 @@ namespace Raven
 
 	void SceneGraph::Update(entt::registry& registry)
 	{
+		auto nonHierarchyView = registry.view<Transform>(entt::exclude<Hierarchy>);
 
+		for (auto entity : nonHierarchyView)
+		{
+			registry.get<Transform>(entity).SetWorldMatrix(glm::mat4{1.f});
+		}
+
+		auto view = registry.view<Transform, Hierarchy>();
+		for (auto entity : view)
+		{
+			const auto hierarchy = registry.try_get<Hierarchy>(entity);
+			if (hierarchy && hierarchy->Parent() == entt::null)
+			{
+				//Recursively update children
+				UpdateTransform(entity, registry);
+			}
+		}
 	}
 
 	void SceneGraph::UpdateTransform(entt::entity entity, entt::registry& registry)
 	{
-	}
+		auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
+		if (hierarchyComponent)
+		{
+			auto transform = registry.try_get<Transform>(entity);
+			if (transform)
+			{
+				if (hierarchyComponent->Parent() != entt::null)
+				{
+					auto parentTransform = registry.try_get<Transform>(hierarchyComponent->Parent());
+					if (parentTransform)
+					{
+						transform->SetWorldMatrix(parentTransform->GetWorldMatrix());
+					}
+				}
+				else
+				{
+					transform->SetWorldMatrix(glm::mat4{1.f});
+				}
+			}
 
+			entt::entity child = hierarchyComponent->First();
+			while (child != entt::null)
+			{
+				auto hierarchyComponent = registry.try_get<Hierarchy>(child);
+				auto next = hierarchyComponent ? hierarchyComponent->Next() : entt::null;
+				UpdateTransform(child, registry);
+				child = next;
+			}
+		}
+	}
 };
 
 

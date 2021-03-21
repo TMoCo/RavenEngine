@@ -2,6 +2,10 @@
 #pragma once
 #include "Logger/Console.h"
 
+// rename cereal function names to follow naming convention
+#define CEREAL_LOAD_FUNCTION_NAME Load
+#define CEREAL_SAVE_FUNCTION_NAME Save
+
 #define RAVEN_ASSERT(condition, ...)								\
 	{																\
 		if(!(condition))											\
@@ -10,7 +14,6 @@
 			__debugbreak(); 										\
 		}															\
 	}	
-
 
 #define NOCOPYABLE(Type)								\
     Type(const Type&) = delete;							\

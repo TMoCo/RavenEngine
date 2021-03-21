@@ -1,5 +1,6 @@
-[20:28:58] [error] MAPLE: this is a message,1,2,3
-[20:28:58] [critical] MAPLE: this is a message,1,2,3
-[20:28:58] [warning] MAPLE: this is a message,1,2,3
-[20:28:58] [info] MAPLE: this is a message,1,2,3
-[20:28:58] [trace] MAPLE: this is a message,1,2,3
+[19:49:04] [trace] MAPLE: Initialised the resource manager
+[19:49:04] [trace] MAPLE: Added a loader of type Type: Image Loader.
+[19:49:04] [trace] MAPLE: Added a loader of type Type: Model Loader.
+[19:49:04] [trace] MAPLE: Load success, n meshes: 1
+[19:49:05] [trace] MAPLE: Raven::Scene::OnInit
+[19:49:08] [trace] MAPLE: Destroyed the resource manager

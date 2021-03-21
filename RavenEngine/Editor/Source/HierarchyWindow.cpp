@@ -1,17 +1,24 @@
 //////////////////////////////////////////////////////////////////////////////
 // This file is part of the Raven Game Engine			                    //
-
 //////////////////////////////////////////////////////////////////////////////
+
 #include "HierarchyWindow.h"
 #include "Scene/Component/Component.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
+#include "Scene/Entity/EntityManager.h"
+#include "Scene/Entity/Entity.h"
+#include "Scene/Component/Light.h"
+#include "Core/Camera.h"
+#include "Scene/Component/Transform.h"
+#include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
+#include <imgui_internal.h>
 #include "Editor.h"
 
 namespace Raven
 {
-
+	constexpr size_t INPUT_BUFFER = 256;
 
 	HierarchyWindow::HierarchyWindow()
 	{
@@ -33,6 +40,15 @@ namespace Raven
 				{
 					scene->CreateEntity();
 				}
+
+				if (ImGui::Selectable("Add Camera"))
+				{
+					auto entity = scene->CreateEntity("Camera");
+					entity.AddComponent<Camera>();
+					entity.GetOrAddComponent<Transform>();
+				}
+
+
 				ImGui::EndPopup();
 			}
 			DrawName();
@@ -44,8 +60,6 @@ namespace Raven
 
 	void HierarchyWindow::DrawName()
 	{
-		constexpr size_t INPUT_BUFFER = 256;
-
 		auto scene = Editor::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& registry = scene->GetRegistry();
 
@@ -102,6 +116,48 @@ namespace Raven
 					DrawNode(entity, registry);
 			}
 		});
+
+		//Only supports one scene
+		ImVec2 minSpace = ImGui::GetWindowContentRegionMin();
+		ImVec2 maxSpace = ImGui::GetWindowContentRegionMax();
+
+		float yOffset = std::max(45.0f, ImGui::GetScrollY()); 
+		minSpace.x += ImGui::GetWindowPos().x + 1.0f;
+		minSpace.y += ImGui::GetWindowPos().y + 1.0f + yOffset;
+		minSpace.x += ImGui::GetWindowPos().x - 1.0f;
+		minSpace.y += ImGui::GetWindowPos().y - 1.0f + ImGui::GetScrollY();
+		ImRect bb{ minSpace, maxSpace };
+
+		const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+		if (payload != NULL && payload->IsDataType("Drag_Entity"))
+		{
+			bool acceptable = false;
+
+			RAVEN_ASSERT(payload->DataSize == sizeof(entt::entity*), "Error ImGUI drag entity");
+			auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+			auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
+			if (hierarchyComponent)
+			{
+				acceptable = hierarchyComponent->Parent() != entt::null;
+			}
+
+			if (acceptable && ImGui::BeginDragDropTargetCustom(bb, ImGui::GetID("Panel Hierarchy")))
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Drag_Entity"))
+				{
+					RAVEN_ASSERT(payload->DataSize == sizeof(entt::entity*), "Error ImGUI drag entity");
+					auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+					auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
+					if (hierarchyComponent)
+					{
+						Hierarchy::Reparent(entity, entt::null, registry, *hierarchyComponent);
+						Entity e(entity, scene);
+						e.RemoveComponent<Hierarchy>();
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+		}
 	}
 
 	void HierarchyWindow::DrawNode(const entt::entity& node, entt::registry& registry)
@@ -110,6 +166,10 @@ namespace Raven
 
 		if (!registry.valid(node))
 			return;
+
+		auto& editor = static_cast<Editor&>(Engine::Get());
+		auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
+
 
 		const auto nameComponent = registry.try_get<NameComponent>(node);
 		std::string name = nameComponent ? nameComponent->name : std::to_string(entt::to_integral(node));
@@ -130,7 +190,9 @@ namespace Raven
 			if (hierarchyComponent != nullptr && hierarchyComponent->First() != entt::null)
 				noChildren = false;
 
-			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
+			ImGuiTreeNodeFlags nodeFlags = ((editor.GetSelected() == node) ? ImGuiTreeNodeFlags_Selected : 0);
+
+			nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_FramePadding;
 
 			if (noChildren)
 			{
@@ -143,12 +205,295 @@ namespace Raven
 			if (!active)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
 
-			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entt::to_integral(node), nodeFlags, name.c_str());
-			if (nodeOpen) 
+			bool doubleClicked = false;
+			if (node == doubleClickedEntity)
 			{
-				ImGui::TreePop();
+				doubleClicked = true;
+			}
+
+			if (doubleClicked)
+				ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 1.0f, 2.0f });
+
+			if (recentDroppedEntity == node)
+			{
+				ImGui::SetNextItemOpen(true);
+				recentDroppedEntity = entt::null;
+			}
+
+			std::string icon = ICON_MDI_CUBE_OUTLINE;
+			auto& iconMap = editor.GetComponentIconMap();
+
+			if (registry.has<Light>(node))
+			{
+				if (iconMap.find(typeid(Light).hash_code()) != iconMap.end())
+					icon = iconMap[typeid(Light).hash_code()];
+			}
+			else if (registry.has<Camera>(node))
+			{
+				if (iconMap.find(typeid(Camera).hash_code()) != iconMap.end())
+					icon = iconMap[typeid(Camera).hash_code()];
+			}
+
+
+
+
+			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entt::to_integral(node), nodeFlags, (icon + " %s").c_str(), doubleClicked ? "" : (name).c_str());
+
+			if (doubleClicked)
+			{
+				ImGui::SameLine();
+				static char objName[INPUT_BUFFER];
+				strcpy(objName, name.c_str());
+
+				ImGui::PushItemWidth(-1);
+				if (ImGui::InputText("##Name", objName, IM_ARRAYSIZE(objName), 0))
+					registry.get_or_emplace<NameComponent>(node).name = objName;
+				ImGui::PopStyleVar();
+			}
+
+
+			if (!active)
+				ImGui::PopStyleColor();
+
+			bool deleteEntity = false;
+			if (ImGui::BeginPopupContextItem(name.c_str()))
+			{
+				if (ImGui::Selectable("Copy"))
+					editor.SetCopiedEntity(node);
+
+				if (ImGui::Selectable("Cut"))
+					editor.SetCopiedEntity(node, true);
+
+				if (editor.GetCopiedEntity() != entt::null && registry.valid(editor.GetCopiedEntity()))
+				{
+					if (ImGui::Selectable("Paste"))
+					{
+						Entity copiedEntity = { editor.GetCopiedEntity(), scene };
+						if (!copiedEntity.Valid())
+						{
+							editor.SetCopiedEntity(entt::null);
+						}
+						else
+						{
+							scene->DuplicateEntity(copiedEntity, { node, scene });
+
+							if (editor.IsCutCopyEntity())
+								deleteEntity = true;
+						}
+					}
+				}
+				else
+				{
+					ImGui::TextDisabled("Paste");
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::Selectable("Duplicate"))
+				{
+					scene->DuplicateEntity({ node , scene });
+				}
+				if (ImGui::Selectable("Delete"))
+					deleteEntity = true;
+				if (editor.GetSelected() == node)
+					editor.SetSelected(entt::null);
+				ImGui::Separator();
+				if (ImGui::Selectable("Rename"))
+					doubleClickedEntity = node;
+				ImGui::Separator();
+
+				if (ImGui::Selectable("Add Child"))
+				{
+					auto child = scene->getEntityManager()->Create();
+
+					child.SetParent({ node, scene });
+				}
+				ImGui::EndPopup();
+			}
+
+			if (!doubleClicked && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+			{
+				auto ptr = node;
+				ImGui::SetDragDropPayload("Drag_Entity", &ptr, sizeof(entt::entity*));
+				ImGui::Text(ICON_MDI_ARROW_UP);
+				ImGui::EndDragDropSource();
+			}
+
+			const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+			if (payload != NULL && payload->IsDataType("Drag_Entity"))
+			{
+				bool acceptable;
+
+				RAVEN_ASSERT(payload->DataSize == sizeof(entt::entity*), "Error ImGUI drag entity");
+				auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
+				auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
+				if (hierarchyComponent != nullptr)
+				{
+					acceptable = entity != node && (!IsParentOfEntity(entity, node, registry)) && (hierarchyComponent->Parent() != node);
+				}
+				else
+					acceptable = entity != node;
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					// Drop directly on to node and append to the end of it's children list.
+					if (ImGui::AcceptDragDropPayload("Drag_Entity"))
+					{
+						if (acceptable)
+						{
+							if (hierarchyComponent)
+								Hierarchy::Reparent(entity, node, registry, *hierarchyComponent);
+							else
+							{
+								registry.emplace<Hierarchy>(entity, node);
+							}
+							droppedEntity = node;
+						}
+					}
+
+					ImGui::EndDragDropTarget();
+				}
+
+				if (editor.GetSelected() == entity)
+					editor.SetSelected(entt::null);
+			}
+
+			if (ImGui::IsItemClicked() && !deleteEntity)
+				editor.SetSelected(node);
+			else if (doubleClickedEntity == node && ImGui::IsMouseClicked(0) && !ImGui::IsItemHovered(ImGuiHoveredFlags_None))
+				doubleClickedEntity = entt::null;
+
+			if (ImGui::IsMouseDoubleClicked(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_None))
+			{
+				doubleClickedEntity = node;
+				/*if (Application::Get().GetEditorState() == EditorState::Preview)
+				{
+					auto transform = registry.try_get<Maths::Transform>(node);
+					if (transform)
+						editor.FocusCamera(transform->GetWorldPosition(), 2.0f, 2.0f);
+				}*/
+			}
+
+			if (deleteEntity)
+			{
+				DestroyEntity(node, registry);
+				if (nodeOpen)
+					ImGui::TreePop();
+				return;
+			}
+
+			/*if (m_SelectUp)
+			{
+				if (editor.GetSelected() == node && registry.valid(m_CurrentPrevious))
+				{
+					m_SelectUp = false;
+					editor.SetSelected(m_CurrentPrevious);
+				}
+			}
+
+			if (m_SelectDown)
+			{
+				if (registry.valid(m_CurrentPrevious) && m_CurrentPrevious == editor.GetSelected())
+				{
+					m_SelectDown = false;
+					editor.SetSelected(node);
+				}
+			}
+
+			m_CurrentPrevious = node;*/
+
+			if (nodeOpen == false)
+			{
+				return;
+			}
+
+			const ImColor TreeLineColor = ImColor(128, 128, 128, 128);
+			const float SmallOffsetX = 6.0f;
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			ImVec2 verticalLineStart = ImGui::GetCursorScreenPos();
+			verticalLineStart.x += SmallOffsetX; //to nicely line up with the arrow symbol
+			ImVec2 verticalLineEnd = verticalLineStart;
+
+			if (!noChildren)
+			{
+				entt::entity child = hierarchyComponent->First();
+				while (child != entt::null && registry.valid(child))
+				{
+					float HorizontalTreeLineSize = 16.0f; //chosen arbitrarily
+					auto currentPos = ImGui::GetCursorScreenPos();
+					ImGui::Indent(10.0f);
+
+					auto childHerarchyComponent = registry.try_get<Hierarchy>(child);
+
+					if (childHerarchyComponent)
+					{
+						entt::entity firstChild = childHerarchyComponent->First();
+						if (firstChild != entt::null && registry.valid(firstChild))
+						{
+							HorizontalTreeLineSize *= 0.5f;
+						}
+					}
+					DrawNode(child, registry);
+					ImGui::Unindent(10.0f);
+
+					const ImRect childRect = ImRect(currentPos, currentPos + ImVec2(0.0f, ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y));
+
+					const float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
+					drawList->AddLine(ImVec2(verticalLineStart.x, midpoint), ImVec2(verticalLineStart.x + HorizontalTreeLineSize, midpoint), TreeLineColor);
+					verticalLineEnd.y = midpoint;
+
+					if (registry.valid(child))
+					{
+						auto hierarchyComponent = registry.try_get<Hierarchy>(child);
+						child = hierarchyComponent ? hierarchyComponent->Next() : entt::null;
+					}
+				}
+			}
+
+			drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
+
+			ImGui::TreePop();
+		}
+	}
+
+	bool HierarchyWindow::IsParentOfEntity(entt::entity entity, entt::entity child, entt::registry& registry)
+	{
+		auto nodeHierarchyComponent = registry.try_get<Hierarchy>(child);
+		if (nodeHierarchyComponent)
+		{
+			auto parent = nodeHierarchyComponent->Parent();
+			while (parent != entt::null)
+			{
+				if (parent == entity)
+				{
+					return true;
+				}
+				else
+				{
+					nodeHierarchyComponent = registry.try_get<Hierarchy>(parent);
+					parent = nodeHierarchyComponent ? nodeHierarchyComponent->Parent() : entt::null;
+				}
 			}
 		}
+		return false;
+	}
+
+	void HierarchyWindow::DestroyEntity(entt::entity entity, entt::registry& registry)
+	{
+		auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
+		if (hierarchyComponent)
+		{
+			entt::entity child = hierarchyComponent->First();
+			while (child != entt::null)
+			{
+				auto hierarchyComponent = registry.try_get<Hierarchy>(child);
+				auto next = hierarchyComponent ? hierarchyComponent->Next() : entt::null;
+				DestroyEntity(child, registry);//
+				child = next;
+			}
+		}
+		registry.destroy(entity);
 	}
 
 };

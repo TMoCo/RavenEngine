@@ -14,7 +14,9 @@ enum EModuleType
 	MT_Render,
 	MT_ImGui,
 	MT_Window,
+	MT_GUI,
 	MT_SceneManager,
+	MT_ResourceManager,
 	MT_ProceduralGenerator,
 	MT_MAX
 };

@@ -18,7 +18,7 @@ namespace Raven
 		GetOrAddComponent<ActiveComponent>().active = isActive;
 	}
 
-	void Entity::SetParent(Entity& entity)
+	void Entity::SetParent(const Entity& entity)
 	{
 		bool acceptable = false;
 		auto hierarchyComponent = TryGetComponent<Hierarchy>();
@@ -67,7 +67,7 @@ namespace Raven
 		return children;
 	}
 
-	bool Entity::IsParent(Entity potentialParent)
+	bool Entity::IsParent(const Entity & potentialParent) const 
 	{
 		auto nodeHierarchyComponent = scene->GetRegistry().try_get<Hierarchy>(entityHandle);
 		if (nodeHierarchyComponent)

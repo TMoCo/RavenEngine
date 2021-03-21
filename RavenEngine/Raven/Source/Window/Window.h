@@ -8,6 +8,8 @@
 #include <memory>
 #include "IModule.h"
 
+#include "glm/vec2.hpp"
+
 
 
 struct GLFWwindow;
@@ -21,7 +23,13 @@ namespace Raven
 		static EModuleType GetModuleType() { return MT_Window; }
 		virtual void Initialize() override;
 		virtual void Destroy() override;
+
+		void InitEventsCallback();
+
 		inline auto GetNativeWindow() { return glfwWindow; }
+
+		std::pair<float, float> GetWindowScale();
+		glm::ivec2 GetFramebufferSize();
 
 		void PollEvent();
 		bool ShouldClose();

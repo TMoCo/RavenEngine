@@ -5,7 +5,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -83,3 +83,9 @@ void GLVertexArray::Unbind() const
 {
 	glBindVertexArray(0);
 }
+
+
+
+
+} // End of namespace Raven.
+

@@ -2,8 +2,8 @@
 
 namespace Raven
 {
-	void Texture2D::CreateResource()
-	{
+	//void Texture2D::CreateResource()
+	//{
 
-	}
+	//}
 }

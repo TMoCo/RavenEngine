@@ -30,12 +30,12 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscMesh.Load(verts, indices); // call interface method
+				renderRscMesh.Load(positions, normals, texCoords, indices); // call interface method
 				onGPU = true;
 			}
 		}
 
-		std::vector<glm::vec3> verts;
+		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
 

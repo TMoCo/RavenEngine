@@ -7,7 +7,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -57,3 +57,7 @@ void GLContext::MakeCurrent()
 {
 	glfwMakeContextCurrent(glfw_context);
 }
+
+
+
+} // End of namespace Raven.

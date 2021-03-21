@@ -33,6 +33,9 @@ namespace Raven
 		void Clear();
 
 		//
+		inline bool IsEmpty() { return elements.empty(); }
+
+		//
 		std::vector<RenderPrimitive*> elements;
 	};
 

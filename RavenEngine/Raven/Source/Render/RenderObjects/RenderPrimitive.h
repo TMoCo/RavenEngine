@@ -36,19 +36,19 @@ namespace Raven
 		// Return material.
 		inline RenderRscMaterial* GetMaterial() { return material; }
 
-		//
+		// Set Render Resrouce Material to be used by for drawing this primitive.
 		void SetMaterial(RenderRscMaterial* mat);
 
-		//
+		// Set the world transformation.
 		void SetWorldMatrix(const glm::mat4& mtx);
 
-		//
+		// Set the normals world transformation.
 		void SetNormalMatrix(const glm::mat4& mtx);
 
-		//
+		// Return world transformation.
 		inline const glm::mat4& GetWorldMatrix() const { return worldMatrix; }
 
-		//
+		// Draw ths Primitive.
 		virtual void Draw(GLShader* shader) const = 0;
 
 	private:

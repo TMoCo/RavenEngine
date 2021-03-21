@@ -13,7 +13,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -389,7 +389,10 @@ void GLShader::SetUniform(const std::string& name, const glm::mat3& value)
 
 void GLShader::BindUniformBlock(const std::string& blockName, int binding)
 {
-	int blockIdx = glGetUniformBlockIndex(0, blockName.c_str());
+	int blockIdx = glGetUniformBlockIndex(id, blockName.c_str());
 	glUniformBlockBinding(id, blockIdx, binding);
 }
 
+
+
+} // End of namespace Raven.

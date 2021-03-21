@@ -16,7 +16,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -148,3 +148,9 @@ void RenderDebug::DrawBox(const glm::vec3& position, const glm::vec3& scale, glm
 	elem.primitive = prim;
 	elem.time = time;
 }
+
+
+
+
+} // End of namespace Raven.
+

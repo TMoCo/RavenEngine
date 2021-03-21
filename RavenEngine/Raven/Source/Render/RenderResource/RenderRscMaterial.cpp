@@ -4,7 +4,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -20,3 +20,7 @@ RenderRscMaterial::~RenderRscMaterial()
 {
 
 }
+
+
+
+} // End of namespace Raven.

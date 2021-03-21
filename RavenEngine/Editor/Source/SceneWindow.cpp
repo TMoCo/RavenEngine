@@ -7,11 +7,13 @@
 #include "SceneWindow.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "Render/RenderModule.h"
+#include "Render/RenderTarget.h"
 #include "Render/OpenGL/GLTexture.h"
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 #include "Logger/Console.h"
 #include "Editor.h"
+
 
 namespace Raven 
 {
@@ -39,8 +41,22 @@ namespace Raven
 		sceneViewSize.y -= static_cast<int>(sceneViewSize.y) % 2 != 0 ? 1.0f : 0.0f;
 
 		Resize(static_cast<uint32_t>(sceneViewSize.x), static_cast<uint32_t>(sceneViewSize.y));
+
+		// Scene Render Target
+		Engine::GetModule<RenderModule>()->SetRTToWindow(false);
 		auto previewTexture = Engine::GetModule<RenderModule>()->GetSceneRT();
-		ImGui::Image((ImTextureID)previewTexture->GetID(), { sceneViewSize.x, sceneViewSize.y},{1,1}, {0,0});
+
+		glm::vec2 sizeFactor; // scale factor defined by the render size over the texture actual size.
+		sizeFactor.x = (float)previewTexture->GetSize().x / (float)previewTexture->GetActualSize().x;
+		sizeFactor.y = (float)previewTexture->GetSize().y / (float)previewTexture->GetActualSize().y;
+
+
+		ImGui::Image(
+			(ImTextureID)previewTexture->GetRTTextureID(),
+			{ sceneViewSize.x, sceneViewSize.y },
+			{ sizeFactor.x, sizeFactor.y },
+			{0,0}
+		);
 
 		auto windowSize = ImGui::GetWindowSize();
 		ImVec2 minBound = sceneViewPosition;
@@ -75,7 +91,7 @@ namespace Raven
 		if (resized) 
 		{
 			auto previewTexture = Engine::GetModule<RenderModule>()->GetSceneRT();
-			//previewTexture->re
+			previewTexture->Resize(glm::ivec2(width, height));
 		}
 		
 	}

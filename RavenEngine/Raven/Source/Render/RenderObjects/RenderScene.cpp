@@ -23,6 +23,7 @@
 #include "Render/RenderObjects/RenderDebugPrimitive.h"
 
 
+#include "ResourceManager/Resources/Model.h"
 
 #include "glm/gtc/type_ptr.hpp"
 
@@ -207,11 +208,12 @@ void RenderScene::TraverseScene(Scene* scene)
 {
 	// Get All transforms in the scene
 	// TODO: Traverse on Models while drawing building render scene.
+/*
 	auto trEnttView = scene->getEntityManager()->GetEntitiesWithType<Transform>();
 
 	// No Transforms?
 	if (trEnttView.Empty())
-		return;
+		return;*/
 
 	
 
@@ -230,12 +232,15 @@ void RenderScene::TraverseScene(Scene* scene)
 	// Clear Debug just for testing...
 	GetBatch(ERSceneBatch::Debug).Clear();
 
-	for (auto& tr : trEnttView)
+
+	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
+
+	for (auto entity : group)
 	{
-		Transform& sceneCamTr = tr.GetComponent<Transform>();
+		const auto& [model, trans] = group.get<Model, Transform>(entity);
 
 		RenderDebugPrimitive* trPrim = NewPrimitive<RenderDebugPrimitive>();
-		trPrim->SetWorldMatrix(sceneCamTr.GetWorldMatrix());
+		trPrim->SetWorldMatrix(trans.GetWorldMatrix());
 		trPrim->SetMaterial(debugMaterial);
 		trPrim->SetDebugMesh(debugRscMesh);
 		trPrim->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));

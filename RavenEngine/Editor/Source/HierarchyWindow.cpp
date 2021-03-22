@@ -44,10 +44,13 @@ namespace Raven
 				if (ImGui::Selectable("Add Camera"))
 				{
 					auto entity = scene->CreateEntity("Camera");
-					entity.AddComponent<Camera>();
+					auto & camera = entity.AddComponent<Camera>();
+					camera.SetFov(45.f);
+					camera.SetFar(100);
+					camera.SetNear(0.01);
+					camera.SetAspectRatio(4 / 3.f);
 					entity.GetOrAddComponent<Transform>();
 				}
-
 
 				ImGui::EndPopup();
 			}

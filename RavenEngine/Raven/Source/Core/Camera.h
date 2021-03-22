@@ -36,8 +36,8 @@ namespace Raven
 
 		inline auto GetFov() const	{	return fov;	}
 		inline auto GetScale() const	{	return scale;	}
-		inline auto SetScale(float scale)	{scale = scale;projectionDirty = true;}
-		inline auto SetFov(float fov)	{fov = fov;projectionDirty = true;}
+		inline auto SetScale(float scale)	{this->scale = scale;projectionDirty = true;}
+		inline auto SetFov(float fov)	{ this->fov = fov;projectionDirty = true;}
 
 	protected:
 		void UpdateProjectionMatrix();

@@ -54,7 +54,7 @@ namespace Raven
 		if (orthographic)
 			projMatrix = glm::ortho(aspectRatio * -scale, aspectRatio * scale, -scale, scale, near, far);
 		else
-			projMatrix = glm::perspective(fov, aspectRatio, near, far);
+			projMatrix = glm::perspective(glm::radians(fov), aspectRatio, near, far);
 	}
 
 };

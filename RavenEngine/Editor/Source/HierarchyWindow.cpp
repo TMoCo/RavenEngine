@@ -307,7 +307,7 @@ namespace Raven
 
 				if (ImGui::Selectable("Add Child"))
 				{
-					auto child = scene->getEntityManager()->Create();
+					auto child = scene->GetEntityManager()->Create();
 
 					child.SetParent({ node, scene });
 				}

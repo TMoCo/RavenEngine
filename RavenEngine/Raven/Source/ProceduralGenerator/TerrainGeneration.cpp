@@ -1,6 +1,4 @@
 #include "TerrainGeneration.h"
-#include <iostream>
-#include <fstream>
 
 namespace Raven {
 
@@ -32,8 +30,10 @@ namespace Raven {
 
 		// buffer to store noise data
 		//GLubyte* data = new GLubyte[width * height * octaves];
-		float data[width * height * octaves];
-		
+		//float data[width * height * octaves];
+		float* data;
+		data = (float*)malloc(width * height * octaves * sizeof(float));
+
 		float xFactor = 1.0f / (width - 1);
 		float yFactor = 1.0f / (height - 1);
 
@@ -83,12 +83,13 @@ namespace Raven {
 					{
 						out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
 					}
-										
+
 				}
 			}
 		}
 
 		out.close();
+		free(data);
 
 		//GLuint texID;
 		//glGenTextures(1, &texID);
@@ -96,6 +97,6 @@ namespace Raven {
 		//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
 		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		//delete [] data;
-		
+
 	}
 }

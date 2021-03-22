@@ -1,9 +1,12 @@
 #pragma once
 
+//#include <glew-2.1.0/include/GL/glew.h>
 #include "IModule.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
-#include <glew-2.1.0/include/GL/glew.h>
+#include <iostream>
+#include <fstream>
 #include "Logger/Console.h"
 
 namespace Raven {
@@ -31,7 +34,7 @@ namespace Raven {
 		// create noise
 		void Noise();
 
-	
+
 	};
 
 }

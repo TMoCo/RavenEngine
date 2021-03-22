@@ -12,6 +12,7 @@ namespace Raven
 		Camera() = default;
 		Camera(float fov, float near, float far, float aspect);
 		Camera(float aspectRatio, float scale);
+		Camera(float pitch, float yaw, const glm::vec3 & position, float fov, float near, float far, float aspect);
 		~Camera() = default;
 
 		inline auto SetMouseSensitivity(float value){ mouseSensitivity = value;	}

@@ -124,11 +124,18 @@ namespace Raven
 
 	}
 
-	std::pair<float, float> Window::GetWindowScale()
+	glm::vec2 Window::GetWindowScale()
 	{
 		float x, y;
 		glfwGetWindowContentScale(glfwWindow, &x, &y);
 		return {x,y};
+	}
+
+	glm::vec2 Window::GetWindowSize()
+	{
+		int32_t x, y;
+		glfwGetWindowSize(glfwWindow, &x, &y);
+		return { x,y };
 	}
 
 	glm::ivec2 Window::GetFramebufferSize()

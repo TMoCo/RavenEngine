@@ -213,6 +213,20 @@ void RenderScene::TraverseScene(Scene* scene)
 	if (trEnttView.Empty())
 		return;
 
+	
+
+/*
+* 
+*   a demo
+	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
+
+	for (auto entity : group)
+	{
+		const auto& [model, trans] = group.get<Model, Transform>(entity);
+	}
+*/
+
+
 	// Clear Debug just for testing...
 	GetBatch(ERSceneBatch::Debug).Clear();
 

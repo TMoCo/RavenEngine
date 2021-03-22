@@ -26,6 +26,19 @@ namespace Raven
 	{
 
 	}
+
+	Camera::Camera(float pitch, float yaw, const glm::vec3& position, float fov, float near, float far, float aspect)
+		: aspectRatio(aspect)
+		, projectionDirty(true)
+		, fov(fov)
+		, near(near)
+		, far(far)
+		, orthographic(false)
+		, scale(1.0f)
+	{
+
+	}
+
 	const glm::mat4& Camera::GetProjectionMatrix()
 	{
 		if (projectionDirty)

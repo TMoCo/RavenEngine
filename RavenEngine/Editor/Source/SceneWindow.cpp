@@ -9,11 +9,15 @@
 #include "Render/RenderModule.h"
 #include "Render/RenderTarget.h"
 #include "Render/OpenGL/GLTexture.h"
-#include <imgui_internal.h>
-#include <ImGuizmo.h>
+
 #include "Logger/Console.h"
 #include "Editor.h"
+#include "Scene/Scene.h"
+#include "Core/Camera.h"
 
+#include <imgui_internal.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <ImGuizmo.h>
 
 namespace Raven 
 {
@@ -196,6 +200,22 @@ namespace Raven
 		ImGui::PopStyleColor();
 		ImGui::Unindent();
 	}
+
+
+
+
+	void SceneWindow::DrawGizmos(float width, float height, float xpos, float ypos, Scene* scene)
+	{
+		auto& editor = static_cast<Editor&>(Engine::Get());
+		auto& camera = editor.GetCamera();
+		auto & cameraTransform = editor.GetEditorCameraTransform();
+		auto & registry = scene->GetRegistry();
+		auto view = glm::inverse(cameraTransform.GetWorldMatrix());
+		auto & proj = camera->GetProjectionMatrix();
+
+	
+	}
+
 
 };
 	

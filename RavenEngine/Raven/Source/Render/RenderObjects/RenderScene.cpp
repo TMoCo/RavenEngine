@@ -133,7 +133,7 @@ void RenderScene::Build(Scene* scene)
 
 
 	// View & Projection...
-	auto camsEttView = scene->getEntityManager()->GetEntitiesWithType<Camera>();
+	auto camsEttView = scene->GetEntityManager()->GetEntitiesWithType<Camera>();
 	if (!camsEttView.Empty())
 	{
 		Camera& sceneCam = camsEttView[0].GetComponent<Camera>();

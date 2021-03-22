@@ -25,7 +25,7 @@ namespace Raven
 		virtual void OnClean();
 		virtual void OnUpdate(float dt);
 
-		inline auto& getEntityManager() { return entityManager; }
+		inline auto& GetEntityManager() { return entityManager; }
 		inline auto& GetName() const { return name; };
 		inline void SetName(const std::string& name) { this->name = name; }
 

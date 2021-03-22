@@ -9,6 +9,9 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+
+#include "ResourceManager/Resources/Model.h"
+
 #include "Core/Camera.h"
 #include "Window/Window.h"
 #include "ImGui/ImGuiHelpers.h"
@@ -36,6 +39,7 @@ namespace Raven
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
+		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();

@@ -9,14 +9,19 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
+#include "ResourceManager/Resources/Model.h"
 #include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Editor.h"
 
 
+
+
 namespace MM 
 {
+
+	
 	using namespace Raven;
 	template<>
 	void ComponentEditorWidget<Transform>(entt::registry& reg, entt::registry::entity_type e)
@@ -79,7 +84,6 @@ namespace MM
 		light.OnImGui();
 	}
 
-
 	template<>
 	void ComponentEditorWidget<Camera>(entt::registry& reg, entt::registry::entity_type e)
 	{
@@ -121,6 +125,86 @@ namespace MM
 		ImGui::PopStyleVar();
 
 	}
+
+
+
+	std::string GetPrimativeName(PrimitiveType type)
+	{
+		switch (type)
+		{
+		case PrimitiveType::Cube: return "Cube";
+		case PrimitiveType::Plane: return "Plane";
+		case PrimitiveType::Quad: return "Quad";
+		case PrimitiveType::Sphere: return "Sphere";
+		case PrimitiveType::Pyramid: return "Pyramid";
+		case PrimitiveType::Capsule: return "Capsule";
+		case PrimitiveType::Cylinder: return "Cylinder";
+		case PrimitiveType::Terrain: return "Terrain";
+		case PrimitiveType::File: return "File";
+		}
+		return "";
+	};
+
+
+	template<>
+	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& model = reg.get<Model>(e);
+		auto& meshes = model.GetMeshes();
+		
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+		ImGui::TextUnformatted("Primitive Type");
+
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
+		std::string shapeCurrent = GetPrimativeName(model.GetPrimitiveType());
+		if (ImGui::BeginCombo("", shapeCurrent.c_str(), 0))
+		{
+			for (auto n = 0; n < 8; n++)
+			{
+				bool isSelected = (shapeCurrent.c_str() == shapes[n]);
+				if (ImGui::Selectable(shapes[n], shapeCurrent.c_str()))
+				{
+					meshes.clear();
+					if (strcmp(shapes[n], "File") != 0)
+					{
+							//add new mesh here..
+					}
+					else
+						model.SetPrimitiveType(PrimitiveType::File);
+				}
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		if (model.GetPrimitiveType() == PrimitiveType::File)
+		{
+			ImGui::TextUnformatted("FilePath");
+
+			ImGui::NextColumn();
+			ImGui::PushItemWidth(-1);
+			ImGui::TextUnformatted(model.GetFileName().c_str());
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+		}
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
+
+	}
+
 };
 
 namespace Raven
@@ -203,6 +287,7 @@ namespace Raven
 		TRIVIAL_COMPONENT(Transform);
 		TRIVIAL_COMPONENT(Light);
 		TRIVIAL_COMPONENT(Camera);
+		TRIVIAL_COMPONENT(Model);
 		init = true;
 	}
 

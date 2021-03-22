@@ -42,6 +42,7 @@ namespace Raven {
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
+
 		// loop through the scene and serialize each entity and its components
 	/*	std::string path = filePath + name;
 		if (binary)

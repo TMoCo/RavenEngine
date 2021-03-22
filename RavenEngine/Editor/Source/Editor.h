@@ -6,9 +6,10 @@
 #include <entt/entt.hpp>
 #include "Engine.h"
 #include "EditorWindow.h"
-
+#include "Scene/Component/Transform.h"
 namespace Raven
 {
+	class Camera;
 
 	class Editor : public Engine
 	{
@@ -27,6 +28,9 @@ namespace Raven
 
 		inline auto GetImGuizmoOperation() const { return imGuizmoOperation; }
 		inline auto SetImGuizmoOperation(uint32_t imGuizmoOperation) { this->imGuizmoOperation = imGuizmoOperation; }
+
+		inline auto& GetCamera() { return camera; }
+		inline auto& GetEditorCameraTransform()	{return editorCameraTransform;}
 
 	private:
 		void OnImGuizmo();
@@ -47,6 +51,8 @@ namespace Raven
 
 		bool snapGuizmo = false;
 
+		std::unique_ptr<Camera> camera;
+		Transform editorCameraTransform;
 
 };
 

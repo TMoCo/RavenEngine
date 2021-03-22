@@ -2,15 +2,36 @@
 
 
 
-in vec2 texCoord;
+
+// Vertex Shader Output.
+in VertexOutput
+{
+	vec3 position;
+	vec3 normal;
+	vec2 texCoord;
+	
+} input;
+
+
+
+// Uniforms...
+uniform sampler2D heightMap;
 uniform vec4 color;
 
-out vec4 outFragColor;
-uniform sampler2D heightMap;
+
+// Output...
+out vec4 fragColor;
+
+
+
+// -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
+// -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
+
+
 
 
 void main()
 {
-	outFragColor = vec4(texture(heightMap, texCoord).r);
+	fragColor = vec4(texture(heightMap, input.texCoord).r);
 }
 

@@ -72,6 +72,12 @@ namespace Raven
 		// Return texture format.
 		inline EGLFilter GetFilter() const { return filter; }
 
+		// Return texture height.
+		inline int GetHeight() const { return height; }
+
+		// Return texture width.
+		inline int GetWidth() const { return width; }
+
 		// Bind this texture and set it as active for TEXTURE(i)
 		void Active(int i);
 

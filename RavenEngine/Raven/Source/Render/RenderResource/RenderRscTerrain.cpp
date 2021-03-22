@@ -8,7 +8,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -16,8 +16,9 @@ using namespace Raven;
 RenderRscTerrain::RenderRscTerrain()
 	: heightMap(nullptr)
 	, vertexArray(nullptr)
-	, vertexBuffer(nullptr)
+	, vxarray(nullptr)
 	, numVerts(0)
+	, height(1.0f)
 {
 
 }
@@ -25,11 +26,8 @@ RenderRscTerrain::RenderRscTerrain()
 
 RenderRscTerrain::~RenderRscTerrain()
 {
-	if (vertexArray != nullptr)
-		delete vertexArray;
-
-	if (vertexBuffer != nullptr)
-		delete vertexBuffer;
+	delete vxarray;
+	delete positionBuffer;
 
 }
 
@@ -47,12 +45,13 @@ void RenderRscTerrain::LoadHeightMap(int width, int height, const void* data)
 }
 
 
-void RenderRscTerrain::GenerateTerrain(int resolution, const glm::vec2& scale)
+void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, float inHeight)
 {
-	terrainScale = scale;
+	scale = inScale;
+	height = inHeight;
 	std::vector<glm::vec3> terrainVerts;
 
-	int vcount = glm::max(resolution, 10);
+	int vcount = glm::max(inRes, 10);
 	terrainVerts.reserve(vcount * vcount * 6);
 	float vof = (1.0f / (float)(vcount - 1));
 
@@ -81,7 +80,7 @@ void RenderRscTerrain::GenerateTerrain(int resolution, const glm::vec2& scale)
 
 
 	numVerts = terrainVerts.size();
-	vertexBuffer = GLBuffer::Create(
+	positionBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
 		(int)(terrainVerts.size() * sizeof(glm::vec3)),
 		terrainVerts.data(),
@@ -91,9 +90,9 @@ void RenderRscTerrain::GenerateTerrain(int resolution, const glm::vec2& scale)
 
 
 	std::vector<GLVABuildAttribData> attributes{
-		// Attribute 0
+		// Attribute 0 - Position
 		{
-			vertexBuffer,      // Buffers
+			positionBuffer,      // Buffers
 			0,                 // Index
 			3,                 // Type-Size
 			EGLTypes::Float,   // Type
@@ -106,3 +105,6 @@ void RenderRscTerrain::GenerateTerrain(int resolution, const glm::vec2& scale)
 	vertexArray = GLVertexArray::Create();
 	vertexArray->Build(attributes, nullptr);
 }
+
+
+} // End of namespace Raven.

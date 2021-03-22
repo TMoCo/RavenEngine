@@ -5,6 +5,7 @@
 #include "Window/Window.h"
 #include "RenderDebug.h"
 #include "OpenGL/GLContext.h"
+#include "RenderTarget.h"
 
 #include "RenderObjects/RenderScene.h"
 #include "Render/RenderObjects/RenderTerrain.h"
@@ -39,7 +40,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -47,19 +48,8 @@ using namespace Raven;
 
 
 // ~TESTING-------------------------------------------------------
-GLFrameBuffer* fbo = nullptr;
-GLTexture* colorTarget = nullptr;
-GLRenderBuffer* depthTarget = nullptr;
-
-RenderRscTerrain* terrainRsc = nullptr;
-RenderTerrain* terrain = nullptr;
-RenderRscShader* terrainShader = nullptr;
-RenderRscMaterial* terrainMaterail = nullptr;
 
 static float camRot = 0.0f;
-static bool blitToWindow = false;
-static glm::ivec2 targetSize = glm::ivec2(50, 50);
-
 
 // ~TESTING-------------------------------------------------------
 
@@ -70,6 +60,7 @@ static glm::ivec2 targetSize = glm::ivec2(50, 50);
 
 RenderModule::RenderModule()
 	: isRendering(false)
+	, isRTToWindow(true)
 {
 	rdebug.reset(new RenderDebug());
 }
@@ -99,63 +90,16 @@ void RenderModule::Initialize()
 	rdebug->Setup();
 
 
-	// ~TESTING-------------------------------------------------------
-	colorTarget = GLTexture::Create(EGLTexture::Texture2D, EGLFormat::RGBA);
-	colorTarget->Bind();
-	colorTarget->SetFilter(EGLFilter::Nearest);
-	colorTarget->SetFilter(EGLFilter::Nearest);
-	colorTarget->UpdateTexData(0, 820, 820, nullptr);
-	colorTarget->UpdateTexParams();
-	colorTarget->Unbind();
+	// Main Scene Render Target.
+	rtScene = std::make_shared<RenderTarget>(EGLTexture::Texture2D, EGLFormat::RGBA);
+	rtScene->Resize(glm::ivec2(1920, 1080));
+	rtScene->SetClearColor(glm::vec4(0.1f, 0.1f, 0.2f, 1.0f));
+	rtScene->SetSampleProeprties(EGLFilter::Nearest, EGLWrap::ClampToEdge);
+	rtScene->Update();
 
-	depthTarget = GLRenderBuffer::Create(EGLFormat::Depth32, 820, 820);
-
-	fbo = GLFrameBuffer::Create();
-	fbo->Attach(EGLAttachment::Color0, 0, colorTarget);
-  fbo->Attach(EGLAttachment::Depth, depthTarget);
-	fbo->Update();
-
-
-	unsigned char* heigtData = new unsigned char[1024 * 1024];
-
-	for (int x = 0; x < 1024; ++x)
-	{
-		for (int y = 0; y < 1024; ++y)
-		{
-			float fx = x / (float)(1024 - 1);
-			float fy = y / (float)(1024 - 1);
-
-			float sx = cos(fx * 20.f) * 0.5f + 0.5f;
-			float sy = sin(fy * 20.f) * 0.5f + 0.5f;
-			float height = sx + sy;
-			height = height * 0.5f;
-
-			heigtData[x + y * 1024] = height * 255;
-		}
-	}
-
-
-	glm::vec2 terrainScale = glm::vec2(1000.0f);
-
-	terrainRsc = new RenderRscTerrain();
-	terrainRsc->LoadHeightMap(1024, 1024, heigtData);
-	terrainRsc->GenerateTerrain(100, terrainScale);
-	delete heigtData;
-
-
-	terrainShader = new RenderRscShader();
-	terrainShader->Load(ERenderShaderType::Terrain, "TerrainShader");
-
-	terrainMaterail = new RenderRscMaterial(terrainShader);
-
-	terrain = new RenderTerrain();
-	terrain->SetHeight(200.0f);
-	terrain->SetTerrainRsc(terrainRsc);
-	terrain->SetWorldMatrix( glm::translate(glm::vec3(terrainScale.x, 0.0f, terrainScale.y) * -0.5f) );
-	terrain->SetNormalMatrix(glm::mat4(1.0f));
-	terrain->SetMaterial(terrainMaterail);
-
-	// ~TESTING-------------------------------------------------------
+	// Render Scene.
+	rscene = std::make_shared<RenderScene>();
+	rscene->Setup();
 
 }
 
@@ -164,15 +108,8 @@ void RenderModule::Destroy()
 {
 	//
 	rdebug->Destroy();
+	rtScene.reset();
 
-
-	delete terrain;
-	delete terrainRsc;
-	delete terrainShader;
-	delete terrainMaterail;
-	delete fbo;
-	delete colorTarget;
-	delete depthTarget;
 }
 
 
@@ -208,69 +145,40 @@ void RenderModule::Update(float dt)
 
 	// ~TESTING-------------------------------------------------------
 
-	rscene = std::make_shared<RenderScene>();
 	rdebug->Update(dt);
 
 }
 
 
-void RenderModule::BeginRender(Scene* scene, bool blit, const glm::ivec2& extent)
+void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 {
 	RAVEN_ASSERT(!isRendering, "Render - Trying to begin render before EndRender().");
 	isRendering = true;
-	blitToWindow = blit;
+
+	// Should we resize with window?
+	if (isRTToWindow)
+	{
+		// Resize our render target, it is fine to call it every frame as it only resize the actuall image when it get larger
+		rtScene->Resize(extent);
+	}
+
+	// Update Render Target if dirty.
+	if (rtScene->IsDirty())
+		rtScene->Update();
 
 
 	// ~TESTING-------------------------------------------------------
-
-	if (blitToWindow)
-	{
-		if (targetSize.x != extent.x || targetSize.y != extent.y)
-		{
-			// Invalid Size?
-			if (extent.x < 10 || extent.y < 10)
-				targetSize = glm::max(extent, glm::ivec2(10, 10));
-			else
-				targetSize = extent;
-
-
-			// Resize Target...
-			colorTarget->Bind();
-			colorTarget->UpdateTexData(0, targetSize.x, targetSize.y, nullptr);
-			colorTarget->Unbind();
-
-			depthTarget->Bind();
-			depthTarget->UpdateStorage(EGLFormat::Depth32, targetSize.x, targetSize.y);
-			depthTarget->Unbind();
-		}
-	}
-
-
-	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * abs(sin(camRot * 0.03f)) * 1000.0f + 1.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)targetSize.x / (float)targetSize.y, 0.01f, 10000.0f);
-	// ~TESTING-------------------------------------------------------
-
-
-	// ~TESTING SCENE DRAWING------------------------------------------
-	auto& registry = scene->GetRegistry();
-	auto entityView = registry.view<Transform>(entt::exclude<Hierarchy>);
-
-	for (auto entity : entityView)
-	{
-		auto& transform = entityView.get<Transform>(entity);
-
-		GetDebug()->DrawBox(transform.GetWorldPosition(), glm::vec3(1.0f),
-			glm::vec4(1.0f));
-	}
-
-	// ~TESTING SCENE DRAWING------------------------------------------
-
-
-	// 
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * abs(sin(camRot * 0.03f)) * 150.0f + 1.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
 	rscene->SetView(view);
 	rscene->SetProjection(proj);
-	rscene->Build(terrain, scene);
+	// ~TESTING-------------------------------------------------------
+
+
+
+	// Build Render Data form the scene...
 	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );
+	rscene->Build(scene);
 }
 
 
@@ -278,15 +186,24 @@ void RenderModule::Render()
 {
 	RAVEN_ASSERT(isRendering, "Render - Trying to render before BeginRender().");
 
-	fbo->Bind(EGLFrameBuffer::Framebuffer);
-	glViewport(0 ,0, targetSize.x, targetSize.y);
-	glScissor(0, 0, targetSize.x, targetSize.y);
-	glClearColor(0.1f, 0.1f, 0.4f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Global OpenGL States...
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+
+
+	// Bind FBO For drawing...
+	rtScene->GetFBO()->Bind(EGLFrameBuffer::Framebuffer);
+	
+	// Viewport.
+	glViewport(0 ,0, rtScene->GetSize().x, rtScene->GetSize().y);
+	glScissor(0, 0, rtScene->GetSize().x, rtScene->GetSize().y);
+
+	// Clear...
+	glm::vec4 clearColor = rtScene->GetClearColor();
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -296,17 +213,18 @@ void RenderModule::Render()
 	rscene->Draw(ERSceneBatch::Debug);
 
 
-	if (blitToWindow)
+	if (isRTToWindow)
 	{
-		fbo->Blit(
+		rtScene->GetFBO()->Blit(
 			nullptr,													// Default Framebuffer.
 			EGLBufferMask::Color,							// Color Mask Bit. 
 			EGLFilter::Nearest,								// Filter.
-			FBBlitViewport(0, 0, targetSize.x, targetSize.y),		// Src Viewport.
-			FBBlitViewport(0, 0, targetSize.x, targetSize.y)		// Dst Viewport.
+			FBBlitViewport(0, 0, rtScene->GetSize().x, rtScene->GetSize().y),		// Src Viewport.
+			FBBlitViewport(0, 0, rtScene->GetSize().x, rtScene->GetSize().y)		// Dst Viewport.
 		);
 	}
 
+	rtScene->GetFBO()->Unbind(EGLFrameBuffer::Framebuffer);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
@@ -328,7 +246,8 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 }
 
 
-GLTexture* RenderModule::GetSceneRT()
-{
-	return colorTarget;
-}
+
+
+
+} // End of namespace Raven.
+

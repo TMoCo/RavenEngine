@@ -4,7 +4,13 @@
 #pragma once
 #include <glm/glm.hpp>
 
-namespace Raven
+namespace Raven 
 {
-	
+
+
+	struct Material
+	{
+		
+	};
 };
+

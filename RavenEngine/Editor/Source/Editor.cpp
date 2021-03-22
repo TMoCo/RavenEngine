@@ -9,12 +9,17 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Core/Camera.h"
 
+#include "ResourceManager/Resources/Model.h"
+
+#include "Core/Camera.h"
+#include "Window/Window.h"
 #include "ImGui/ImGuiHelpers.h"
 #include <ImGuizmo.h>
 #include <imgui_internal.h>
 #include <imgui.h>
+#include <glm/glm.hpp>
+
 
 namespace Raven 
 {
@@ -34,8 +39,21 @@ namespace Raven
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
+		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
+		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
+		camera = std::make_unique<Camera>(
+			-20.0f,
+			-40.0f,
+			glm::vec3(-31.0f, 12.0f, 51.0f),
+			60.0f,
+			0.1f,
+			1000.0f,
+			(float)winSize.x / (float)winSize.y);
+
+		editorCameraTransform.SetLocalPosition({ -31.0f, 12.0f, 51.0f });
+		editorCameraTransform.SetLocalOrientation(glm::radians(glm::vec3{ -20.0f, -40.0f, 0.0f }));
 	}
 
 	void Editor::OnImGui()

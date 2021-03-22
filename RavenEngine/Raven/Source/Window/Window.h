@@ -28,7 +28,8 @@ namespace Raven
 
 		inline auto GetNativeWindow() { return glfwWindow; }
 
-		std::pair<float, float> GetWindowScale();
+		glm::vec2  GetWindowScale();
+		glm::vec2  GetWindowSize();
 		glm::ivec2 GetFramebufferSize();
 
 		void PollEvent();

@@ -56,7 +56,7 @@ namespace Raven
             for (const auto& index : shape.mesh.indices)
             {
                 // set vertex data 
-                mesh->verts.push_back(glm::vec3(
+                mesh->positions.push_back(glm::vec3(
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]));

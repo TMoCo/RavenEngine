@@ -22,7 +22,7 @@ namespace Raven
 	class RenderScene;
 	class RenderDebug;
 	class Scene;
-	class GLTexture;
+	class RenderTarget;
 
 
 	// RenderModule:
@@ -47,14 +47,17 @@ namespace Raven
 		inline RenderDebug* GetDebug() { return rdebug.get(); }
 
 		// Return the final render texture target of the scene.
-		GLTexture* GetSceneRT();
+		RenderTarget* GetSceneRT() { return rtScene.get(); }
+
+		// if true will resize the render target with engine window.
+		inline void SetRTToWindow(bool value) { isRTToWindow = value; }
 
 	public:
 		// Update render.
 		void Update(float dt);
 
 		// Beging and Prepare the render
-		void BeginRender(Scene* scene, bool blit, const glm::ivec2& extent);
+		void BeginRender(Scene* scene, const glm::ivec2& extent);
 
 		// Render
 		void Render();
@@ -81,6 +84,12 @@ namespace Raven
 
 		// Render Debug, used for debug drawing.
 		std::unique_ptr<RenderDebug> rdebug;
+
+		// The Render Target we draw our scene on.
+		std::shared_ptr<RenderTarget> rtScene;
+
+		// if true will render to window with the exact size as the window.
+		bool isRTToWindow;
 	};
 
 }

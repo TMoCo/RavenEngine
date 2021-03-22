@@ -5,14 +5,21 @@
 layout(location=0) in vec3 inPosition;
 
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 proj;
+// Transform Unifrom Block.
+layout(std140) uniform TransformBlock
+{
+	mat4 inModelMatrix;
+	mat4 inViewMatrix;
+	mat4 inProjectionMatrix;
+};
+
 
 
 
 void main()
 {
-	gl_Position = proj * view * model * vec4(inPosition, 1.0);
+	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * vec4(inPosition, 1.0);
+	
+	
 }
 

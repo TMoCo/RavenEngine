@@ -29,7 +29,7 @@ namespace MM
 	{
 		auto& transform = reg.get<Transform>(e);
 
-		auto rotation = glm::eulerAngles(transform.GetLocalOrientation());
+		auto rotation = glm::degrees(transform.GetLocalOrientation());
 		auto position = transform.GetLocalPosition();
 		auto scale = transform.GetLocalScale();
 
@@ -52,11 +52,11 @@ namespace MM
 		ImGui::TextUnformatted("Rotation");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),5))
+		
+
+		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),0.1))
 		{
-			float pitch = std::min(rotation.x, 89.9f);
-			pitch = std::max(pitch, -89.9f);
-			transform.SetLocalOrientation(glm::radians(glm::vec3{ pitch, rotation.y, rotation.z }));
+			transform.SetLocalOrientation(glm::radians(rotation));
 		}
 
 		ImGui::PopItemWidth();

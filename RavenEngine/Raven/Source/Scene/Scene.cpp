@@ -9,9 +9,13 @@
 #include "SceneGraph.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/CameraControllerComponent.h"
+#include "Core/CameraController.h"
+
 #include "ResourceManager/Resources/Model.h"
 #include "Utilities/StringUtils.h"
 #include "Core/Camera.h"
+#include "Devices/Input.h"
 
 #include <fstream>
 #include "Engine.h"
@@ -39,7 +43,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -203,6 +207,21 @@ namespace Raven {
 
 	void Scene::OnUpdate(float dt)
 	{
+		const auto mousePos = Input::GetInput()->GetMousePosition();
+
+		auto defaultCameraControllerView = entityManager->GetEntitiesWithType<CameraControllerComponent>();
+
+		if (!defaultCameraControllerView.Empty())
+		{
+			auto& cameraController = defaultCameraControllerView.Front().GetComponent<CameraControllerComponent>();
+			auto trans = defaultCameraControllerView.Front().TryGetComponent<Transform>();
+			if (Engine::Get().IsSceneActive() && trans && cameraController.GetController())
+			{
+				cameraController.GetController()->HandleMouse(*trans, dt, mousePos.x, mousePos.y);
+				cameraController.GetController()->HandleKeyboard(*trans, dt);
+			}
+		}
+
 		sceneGraph->Update(entityManager->GetRegistry());
 	}
 

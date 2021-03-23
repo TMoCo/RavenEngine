@@ -12,6 +12,8 @@
 
 #include "ResourceManager/Resources/Model.h"
 
+#include "Devices/Input.h"
+
 #include "Core/Camera.h"
 #include "Window/Window.h"
 #include "ImGui/ImGuiHelpers.h"
@@ -43,17 +45,11 @@ namespace Raven
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
-		camera = std::make_unique<Camera>(
-			-20.0f,
-			-40.0f,
-			glm::vec3(-31.0f, 12.0f, 51.0f),
-			45.0f,
-			0.1f,
-			1000.0f,
-			(float)winSize.x / (float)winSize.y);
 
-		editorCameraTransform.SetLocalPosition({ -31.0f, 12.0f, 51.0f });
-		editorCameraTransform.SetLocalOrientation(glm::radians(glm::vec3{ -20.0f, -40.0f, 0.0f }));
+		camera = std::make_unique<Camera>(
+			45,0.1,100,winSize.x / winSize.y);
+
+	
 		SetEditorState(EditorState::Preview);
 	}
 
@@ -67,6 +63,55 @@ namespace Raven
 		}
 		EndDockSpace();
 		Engine::OnImGui();
+	}
+
+	void Editor::OnUpdate(float dt)
+	{
+		Engine::OnUpdate(dt);
+
+		if (GetEditorState() == EditorState::Preview)
+		{
+			auto& registry = GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+
+			if (IsSceneActive())
+			{
+				const auto mousePos = Input::GetInput()->GetMousePosition();
+
+				editorCameraController.HandleMouse(editorCameraTransform, dt, mousePos.x, mousePos.y);
+				editorCameraController.HandleKeyboard(editorCameraTransform, dt);
+				
+			}
+
+			if (!Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight) && !ImGuizmo::IsUsing())
+			{
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::Q))
+				{
+					SetImGuizmoOperation(4);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::W))
+				{
+					SetImGuizmoOperation(0);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::E))
+				{
+					SetImGuizmoOperation(1);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::R))
+				{
+					SetImGuizmoOperation(2);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::T))
+				{
+					SetImGuizmoOperation(3);
+				}
+			}
+			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));
+		}
+
 	}
 
 	void Editor::SetSelected(const entt::entity& node)

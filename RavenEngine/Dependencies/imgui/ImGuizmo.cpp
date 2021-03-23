@@ -2346,6 +2346,7 @@ namespace ImGuizmo
       }
    }
 
+
    void ViewManipulate(float* view, float length, ImVec2 position, ImVec2 size, ImU32 backgroundColor)
    {
       static bool isDraging = false;

@@ -7,6 +7,7 @@
 #include "Engine.h"
 #include "EditorWindow.h"
 #include "Scene/Component/Transform.h"
+#include "Core/EditorCamera.h"
 #include "Core/Ray.h"
 
 namespace Raven
@@ -18,6 +19,8 @@ namespace Raven
 	public:
 		void Initialize() override;
 		void OnImGui() override;
+		void OnUpdate(float dt) override;
+
 		void SetSelected(const entt::entity& selectedNode);
 		void SetCopiedEntity(const entt::entity& selectedNode,bool cut = false);
 		inline auto& GetSelected() const { return selectedNode; }
@@ -34,10 +37,11 @@ namespace Raven
 		inline auto& GetCamera() { return camera; }
 		inline auto& GetEditorCameraTransform()	{return editorCameraTransform;}
 
+		inline auto& GetEditorCameraController() { return editorCameraController; }
+
 		void OnImGuizmo();
 
-		inline void SetSceneActive(bool active) { sceneActive = active; };
-		inline bool IsSceneActive() const { return sceneActive; };
+	
 
 		Ray SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height);
 		void SelectObject(const Ray& ray);
@@ -61,7 +65,8 @@ namespace Raven
 
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;
-		bool sceneActive;
-};
+		EditorCameraController editorCameraController;
+
+	};
 
 };

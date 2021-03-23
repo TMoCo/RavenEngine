@@ -22,6 +22,8 @@
 
 #include <ImGuizmo.h>
 
+
+
 namespace Raven 
 {
 	const ImVec4 SelectedColor(0.28f, 0.56f, 0.9f, 1.0f);
@@ -107,20 +109,34 @@ namespace Raven
 		editor.SetSceneActive(ImGui::IsWindowFocused() && !ImGuizmo::IsUsing() && updateCamera);
 
 		ImGuizmo::SetRect(sceneViewPosition.x, sceneViewPosition.y, sceneViewSize.x, sceneViewSize.y);
-		ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });
+		ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });;
+
+		const float* cameraViewPtr = glm::value_ptr(glm::inverse(transform->GetWorldMatrix()));
+
+		ImGuizmo::DrawGrid(
+			cameraViewPtr,
+			glm::value_ptr(camera->GetProjectionMatrix()),
+			glm::value_ptr(glm::mat4(1)), 100.f);
 
 		//2D Grid..here
 
 		ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });
 
-		editor.OnImGuizmo();
+		float viewManipulateRight = sceneViewPosition.x + sceneViewSize.x;
+		float viewManipulateTop =	sceneViewPosition.y;
 
+		ImGuizmo::ViewManipulate(const_cast<float*>(cameraViewPtr), 8, ImVec2(viewManipulateRight - 32, viewManipulateTop), ImVec2(32, 32), 0x10101010);
+
+		editor.OnImGuizmo();
 
 		if (editor.IsSceneActive() && !ImGuizmo::IsUsing() && Input::GetInput()->IsMouseClicked(KeyCode::MouseKey::ButtonLeft))
 		{
 			auto clickPos = Input::GetInput()->GetMousePosition() - glm::vec2(sceneViewPosition.x, sceneViewPosition.y);
 			editor.SelectObject(editor.SendScreenRay(int32_t(clickPos.x), int32_t(clickPos.y), camera, int32_t(sceneViewSize.x), int32_t(sceneViewSize.y)));
 		}
+
+
+
 
 		DrawGizmos(sceneViewSize.x, sceneViewSize.y, offset.x, offset.y, editor.GetModule<SceneManager>()->GetCurrentScene());
 

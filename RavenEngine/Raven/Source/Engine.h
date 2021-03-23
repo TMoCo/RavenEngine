@@ -68,6 +68,11 @@ namespace Raven
 		inline auto SetEditorState(EditorState state) { this->state = state; }
 
 		inline auto& GetEventDispatcher() { return eventDispatcher; }
+		
+		
+		inline void SetSceneActive(bool active){sceneActive = active;}
+		//mainly used in editor mode. when the scene is selected, return true
+		inline bool IsSceneActive() const {return sceneActive;}
 
 	protected:
 		virtual void OnImGui();
@@ -105,7 +110,7 @@ namespace Raven
 	
 
 
-	private:
+	protected:
 
 		//main thread --call Post to post callback to main-thread if you are in other threads.
 		std::queue<std::pair<std::promise<bool>, std::function<bool()>>> executeQueue;
@@ -117,6 +122,9 @@ namespace Raven
 		EditorState state = EditorState::Play; //default as Play, if editor is loaded, the state will be set as preview.
 
 		EventDispatcher eventDispatcher;
+
+
+		bool sceneActive = false;
 
 	};
 };

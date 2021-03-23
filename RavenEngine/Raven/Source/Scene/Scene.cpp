@@ -14,6 +14,7 @@
 #include "Core/Camera.h"
 
 #include <fstream>
+#include "Engine.h"
 
 // for serialization
 #include "cereal/archives/json.hpp"
@@ -145,6 +146,30 @@ namespace Raven {
 		Entity newEntity = entityManager->Create();
 		//COPY
 		CopyComponents(entity,newEntity);
+	}
+
+	Camera* Scene::GetTargetCamera()
+	{
+		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
+		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		{
+			Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
+			return &sceneCam;
+		}
+
+		return overrideCamera;
+	}
+
+	Raven::Transform* Scene::GetCameraTransform()
+	{
+		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
+		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		{
+			Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
+
+			return &sceneCamTr;
+		}
+		return overrideTransform;
 	}
 
 	void Scene::CopyComponents(const Entity& from, const Entity& to)

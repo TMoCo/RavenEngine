@@ -48,13 +48,17 @@ namespace Raven
 		{
 			camera = editor.GetCamera().get();
 			transform = &editor.GetEditorCameraTransform();
-			editor.GetModule<RenderModule>()->SetCamera(camera, transform);
+			auto currentScene = editor.GetModule<SceneManager>()->GetCurrentScene();
+			currentScene->SetOverrideCamera(camera);
+			currentScene->SetOverrideTransform(transform);
 		}
 		else
 		{
 			gameView = true;
-			editor.GetModule<RenderModule>()->SetCamera(nullptr, nullptr);
 			auto currentScene = editor.GetModule<SceneManager>()->GetCurrentScene();
+			currentScene->SetOverrideCamera(nullptr);
+			currentScene->SetOverrideTransform(nullptr);
+
 			auto& registry = currentScene->GetRegistry();
 			auto cameraView = registry.view<Camera>();
 			if (!cameraView.empty())

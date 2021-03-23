@@ -175,12 +175,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 	
 	rscene->SetView(view);
 	rscene->SetProjection(proj);
-	
-	if (overrideCamera != nullptr) 
-	{
-		rscene->SetView(glm::inverse(overrideTransform->GetWorldMatrix()));
-		rscene->SetProjection(overrideCamera->GetProjectionMatrix());
-	}
+
 	// ~TESTING-------------------------------------------------------
 
 

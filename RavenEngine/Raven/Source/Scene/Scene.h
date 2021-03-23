@@ -14,6 +14,8 @@ namespace Raven
 	class EntityManager;
 	class Entity;
 	class SceneGraph;
+	class Camera;
+	class Transform;
 
 	class Scene 
 	{
@@ -42,6 +44,12 @@ namespace Raven
 		void DuplicateEntity(const Entity& entity);
 
 
+		Camera* GetTargetCamera();
+		Transform* GetCameraTransform();
+
+		inline auto SetOverrideCamera(Camera* overrideCamera) { this->overrideCamera = overrideCamera; }
+		inline auto SetOverrideTransform(Transform* overrideTransform) { this->overrideTransform = overrideTransform; }
+
 	private:
 		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
@@ -52,6 +60,11 @@ namespace Raven
 
 		void CopyComponents(const Entity& from, const Entity& to );
 		bool inited = false;
+		Camera* overrideCamera = nullptr;
+		Transform* overrideTransform = nullptr;
 
-	};
+	public:
+     
+
+};
 };

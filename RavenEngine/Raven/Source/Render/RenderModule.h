@@ -52,8 +52,6 @@ namespace Raven
 		// if true will resize the render target with engine window.
 		inline void SetRTToWindow(bool value) { isRTToWindow = value; }
 
-		void SetCamera(Camera* camera, Transform* transform) { overrideCamera = camera; overrideTransform = transform; }
-
 	public:
 		// Update render.
 		void Update(float dt);
@@ -93,8 +91,6 @@ namespace Raven
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;
 
-		Camera* overrideCamera = nullptr;
-		Transform* overrideTransform = nullptr;
 
 	};
 

@@ -24,7 +24,7 @@ out VertexOutput
 	vec3 normal;
 	vec2 texCoord;
 	
-} output;
+} vxOut;
 
 
 
@@ -39,8 +39,8 @@ out VertexOutput
 void main()
 {
 	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * vec4(inPosition, 1.0);
-	output.position = (inModelMatrix * vec4(inPosition, 1.0)).xyz;
-	output.normal 	= (inModelMatrix * vec4(inNormal,   0.0)).xyz;
-	output.texCoord = inTexCoord;
+	vxOut.position = (inModelMatrix * vec4(inPosition, 1.0)).xyz;
+	vxOut.normal 	= (inModelMatrix * vec4(inNormal,   0.0)).xyz;
+	vxOut.texCoord = inTexCoord;
 }
 

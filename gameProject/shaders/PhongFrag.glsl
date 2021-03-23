@@ -12,7 +12,7 @@ in VertexOutput
 	vec3 normal;
 	vec2 texCoord;
 	
-} input;
+} fgIn;
 
 
 
@@ -104,10 +104,10 @@ vec3 ComputeDirLight(vec3 pos, vec3 normal, vec4 difftex, vec4 spectex)
 
 void main()
 {
-	vec3 normal = normalize(input.normal);
-	vec3 pos = input.position;
-	//vec4 difftex = texture(inDiffuseTexture, input.texCoord);
-	//vec4 spectex = texture(inSpecularTexture, input.texCoord);
+	vec3 normal = normalize(fgIn.normal);
+	vec3 pos = fgIn.position;
+	//vec4 difftex = texture(inDiffuseTexture, fgIn.texCoord);
+	//vec4 spectex = texture(inSpecularTexture, fgIn.texCoord);
 	vec4 difftex = vec4(1.0);
 	vec4 spectex = vec4(1.0);
 	

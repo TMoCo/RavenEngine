@@ -25,7 +25,7 @@ out VertexOutput
 	vec3 normal;
 	vec2 texCoord;
 	
-} output;
+} vxOut;
 
 
 
@@ -48,12 +48,12 @@ void main()
 	vec2 uv = vec2(inPosition.x / inScale.x, inPosition.z / inScale.y);
 	float height = texture(inHeightMap, uv).r; 
 
-	output.position = vec3(inPosition.x, height * inHeightFactor, inPosition.z);
-	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * vec4(output.position, 1.0);
+	vxOut.position = vec3(inPosition.x, height * inHeightFactor, inPosition.z);
+	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * vec4(vxOut.position, 1.0);
 	
-	output.position = (inModelMatrix * vec4(output.position, 1.0)).xyz;
-	output.normal = vec3(0.0, 1.0, 0.0);
-	output.texCoord = uv;
+	vxOut.position = (inModelMatrix * vec4(vxOut.position, 1.0)).xyz;
+	vxOut.normal = vec3(0.0, 1.0, 0.0);
+	vxOut.texCoord = uv;
 }
 
 

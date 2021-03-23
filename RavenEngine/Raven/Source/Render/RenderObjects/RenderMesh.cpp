@@ -30,6 +30,12 @@ void RenderMesh::SetMesh(RenderRscMesh* inMesh)
 }
 
 
+RenderRscPrimitive* RenderMesh::GetRsc()
+{
+	return mesh;
+}
+
+
 void RenderMesh::Draw(GLShader* shader) const
 {
 	mesh->GetArray()->Bind();

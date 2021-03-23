@@ -106,9 +106,10 @@ void main()
 {
 	vec3 normal = normalize(input.normal);
 	vec3 pos = input.position;
-	vec4 difftex = texture(inDiffuseTexture, input.texCoord);
-	vec4 spectex = texture(inSpecularTexture, input.texCoord);
-	
+	//vec4 difftex = texture(inDiffuseTexture, input.texCoord);
+	//vec4 spectex = texture(inSpecularTexture, input.texCoord);
+	vec4 difftex = vec4(1.0);
+	vec4 spectex = vec4(1.0);
 	
 	fragColor.rgb = ComputeDirLight(pos, normal, difftex, spectex);
 	fragColor.a = inMaterail.alpha;

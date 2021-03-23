@@ -23,6 +23,9 @@ namespace Raven
 		// Destruct.
 		~RenderMesh();
 
+		// Return the primitive resource.
+		virtual RenderRscPrimitive* GetRsc() override;
+
 		// Set the mesh to be drawn.
 		void SetMesh(RenderRscMesh* inMesh);
 

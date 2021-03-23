@@ -92,9 +92,6 @@ namespace Raven
 		auto view = glm::inverse(editorCameraTransform.GetWorldMatrix());
 		auto proj = camera->GetProjectionMatrix();
 
-		view = glm::transpose(view);
-		proj = glm::transpose(proj);
-
 		if (selectedNode == entt::null || imGuizmoOperation == 4)
 			return;
 
@@ -107,7 +104,7 @@ namespace Raven
 			auto transform = registry.try_get<Transform>(selectedNode);
 			if (transform != nullptr)
 			{
-				auto model = glm::transpose(transform->GetWorldMatrix());
+				auto model = transform->GetWorldMatrix();
 				float delta[16];
 
 				ImGuizmo::Manipulate(
@@ -123,13 +120,13 @@ namespace Raven
 				{
 					if (static_cast<ImGuizmo::OPERATION>(imGuizmoOperation) == ImGuizmo::OPERATION::SCALE)
 					{
-						auto mat = glm::transpose(glm::make_mat4(delta));
+						auto mat = glm::make_mat4(delta);
 						
 						transform->SetLocalScale(transform->GetLocalScale() * Transform::GetScaleFromMatrix(mat));
 					}
 					else
 					{
-						auto mat = glm::transpose(glm::make_mat4(delta)) * transform->GetLocalMatrix();
+						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
 						transform->SetLocalTransform(mat);
 						//TOOD
 					}

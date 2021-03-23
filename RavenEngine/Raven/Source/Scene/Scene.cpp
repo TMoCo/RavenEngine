@@ -154,16 +154,21 @@ namespace Raven {
 
 	void Scene::OnInit()
 	{
-		LOGV("{0}", __FUNCTION__);
-		entityManager = std::make_shared<EntityManager>(this);
-		
-		entityManager->AddDependency<Camera, Transform>();
-		entityManager->AddDependency<Model, Transform>();
-		entityManager->AddDependency<Light, Transform>();
-		
-		sceneGraph = std::make_shared<SceneGraph>();
-		sceneGraph->Init(entityManager->GetRegistry());
 
+		if (!inited) 
+		{
+			LOGV("{0}", __FUNCTION__);
+			entityManager = std::make_shared<EntityManager>(this);
+
+			entityManager->AddDependency<Camera, Transform>();
+			entityManager->AddDependency<Model, Transform>();
+			entityManager->AddDependency<Light, Transform>();
+
+			sceneGraph = std::make_shared<SceneGraph>();
+			sceneGraph->Init(entityManager->GetRegistry());
+			inited = true;
+		}
+	
 	}
 
 	void Scene::OnClean()

@@ -26,7 +26,7 @@
 #include "ResourceManager/Resources/Model.h"
 
 #include "glm/gtc/type_ptr.hpp"
-
+#include "Engine.h"
 
 
 
@@ -134,7 +134,7 @@ void RenderScene::Build(Scene* scene)
 
 	// View & Projection...
 	auto camsEttView = scene->GetEntityManager()->GetEntitiesWithType<Camera>();
-	if (!camsEttView.Empty())
+	if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
 	{
 		Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
 		Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
@@ -228,12 +228,14 @@ void RenderScene::TraverseScene(Scene* scene)
 	}
 */
 
+	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
+	if (group.empty())
+		return; 
 
 	// Clear Debug just for testing...
 	GetBatch(ERSceneBatch::Debug).Clear();
 
 
-	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
 
 	for (auto entity : group)
 	{

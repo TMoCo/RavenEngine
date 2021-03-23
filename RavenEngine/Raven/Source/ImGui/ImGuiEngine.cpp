@@ -9,8 +9,10 @@
 #include <IconsMaterialDesignIcons.h>
 #include <MaterialDesign.inl>
 #include <imgui.h>
+#include <ImGuizmo.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
 
 namespace Raven 
 {
@@ -51,6 +53,7 @@ namespace Raven
 
 	void ImGuiEngine::Render()
 	{
+	
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -60,6 +63,7 @@ namespace Raven
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiEngine::AddIcon()

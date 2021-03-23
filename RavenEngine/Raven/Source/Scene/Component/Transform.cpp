@@ -101,5 +101,17 @@ namespace Raven
 		glm::vec4 perspective;
 		glm::decompose(localMatrix, localScale, localOrientation, localPosition, skew, perspective);
 	}
+
+	glm::vec3 Transform::GetScaleFromMatrix(const glm::mat4& mat)
+	{
+		glm::vec3 skew;
+		glm::vec3 localScale;
+		glm::quat localOrientation;
+		glm::vec3 localPosition;
+		glm::vec4 perspective;
+		glm::decompose(mat, localScale, localOrientation, localPosition, skew, perspective);
+		return localScale;
+	}
+
 };
 

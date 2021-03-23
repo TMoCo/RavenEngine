@@ -114,7 +114,7 @@ namespace Raven
 		/** List of all the modules in the engine. */
 		std::array<IModule*, MT_MAX> engineModules;
 
-		EditorState state = EditorState::Preview;
+		EditorState state = EditorState::Play; //default as Play, if editor is loaded, the state will be set as preview.
 
 		EventDispatcher eventDispatcher;
 

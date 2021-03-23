@@ -7,6 +7,8 @@
 #include "Engine.h"
 #include "EditorWindow.h"
 #include "Scene/Component/Transform.h"
+#include "Core/Ray.h"
+
 namespace Raven
 {
 	class Camera;
@@ -32,8 +34,14 @@ namespace Raven
 		inline auto& GetCamera() { return camera; }
 		inline auto& GetEditorCameraTransform()	{return editorCameraTransform;}
 
-	private:
 		void OnImGuizmo();
+
+		inline void SetSceneActive(bool active) { sceneActive = active; };
+		inline bool IsSceneActive() const { return sceneActive; };
+
+		Ray SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height);
+		void SelectObject(const Ray& ray);
+	private:
 		void DrawMenu();
 		void BeginDockSpace();
 		void EndDockSpace();
@@ -49,11 +57,11 @@ namespace Raven
 
 		uint32_t imGuizmoOperation = 0;
 
-		bool snapGuizmo = false;
+		bool showGizmos = true;
 
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;
-
+		bool sceneActive;
 };
 
 };

@@ -49,6 +49,27 @@ namespace Raven
 		return projMatrix;
 	}
 
+	Ray Camera::GetScreenRay(float x, float y, const glm::mat4& viewMatrix, bool invertY /*= false*/) const
+	{
+		Ray ret;
+
+		auto viewProjInverse = glm::inverse(projMatrix * viewMatrix);
+
+		// The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0)
+		x = 2.0f * x - 1.0f;
+		y = 2.0f * y - 1.0f;
+
+		if (invertY)
+			y *= -1.0f;
+		glm::vec3 nearPlane(x, y, 0.0f);
+		glm::vec3 farPlane(x, y, 1.0f);
+
+		ret.origin = glm::vec3(viewProjInverse * glm::vec4(nearPlane, 0.0));
+		ret.direction = glm::normalize(glm::vec3(viewProjInverse * glm::vec4(farPlane, 0.0)) - ret.origin);
+
+		return ret;
+	}
+
 	void Camera::UpdateProjectionMatrix()
 	{
 		if (orthographic)

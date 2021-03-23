@@ -51,6 +51,7 @@ namespace Raven
 		NOCOPYABLE(Scene);
 
 		void CopyComponents(const Entity& from, const Entity& to );
+		bool inited = false;
 
 	};
 };

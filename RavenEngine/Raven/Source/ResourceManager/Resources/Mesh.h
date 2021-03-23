@@ -35,6 +35,8 @@ namespace Raven
 			}
 		}
 
+		inline auto IsActive() const { return active; }
+
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
@@ -42,5 +44,8 @@ namespace Raven
 		std::vector<uint32_t> indices;
 
 		RenderRscMesh renderRscMesh; // interface with renderer (default constructor)
+
+
+		bool active = true;
 	};
 }

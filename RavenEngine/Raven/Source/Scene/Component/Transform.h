@@ -59,6 +59,8 @@ namespace Raven
 		glm::vec3 GetForwardDirection() const;
 	
 
+		static glm::vec3 GetScaleFromMatrix(const glm::mat4& mat);
+
 	protected:
 		glm::mat4 localMatrix = glm::mat4(1);
 		glm::mat4 worldMatrix = glm::mat4(1);

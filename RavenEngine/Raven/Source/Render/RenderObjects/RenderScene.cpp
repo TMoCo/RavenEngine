@@ -124,20 +124,22 @@ void RenderScene::Setup()
 void RenderScene::Build(Scene* scene)
 {
 	// View & Projection...
-	auto camsEttView = scene->GetEntityManager()->GetEntitiesWithType<Camera>();
-	if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
-	{
-		Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
-		Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
+	glm::mat4 camTr;
 
-		SetProjection(sceneCam.GetProjectionMatrix());
-		SetView(glm::inverse(sceneCamTr.GetWorldMatrix()));
+	// Has Camera? 
+	if (scene->GetTargetCamera())
+	{
+		SetProjection(scene->GetTargetCamera()->GetProjectionMatrix());
+		camTr = scene->GetCameraTransform()->GetWorldMatrix();
+		SetView(glm::inverse(camTr));
+	}
+	else
+	{
+		camTr = glm::inverse(view);
 	}
 
-	// ~Testing----------
-	lightData.viewDir = glm::normalize(glm::inverse(view) * glm::vec4(Raven::FORWARD, 0.0f));
-	lightData.viewPos = glm::inverse(view) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	// ~Testing----------
+	lightData.viewDir = glm::normalize(camTr  * glm::vec4(Raven::FORWARD, 0.0f));
+	lightData.viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
 	// Lights...

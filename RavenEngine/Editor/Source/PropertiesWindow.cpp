@@ -127,8 +127,6 @@ namespace MM
 
 	}
 
-
-
 	std::string GetPrimativeName(PrimitiveType type)
 	{
 		switch (type)

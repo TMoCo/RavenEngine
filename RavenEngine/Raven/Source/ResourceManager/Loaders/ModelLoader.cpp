@@ -45,8 +45,9 @@ namespace Raven
             return false;
         }
 
-        // The model class, just a container for mesh resources to easily access the meshes
-        Model* model = new Model();
+        // The model class, a container for mesh resources to easily access the meshes
+        Model* model = new Model(path);
+
         // loop over the shapes in the model
         for (const auto& shape : shapes)
         {

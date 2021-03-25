@@ -17,7 +17,7 @@ namespace Raven
 	class Model : public IResource
 	{
 	public:
-		Model() : IResource(EResourceType::RT_Model, true) {}
+		Model(const std::string& path) : IResource(EResourceType::RT_Model, true), filePath(path) {}
 
 		~Model()
 		{

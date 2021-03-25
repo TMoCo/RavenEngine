@@ -3,7 +3,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -32,3 +32,4 @@ void RenderBatch::Clear()
 }
 
 
+} // End of namespace Raven.

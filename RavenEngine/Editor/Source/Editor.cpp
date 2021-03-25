@@ -9,12 +9,19 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Core/Camera.h"
 
+#include "ResourceManager/Resources/Model.h"
+
+#include "Devices/Input.h"
+
+#include "Core/Camera.h"
+#include "Window/Window.h"
 #include "ImGui/ImGuiHelpers.h"
 #include <ImGuizmo.h>
 #include <imgui_internal.h>
 #include <imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Raven 
 {
@@ -34,8 +41,16 @@ namespace Raven
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
+		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
+		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
+
+		camera = std::make_unique<Camera>(
+			45,0.1,100,winSize.x / winSize.y);
+
+	
+		SetEditorState(EditorState::Preview);
 	}
 
 	void Editor::OnImGui()
@@ -48,6 +63,55 @@ namespace Raven
 		}
 		EndDockSpace();
 		Engine::OnImGui();
+	}
+
+	void Editor::OnUpdate(float dt)
+	{
+		Engine::OnUpdate(dt);
+
+		if (GetEditorState() == EditorState::Preview)
+		{
+			auto& registry = GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+
+			if (IsSceneActive())
+			{
+				const auto mousePos = Input::GetInput()->GetMousePosition();
+
+				editorCameraController.HandleMouse(editorCameraTransform, dt, mousePos.x, mousePos.y);
+				editorCameraController.HandleKeyboard(editorCameraTransform, dt);
+				
+			}
+
+			if (!Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight) && !ImGuizmo::IsUsing())
+			{
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::Q))
+				{
+					SetImGuizmoOperation(4);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::W))
+				{
+					SetImGuizmoOperation(ImGuizmo::OPERATION::TRANSLATE);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::E))
+				{
+					SetImGuizmoOperation(ImGuizmo::OPERATION::ROTATE);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::R))
+				{
+					SetImGuizmoOperation(ImGuizmo::OPERATION::SCALE);
+				}
+
+				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::T))
+				{
+					SetImGuizmoOperation(ImGuizmo::OPERATION::BOUNDS);
+				}
+			}
+			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));
+		}
+
 	}
 
 	void Editor::SetSelected(const entt::entity& node)
@@ -70,7 +134,116 @@ namespace Raven
 
 	void Editor::OnImGuizmo()
 	{
+		auto view = glm::inverse(editorCameraTransform.GetWorldMatrix());
+		auto proj = camera->GetProjectionMatrix();
 
+		if (selectedNode == entt::null || imGuizmoOperation == 4)
+			return;
+
+		if (showGizmos)
+		{
+			ImGuizmo::SetDrawlist();
+			ImGuizmo::SetOrthographic(camera->IsOrthographic());
+
+			auto& registry = Editor::GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+			auto transform = registry.try_get<Transform>(selectedNode);
+			if (transform != nullptr)
+			{
+				auto model = transform->GetWorldMatrix();
+				float delta[16];
+
+				ImGuizmo::Manipulate(
+					glm::value_ptr(view),
+					glm::value_ptr(proj),
+					static_cast<ImGuizmo::OPERATION>(imGuizmoOperation),
+					ImGuizmo::LOCAL,
+					glm::value_ptr(model),
+					delta,
+					nullptr);
+
+				if (ImGuizmo::IsUsing())
+				{
+					if (static_cast<ImGuizmo::OPERATION>(imGuizmoOperation) == ImGuizmo::OPERATION::SCALE)
+					{
+						auto mat = glm::make_mat4(delta);
+						
+						transform->SetLocalScale(transform->GetLocalScale() * Transform::GetScaleFromMatrix(mat));
+					}
+					else
+					{
+						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
+						transform->SetLocalTransform(mat);
+						//TOOD
+					}
+				}
+			}
+		}
+	}
+
+	void Editor::SelectObject(const Ray& ray)
+	{
+		/*auto& registry = GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+		float closestEntityDist = std::numeric_limits<float>::infinity();
+
+		entt::entity currentClosestEntity = entt::null;
+
+		auto group = registry.group<Model>(entt::get<Transform>);
+
+		for (auto entity : group)
+		{
+			const auto& [model, trans] = group.get<Model, Transform>(entity);
+
+			auto& meshes = model.GetMeshes();
+
+			for (auto mesh : meshes)
+			{
+				if (mesh->IsActive())
+				{
+					auto& worldTransform = trans.GetWorldMatrix();
+
+					auto bbCopy = mesh->GetBoundingBox()->Transformed(worldTransform);
+					float dist = ray.HitDistance(bbCopy);
+
+					if (dist < std::numeric_limits<float>::infinity())
+					{
+						if (dist < closestEntityDist)
+						{
+							closestEntityDist = dist;
+							currentClosestEntity = entity;
+						}
+					}
+				}
+			}
+		}
+
+		if (selectedNode != entt::null)
+		{
+			if (selectedNode == currentClosestEntity)
+			{
+				
+				auto& trans = registry.get<Transform>(selectedNode);
+				auto& model = registry.get<Model>(selectedNode);
+				auto bb = model.GetMeshes().front()->GetBoundingBox()->Transformed(trans.GetWorldMatrix());
+
+				FocusCamera(trans.GetWorldPosition(), (bb.max_ - bb.min_).Length());
+			}
+
+			selectedNode = currentClosestEntity;
+			return;
+		}*/
+	}
+
+	Ray Editor::SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height)
+	{
+		if (!camera)
+			return Ray();
+
+		float screenX = (float)x / (float)width;
+		float screenY = (float)y / (float)height;
+
+		bool flipY = true;
+
+		return camera->GetScreenRay(screenX, screenY, glm::inverse(editorCameraTransform.GetWorldMatrix()), flipY);
 	}
 
 	void Editor::DrawMenu()

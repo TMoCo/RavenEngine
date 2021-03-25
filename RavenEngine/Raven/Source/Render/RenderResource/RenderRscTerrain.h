@@ -32,36 +32,45 @@ namespace Raven
 		// Load a grayscale height map image
 		void LoadHeightMap(int width, int height, const void* data);
 
-		//
-		void GenerateTerrain(int resolution, const glm::vec2& scale);
+		// Generate Terrain Mesh
+		void GenerateTerrain(int32_t inRes, const glm::vec2& inScale, float inHeight);
 
 		// Return mesh vertex array.
 		inline const GLVertexArray* GetArray() const { return vertexArray; }
 
-		//
+		// Return the number of vertices in the terrain mesh.
 		inline uint32_t GetNumVerts() const { return numVerts; }
 
-		//
-		inline glm::vec2 GetScale() const { return terrainScale; }
+		// Return the terrain sacle.
+		inline glm::vec2 GetScale() const { return scale; }
 
-		//
+		// Return the height map texture.
 		inline GLTexture* GetHeightMap() const { return heightMap; }
+
+		// Return the height factor of the terrain.
+		inline float GetHeight() const { return height; }
 
 	private:
 		// Height Map.
 		GLTexture* heightMap;
 
-		//
+		/** The OpenGL Vertex Array of the terrain mesh, defines mesh vertex input. */
+		GLVertexArray* vxarray;
+
+		// OpenGL Buffer for Terrain Mesh Positions.
+		GLBuffer* positionBuffer;
+
+		// Vertex Array.
 		GLVertexArray* vertexArray;
 
-		//
-		GLBuffer* vertexBuffer;
-
-		//
+		// Number of vertices in the terrain mesh.
 		uint32_t numVerts;
 
-		//
-		glm::vec2 terrainScale;
+		// Terrain Plane(X,Y) Scale.
+		glm::vec2 scale;
+
+		// Terrain Height Scale.
+		float height;
 	};
 
 

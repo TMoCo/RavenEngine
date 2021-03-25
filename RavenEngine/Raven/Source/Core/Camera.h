@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <glm/glm.hpp>
+#include "Ray.h"
 
 namespace Raven
 {
@@ -12,6 +13,7 @@ namespace Raven
 		Camera() = default;
 		Camera(float fov, float near, float far, float aspect);
 		Camera(float aspectRatio, float scale);
+		Camera(float pitch, float yaw, const glm::vec3 & position, float fov, float near, float far, float aspect);
 		~Camera() = default;
 
 		inline auto SetMouseSensitivity(float value){ mouseSensitivity = value;	}
@@ -35,8 +37,10 @@ namespace Raven
 
 		inline auto GetFov() const	{	return fov;	}
 		inline auto GetScale() const	{	return scale;	}
-		inline auto SetScale(float scale)	{scale = scale;projectionDirty = true;}
-		inline auto SetFov(float fov)	{fov = fov;projectionDirty = true;}
+		inline auto SetScale(float scale)	{this->scale = scale;projectionDirty = true;}
+		inline auto SetFov(float fov)	{ this->fov = fov;projectionDirty = true;}
+
+		Ray GetScreenRay(float x, float y, const glm::mat4 & viewMatrix, bool invertY = false) const;
 
 	protected:
 		void UpdateProjectionMatrix();

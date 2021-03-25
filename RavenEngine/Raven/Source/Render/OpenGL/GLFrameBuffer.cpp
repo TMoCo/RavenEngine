@@ -7,7 +7,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -243,3 +243,6 @@ void GLFrameBuffer::Blit(GLFrameBuffer* fb, EGLAttachment readAttachment, EGLAtt
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
+
+
+} // End of namespace Raven.

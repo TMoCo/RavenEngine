@@ -17,6 +17,10 @@ namespace Raven
 	class RenderTerrain;
 	class Scene;
 
+	class GLBuffer;
+
+
+
 
 
 	// Render Scene Batches.
@@ -42,8 +46,11 @@ namespace Raven
 		// Destruct. 
 		~RenderScene();
 
+		//
+		void Setup();
+
 		// Build Render scene data form a scene.
-		void Build(RenderTerrain* terrain, Scene* scene);
+		void Build(Scene* scene);
 
 		// Set scene view.
 		void SetView(const glm::mat4& mtx);
@@ -60,12 +67,27 @@ namespace Raven
 		// Clear all render data of the previous frame.
 		void Clear();
 
+		// Return true if the batch is empty.
+		inline bool IsEmpty(ERSceneBatch batch) { return batches[(uint32_t)batch].IsEmpty(); }
+
 	private:
 		//
 		void TraverseScene(Scene* scene);
 
 		// Return batch of a batchtype.
 		inline RenderBatch& GetBatch(ERSceneBatch batchType) { return batches[(uint32_t)batchType]; }
+
+		// Create New Primitive to render.
+		template<class PrimitiveType>
+		PrimitiveType* NewPrimitive()
+		{
+			// TODO: Memeory management for dynamic primitives.
+			PrimitiveType* prim = new PrimitiveType();
+			dynamicPrimitive.push_back(prim);
+
+			return prim;
+		}
+
 
 	private:
 		// Render Scene Batches.
@@ -77,8 +99,18 @@ namespace Raven
 		// Main Project.
 		glm::mat4 projection;
 		
-		//
+		// Dynamic Primitives Container.
 		std::vector<RenderPrimitive*> dynamicPrimitive;
+
+		// ~MinimalSolution --- ---- --- ---- --- ---- ---
+		GLBuffer* trUBO;
+		GLBuffer* lightingUBO;
+		GLBuffer* materialUBO;
+		// ~MinimalSolution --- ---- --- ---- --- ---- ---
+
+		// If primitives does not have materials, we use this one.
+		class RenderRscShader* defaultShader;
+		class RenderRscMaterial* defaultMaterail;
 	};
 
 

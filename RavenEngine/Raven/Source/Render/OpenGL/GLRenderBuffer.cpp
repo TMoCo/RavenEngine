@@ -4,7 +4,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -58,3 +58,7 @@ void GLRenderBuffer::UpdateStorage(EGLFormat format, int width, int height)
 {
 	glRenderbufferStorage(GL_RENDERBUFFER, (GLENUM)format, width, height);
 }
+
+
+
+} // End of namespace Raven.

@@ -1,12 +1,15 @@
 
 
 #include "GLBuffer.h"
+#include "Utilities/Core.h"
 #include "GL/glew.h"
 
 
 
 
-using namespace Raven;
+
+namespace Raven {
+
 
 
 
@@ -77,8 +80,7 @@ void GLBuffer::UpdateData(int dataSize, void* data)
 
 void GLBuffer::UpdateSubData(int dataSize, int offset, const void* data)
 {
-	// TODO:: Assert on data size exceeding the allocated size.
-	// check(size <= dataSize)
+	RAVEN_ASSERT((offset + dataSize) <= size, "GLBuffer Update - Invalid Size.");
 
 	glBindBuffer((GLENUM)type, id);
 	glBufferSubData((GLENUM)type, offset, dataSize, data);
@@ -108,3 +110,6 @@ void GLBuffer::BindRange(int binding, int offset, int size)
 {
 	glBindBufferRange((GLENUM)type, binding, id, offset, size);
 }
+
+
+} // End of namespace Raven.

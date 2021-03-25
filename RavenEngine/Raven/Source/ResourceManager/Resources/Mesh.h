@@ -30,12 +30,14 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscMesh.Load(verts, indices); // call interface method
+				renderRscMesh.Load(positions, normals, texCoords, indices); // call interface method
 				onGPU = true;
 			}
 		}
 
-		std::vector<glm::vec3> verts;
+		inline auto IsActive() const { return active; }
+
+		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;
 
@@ -43,6 +45,7 @@ namespace Raven
 
 		RenderRscMesh renderRscMesh; // interface with renderer (default constructor)
 
-		NOCOPYABLE(Mesh);
+
+		bool active = true;
 	};
 }

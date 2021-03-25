@@ -4,7 +4,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -239,3 +239,7 @@ void GLTexture::SetWrap(EGLWrap value)
 {
 	wrap = value;
 }
+
+
+
+} // End of namespace Raven.

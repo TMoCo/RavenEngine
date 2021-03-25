@@ -72,6 +72,27 @@ namespace Raven
 		ImGui::TextUnformatted("Light Type");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
+	
+
+
+		const char* lights[] = {"Directional Light","Spot Light","Point Light" };
+		auto currLight = LightTypeToString(LightType(int32_t(type)));
+
+		if (ImGui::BeginCombo("LightType", currLight.c_str(), 0))
+		{
+			for (auto n = 0; n < 3; n++)
+			{
+				if (ImGui::Selectable(lights[n]))
+				{
+					type = n;
+				}
+	
+			}
+			ImGui::EndCombo();
+		}
+
+
+/*
 		if (ImGui::BeginMenu(LightTypeToString(LightType(int32_t(type))).c_str()))
 		{
 			if (ImGui::MenuItem("Directional Light", "", static_cast<int>(type) == 0, true))
@@ -88,6 +109,8 @@ namespace Raven
 			}
 			ImGui::EndMenu();
 		}
+*/
+
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();

@@ -7,7 +7,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -107,3 +107,7 @@ void RenderRscDebugMesh::CreateBox()
 	// Load Resoruce...
 	Load(verts, indices);
 }
+
+
+
+} // End of namespace Raven.

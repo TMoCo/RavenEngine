@@ -14,8 +14,7 @@ namespace Raven
 
 
 	// RenderTerrain:
-	//		-
-	//		
+	//		- Represent a Terrain while rendering.
 	class RenderTerrain : public RenderPrimitive
 	{
 	public:
@@ -28,30 +27,16 @@ namespace Raven
 		// Return the primitive resource.
 		virtual RenderRscPrimitive* GetRsc() override;
 
-		// Set color.
-		inline void SetHeight(const glm::vec4& value) { color = value; }
-
-		// Return color.
-		inline const glm::vec4& GetHeight() { return color; }
-
-		//
+		// Set the terrain render resource to render.
 		void SetTerrainRsc(RenderRscTerrain* terrain);
 
-		//
-		void SetHeight(float value);
-
-		//
+		// Draw the terrain.
 		virtual void Draw(GLShader* shader) const override;
 
 	private:
-		// The Color.
-		glm::vec4 color;
-
-		//
+		// Terrain Render Resrouce.
 		RenderRscTerrain* terrainRsc;
 
-		//
-		float height;
 	};
 
 

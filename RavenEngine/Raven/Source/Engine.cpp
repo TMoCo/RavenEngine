@@ -5,6 +5,7 @@
 
 #include "Window/Window.h"
 #include "Render/RenderModule.h"
+#include "Render/RenderTarget.h"
 #include "ResourceManager/ResourceManager.h"
 #include "ImGui/ImGuiEngine.h"
 #include "Scene/SceneManager.h"
@@ -102,10 +103,9 @@ namespace Raven
 
 		// TODO: Better Sync between render, window and targets.
 		glm::ivec2 extent = GetModule<Window>()->GetFramebufferSize();
-		bool blitToWindow = true;
 	
 		// Prepare Rendering...
-		renderer->BeginRender(scene, blitToWindow, extent);
+		renderer->BeginRender(scene, extent);
 	
 		// Render...
 		renderer->Render();

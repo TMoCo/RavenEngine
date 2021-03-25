@@ -6,15 +6,21 @@
 #include <entt/entt.hpp>
 #include "Engine.h"
 #include "EditorWindow.h"
+#include "Scene/Component/Transform.h"
+#include "Core/EditorCamera.h"
+#include "Core/Ray.h"
 
 namespace Raven
 {
+	class Camera;
 
 	class Editor : public Engine
 	{
 	public:
 		void Initialize() override;
 		void OnImGui() override;
+		void OnUpdate(float dt) override;
+
 		void SetSelected(const entt::entity& selectedNode);
 		void SetCopiedEntity(const entt::entity& selectedNode,bool cut = false);
 		inline auto& GetSelected() const { return selectedNode; }
@@ -28,8 +34,18 @@ namespace Raven
 		inline auto GetImGuizmoOperation() const { return imGuizmoOperation; }
 		inline auto SetImGuizmoOperation(uint32_t imGuizmoOperation) { this->imGuizmoOperation = imGuizmoOperation; }
 
-	private:
+		inline auto& GetCamera() { return camera; }
+		inline auto& GetEditorCameraTransform()	{return editorCameraTransform;}
+
+		inline auto& GetEditorCameraController() { return editorCameraController; }
+
 		void OnImGuizmo();
+
+	
+
+		Ray SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height);
+		void SelectObject(const Ray& ray);
+	private:
 		void DrawMenu();
 		void BeginDockSpace();
 		void EndDockSpace();
@@ -42,12 +58,15 @@ namespace Raven
 		entt::entity copiedNode = entt::null;
 		bool cutCopyEntity = false;
 		std::unordered_map<size_t, const char*> iconMap;
+		//	ImGuizmo::OPERATION::
+		uint32_t imGuizmoOperation = 4;
 
-		uint32_t imGuizmoOperation = 0;
+		bool showGizmos = true;
 
-		bool snapGuizmo = false;
+		std::unique_ptr<Camera> camera;
+		Transform editorCameraTransform;
+		EditorCameraController editorCameraController;
 
-
-};
+	};
 
 };

@@ -7,13 +7,15 @@
 #include "GL/glew.h"
 
 
-using namespace Raven;
+
+
+namespace Raven {
+
 
 
 
 RenderTerrain::RenderTerrain()
-	: height(0.0f)
-	, terrainRsc(nullptr)
+	: terrainRsc(nullptr)
 {
 
 }
@@ -37,22 +39,22 @@ void RenderTerrain::SetTerrainRsc(RenderRscTerrain* terrain)
 }
 
 
-void RenderTerrain::SetHeight(float value)
-{
-	height = value;
-}
-
 
 void RenderTerrain::Draw(GLShader* shader) const
 {
-	shader->SetUniform("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	shader->SetUniform("scale", terrainRsc->GetScale());
-	shader->SetUniform("heightFactor", 50.0f);
-	shader->SetUniform("heightMap", 0);
+	//
+	shader->SetUniform("inScale", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	shader->SetUniform("inHeightFactor", terrainRsc->GetScale());
+	shader->SetUniform("inHeightMap", terrainRsc->GetHeight());
 
+	//
 	terrainRsc->GetHeightMap()->Active(0);
 
 	terrainRsc->GetArray()->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)terrainRsc->GetNumVerts());
 	terrainRsc->GetArray()->Bind();
 }
+
+
+
+} // End of namespace Raven.

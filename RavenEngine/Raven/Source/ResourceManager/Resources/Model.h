@@ -13,12 +13,13 @@
 
 namespace Raven
 {
+	enum class PrimitiveType;
 	class Model : public IResource
 	{
 	public:
 		Model() : IResource(EResourceType::RT_Model, true) {}
 
-		inline virtual ~Model()
+		~Model()
 		{
 			meshes.clear(); // calls the deleters for mesh objects
 		}
@@ -53,9 +54,9 @@ namespace Raven
 		}
 
 		// pointer to the vector of meshes
-		inline auto* GetMeshes()
+		inline auto& GetMeshes()
 		{
-			return &meshes;
+			return meshes;
 		}
 
 		inline void AddMesh(Mesh* mesh)
@@ -63,9 +64,15 @@ namespace Raven
 			meshes.push_back(std::shared_ptr<Mesh>(mesh));
 		}
 
+		inline auto GetPrimitiveType() const { return primitiveType; }
+
+		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }
+
+		inline auto GetFileName() const { return filePath; }
+
 	private:
 		std::vector<std::shared_ptr<Mesh>> meshes;
-
-		NOCOPYABLE(Model);
+		std::string filePath;
+		PrimitiveType primitiveType;
 	};
 }

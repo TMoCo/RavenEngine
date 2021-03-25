@@ -15,3 +15,7 @@ the inspiration comes from [Click to watch](https://www.youtube.com/watch?v=sULV
 
 - 3. the bin,bin-int,build folders should be ignored when you push your code. I add them into the .gitignore
 
+
+#### Editor Preview Operations
+
+- 1. using W/S/A/D/E/Q to adjust preview camera

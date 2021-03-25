@@ -3,8 +3,8 @@
 #include "Logger/Console.h"
 
 // rename cereal function names to follow naming convention
-#define CEREAL_LOAD_FUNCTION_NAME Load
-#define CEREAL_SAVE_FUNCTION_NAME Save
+#define CEREAL_LOAD_FUNCTION_NAME LoadSerialized
+#define CEREAL_SAVE_FUNCTION_NAME SaveSerialized
 
 #define RAVEN_ASSERT(condition, ...)								\
 	{																\

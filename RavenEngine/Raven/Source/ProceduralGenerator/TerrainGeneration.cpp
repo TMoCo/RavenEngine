@@ -25,8 +25,10 @@ namespace Raven {
 		const int width = 128;
 		const int height = 128;
 		const int octaves = 4;
-		float a = 0.1;
+		// seeds
+		float a = 0.5;
 		float b = 1.0;
+		bool periodic = false;
 
 		// buffer to store noise data
 		//GLubyte* data = new GLubyte[width * height * octaves];
@@ -51,13 +53,20 @@ namespace Raven {
 				for (int oct = 0; oct < octaves; oct++)
 				{
 					glm::vec2 p(x * freq, y * freq);
-					float val = glm::perlin(p) / scale;
+					float val = 0.0f;
+					// periodic for seamless noise
+					if (periodic) {
+						val = glm::perlin(p, glm::vec2(freq)) / scale;
+					}
+					// normal
+					else {
+						val = glm::perlin(p) / scale;
+					}
 					sum += val;
 					float result = (sum + 1.0f) / 2.0f;
 					// store in texture buffer
 					//data[((row * width + col) * octaves) + oct] = (GLubyte)(result * 255.0f);
 					data[((row * width + col) * octaves) + oct] = result * 255.0f;
-					//LOGI(data[((row * width + col) * octaves) + oct]);
 
 					freq *= 2.0f; // double the frequency
 					scale *= b; // next power of b
@@ -65,13 +74,17 @@ namespace Raven {
 			}
 		}
 
-		std::ostringstream outFile;
+		// change file name
+		//std::ostringstream outFile;
+		//outFile << "height0.ppm";
+		//outFile.str().c_str());
 
-		outFile << "heightmap.ppm";
-
-		std::ofstream out(outFile.str().c_str());
+		std::ofstream out("height.ppm"); 
 
 		out << "P3 " << width << " " << height << " 255\n";
+
+		// add heights from all octaves
+		float sumHeight = 0;
 
 		for (int row = 0; row < height; row++)
 		{
@@ -79,9 +92,14 @@ namespace Raven {
 			{
 				for (int oct = 0; oct < octaves; oct++)
 				{
+					sumHeight += data[((row * width + col) * octaves) + oct];
+
 					if (oct == 3)
 					{
-						out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
+						sumHeight /= 4;
+						out << (int)sumHeight << ' ' << (int)sumHeight << ' ' << (int)sumHeight << '\n';
+						sumHeight = 0;
+						//out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
 					}
 
 				}

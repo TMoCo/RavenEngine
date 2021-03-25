@@ -46,7 +46,10 @@ namespace Raven
         }
 
         // The model class, a container for mesh resources to easily access the meshes
-        Model* model = new Model(path);
+        Model* model = new Model();
+
+        // model loader is friend with model class
+        model->SetFileName(path);
 
         // loop over the shapes in the model
         for (const auto& shape : shapes)

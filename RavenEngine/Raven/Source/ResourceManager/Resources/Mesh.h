@@ -45,7 +45,6 @@ namespace Raven
 
 		RenderRscMesh renderRscMesh; // interface with renderer (default constructor)
 
-
 		bool active = true;
 	};
 }

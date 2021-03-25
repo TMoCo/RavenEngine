@@ -17,7 +17,7 @@ namespace Raven
 	class Model : public IResource
 	{
 	public:
-		Model(const std::string& path) : IResource(EResourceType::RT_Model, true), filePath(path) {}
+		Model() : IResource(EResourceType::RT_Model, true) {}
 
 		~Model()
 		{
@@ -61,7 +61,7 @@ namespace Raven
 
 		inline void AddMesh(Mesh* mesh)
 		{
-			meshes.push_back(std::shared_ptr<Mesh>(mesh));
+			meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
 		}
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
@@ -71,8 +71,13 @@ namespace Raven
 		inline auto GetFileName() const { return filePath; }
 
 	private:
+
+		inline void SetFileName(const std::string& path) { filePath = path; }
+
 		std::vector<std::shared_ptr<Mesh>> meshes;
 		std::string filePath;
 		PrimitiveType primitiveType;
+
+		friend class ModelLoader; // for setting file name
 	};
 }

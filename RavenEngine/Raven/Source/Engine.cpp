@@ -126,7 +126,6 @@ namespace Raven
 
 		Input::Create();
 
-
 		// Initialize - Here order matter.
 		InitializeModule<Raven::Window>();
 		InitializeModule<Raven::ResourceManager>();

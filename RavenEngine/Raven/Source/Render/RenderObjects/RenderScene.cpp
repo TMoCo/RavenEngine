@@ -159,7 +159,6 @@ void RenderScene::Build(Scene* scene)
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);
-	
 }
 
 
@@ -218,7 +217,6 @@ void RenderScene::TraverseScene(Scene* scene)
 				mesh->LoadOnGpu();
 			}
 
-
 			RenderMesh* rmesh = NewPrimitive<RenderMesh>();
 			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
 			rmesh->SetMesh(&mesh->renderRscMesh);
@@ -229,10 +227,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Add to opaque...
 			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
 		}
-
 	}
-
-
 }
 
 

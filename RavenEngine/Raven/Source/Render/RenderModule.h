@@ -23,8 +23,8 @@ namespace Raven
 	class RenderDebug;
 	class Scene;
 	class RenderTarget;
-
-
+	class Camera;
+	class Transform;
 	// RenderModule:
 	//		- The Engine Render Manager.
 	//
@@ -90,6 +90,8 @@ namespace Raven
 
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;
+
+
 	};
 
 }

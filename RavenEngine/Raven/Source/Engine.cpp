@@ -24,8 +24,6 @@ namespace Raven
 
 	}
 
-
-
 	Engine::~Engine()
 	{
 
@@ -38,14 +36,10 @@ namespace Raven
 		return *instance;
 	}
 
-
 	void Engine::Initialize()
 	{
-
-
 		// Module
 		LoadModules();
-
 	}
 
 

@@ -4,7 +4,9 @@
 
 #include "Transform.h"
 #include <glm/gtx/matrix_decompose.hpp>
-
+#include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 namespace Raven
 {
@@ -36,8 +38,10 @@ namespace Raven
 	Transform::Transform(const glm::mat4& matrix)
 	{
 		glm::vec3 skew;
+		glm::quat rotation;
 		glm::vec4 perspective;
-		glm::decompose(matrix, localScale, localOrientation, localPosition, skew, perspective);
+		glm::decompose(matrix, localScale, rotation, localPosition, skew, perspective);
+		localOrientation = glm::eulerAngles(rotation);
 		localMatrix = matrix;
 		worldMatrix = matrix;
 	}
@@ -80,16 +84,17 @@ namespace Raven
 		localScale = scale;
 	}
 
-	void Transform::SetLocalOrientation(const glm::quat& quat)
+	//void Transform::SetLocalOrientation(const glm::quat& quat)
+	void Transform::SetLocalOrientation(const glm::vec3& rotation)
 	{
 		dirty = true;
-		localOrientation = quat;
+		localOrientation = rotation;
 	}
 
 	void Transform::UpdateLocalMatrix()
 	{
 		localMatrix = glm::translate(glm::mat4(1), localPosition);
-		localMatrix *= glm::mat4_cast(localOrientation);
+		localMatrix *= glm::toMat4(glm::quat(localOrientation));
 		localMatrix = glm::scale(localMatrix,localScale);
 		dirty = false;
 		hasUpdated = true;
@@ -99,7 +104,21 @@ namespace Raven
 	{
 		glm::vec3 skew;
 		glm::vec4 perspective;
-		glm::decompose(localMatrix, localScale, localOrientation, localPosition, skew, perspective);
+		glm::quat rotation;
+		glm::decompose(localMatrix, localScale, rotation, localPosition, skew, perspective);
+		localOrientation = glm::eulerAngles(rotation);
 	}
+
+	glm::vec3 Transform::GetScaleFromMatrix(const glm::mat4& mat)
+	{
+		glm::vec3 skew;
+		glm::vec3 localScale;
+		glm::quat localOrientation;
+		glm::vec3 localPosition;
+		glm::vec4 perspective;
+		glm::decompose(mat, localScale, localOrientation, localPosition, skew, perspective);
+		return localScale;
+	}
+
 };
 

@@ -9,11 +9,16 @@
 #include "SceneGraph.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/CameraControllerComponent.h"
+#include "Core/CameraController.h"
+
 #include "ResourceManager/Resources/Model.h"
 #include "Utilities/StringUtils.h"
 #include "Core/Camera.h"
+#include "Devices/Input.h"
 
 #include <fstream>
+#include "Engine.h"
 
 // for serialization
 #include "cereal/archives/json.hpp"
@@ -38,7 +43,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -147,6 +152,30 @@ namespace Raven {
 		CopyComponents(entity,newEntity);
 	}
 
+	Camera* Scene::GetTargetCamera()
+	{
+		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
+		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		{
+			Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
+			return &sceneCam;
+		}
+
+		return overrideCamera;
+	}
+
+	Raven::Transform* Scene::GetCameraTransform()
+	{
+		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
+		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		{
+			Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
+
+			return &sceneCamTr;
+		}
+		return overrideTransform;
+	}
+
 	void Scene::CopyComponents(const Entity& from, const Entity& to)
 	{
 		LOGW("Not implementation {0}", __FUNCTION__);
@@ -154,16 +183,21 @@ namespace Raven {
 
 	void Scene::OnInit()
 	{
-		LOGV("{0}", __FUNCTION__);
-		entityManager = std::make_shared<EntityManager>(this);
-		
-		entityManager->AddDependency<Camera, Transform>();
-		entityManager->AddDependency<Model, Transform>();
-		entityManager->AddDependency<Light, Transform>();
-		
-		sceneGraph = std::make_shared<SceneGraph>();
-		sceneGraph->Init(entityManager->GetRegistry());
 
+		if (!inited) 
+		{
+			LOGV("{0}", __FUNCTION__);
+			entityManager = std::make_shared<EntityManager>(this);
+
+			entityManager->AddDependency<Camera, Transform>();
+			entityManager->AddDependency<Model, Transform>();
+			entityManager->AddDependency<Light, Transform>();
+
+			sceneGraph = std::make_shared<SceneGraph>();
+			sceneGraph->Init(entityManager->GetRegistry());
+			inited = true;
+		}
+	
 	}
 
 	void Scene::OnClean()
@@ -173,6 +207,21 @@ namespace Raven {
 
 	void Scene::OnUpdate(float dt)
 	{
+		const auto mousePos = Input::GetInput()->GetMousePosition();
+
+		auto defaultCameraControllerView = entityManager->GetEntitiesWithType<CameraControllerComponent>();
+
+		if (!defaultCameraControllerView.Empty())
+		{
+			auto& cameraController = defaultCameraControllerView.Front().GetComponent<CameraControllerComponent>();
+			auto trans = defaultCameraControllerView.Front().TryGetComponent<Transform>();
+			if (Engine::Get().IsSceneActive() && trans && cameraController.GetController())
+			{
+				cameraController.GetController()->HandleMouse(*trans, dt, mousePos.x, mousePos.y);
+				cameraController.GetController()->HandleKeyboard(*trans, dt);
+			}
+		}
+
 		sceneGraph->Update(entityManager->GetRegistry());
 	}
 

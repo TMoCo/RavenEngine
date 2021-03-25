@@ -81,6 +81,7 @@ namespace Raven
 		template<class PrimitiveType>
 		PrimitiveType* NewPrimitive()
 		{
+			// TODO: Memeory management for dynamic primitives.
 			PrimitiveType* prim = new PrimitiveType();
 			dynamicPrimitive.push_back(prim);
 
@@ -101,14 +102,15 @@ namespace Raven
 		// Dynamic Primitives Container.
 		std::vector<RenderPrimitive*> dynamicPrimitive;
 
-		//
+		// ~MinimalSolution --- ---- --- ---- --- ---- ---
 		GLBuffer* trUBO;
-
-		//
 		GLBuffer* lightingUBO;
-
-		//
 		GLBuffer* materialUBO;
+		// ~MinimalSolution --- ---- --- ---- --- ---- ---
+
+		// If primitives does not have materials, we use this one.
+		class RenderRscShader* defaultShader;
+		class RenderRscMaterial* defaultMaterail;
 	};
 
 

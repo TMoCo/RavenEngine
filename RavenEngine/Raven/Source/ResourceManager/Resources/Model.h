@@ -13,21 +13,7 @@
 
 namespace Raven
 {
-
-	//Can be moved to other files
-	enum class PrimitiveType : int32_t
-	{
-		Plane = 0,
-		Quad = 1,
-		Cube = 2,
-		Pyramid = 3,
-		Sphere = 4,
-		Capsule = 5,
-		Cylinder = 6,
-		Terrain = 7,
-		File = 8
-	};
-
+	enum class PrimitiveType;
 	class Model : public IResource
 	{
 	public:

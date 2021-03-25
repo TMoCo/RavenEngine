@@ -1,41 +1,38 @@
 #include "RenderScene.h"
 
+#include "Engine.h"
 #include "RenderPrimitive.h"
 #include "RenderTerrain.h"
 #include "Render/RenderResource/RenderRscMaterial.h"
 #include "Render/RenderResource/RenderRscShader.h"
-
 #include "Render/OpenGL/GLShader.h"
 #include "Render/OpenGL/GLBuffer.h"
+#include "RenderDebugPrimitive.h"
+#include "RenderPrimitive.h"
+#include "RenderMesh.h"
 
+#include "Core/Camera.h"
 #include "Scene/Scene.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Core/Camera.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
+#include "ResourceManager/Resources/Model.h"
+
 #include "GL/glew.h"
-
-#include "Render/RenderResource/RenderRscDebugMesh.h"
-#include "Render/RenderObjects/RenderDebugPrimitive.h"
-
-
-
 #include "glm/gtc/type_ptr.hpp"
-
 
 
 
 namespace Raven {
 
-// ~Testing .............................................................
-RenderRscShader* debugShader;
-RenderRscMaterial* debugMaterial;
-RenderRscDebugMesh* debugRscMesh;
 
+
+
+// ~MinimalSolution --- ---- --- ---- --- ---- ---
 struct TransformUBO
 {
 	glm::mat4 modelMatrix;
@@ -69,10 +66,11 @@ struct MaterialUBO
 
 
 TransformUBO trData;
-TransformUBO lightData;
-TransformUBO matData;
+LightingUBO lightData;
+MaterialUBO matData;
+// ~MinimalSolution --- ---- --- ---- --- ---- ---
 
-// ~Testing .............................................................
+
 
 
 
@@ -87,32 +85,21 @@ RenderScene::RenderScene()
 RenderScene::~RenderScene()
 {
 	delete trUBO;
-	delete debugRscMesh;
-	delete debugMaterial;
-	delete debugShader;
+	delete lightingUBO;
+	delete materialUBO;
+	delete defaultShader;
+	delete defaultMaterail;
 }
 
 
 void RenderScene::Setup()
 {
-	// ~Testing.....................................................
-	if (!debugShader)
-	{
-		debugShader = new RenderRscShader();
-		debugShader->Load(ERenderShaderType::Debug, "DrawDebugShader");
-
-		//
-		debugMaterial = new RenderRscMaterial(debugShader);
-
-		//
-		debugRscMesh = new RenderRscDebugMesh();
-		debugRscMesh->CreateBox();
-	}
-	// ~Testing.....................................................
+	defaultShader = new RenderRscShader();
+	defaultShader->Load(ERenderShaderType::MaterialOpaque, "Default_Materail");
+	defaultMaterail = new RenderRscMaterial(defaultShader);
 
 
-
-	//
+	// ~MinimalSolution --- ---- --- ---- --- ---- ---
 	trUBO = GLBuffer::Create(EGLBufferType::Uniform, sizeof(TransformUBO), EGLBufferUsage::DynamicDraw);
 	trUBO->BindBase(ShaderInput::TRANSFORM_BINDING);
 
@@ -122,56 +109,53 @@ void RenderScene::Setup()
 	materialUBO = GLBuffer::Create(EGLBufferType::Uniform, sizeof(MaterialUBO), EGLBufferUsage::DynamicDraw);
 	materialUBO->BindBase(2);
 
+	matData.diffuse = glm::vec4(0.7f);
+	matData.ambient = 0.05f;
+	matData.specular = glm::vec4(1.0f);
+	matData.shininess = 32.0f;
+	matData.emission = glm::vec4(0.0f);
+	matData.alpha = 1.0f;
+	// ~MinimalSolution --- ---- --- ---- --- ---- ---
+
 
 }
 
 
 void RenderScene::Build(Scene* scene)
 {
-	
-
-
 	// View & Projection...
-	auto camsEttView = scene->getEntityManager()->GetEntitiesWithType<Camera>();
-	if (!camsEttView.Empty())
-	{
-		Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
-		Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
+	glm::mat4 camTr;
 
-		SetProjection(sceneCam.GetProjectionMatrix());
-		SetView(glm::inverse(sceneCamTr.GetWorldMatrix()));
+	// Has Camera? 
+	if (scene->GetTargetCamera())
+	{
+		SetProjection(scene->GetTargetCamera()->GetProjectionMatrix());
+		camTr = scene->GetCameraTransform()->GetWorldMatrix();
+		SetView(glm::inverse(camTr));
 	}
+	else
+	{
+		camTr = glm::inverse(view);
+	}
+
+	lightData.viewDir = glm::normalize(camTr  * glm::vec4(Raven::FORWARD, 0.0f));
+	lightData.viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
 	// Lights...
 	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
-
 
 	for (auto entity : lightsEttView)
 	{
 		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
 		if (light.type != (int32_t)LightType::DirectionalLight)
 			continue;
+
+		lightData.lightDir = glm::normalize(glm::vec4(light.direction, 0.0f));
+		lightData.lightColor = light.color;
+		lightData.lightPower = light.intensity;
 	}
 
-
-/*
-
-	if (!lightsEttView.Empty())
-	{
-		Light* dirLight = nullptr;
-
-		// Find the first Directional Light.
-		for (auto& light : lightsEttView)
-		{
-			Light& sceneLight = camsEttView[0].GetComponent<Light>();
-
-			if (sceneLight.type != (int32_t)LightType::DirectionalLight)
-				continue;
-		}
-
-		// Light Data...
-	}*/
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);
@@ -205,42 +189,47 @@ void RenderScene::AddDebugPrimitives(const std::vector<RenderPrimitive*>& primit
 
 void RenderScene::TraverseScene(Scene* scene)
 {
-	// Get All transforms in the scene
-	// TODO: Traverse on Models while drawing building render scene.
-	auto trEnttView = scene->getEntityManager()->GetEntitiesWithType<Transform>();
-
-	// No Transforms?
-	if (trEnttView.Empty())
-		return;
-
-	
-
-/*
-* 
-*   a demo
+	// Get All models in the scene
 	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
+	if (group.empty())
+		return; 
 
+	// ~Testing---------------------------------------
+	// Clear Debug just for testing...
+	GetBatch(ERSceneBatch::Debug).Clear();
+	// ~Testing---------------------------------------
+
+
+	// Iterate over all Models in the scene.
+	// TODO: Culling should be here, for both the view and lights shadow frustums.
 	for (auto entity : group)
 	{
 		const auto& [model, trans] = group.get<Model, Transform>(entity);
-	}
-*/
+		const auto& meshes = model.GetMeshes();
+
+		// Create a RenderPrimitive for each model, and add it to the correct batch.
+		for (uint32_t i = 0; i < meshes.size(); ++i)
+		{
+			const auto& mesh = meshes[i];
+
+			// Update Mesh on GPU if not loaded yet.
+			if (!mesh->IsOnGPU())
+			{
+				mesh->LoadOnGpu();
+			}
 
 
-	// Clear Debug just for testing...
-	GetBatch(ERSceneBatch::Debug).Clear();
+			RenderMesh* rmesh = NewPrimitive<RenderMesh>();
+			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
+			rmesh->SetMesh(&mesh->renderRscMesh);
 
-	for (auto& tr : trEnttView)
-	{
-		Transform& sceneCamTr = tr.GetComponent<Transform>();
+			// TODO: Render with Model Materials...
+			rmesh->SetMaterial(defaultMaterail);
 
-		RenderDebugPrimitive* trPrim = NewPrimitive<RenderDebugPrimitive>();
-		trPrim->SetWorldMatrix(sceneCamTr.GetWorldMatrix());
-		trPrim->SetMaterial(debugMaterial);
-		trPrim->SetDebugMesh(debugRscMesh);
-		trPrim->SetColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+			// Add to opaque...
+			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
+		}
 
-		GetBatch(ERSceneBatch::Opaque).Add(trPrim);
 	}
 
 
@@ -292,7 +281,6 @@ void RenderScene::Draw(ERSceneBatch type)
 		shader->Use();
 		prim->Draw(shader);
 	}
-
 	//
 	glBindVertexArray(0);
 }

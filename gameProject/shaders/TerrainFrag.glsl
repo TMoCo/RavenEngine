@@ -10,7 +10,7 @@ in VertexOutput
 	vec3 normal;
 	vec2 texCoord;
 	
-} input;
+} fgIn;
 
 
 
@@ -32,6 +32,6 @@ out vec4 fragColor;
 
 void main()
 {
-	fragColor = vec4(texture(heightMap, input.texCoord).r);
+	fragColor = vec4(texture(heightMap, fgIn.texCoord).r);
 }
 

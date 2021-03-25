@@ -104,21 +104,21 @@ namespace Raven
 		glfwSetKeyCallback(glfwWindow, [](GLFWwindow*, int32_t key, int32_t scancode, int32_t action, int32_t mods) {
 			switch (action)
 			{
-			case GLFW_PRESS:
-			{
-				Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyPressedEvent>(static_cast<KeyCode::Id>(key), 0));
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyReleasedEvent>(static_cast<KeyCode::Id>(key)));
-				break;
-			}
-			case GLFW_REPEAT:
-			{
-				Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyPressedEvent>(static_cast<KeyCode::Id>(key), 1));
-				break;
-			}
+				case GLFW_PRESS:
+				{
+					Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyPressedEvent>(static_cast<KeyCode::Id>(key), 0));
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyReleasedEvent>(static_cast<KeyCode::Id>(key)));
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					Engine::Get().GetEventDispatcher().PostEvent(std::make_unique <KeyPressedEvent>(static_cast<KeyCode::Id>(key), 1));
+					break;
+				}
 			}
 		});
 

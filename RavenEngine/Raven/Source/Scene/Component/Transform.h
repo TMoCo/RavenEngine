@@ -33,7 +33,8 @@ namespace Raven
 		void SetLocalTransform(const glm::mat4& localMat);
 		void SetLocalPosition(const glm::vec3& localPos);
 		void SetLocalScale(const glm::vec3& localScale);
-		void SetLocalOrientation(const glm::quat& quat);
+		//void SetLocalOrientation(const glm::quat& quat);
+		void SetLocalOrientation(const glm::vec3& rotation);
 
 		inline auto& GetWorldMatrix() { if (dirty) UpdateLocalMatrix();  return worldMatrix; }
 		inline auto& GetLocalMatrix() { if (dirty) UpdateLocalMatrix();  return localMatrix; }
@@ -59,13 +60,16 @@ namespace Raven
 		glm::vec3 GetForwardDirection() const;
 	
 
+		static glm::vec3 GetScaleFromMatrix(const glm::mat4& mat);
+
 	protected:
 		glm::mat4 localMatrix = glm::mat4(1);
 		glm::mat4 worldMatrix = glm::mat4(1);
 
 		glm::vec3 localPosition = {};
 		glm::vec3 localScale = {};
-		glm::quat localOrientation = {};
+		//glm::quat localOrientation = {};
+		glm::vec3 localOrientation = {};
 
 		bool hasUpdated = false;
 		bool dirty = false;

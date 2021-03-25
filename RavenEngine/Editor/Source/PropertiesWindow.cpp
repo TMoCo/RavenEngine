@@ -12,6 +12,7 @@
 #include "ResourceManager/Resources/Model.h"
 #include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
+#include "ResourceManager/MeshFactory.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "Editor.h"
 
@@ -28,7 +29,7 @@ namespace MM
 	{
 		auto& transform = reg.get<Transform>(e);
 
-		auto rotation = glm::eulerAngles(transform.GetLocalOrientation());
+		auto rotation = glm::degrees(transform.GetLocalOrientation());
 		auto position = transform.GetLocalPosition();
 		auto scale = transform.GetLocalScale();
 
@@ -51,11 +52,11 @@ namespace MM
 		ImGui::TextUnformatted("Rotation");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),5))
+		
+
+		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),0.1))
 		{
-			float pitch = std::min(rotation.x, 89.9f);
-			pitch = std::max(pitch, -89.9f);
-			transform.SetLocalOrientation(glm::radians(glm::vec3{ pitch, rotation.y, rotation.z }));
+			transform.SetLocalOrientation(glm::radians(rotation));
 		}
 
 		ImGui::PopItemWidth();
@@ -104,7 +105,7 @@ namespace MM
 			camera.SetFov(fov);
 
 		float near = camera.GetNear();
-		if (ImGuiHelper::Property("Near", near, 0.0f, 10.0f))
+		if (ImGuiHelper::Property("Near", near, 0.01, 10.f))
 			camera.SetNear(near);
 
 		float far = camera.GetFar();
@@ -116,7 +117,7 @@ namespace MM
 			camera.SetScale(scale);
 
 		bool ortho = camera.IsOrthographic();
-		if (ImGuiHelper::Property("Orthograhic", ortho))
+		if (ImGuiHelper::Property("Orthographic", ortho))
 			camera.SetOrthographic(ortho);
 
 
@@ -145,6 +146,39 @@ namespace MM
 		return "";
 	};
 
+	PrimitiveType GetPrimativeName(const std::string& type)
+	{
+		if (type == "Cube")
+		{
+			return PrimitiveType::Cube;
+		}
+		else if (type == "Quad")
+		{
+			return PrimitiveType::Quad;
+		}
+		else if (type == "Sphere")
+		{
+			return PrimitiveType::Sphere;
+		}
+		else if (type == "Pyramid")
+		{
+			return PrimitiveType::Pyramid;
+		}
+		else if (type == "Capsule")
+		{
+			return PrimitiveType::Capsule;
+		}
+		else if (type == "Cylinder")
+		{
+			return PrimitiveType::Cylinder;
+		}
+		else if (type == "Terrain")
+		{
+			return PrimitiveType::Terrain;
+		}
+
+		return PrimitiveType::Cube;
+	};
 
 	template<>
 	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
@@ -174,6 +208,8 @@ namespace MM
 					if (strcmp(shapes[n], "File") != 0)
 					{
 							//add new mesh here..
+						meshes.emplace_back(MeshFactory::CreatePrimative(GetPrimativeName(shapes[n])));
+						model.SetPrimitiveType(GetPrimativeName(shapes[n]));
 					}
 					else
 						model.SetPrimitiveType(PrimitiveType::File);

@@ -1,5 +1,4 @@
-[17:18:28] [trace] Raven: Initialised the resource manager
-[17:18:28] [trace] Raven: Added a loader of type Type: Image Loader.
-[17:18:28] [trace] Raven: Added a loader of type Type: Model Loader.
-[17:18:29] [trace] Raven: Raven::Scene::OnInit
-[17:18:30] [trace] Raven: Destroyed the resource manager
+[08:52:58] [trace] Raven: Initialised the resource manager
+[08:52:58] [trace] Raven: Added a loader of type Type: Image Loader.
+[08:52:58] [trace] Raven: Added a loader of type Type: Model Loader.
+[08:52:58] [trace] Raven: Raven::Scene::OnInit

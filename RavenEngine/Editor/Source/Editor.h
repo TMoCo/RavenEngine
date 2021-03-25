@@ -58,8 +58,8 @@ namespace Raven
 		entt::entity copiedNode = entt::null;
 		bool cutCopyEntity = false;
 		std::unordered_map<size_t, const char*> iconMap;
-
-		uint32_t imGuizmoOperation = 0;
+		//	ImGuizmo::OPERATION::
+		uint32_t imGuizmoOperation = 4;
 
 		bool showGizmos = true;
 

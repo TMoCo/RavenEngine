@@ -13,8 +13,10 @@
 #include "Scene/Component/Transform.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
-#include <imgui_internal.h>
 #include "Editor.h"
+#include "ResourceManager/Resources/Model.h"
+
+#include <imgui_internal.h>
 
 namespace Raven
 {
@@ -38,7 +40,21 @@ namespace Raven
 			{
 				if (ImGui::Selectable("Add Empty Entity"))
 				{
-					scene->CreateEntity();
+					scene->CreateEntity("Empty Entity");
+				}
+
+				if (ImGui::Selectable("Add Light"))
+				{
+					auto entity = scene->CreateEntity("Light");
+					entity.AddComponent<Light>();
+					entity.GetOrAddComponent<Transform>();
+				}
+
+				if (ImGui::Selectable("Add Model"))
+				{
+					auto entity = scene->CreateEntity("Model");
+					entity.AddComponent<Model>();
+					entity.GetOrAddComponent<Transform>();
 				}
 
 				if (ImGui::Selectable("Add Camera"))

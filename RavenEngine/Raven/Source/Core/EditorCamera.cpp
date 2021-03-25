@@ -25,7 +25,7 @@ namespace Raven
         
 		if(Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight))
 		{
-			mouseSensitivity = 0.02f;
+			mouseSensitivity = 0.01f;
 			rotateVelocity = rotateVelocity + 
 				glm::vec2((xpos - previousCurserPos.x), (ypos - previousCurserPos.y)) * mouseSensitivity;
 

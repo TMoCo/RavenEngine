@@ -91,22 +91,22 @@ namespace Raven
 
 				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::W))
 				{
-					SetImGuizmoOperation(0);
+					SetImGuizmoOperation(ImGuizmo::OPERATION::TRANSLATE);
 				}
 
 				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::E))
 				{
-					SetImGuizmoOperation(1);
+					SetImGuizmoOperation(ImGuizmo::OPERATION::ROTATE);
 				}
 
 				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::R))
 				{
-					SetImGuizmoOperation(2);
+					SetImGuizmoOperation(ImGuizmo::OPERATION::SCALE);
 				}
 
 				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::T))
 				{
-					SetImGuizmoOperation(3);
+					SetImGuizmoOperation(ImGuizmo::OPERATION::BOUNDS);
 				}
 			}
 			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));

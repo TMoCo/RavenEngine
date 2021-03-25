@@ -102,7 +102,6 @@ void RenderScene::Draw(ERSceneBatch type)
 
 		prim->Draw(shader);
 	}
-
 	//
 	glBindVertexArray(0);
 }

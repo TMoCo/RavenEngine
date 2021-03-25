@@ -20,7 +20,14 @@ namespace Raven
 	{
 	public:
 		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
-			heightMap(initHeight) {}
+			heightMap(initHeight) 
+		{
+			if (heightMap->format != EGLFormat::R)
+			{
+				// Invalid image format for a height map (must be grayscale)
+				throw std::runtime_error("Height map must be grayscale!");
+			}
+		}
 		
 		inline virtual ~Terrain()
 		{

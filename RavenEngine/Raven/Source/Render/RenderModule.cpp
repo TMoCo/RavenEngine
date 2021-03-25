@@ -195,7 +195,6 @@ void RenderModule::Render()
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
-
 	// Bind FBO For drawing...
 	rtScene->GetFBO()->Bind(EGLFrameBuffer::Framebuffer);
 	

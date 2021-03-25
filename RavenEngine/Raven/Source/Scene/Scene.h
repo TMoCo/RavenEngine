@@ -64,7 +64,5 @@ namespace Raven
 		Transform* overrideTransform = nullptr;
 
 	public:
-     
-
-};
+	};
 };

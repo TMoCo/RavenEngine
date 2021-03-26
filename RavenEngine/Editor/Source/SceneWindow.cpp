@@ -140,10 +140,20 @@ namespace Raven
 
 		DrawGizmos(sceneViewSize.x, sceneViewSize.y, offset.x, offset.y, editor.GetModule<SceneManager>()->GetCurrentScene());
 
-		if (updateCamera)
-		{
 		
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			auto data = ImGui::AcceptDragDropPayload("AssetFile", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+			if (data)
+			{
+				std::string file = (char*)data->Data;
+				LOGV("Receive file from assets window : {0}",file);
+				editor.OpenFile(file);
+			}
+			ImGui::EndDragDropTarget();
 		}
+
 
 		ImGui::End();
 		ImGui::PopStyleVar();

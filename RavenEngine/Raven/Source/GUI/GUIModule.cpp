@@ -21,7 +21,7 @@ namespace Raven {
 		loadedFonts.push_back(io.Fonts->AddFontDefault());
 
 		// This font loading is a temporary system but works for now
-		loadFont("../RavenEngine/Raven/Source/GUI/FONTS_TEMP/DroidSans.ttf", 15);
+		loadFont("../RavenEngine/Raven/Source/GUI/FONTS_TEMP/DroidSans.ttf", 50);
 	}
 
 	/** Responsible for cleaning up the ImGui context and any other memory used by the module

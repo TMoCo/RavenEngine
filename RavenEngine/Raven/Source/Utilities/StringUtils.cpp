@@ -1,4 +1,9 @@
+#include <cstdlib>
+#include <algorithm>
+
+#include "Utilities/Core.h"
 #include "StringUtils.h"
+
 #ifdef _WIN32
 #include <direct.h>
 #define GetCwd _getcwd
@@ -36,7 +41,6 @@ namespace Raven
 			return filePath;
 		}
 
-<<<<<<< HEAD
 		std::string GetCurrentWorkingDirectory()
 		{
 			char currentPath[FILENAME_MAX];
@@ -47,7 +51,7 @@ namespace Raven
 			currentPath[sizeof(currentPath) - 1] = '\0'; // terminate the string
 			return std::string(currentPath);
 		}
-=======
+
 		bool IsHiddenFile(const std::string& path)
 		{
 			if (path != ".." &&
@@ -97,6 +101,37 @@ namespace Raven
 			return extension == "png" || extension == "tga" || extension == "jpg";
 		}
 
->>>>>>> master
+		char* IntToString(int num, char* buffer, int base)
+		{
+			int i = 0;
+			// check for 0 case
+			if (num == 0)
+			{
+				buffer[i++] = '0';
+				buffer[i]   = '\0';
+				return buffer;
+			}
+			// detect negative numbers for base 10
+			bool negative = false;
+			if (num < 0 && base == 10)
+			{
+				num = -num;
+				negative = true;
+			}
+			// loop till all digits have been processed
+			while (num != 0)
+			{
+				int remainder = num % base; // determine digit
+				buffer[i++] = remainder > 9 ? remainder - 10 + 'a' : remainder + '0';
+				num /= base; // integer division by base changes to next digit
+			}
+			if (negative)
+			{
+				buffer[i++] = '-';
+			}
+			buffer[i] = '\0';
+			std::reverse(buffer, buffer + strlen(buffer));
+			return buffer;
+		}
 	};
 };

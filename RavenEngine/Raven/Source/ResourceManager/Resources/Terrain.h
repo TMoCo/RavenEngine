@@ -16,7 +16,7 @@
 
 namespace Raven
 {
-	class Terrain : public Mesh
+	class Terrain : public IResource
 	{
 	public:
 		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
@@ -50,7 +50,6 @@ namespace Raven
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
 		Texture2D* heightMap; // store heights in a texture
-		// is a mesh so also has verts, normals, texCoords, indices... 
 
 		RenderRscTerrain renderRscTerrain; // interface with renderer
 

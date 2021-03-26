@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Resources/Mesh.h"
 
 //
@@ -17,14 +16,7 @@ namespace Raven
 	class Model
 	{
 	public:
-<<<<<<< HEAD
 		Model() {} 
-=======
-		Model() : IResource(EResourceType::RT_Model, true) {}
-		Model(const std::string & file) :IResource(EResourceType::RT_Model, true),filePath(file){
-			LOGW("mesh did not load when model initilize");
-		}
->>>>>>> master
 
 		~Model()
 		{
@@ -63,7 +55,14 @@ namespace Raven
 
 		inline void AddMesh(Mesh* mesh)
 		{
+			// add a single mesh to the model
 			meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
+		}
+
+		inline void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes)
+		{
+			// for multiple meshes
+			meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
 		}
 
 		inline auto GetPrimitiveType() const { return primitiveType; }

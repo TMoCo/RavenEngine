@@ -15,7 +15,7 @@
 
 namespace Raven
 {
-	class Mesh : public virtual IResource
+	class Mesh : public IResource
 	{
 	// This type of resource will rarely if not ever be on its own in the resource register.
 	// It is almost definitely part of a Model resource.

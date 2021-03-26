@@ -30,6 +30,16 @@ namespace Raven
 
     bool MeshLoader::LoadOBJ(const std::string& path)
     {
+        int meshNum = 0;
+        char buffer[100]; // up to 100 different meshes in a model
+        std::string meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
+
+        if (resourceManager->HasResource(meshId))
+        {
+            // already loaded
+            return true;
+        }
+
         // setup variables to get model info
         tinyobj::attrib_t attrib; // contains all the positions, normals, textures and faces
         std::vector<tinyobj::shape_t> shapes; // all the separate objects and their faces
@@ -42,13 +52,9 @@ namespace Raven
             return false;
         }
 
-        // The model class, a container for mesh resources to easily access the meshes
-        Model* model = new Model();
-
         // loop over the shapes in the model
         for (const auto& shape : shapes)
         {
-            LOGI(shape.name);             
             // one shape = one mesh
             Mesh* mesh = new Mesh();
             // resize the mesh data
@@ -87,8 +93,8 @@ namespace Raven
 
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
-            model->AddMesh(mesh);
-            resourceManager->AddResource(shape.name, mesh); // file path is resource id
+            resourceManager->AddResource(meshId, mesh); // file path is resource id
+            meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
         }
         // TODO: process Material data
         return true;

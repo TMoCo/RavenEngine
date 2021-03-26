@@ -1,20 +1,13 @@
-# Ignore Every Thing
-
-
-
+# Executables and VS files
 bin/
 bin-int/
 build/
 
-./gameProject/Raven.log
-./gameProject/imgui.ini
+# Change at every compilation
+gameProject/Raven.log
+gameProject/imgui.ini
 
 # Directories
-
-
-#./RavenEngine/ThirdParty/
-#./RavenEngine/Source
-#/Intermediate/
 /RavenEngine/Build/
 /RavenEngine/.vs/
 !/RavenEngine/Dependencies/*

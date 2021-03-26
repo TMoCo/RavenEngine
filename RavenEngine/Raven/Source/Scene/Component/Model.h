@@ -25,10 +25,10 @@ namespace Raven
 		// return shared pointer to a mesh resource
 		std::shared_ptr<Mesh> GetMesh(size_t index);
 		// pointer to the vector of meshes
-		auto& GetMeshes();
+		std::vector<std::shared_ptr<Mesh>>& GetMeshes();
 
 		void AddMesh(Mesh* mesh);
-		inline void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes);
+		void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes);
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
 		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }

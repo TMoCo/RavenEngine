@@ -40,7 +40,7 @@ namespace Raven
 	}
 
 	// pointer to the vector of meshes
-	auto& Model::GetMeshes()
+	std::vector<std::shared_ptr<Mesh>>& Model::GetMeshes()
 	{
 		return meshes;
 	}

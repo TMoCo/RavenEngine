@@ -1,4 +1,7 @@
-[08:52:58] [trace] Raven: Initialised the resource manager
-[08:52:58] [trace] Raven: Added a loader of type Type: Image Loader.
-[08:52:58] [trace] Raven: Added a loader of type Type: Model Loader.
-[08:52:58] [trace] Raven: Raven::Scene::OnInit
+[11:12:35] [trace] Raven: Initialised the resource manager
+[11:12:35] [trace] Raven: Added a loader of type Type: Image Loader.
+[11:12:35] [trace] Raven: Added a loader of type Type: Mesh Loader.
+[11:12:35] [trace] Raven: C:\Users\Tommy\Documents\COMP4\5530MGroupProject\GameEngine\gameProject
+[11:12:35] [error] Raven: Cannot open file [C:\Users\Tommy\Documents\COMP4\5530MGroupProject\GameEngine\gameProject\assets\mallard.obj]
+
+[11:12:35] [trace] Raven: Raven::Scene::OnInit

@@ -7,19 +7,10 @@ build/
 gameProject/Raven.log
 gameProject/imgui.ini
 
-# Directories
-/RavenEngine/Build/
-/RavenEngine/.vs/
-!/RavenEngine/Dependencies/*
-
-!/Tools/premake.exe
 # Project and git
 !.gitignore
 !*.sln
 !*.bat
-!*.vcxproj
-!*.filters
-!*.user
 !*.natvis
 
 # Source

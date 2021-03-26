@@ -5,6 +5,7 @@
 #include "SceneGraph.h"
 #include "Component/Component.h"
 #include "Component/Transform.h"
+#include "Component/GUIComponent.h"
 
 namespace Raven 
 {
@@ -41,6 +42,20 @@ namespace Raven
 				//Recursively update children
 				UpdateTransform(entity, registry);
 			}
+		}
+
+		auto mGuiView = registry.view<GUIMenu>();
+		for (auto entity : mGuiView)
+		{
+			const auto mGUI = registry.try_get<GUIMenu>(entity);
+			if (mGUI) mGUI->UpdateGUI();
+		}
+
+		auto igGuiView = registry.view<GUIInGame>();
+		for (auto entity : igGuiView)
+		{
+			const auto mGUI = registry.try_get<GUIInGame>(entity);
+			if (mGUI) mGUI->UpdateGUI();
 		}
 	}
 

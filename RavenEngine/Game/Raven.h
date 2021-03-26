@@ -1,9 +1,14 @@
 
 #include "Engine.h"
 
-class RavenGame : public Raven::Engine
+namespace Raven
 {
-public:
-	virtual void Initialize() override;
-	void OnImGui() override;
-};
+	class RavenGame : public Engine
+	{
+	public:
+		virtual void Initialize() override;
+		void OnImGui() override;
+		void OnUpdate(float dt) override;
+	};
+}
+

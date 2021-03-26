@@ -20,7 +20,7 @@
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
-#include "ResourceManager/Resources/Model.h"
+#include "Scene/Component/Model.h"
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -219,7 +219,7 @@ void RenderScene::TraverseScene(Scene* scene)
 
 			RenderMesh* rmesh = NewPrimitive<RenderMesh>();
 			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-			rmesh->SetMesh(&mesh->renderRscMesh);
+			rmesh->SetMesh(mesh->renderRscMesh);
 
 			// TODO: Render with Model Materials...
 			rmesh->SetMaterial(defaultMaterail);

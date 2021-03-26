@@ -13,7 +13,6 @@
 #include "ResourceManager/Loaders/ImageLoader.h"
 #include "ResourceManager/Loaders/MeshLoader.h"
 
-#include "ResourceManager/Resources/Model.h"
 #include "ResourceManager/Resources/Texture2D.h"
 #include "ResourceManager/Resources/Terrain.h"
 
@@ -31,7 +30,7 @@ namespace Raven {
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
 		AddLoader(std::make_unique<MeshLoader>(*this));
 
-
+		/*
 		std::string path = StringUtils::GetCurrentWorkingDirectory() + std::string("\\assets\\models\\mallard.obj");
 		GetLoader<MeshLoader>()->LoadAsset(path);
 		// test that all the models can be accessed
@@ -44,6 +43,7 @@ namespace Raven {
 			LOGV(GetResource<Mesh>(id)->indices.size());
 			id = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
 		}
+		*/
 	}
 
 	void ResourceManager::Destroy()

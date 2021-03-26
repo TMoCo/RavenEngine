@@ -49,7 +49,6 @@ namespace Raven
 
 		void LoadCurrentList();
 
-
 		virtual void Initialize() override;
 
 		virtual void Destroy() override;
@@ -57,7 +56,6 @@ namespace Raven
 		static auto GetModuleType() { return MT_SceneManager; }
 
 	protected:
-
 		uint32_t sceneIdx = -1;
 		Scene* currentScene = nullptr;
 		std::vector<std::shared_ptr<Scene>> allScenes;

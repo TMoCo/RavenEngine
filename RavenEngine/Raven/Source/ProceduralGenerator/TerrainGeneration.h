@@ -33,8 +33,6 @@ namespace Raven {
 
 		// create noise
 		void Noise();
-
-
 	};
 
 }

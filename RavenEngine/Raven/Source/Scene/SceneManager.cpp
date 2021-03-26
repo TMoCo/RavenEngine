@@ -7,7 +7,7 @@
 #include "Scene/Scene.h"
 #include "Engine.h"
 #include "Entity/Entity.h"
-#include "ResourceManager/Resources/Model.h"
+#include "Scene/Component/Model.h"
 
 namespace Raven 
 {

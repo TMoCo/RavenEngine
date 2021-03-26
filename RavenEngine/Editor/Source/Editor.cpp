@@ -10,10 +10,9 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/Model.h"
 #include "Scene/Entity/Entity.h"
 
-
-#include "ResourceManager/Resources/Model.h"
 #include "ResourceManager/MeshFactory.h"
 
 #include "Devices/Input.h"
@@ -54,7 +53,6 @@ namespace Raven
 		camera = std::make_unique<Camera>(
 			45,0.1,100,winSize.x / winSize.y);
 
-	
 		SetEditorState(EditorState::Preview);
 	}
 

@@ -9,7 +9,6 @@
 #include "Utilities/StringUtils.h"
 
 #include "ResourceManager/Loaders/MeshLoader.h"
-#include "ResourceManager/Resources/Model.h"
 #include "ResourceManager/Resources/Mesh.h"
 
 namespace Raven

@@ -101,7 +101,6 @@ namespace Raven {
 						sumHeight = 0;
 						//out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
 					}
-
 				}
 			}
 		}

@@ -30,7 +30,7 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscMesh.Load(positions, normals, texCoords, indices); // call interface method
+				renderRscMesh->Load(positions, normals, texCoords, indices); // call interface method
 				onGPU = true;
 			}
 		}
@@ -43,7 +43,7 @@ namespace Raven
 
 		std::vector<uint32_t> indices;
 
-		RenderRscMesh renderRscMesh; // interface with renderer (default constructor)
+		RenderRscMesh* renderRscMesh; // interface with renderer (default constructor)
 
 		bool active = true;
 	};

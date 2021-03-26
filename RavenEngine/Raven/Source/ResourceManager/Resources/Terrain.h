@@ -42,16 +42,21 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscTerrain.LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
+				renderRscTerrain->LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
 				onGPU = true;
 			}
 		}
 
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
-		Texture2D* heightMap; // store heights in a texture
+		// store heights in a texture
+		Texture2D* heightMap; 
 
-		RenderRscTerrain renderRscTerrain; // interface with renderer
+		// textures 
+		std::vector<Texture2D*> textures;
+
+		// interface with renderer
+		RenderRscTerrain* renderRscTerrain = nullptr; 
 
 		NOCOPYABLE(Terrain);
 	};

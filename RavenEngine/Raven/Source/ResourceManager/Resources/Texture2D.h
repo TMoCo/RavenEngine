@@ -39,7 +39,7 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscTexture.Load(EGLTexture::Texture2D, EGLFormat::RGBA, glm::ivec2(width, height), data); // call interface method
+				renderRscTexture->Load(EGLTexture::Texture2D, EGLFormat::RGBA, glm::ivec2(width, height), data); // call interface method
 				onGPU = true;
 			}
 		}
@@ -53,7 +53,7 @@ namespace Raven
 		
 		byte* data; // image data should be sizeof(byte) * height * width
 
-		RenderRscTexture renderRscTexture; // interface with renderer
+		RenderRscTexture* renderRscTexture; // interface with renderer
 		NOCOPYABLE(Texture2D);
 	};
 }

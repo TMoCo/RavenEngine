@@ -4,16 +4,45 @@
 #include "Logger/Console.h"
 #include "GUI/GUIModule.h"
 
-void RavenGame::Initialize()
+#include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Component/Component.h"
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Light.h"
+#include "Scene/Entity/Entity.h"
+
+#include "Scene/Component/GUIComponent.h"
+
+namespace Raven
 {
-	Raven::Engine::Initialize();
-	//init code here for game 
+	void RavenGame::Initialize()
+	{
+		Raven::Engine::Initialize();
+		//init code here for game 
+
+		auto scene = new Scene("Main Menu");
+		GetModule<SceneManager>()->AddScene(scene);
+		scene->OnInit();
+
+
+		auto guiEnt = scene->CreateEntity("GUI_Entity");
+		
+		guiEnt.AddComponent<GUIMenu>();
+	}
+
+	void RavenGame::OnImGui() 
+	{
+		Engine::OnImGui();
+	}
+
+	void RavenGame::OnUpdate(float dt)
+	{
+		Engine::OnUpdate(dt);
+	}
+
 }
 
-void RavenGame::OnImGui() {
-	Raven::Engine::OnImGui();
-}
-
-Raven::Engine* CreateEngine() {
-	return new RavenGame();
+Raven::Engine* CreateEngine() 
+{
+	return new Raven::RavenGame();
 }

@@ -101,7 +101,6 @@ void RenderModule::Initialize()
 	// Render Scene.
 	rscene = std::make_shared<RenderScene>();
 	rscene->Setup();
-
 }
 
 

@@ -9,7 +9,8 @@
 #include "glm/glm.hpp"
 
 #include "Utilities/Core.h"
-#include "ResourceManager/Resources/IResource.h"
+#include "ResourceManager/Resources/IResource.h" 
+#include "ResourceManager/Resources/Texture2D.h" // for height map
 #include "Render/RenderResource/RenderRscTerrain.h"
 
 //
@@ -18,20 +19,19 @@
 
 namespace Raven
 {
-	class Terrain : public IResource
+	class TerrainRsc : public IResource
 	{
 	public:
-		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
+		TerrainRsc(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
 			heightMap(initHeight) // vector for textures, may want to swap container to a map
 		{
-			if (heightMap->format != EGLFormat::R)
+			if (!IsValidHeightMap(initHeight))
 			{
-				// Invalid image format for a height map (must be grayscale)
-				throw std::runtime_error("Height map must be grayscale!");
+				initHeight = nullptr;
 			}
 		}
 		
-		inline virtual ~Terrain()
+		inline virtual ~TerrainRsc()
 		{
 			if (heightMap)
 			{
@@ -44,23 +44,29 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
+				// load the height map data
 				renderRscTerrain->LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
 				onGPU = true;
 			}
 		}
 
+		static bool IsValidHeightMap(Texture2D* heightMap)
+		{
+			if (heightMap->format != EGLFormat::R)
+			{
+				return false;
+			}
+			return true;
+		}
+
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
 		// store heights in a texture
-		Texture2D* heightMap; 
-
-		// textures {name, texture} 
-		// TODO put this in Terrain component
-		std::map<std::string, Texture2D*> textures;
+		Texture2D* heightMap;
 
 		// interface with renderer
 		RenderRscTerrain* renderRscTerrain = nullptr; 
 
-		NOCOPYABLE(Terrain);
+		NOCOPYABLE(TerrainRsc);
 	};
 }

@@ -13,14 +13,14 @@
 
 namespace Raven 
 {
-	class ModelLoader : public ILoader
+	class MeshLoader : public ILoader
 	{
 	public:
-		ModelLoader(ResourceManager& initResourceManager);
+		MeshLoader(ResourceManager& initResourceManager) : ILoader(initResourceManager, ELoaderType::LT_Mesh) {}
 
-		inline static auto Type() { return ELoaderType::LT_Model; } // type of loader
+		inline static auto Type() { return ELoaderType::LT_Mesh; } // type of loader
 
-		bool virtual LoadAsset(const std::string& path) override;
+		bool LoadAsset(const std::string& path) override;
 
 		bool LoadOBJ(const std::string& path);
 

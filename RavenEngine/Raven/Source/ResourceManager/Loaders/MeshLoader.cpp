@@ -8,16 +8,13 @@
 
 #include "Utilities/StringUtils.h"
 
-#include "ResourceManager/Loaders/ModelLoader.h"
+#include "ResourceManager/Loaders/MeshLoader.h"
 #include "ResourceManager/Resources/Model.h"
 #include "ResourceManager/Resources/Mesh.h"
 
 namespace Raven
 {
-	// calls the inherited constructor
-	ModelLoader::ModelLoader(ResourceManager& initResourceManager) : ILoader(initResourceManager, ELoaderType::LT_Model) {}
-
-	bool ModelLoader::LoadAsset(const std::string& path)
+	bool MeshLoader::LoadAsset(const std::string& path)
 	{
         std::string extension = StringUtils::GetExtension(path);
         // file extension calls appropriate loading function
@@ -31,7 +28,7 @@ namespace Raven
         }
 	}
 
-    bool ModelLoader::LoadOBJ(const std::string& path)
+    bool MeshLoader::LoadOBJ(const std::string& path)
     {
         // setup variables to get model info
         tinyobj::attrib_t attrib; // contains all the positions, normals, textures and faces
@@ -48,12 +45,10 @@ namespace Raven
         // The model class, a container for mesh resources to easily access the meshes
         Model* model = new Model();
 
-        // model loader is friend with model class
-        model->SetFileName(path);
-
         // loop over the shapes in the model
         for (const auto& shape : shapes)
         {
+            LOGI(shape.name);             
             // one shape = one mesh
             Mesh* mesh = new Mesh();
             // resize the mesh data
@@ -93,9 +88,9 @@ namespace Raven
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
             model->AddMesh(mesh);
+            resourceManager->AddResource(shape.name, mesh); // file path is resource id
         }
         // TODO: process Material data
-        resourceManager->AddResource(path, model); // file path is resource id
         return true;
     }
 }

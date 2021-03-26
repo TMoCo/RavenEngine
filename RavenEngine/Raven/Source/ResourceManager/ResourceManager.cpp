@@ -4,11 +4,14 @@
 
 #include <iostream>
 
+#include "Utilities/Core.h"
+#include "Utilities/StringUtils.h"
+
 #include "ResourceManager.h"
 
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/Loaders/ImageLoader.h"
-#include "ResourceManager/Loaders/ModelLoader.h"
+#include "ResourceManager/Loaders/MeshLoader.h"
 
 #include "ResourceManager/Resources/Model.h"
 #include "ResourceManager/Resources/Texture2D.h"
@@ -26,7 +29,10 @@ namespace Raven {
 	{
 		LOGV("Initialised the resource manager");
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
-		AddLoader(std::make_unique<ModelLoader>(*this));
+		AddLoader(std::make_unique<MeshLoader>(*this));
+
+		LOGV(StringUtils::GetCurrentWorkingDirectory());
+		GetLoader<MeshLoader>()->LoadAsset(StringUtils::GetCurrentWorkingDirectory() + std::string("\\assets\\mallard.obj"));
 	}
 
 	void ResourceManager::Destroy()

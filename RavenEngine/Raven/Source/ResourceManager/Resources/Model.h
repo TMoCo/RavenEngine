@@ -14,29 +14,24 @@
 namespace Raven
 {
 	enum class PrimitiveType;
-	class Model : public IResource
+	class Model
 	{
 	public:
-		Model() : IResource(EResourceType::RT_Model, true) {}
+		Model() {} 
 
 		~Model()
 		{
 			meshes.clear(); // calls the deleters for mesh objects
 		}
 
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Model; } // return the resource type
-
 		inline void LoadOnGpu()
 		{
-			if (!onGPU)
+			// loads the meshes onto the GPU
+			for (const auto& mesh : meshes)
 			{
-				// loads the meshes onto the GPU
-				for (const auto& mesh : meshes)
-				{
-					mesh->LoadOnGpu();
-				}
-				onGPU = true;
+				mesh->LoadOnGpu();
 			}
+			
 		}
 
 		// return shared pointer to a mesh resource

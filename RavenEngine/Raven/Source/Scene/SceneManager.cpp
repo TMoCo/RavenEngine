@@ -115,12 +115,7 @@ namespace Raven
 
 	void SceneManager::Initialize()
 	{
-		// build a debug scene
-		Scene* debugScene = new Scene("Debug Scene");
-		auto handle = debugScene->CreateEntity("debug");
-		debugScene->GetRegistry().get_or_emplace<Model>(handle);
 
-		AddScene(debugScene);
 	}
 
 	void SceneManager::Destroy()

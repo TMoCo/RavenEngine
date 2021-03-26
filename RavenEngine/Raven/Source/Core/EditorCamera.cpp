@@ -1,7 +1,7 @@
 #include "EditorCamera.h"
 #include "Camera.h"
 #include "Devices/Input.h"
-#include "Utilities/MathUtils.h"
+#include "Math/MathUtils.h"
 
 
 namespace Raven
@@ -51,15 +51,6 @@ namespace Raven
 		UpdateScroll(transform, Input::GetInput()->GetScrollOffset(), dt);
 	}
 
-	static bool operator >=(const glm::vec3& left, const glm::vec3& other) 
-	{
-		return left.x >= other.x && left.y >= other.y && left.z >= other.z;
-	}
-
-	static bool operator <=(const glm::vec3& left, const glm::vec3& other)
-	{
-		return left.x <= other.x && left.y <= other.y && left.z <= other.z;
-	}
 
 	void EditorCameraController::HandleKeyboard(Transform& transform, float dt)
 	{
@@ -106,7 +97,7 @@ namespace Raven
 			}
 		}
 
-		if (!MathUtils::Equals(velocity, Raven::ZERO, glm::vec3{ 0.000001f }))
+		if (!MathUtils::Equals(velocity, Raven::ZERO))
 		{
 			glm::vec3 position = transform.GetLocalPosition();
 			position += velocity * dt;

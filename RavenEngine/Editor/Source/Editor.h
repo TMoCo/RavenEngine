@@ -41,10 +41,13 @@ namespace Raven
 
 		void OnImGuizmo();
 
-	
-
 		Ray SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height);
 		void SelectObject(const Ray& ray);
+
+		void OpenFile(const std::string& file);
+
+		const char* GetIconFontIcon(const std::string& filePath);
+
 	private:
 		void DrawMenu();
 		void BeginDockSpace();

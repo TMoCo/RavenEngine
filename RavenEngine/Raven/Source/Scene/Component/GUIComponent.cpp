@@ -4,33 +4,13 @@
 
 namespace Raven
 {
-	// This function will be responsible for defining the GUI
-	void GUIMenu::UpdateGUI()
-	{
-		regi->BeginFrame();
-
-		regi->BeginPanel(titlePanelCFG);
-		regi->Text(titleTextCFG, "Raven Game");
-		regi->EndPanel();
-
-		regi->BeginPanel(startPanelCFG);
-		if (regi->Button(startButtonCFG, startTextCFG, "Start Game")) {
-			LOGI("The start button has been pressed!");
-			// TODO: Add the scene switching code
-
-		}
-		regi->EndPanel();
-
-		regi->EndFrame();
-	}
-
 	GUIComponent::GUIComponent() 
 	{
 		regi = Engine::Get().GetModule<GUIModule>();
 
 	}
 
-	GUIMenu::GUIMenu() : GUIComponent::GUIComponent() {
+	GUIMenu::GUIMenu() {
 		/* The following simply defines the hard coded configuration for the main menu GUI
 		 * This is only accepatble for the minimum solition and should be done by the game developer
 		 * when they create the scene entity containing this component
@@ -65,4 +45,64 @@ namespace Raven
 		startButtonCFG.color_active = ImVec4(74 / 255., 179 / 255., 255 / 255., 255. / 255.);
 
 	}
+
+	// This function will be responsible for defining the GUI
+	void GUIMenu::UpdateGUI()
+	{
+		regi->BeginFrame();
+
+		regi->BeginPanel(titlePanelCFG);
+		regi->Text(titleTextCFG, "Raven Game");
+		regi->EndPanel();
+
+		regi->BeginPanel(startPanelCFG);
+		if (regi->Button(startButtonCFG, startTextCFG, "Start Game")) {
+			LOGI("The start button has been pressed!");
+			// TODO: Add the scene switching code
+
+		}
+		regi->EndPanel();
+
+		regi->EndFrame();
+	}
+
+	GUIInGame::GUIInGame() 
+	{
+		auto window = Engine::Get().GetModule<Window>();
+		glm::vec2 wSize = window->GetWindowSize();
+
+		healthPanelCFG.size = ImVec2(200, 60);
+		healthPanelCFG.position = ImVec2(0, (wSize.y - healthPanelCFG.size.y));
+		healthPanelCFG.bg_col = ImVec4(0., 0., 0., 0.5);
+		healthPanelCFG.rounding = 0.;
+		healthPanelCFG.border_col = ImVec4(0, 0, 0, 0);
+
+		healthTextCFG.font = regi->getFont(1);
+		healthTextCFG.color = ImVec4(1., 1., 1., 1.);
+		healthTextCFG.text_align = ImVec2(0, 0);
+
+		samplePanelCFG = healthPanelCFG;
+		samplePanelCFG.size = ImVec2(270, 65);
+		samplePanelCFG.position = ImVec2((wSize.x - samplePanelCFG.size.x), (wSize.y - samplePanelCFG.size.y));
+
+		sampleTextCFG = healthTextCFG;
+	}
+
+	void GUIInGame::UpdateGUI() 
+	{
+		regi->BeginFrame();
+
+		regi->BeginPanel(healthPanelCFG);
+		regi->Text(healthTextCFG, "100 HP");
+		regi->EndPanel();
+
+		regi->BeginPanel(samplePanelCFG);
+		regi->Text(sampleTextCFG, "Sample Text");
+		regi->EndPanel();
+
+
+		regi->EndFrame();
+
+	}
+
 }

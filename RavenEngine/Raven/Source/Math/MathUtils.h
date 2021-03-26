@@ -12,6 +12,16 @@ namespace Raven
 		constexpr float EPS = 0.000001f;
 
 
+		// enum for different intersection types
+		enum class EIntersection : int32_t
+		{
+			Inside,
+			Outside,
+			Intesects
+		};
+
+
+		// vec4 comparators
 		bool operator >=(const glm::vec4& left, const glm::vec4& other)
 		{
 			return left.x >= other.x && left.y >= other.y && left.z >= other.z && left.w >= other.w;
@@ -23,6 +33,7 @@ namespace Raven
 		}
 
 
+		// vec3 comparators
 		bool operator >=(const glm::vec3& left, const glm::vec3& other)
 		{
 			return left.x >= other.x && left.y >= other.y && left.z >= other.z;
@@ -33,6 +44,8 @@ namespace Raven
 			return left.x <= other.x && left.y <= other.y && left.z <= other.z;
 		}
 
+
+		// vec3 comparators
 		bool operator >=(const glm::vec2& left, const glm::vec2& other)
 		{
 			return left.x >= other.x && left.y >= other.y ;
@@ -46,7 +59,6 @@ namespace Raven
 
 		//only support for float value and vector
 		template <class T>
-
 		typename std::enable_if<
 			std::is_floating_point<T>::value || 
 			std::is_same<T,glm::vec2>::value || 
@@ -55,6 +67,5 @@ namespace Raven
 			T eps(0.000001f); 
 			return lhs + eps >= rhs && lhs - eps <= rhs; 
 		}
-
 	};
 };

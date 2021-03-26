@@ -4,15 +4,20 @@
 #include "HierarchyWindow.h"
 #include "PropertiesWindow.h"
 #include "AssetsWindow.h"
+
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Entity/Entity.h"
+
 
 #include "ResourceManager/Resources/Model.h"
+#include "ResourceManager/MeshFactory.h"
 
 #include "Devices/Input.h"
+#include "Utilities/StringUtils.h"
 
 #include "Core/Camera.h"
 #include "Window/Window.h"
@@ -231,6 +236,56 @@ namespace Raven
 			selectedNode = currentClosestEntity;
 			return;
 		}*/
+	}
+
+	void Editor::OpenFile(const std::string& filePath)
+	{
+
+		if (StringUtils::IsTextFile(filePath)) 
+		{
+			LOGW("OpenFile file : {0} did not implement",filePath);
+		}
+		else if (StringUtils::IsModelFile(filePath))
+		{
+			auto modelEntity = GetModule<SceneManager>()->GetCurrentScene()->CreateEntity("Model");
+			auto & model = modelEntity.AddComponent<Model>(filePath);
+			model.SetPrimitiveType(PrimitiveType::File);
+			selectedNode = modelEntity.GetHandle();
+		}
+		else if (StringUtils::IsAudioFile(filePath))
+		{
+			LOGW("OpenFile file : {0} did not implement", filePath);
+		}
+		else if (StringUtils::IsSceneFile(filePath))
+		{
+			LOGW("OpenFile file : {0} did not implement", filePath);
+		}
+		else if (StringUtils::IsTextureFile(filePath))
+		{
+			LOGW("OpenFile file : {0} did not implement", filePath);
+		}
+	}
+
+	const char* Editor::GetIconFontIcon(const std::string& filePath)
+	{
+		if (StringUtils::IsTextFile(filePath))
+		{
+			return ICON_MDI_FILE_XML;
+		}
+		else if (StringUtils::IsModelFile(filePath))
+		{
+			return ICON_MDI_SHAPE;
+		}
+		else if (StringUtils::IsAudioFile(filePath))
+		{
+			return ICON_MDI_FILE_MUSIC;
+		}
+		else if (StringUtils::IsTextureFile(filePath))
+		{
+			return ICON_MDI_FILE_IMAGE;
+		}
+
+		return ICON_MDI_FILE;
 	}
 
 	Ray Editor::SendScreenRay(int32_t x, int32_t y, Camera* camera, int32_t width, int32_t height)

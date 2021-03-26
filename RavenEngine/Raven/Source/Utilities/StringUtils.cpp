@@ -36,6 +36,7 @@ namespace Raven
 			return filePath;
 		}
 
+<<<<<<< HEAD
 		std::string GetCurrentWorkingDirectory()
 		{
 			char currentPath[FILENAME_MAX];
@@ -46,5 +47,56 @@ namespace Raven
 			currentPath[sizeof(currentPath) - 1] = '\0'; // terminate the string
 			return std::string(currentPath);
 		}
+=======
+		bool IsHiddenFile(const std::string& path)
+		{
+			if (path != ".." &&
+				path != "." &&
+				path[0] == '.')
+			{
+				return true;
+			}
+			return false;
+		}
+
+
+		bool IsTextFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+
+			if (extension == "txt" || extension == "glsl" || extension == "shader" || extension == "vert"
+				|| extension == "frag" || extension == "lua" || extension == "Lua")
+				return true;
+
+			return false;
+		}
+
+		bool IsAudioFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			return extension == "ogg" || extension == "wav" || extension == "mp3";
+		}
+
+		bool IsSceneFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+
+			return extension == "raven";
+			
+		}
+
+		bool IsModelFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			return extension == "obj" || extension == "gltf" || extension == "glb" || extension == "fbx" || extension == "FBX";
+		}
+
+		bool IsTextureFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			return extension == "png" || extension == "tga" || extension == "jpg";
+		}
+
+>>>>>>> master
 	};
 };

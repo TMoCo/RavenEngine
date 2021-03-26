@@ -10,6 +10,7 @@
 #include "ImGui/ImGuiEngine.h"
 #include "Scene/SceneManager.h"
 #include "GUI/GUIModule.h"
+#include "ProceduralGenerator/TerrainGeneration.h"
 #include <GLFW/glfw3.h>
 #include "Scene/Scene.h"
 #include "Devices/Input.h"
@@ -123,6 +124,7 @@ namespace Raven
 		CreateModule<Raven::Window>("Raven");
 		CreateModule<Raven::SceneManager>();
 		CreateModule<Raven::GUIModule>();
+		CreateModule<Raven::TerrainGeneration>();
 
 		Input::Create();
 
@@ -133,6 +135,7 @@ namespace Raven
 		InitializeModule<Raven::ImGuiEngine>();
 		InitializeModule<Raven::SceneManager>();
 		InitializeModule<Raven::GUIModule>();
+		InitializeModule<Raven::TerrainGeneration>();
 
 	}
 
@@ -141,6 +144,7 @@ namespace Raven
 	void Engine::DestoryModules()
 	{
 		// Destroy - Here order matter.
+		DestroyModule<TerrainGeneration>();
 		DestroyModule<RenderModule>();
 		DestroyModule<SceneManager>();
 		DestroyModule<GUIModule>();

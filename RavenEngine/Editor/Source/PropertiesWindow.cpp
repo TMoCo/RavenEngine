@@ -16,7 +16,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Editor.h"
 
-
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/Mesh.h"
+#include "Engine.h"
 
 
 namespace MM 
@@ -188,6 +190,7 @@ namespace MM
 		ImGui::Columns(2);
 		ImGui::Separator();
 
+	
 		ImGui::TextUnformatted("Primitive Type");
 
 		ImGui::NextColumn();
@@ -227,10 +230,26 @@ namespace MM
 
 			ImGui::NextColumn();
 			ImGui::PushItemWidth(-1);
+
 			ImGui::TextUnformatted(model.GetFileName().c_str());
+
+		/*	
+			static char buffer[128] = {};
+			if (ImGui::InputText("filePath", buffer,128))
+			{
+				//model.AddMesh(Engine::Get().GetModule<ResourceManager>()->GetResource<Mesh>(buffer));
+			}*/
+
+			//model.AddMesh(Engine::Get().GetModule<ResourceManager>()->GetResource<Mesh>(buffer));
 
 			ImGui::PopItemWidth();
 			ImGui::NextColumn();
+
+			for (auto & mesh : model.GetMeshes())
+			{
+				ImGui::TextUnformatted(std::to_string((int64_t)mesh.get()).c_str());
+			}
+
 		}
 
 		ImGui::Columns(1);

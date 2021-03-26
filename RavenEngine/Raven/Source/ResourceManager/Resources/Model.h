@@ -17,7 +17,14 @@ namespace Raven
 	class Model
 	{
 	public:
+<<<<<<< HEAD
 		Model() {} 
+=======
+		Model() : IResource(EResourceType::RT_Model, true) {}
+		Model(const std::string & file) :IResource(EResourceType::RT_Model, true),filePath(file){
+			LOGW("mesh did not load when model initilize");
+		}
+>>>>>>> master
 
 		~Model()
 		{

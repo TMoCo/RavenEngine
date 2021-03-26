@@ -30,4 +30,17 @@ namespace Raven
 		GUIModule::GUITextConfig startTextCFG;
 		GUIModule::GUIButtonConfig startButtonCFG;
 	};
+
+	class GUIInGame : GUIComponent {
+	public:
+		GUIInGame();
+		void UpdateGUI() override;
+
+	private:
+		// Hard coded configurations for the main menu GUI
+		GUIModule::GUIPanelConfig healthPanelCFG;
+		GUIModule::GUITextConfig healthTextCFG;
+		GUIModule::GUIPanelConfig samplePanelCFG;
+		GUIModule::GUITextConfig sampleTextCFG;
+	};
 };

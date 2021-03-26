@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <map>
+
 #include "glm/glm.hpp"
 
 #include "Utilities/Core.h"
@@ -20,7 +22,7 @@ namespace Raven
 	{
 	public:
 		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
-			heightMap(initHeight) 
+			heightMap(initHeight) // vector for textures, may want to swap container to a map
 		{
 			if (heightMap->format != EGLFormat::R)
 			{
@@ -52,8 +54,9 @@ namespace Raven
 		// store heights in a texture
 		Texture2D* heightMap; 
 
-		// textures 
-		std::vector<Texture2D*> textures;
+		// textures {name, texture} 
+		// TODO put this in Terrain component
+		std::map<std::string, Texture2D*> textures;
 
 		// interface with renderer
 		RenderRscTerrain* renderRscTerrain = nullptr; 

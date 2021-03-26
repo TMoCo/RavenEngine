@@ -18,55 +18,19 @@ namespace Raven
 	public:
 		Model() {} 
 
-		~Model()
-		{
-			meshes.clear(); // calls the deleters for mesh objects
-		}
+		~Model();
 
-		inline void LoadOnGpu()
-		{
-			// loads the meshes onto the GPU
-			for (const auto& mesh : meshes)
-			{
-				mesh->LoadOnGpu();
-			}
-			
-		}
+		void LoadOnGpu();
 
 		// return shared pointer to a mesh resource
-		inline std::shared_ptr<Mesh> GetMesh(size_t index)
-		{
-			if (index > meshes.size())
-			{
-				return nullptr;
-			}
-			else
-			{
-				// can use this pointer to load a single mesh onto the GPU
-				return meshes[index];
-			}
-		}
-
+		std::shared_ptr<Mesh> GetMesh(size_t index);
 		// pointer to the vector of meshes
-		inline auto& GetMeshes()
-		{
-			return meshes;
-		}
+		auto& GetMeshes();
 
-		inline void AddMesh(Mesh* mesh)
-		{
-			// add a single mesh to the model
-			meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
-		}
-
-		inline void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes)
-		{
-			// for multiple meshes
-			meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
-		}
+		void AddMesh(Mesh* mesh);
+		inline void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes);
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
-
 		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }
 
 		inline auto GetFileName() const { return filePath; }

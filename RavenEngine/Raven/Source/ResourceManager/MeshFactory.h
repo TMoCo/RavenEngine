@@ -15,7 +15,6 @@ namespace Raven
 		Cylinder = 6,
 		Terrain = 7,
 		File = 8,
-
 	};
 
 	namespace MeshFactory

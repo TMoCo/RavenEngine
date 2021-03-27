@@ -4,6 +4,8 @@
 
 #pragma once
 #include <memory>
+#include <unordered_map>
+#include <typeinfo>
 #include "Utilities/Core.h"
 #include "ISystem.h"
 
@@ -14,16 +16,18 @@ namespace Raven
 	{
 	public:
 		template<typename T, typename... Args>
-		std::shared_ptr<T> AddSystem(Args&&... args)
+		std::shared_ptr<ISystem> AddSystem(Args&&... args)
 		{
+			static_assert(std::is_base_of<ISystem, T>::value, "class T should extend from ISystem");
 			auto typeName = typeid(T).hash_code();
 			RAVEN_ASSERT(systems.find(typeName) == systems.end(), "Add system more than once.");
 			return systems.emplace(typeName, std::make_shared<T>(std::forward<Args>(args)...)).first->second;
 		}
 
 		template<typename T>
-		std::shared_ptr<T> AddSystem(T* t)
+		std::shared_ptr<ISystem> AddSystem(T* t)
 		{
+			static_assert(std::is_base_of<ISystem, T>::value, "class T should extend from ISystem");
 			auto typeName = typeid(T).hash_code();
 			RAVEN_ASSERT(systems.find(typeName) == systems.end(), "Add system more than once.");
 			return systems.emplace(typeName, std::shared_ptr<T>(t)).first->second;

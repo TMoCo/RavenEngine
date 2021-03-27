@@ -5,6 +5,21 @@ namespace Raven
 {
 	namespace StringUtils 
 	{
+		// later we should use enums to identify formats for faster comparison
+		enum EFileExtensions : uint32_t
+		{
+			Txt,
+			Obj,
+			Fbx
+		};
+
+		enum EBase : uint32_t
+		{
+			Decimal		= 10,
+			Hexadecimal = 16,
+			Binary		= 2
+		};
+
 		std::string GetExtension(const std::string& fileName);
 		std::string RemoveExtension(const std::string& fileName);
 		std::string GetFileName(const std::string& filePath);
@@ -17,7 +32,7 @@ namespace Raven
 		bool IsModelFile(const std::string& filePath);
 		bool IsTextureFile(const std::string& filePath);
 		
-		char* IntToString(int num, char* buffer, int base); // itoa
+		char* IntToString(int num, char* buffer, EBase base); // itoa
 	};
 
 };

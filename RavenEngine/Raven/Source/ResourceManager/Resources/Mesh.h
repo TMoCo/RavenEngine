@@ -6,6 +6,8 @@
 
 #include "glm/glm.hpp"
 
+#include "Math/BoundingBox.h"
+
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/RenderRscMesh.h"
 
@@ -43,7 +45,9 @@ namespace Raven
 
 		std::vector<uint32_t> indices;
 
-		RenderRscMesh* renderRscMesh; // interface with renderer (default constructor)
+		MathUtils::BoundingBox bbox; // defaults to 0 values
+
+		RenderRscMesh* renderRscMesh = nullptr; // interface with renderer (default constructor)
 
 		bool active = true;
 	};

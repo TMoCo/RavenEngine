@@ -77,7 +77,6 @@ namespace Raven
 		{
 			// update the centre depending on min and max values
 			centre = glm::vec3((min.x + max.x) / 2.0f, (min.y + max.y) / 2.0f, (min.z + max.z) / 2.0f);
-
 		}
 	};
 };

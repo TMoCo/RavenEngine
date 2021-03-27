@@ -101,7 +101,7 @@ namespace Raven
 			return extension == "png" || extension == "tga" || extension == "jpg";
 		}
 
-		char* IntToString(int num, char* buffer, int base)
+		char* IntToString(int num, char* buffer, EBase base)
 		{
 			int i = 0;
 			// check for 0 case

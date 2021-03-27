@@ -26,6 +26,12 @@ namespace Raven
 		float radius;
 		int32_t type;
 		float angle;
+
+		template<class Archive>
+		void serialize(Archive& archive)
+		{
+			archive(position, color, type, angle, direction,intensity, radius);
+		}
 	};
 };
 

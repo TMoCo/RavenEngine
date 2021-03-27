@@ -22,6 +22,9 @@
 
 namespace Raven 
 {
+
+	class SystemManager;
+
 	enum class EditorState
 	{
 		Paused,
@@ -72,6 +75,8 @@ namespace Raven
 		//mainly used in editor mode. when the scene is selected, return true
 		inline bool IsSceneActive() const {return sceneActive;}
 
+		inline auto& GetSystemManager() { return systemManager; }
+
 	protected:
 		virtual void OnImGui();
 		virtual void OnUpdate(float dt);
@@ -119,6 +124,7 @@ namespace Raven
 
 		EventDispatcher eventDispatcher;
 
+		std::unique_ptr<SystemManager> systemManager;
 
 		bool sceneActive = false;
 

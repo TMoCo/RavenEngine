@@ -64,14 +64,17 @@ namespace Raven
 		if (currentScene == nullptr && allScenes.size() > 0) 
 		{
 			currentScene = allScenes.back().get();
-			currentScene->OnInit();
 		}
 		else if (currentScene != nullptr) 
 		{
 			currentScene->OnClean();
 			currentScene = allScenes.back().get();
-			currentScene->OnInit();
 		}
+
+		currentScene->Load("./scenes/");
+
+		if(Engine::Get().GetEditorState() == EditorState::Play)
+			currentScene->OnInit();
 
 		Engine::Get().OnSceneCreated(currentScene);
 

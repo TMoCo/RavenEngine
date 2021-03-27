@@ -14,6 +14,8 @@
 #include <GLFW/glfw3.h>
 #include "Scene/Scene.h"
 #include "Devices/Input.h"
+#include "Scene/System/SystemManager.h"
+
 #include <memory>
 
 
@@ -89,6 +91,7 @@ namespace Raven
 	void Engine::OnUpdate(float dt)
 	{
 		eventDispatcher.DispatchEvents();
+		systemManager->OnUpdate(dt, GetModule<Raven::SceneManager>()->GetCurrentScene());
 		GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 
 		// Update Render...
@@ -118,6 +121,9 @@ namespace Raven
 	void Engine::LoadModules()
 	{
 		// Create...
+		systemManager = std::make_unique<SystemManager>();
+
+
 		CreateModule<Raven::ResourceManager>();
 		CreateModule<Raven::RenderModule>();
 		CreateModule<Raven::ImGuiEngine>();
@@ -137,6 +143,14 @@ namespace Raven
 		InitializeModule<Raven::SceneManager>();
 		InitializeModule<Raven::GUIModule>();
 		InitializeModule<Raven::TerrainGeneration>();
+
+//############	Register your system here ######################
+
+		
+	
+
+
+//############	Register your system here ######################
 
 	}
 

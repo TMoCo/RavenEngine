@@ -44,7 +44,7 @@ namespace Raven
 		void load(Archive& archive)
 		{
 			archive(cereal::make_nvp("ControllerType",type));
-			SetControllerType(m_Type);
+			SetControllerType(type);
 		}
 
 		inline auto GetType() const 

@@ -18,6 +18,8 @@ namespace Raven
 	};
 };
 
+
+#define PRINT_FUNC()   Raven::Console::GetLogger()->info("{0} : {1}",__FUNCTION__,__LINE__)	
 #define LOGV(...)      Raven::Console::GetLogger()->trace(__VA_ARGS__)
 #define LOGI(...)      Raven::Console::GetLogger()->info(__VA_ARGS__)
 #define LOGW(...)      Raven::Console::GetLogger()->warn(__VA_ARGS__)

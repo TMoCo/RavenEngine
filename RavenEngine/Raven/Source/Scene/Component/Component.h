@@ -10,12 +10,22 @@ namespace Raven
 	//TODO serialize function is not implementation
 	struct NameComponent
 	{
+		template<typename Archive>
+		void serialize(Archive& archive)
+		{
+			archive(cereal::make_nvp("Name", name));
+		}
 		std::string name;
 	};
 
 
 	struct ActiveComponent
 	{
+		template<typename Archive>
+		void serialize(Archive& archive)
+		{
+			archive(cereal::make_nvp("Active", active));
+		}
 		bool active = true;
 	};
 
@@ -53,6 +63,12 @@ namespace Raven
 		entt::entity first = entt::null;
 		entt::entity next = entt::null;
 		entt::entity prev = entt::null;
+
+		template<typename Archive>
+		void serialize(Archive& archive)
+		{
+			archive(cereal::make_nvp("First", first), cereal::make_nvp("Next", next), cereal::make_nvp("Previous", prev), cereal::make_nvp("Parent", parent));
+		}
 	};
 
 };

@@ -6,8 +6,9 @@
 #include <string>
 #include <memory>
 #include <entt/entt.hpp>
-#include "Utilities/Core.h"
+#include <cereal/cereal.hpp>
 
+#include "Utilities/Core.h"
 namespace Raven
 {
 	class EntityManager;
@@ -27,8 +28,12 @@ namespace Raven
 		virtual void OnUpdate(float dt);
 
 		inline auto& GetEntityManager() { return entityManager; }
+
 		inline auto& GetName() const { return name; };
+
 		inline void SetName(const std::string& name) { this->name = name; }
+
+		inline void SetInitCallback(const std::function<void(Scene* scene)>& call) { initCallback = call; }
 
 		void SetSize(uint32_t w, uint32_t h);
 		entt::registry& GetRegistry();
@@ -49,6 +54,18 @@ namespace Raven
 		inline auto SetOverrideCamera(Camera* overrideCamera) { this->overrideCamera = overrideCamera; }
 		inline auto SetOverrideTransform(Transform* overrideTransform) { this->overrideTransform = overrideTransform; }
 
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::make_nvp("SceneName",name));
+		}
+
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::make_nvp("SceneName", name));
+		}
+
 	private:
 		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
@@ -62,6 +79,7 @@ namespace Raven
 		Camera* overrideCamera = nullptr;
 		Transform* overrideTransform = nullptr;
 
+		std::function<void(Scene *scene)> initCallback;
 	public:
      
 

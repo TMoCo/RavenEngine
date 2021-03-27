@@ -9,6 +9,9 @@
 #include <glm/gtc/quaternion.hpp>
 
 
+
+
+
 namespace Raven 
 {
 
@@ -20,6 +23,7 @@ namespace Raven
 	constexpr glm::vec3 FORWARD(0.0f, 0.0f, 1.0f);
 	constexpr glm::vec3 BACK(0.0f, 0.0f, -1.0f);
 	constexpr glm::vec3 ONE(1.0f, 1.0f, 1.0f);
+
 
 	class Transform final
 	{
@@ -62,6 +66,20 @@ namespace Raven
 
 		static glm::vec3 GetScaleFromMatrix(const glm::mat4& mat);
 
+
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::make_nvp("Position", localPosition), cereal::make_nvp("Rotation", localOrientation), cereal::make_nvp("Scale", localScale));
+		}
+
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::make_nvp("Position", localPosition), cereal::make_nvp("Rotation", localOrientation), cereal::make_nvp("Scale",  localScale));
+			dirty = true;
+		}
+
 	protected:
 		glm::mat4 localMatrix = glm::mat4(1);
 		glm::mat4 worldMatrix = glm::mat4(1);
@@ -74,4 +92,8 @@ namespace Raven
 		bool hasUpdated = false;
 		bool dirty = false;
 	};
+
 };
+
+
+

@@ -104,3 +104,66 @@ Organize entities and decide which entity will be updated.
 ##### [Model](./Component/Model.h)
 ##### [Transform](./Component/Transform.h)
 
+
+### System 
+
+A system is a tool that operates on a collection of entities with one or more identical components. It has only behavior and no state, that is, it should not store any data. 
+
+#### ISystem
+
+the interface of your system module
+
+
+
+#### SystemManager
+
+the manager of systems and manage the lifecycle of systems.
+
+
+
+#### Example
+
+
+``` c++
+    //define your own system here
+    class UISystem : public ISystem
+    {
+        //do you code
+    }
+
+
+    void UISystem::OnUpdate(float dt, Scene* scene)
+    {
+        //update your entity or component here.        
+    }
+
+    auto ui = systemManager->AddSystem<UISystem>();
+    ui->OnInit();
+
+
+```
+
+
+``` c++
+    //define your own system here
+    class PhysicsSystem : public ISystem
+    {
+        //do you code
+    }
+
+
+    void PhysicsSystem::OnUpdate(float dt, Scene* scene)
+    {
+        auto group = registry.group<Physics3DComponent>(entt::get<Transform>);  
+        for(auto entity : group)
+        {
+           const auto& phys = group.get<Physics3DComponent>(entity);
+           phys.OnUpdate();
+        }
+    }
+
+    auto ui = systemManager->AddSystem<PhysicsSystem>();
+    ui->OnInit();
+
+
+```

@@ -11,6 +11,7 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Core/CameraController.h"
+#include "ResourceManager/Resources/Model.h"
 
 #include "ResourceManager/Resources/Model.h"
 #include "Utilities/StringUtils.h"
@@ -19,17 +20,35 @@
 
 #include <fstream>
 #include "Engine.h"
-
+#include "Utilities/Serialization.h"
 // for serialization
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
+
+
+
+template<typename Archive>
+static void serialize(Archive& archive, glm::vec3& v2)
+{
+	archive(v2.x, v2.y, v2.z);
+}
+
+
 
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
 		:name(initName)
 	{
-	
+		LOGV("{0}", __FUNCTION__);
+		entityManager = std::make_shared<EntityManager>(this);
+
+		entityManager->AddDependency<Camera, Transform>();
+		entityManager->AddDependency<Model, Transform>();
+		entityManager->AddDependency<Light, Transform>();
+
+		sceneGraph = std::make_shared<SceneGraph>();
+		sceneGraph->Init(entityManager->GetRegistry());
 	}
 
 	entt::registry& Scene::GetRegistry()
@@ -43,31 +62,32 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
-
+		PRINT_FUNC();
 		// loop through the scene and serialize each entity and its components
-	/*	std::string path = filePath + name;
+		std::string path = filePath + name;
 		if (binary)
 		{
-			path += std::string(".bin");
+			/*path += std::string(".bin");
 
 			std::ofstream file(path, std::ios::binary);
 
 			{
 				// output finishes flushing its contents when it goes out of scope
-				cereal::BinaryOutputArchive output{ file };
+				cereal::BinaryOutputAr chive output{ file };
 				output(*this);
 				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
 			}
-			file.close();
+			file.flush();
+			file.close();*/
 		}
 		else
 		{
 			std::stringstream storage;
-			path += std::string(".lsn");
+			path += std::string(".raven");
 
 			{
 				cereal::JSONOutputArchive output{ storage };
@@ -76,28 +96,32 @@ namespace Raven {
 				
 			}
 
-			FileSystem::Write(path, storage.str());
-		}*/
+			std::ofstream file(path, std::ios::binary);
+
+			file << storage.str();
+
+			file.flush();
+			file.close();
+		}
 	}
 
 	void Scene::Load(const std::string& filePath, bool binary)
 	{
-
+		PRINT_FUNC();
 		entityManager->Clear();
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
 		std::string path = filePath + name;
 
 		if (binary)
 		{
-			path += std::string(".bin");
-
-			/*if (!FileSystem::FileExists(path))
+			/*path += std::string(".bin");
+			std::ifstream file(path, std::ios::binary);
+			if (!file.good())
 			{
 				LOGE("No saved scene file found {0}", path);
 				return;
 			}
 
-			std::ifstream file(path, std::ios::binary);
 			cereal::BinaryInputArchive input(file);
 			input(*this);
 	
@@ -107,18 +131,27 @@ namespace Raven {
 		{
 			path += std::string(".raven");
 
-	/*		if (!FileSystem::FileExists(path))
+			std::ifstream in(path);
+			if (!in.good())
 			{
 				LOGE("No saved scene file found {0}", path);
+				in.close();
 				return;
 			}
-			std::string data = FileSystem::Read(path);
+			std::string data;
+			in.seekg(0, std::ios::end);
+			auto len = in.tellg();
+			in.seekg(0, std::ios::beg);
+			data.resize(len);
+			in.read(data.data(), len);
+			in.close();
+
 			std::istringstream istr;
 			istr.str(data);
 			cereal::JSONInputArchive input(istr);
 			input(*this);
 
-			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);*/
+			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 		}
 
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
@@ -183,21 +216,10 @@ namespace Raven {
 
 	void Scene::OnInit()
 	{
-
-		if (!inited) 
+		if (initCallback != nullptr) 
 		{
-			LOGV("{0}", __FUNCTION__);
-			entityManager = std::make_shared<EntityManager>(this);
-
-			entityManager->AddDependency<Camera, Transform>();
-			entityManager->AddDependency<Model, Transform>();
-			entityManager->AddDependency<Light, Transform>();
-
-			sceneGraph = std::make_shared<SceneGraph>();
-			sceneGraph->Init(entityManager->GetRegistry());
-			inited = true;
+			initCallback(this);
 		}
-	
 	}
 
 	void Scene::OnClean()

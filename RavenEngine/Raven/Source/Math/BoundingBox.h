@@ -22,9 +22,10 @@ namespace Raven
 			// add a vertex and update bounding box min and max if nescessary
 			void AddVertex(const glm::vec3& vert);
 
-			EIntersection PointIntersection (const glm::vec3 point) const;
-			EIntersection RayIntersection(const glm::vec3 dir) const;
-			EIntersection BoxIntersection (const BoundingBox& other) const;
+			EIntersection DoesPointIntersect (const glm::vec3 point) const;
+			EIntersection DoesBoxIntersect (const BoundingBox& other) const;
+
+			glm::vec3 RayIntersection(const glm::vec3 dir) const;
 
 			void UpdateCentre(); // update the centre depending on min and max values
 

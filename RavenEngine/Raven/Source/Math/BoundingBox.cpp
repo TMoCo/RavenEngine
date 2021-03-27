@@ -12,10 +12,21 @@ namespace Raven
 		// add a vertex and update bounding box min and max if nescessary
 		void BoundingBox::AddVertex(const glm::vec3& vert)
 		{
-
+			if (min.x > vert.x + EPS)
+				min.x = vert.x;
+			if (max.x < vert.x - EPS)
+				max.x = vert.x;
+			if (min.y > vert.y + EPS)
+				min.y = vert.y;
+			if (max.y < vert.y - EPS)
+				max.y = vert.y;
+			if (min.z > vert.z + EPS)
+				min.z = vert.z;
+			if (max.z < vert.z - EPS)
+				max.z = vert.z;
 		}
 
-		EIntersection BoundingBox::PointIntersection(const glm::vec3 point) const
+		EIntersection BoundingBox::DoesPointIntersect(const glm::vec3 point) const
 		{
 			// point is outside if either of its xyz is bigger or smaller than the corresponding max or min respectively
 			if (point.x > min.x || point.x < max.x ||
@@ -30,12 +41,7 @@ namespace Raven
 			}
 		}
 
-		EIntersection BoundingBox::RayIntersection(const glm::vec3 dir) const
-		{
-			// intersection if 
-		}
-
-		EIntersection BoundingBox::BoxIntersection(const BoundingBox& other) const
+		EIntersection BoundingBox::DoesBoxIntersect(const BoundingBox& other) const
 		{
 			// other box is outside if either of its max or min is smaller or bigger
 			// than this box's corresponding min or max respectively
@@ -49,8 +55,8 @@ namespace Raven
 			// other box is intersecting if either of its max or min is or smaller 
 			// than this box's corresponding max or min respectively
 			if (other.max.x > max.x || min.x < other.min.x ||
-				other.max.y > max.y || min.y > other.min.y ||
-				other.max.z > max.z || min.z > other.min.z)
+				other.max.y > max.y || min.y < other.min.y ||
+				other.max.z > max.z || min.z < other.min.z)
 			{
 				return EIntersection::Intesects;
 			}
@@ -59,6 +65,12 @@ namespace Raven
 			{
 				return EIntersection::Inside;
 			}
+		}
+
+
+		glm::vec3 BoundingBox::RayIntersection(const glm::vec3 dir) const
+		{
+			// get intersection point with box, how to process no intersection?
 		}
 
 		void BoundingBox::UpdateCentre()

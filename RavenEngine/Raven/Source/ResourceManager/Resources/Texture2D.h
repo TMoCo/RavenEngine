@@ -47,9 +47,9 @@ namespace Raven
 		// return the resource type
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } 
 
-		size_t height;		// image dimensions
+		size_t height;	  // image dimensions
 		size_t width;
-		EGLFormat format;	// image format
+		EGLFormat format; // image format
 		
 		byte* data; // image data should be sizeof(byte) * height * width
 

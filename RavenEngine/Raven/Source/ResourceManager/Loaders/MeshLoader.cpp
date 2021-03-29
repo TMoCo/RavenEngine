@@ -29,11 +29,11 @@ namespace Raven
 
     bool MeshLoader::LoadOBJ(const std::string& path)
     {
-        int meshNum = 0;
-        char buffer[100]; // up to 100 different meshes in a model
-        std::string meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
+     //   int meshNum = 0;
+     //   char buffer[100]; // up to 100 different meshes in a model
+     //  std::string meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
 
-        if (resourceManager->HasResource(meshId))
+        if (resourceManager->HasResource(path))
         {
             // already loaded
             return true;
@@ -96,8 +96,8 @@ namespace Raven
             }
             // once all vertices have been processed, update the bbox's centre
             mesh->bbox.UpdateCentre();
-            resourceManager->AddResource(meshId, mesh); // file path is resource id
-            meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
+            resourceManager->AddResource(path, mesh); // file path is resource id
+            //meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
         }
         // TODO: process Material data
         return true;

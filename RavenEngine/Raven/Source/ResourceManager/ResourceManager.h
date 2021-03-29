@@ -19,13 +19,16 @@
 #include <unordered_map> // a register for unique resources
 #include <memory>		 // pointer classes
 #include <array>		 // array container
+#include <vector>
+
 
 #include "Utilities/Core.h"
 
 #include "IModule.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "ResourceManager/Loaders/ILoader.h"
-
+#include "ResourceManager/Loaders/ImageLoader.h"
+#include "ResourceManager/Loaders/MeshLoader.h"
 
 namespace Raven
 {
@@ -49,7 +52,11 @@ namespace Raven
 
 		// resources are obtained by passing their path as keys for the unordered map
 		template<class TResource>
-		TResource* GetResource(const std::string& path);
+		std::shared_ptr<TResource> GetResource(const std::string& path);
+		template<class TResource>
+		void GetResource(const std::string& path, std::vector<std::shared_ptr<TResource>>& outVec);
+		template<class TResource>
+		std::vector<std::shared_ptr<TResource>> GetResources(const std::string& path);
 
 		// returns true if the resource is already in the resource register
 		bool HasResource(const std::string& id);
@@ -100,7 +107,10 @@ namespace Raven
 		TLoader* GetLoader();
 
 		// for now the resource registers map an id to the resource in heap memory
-		std::unordered_map<std::string, IResource*> resources;
+		//std::unordered_map<std::string, IResource*> resources;
+
+		//one to many
+		std::unordered_multimap<std::string, std::shared_ptr<IResource>> resources;
 
 		// an array containing the resource loaders used
 		std::vector<std::unique_ptr<ILoader>> loaders;
@@ -109,4 +119,109 @@ namespace Raven
 
 		NOCOPYABLE(ResourceManager); // delete copy constructor and = operator
 	};
+
+
+
+	//####################Note##########################
+	//template method should be implemented in *.h files rather than .*cpp files
+	//if implemented in cpp files ,the files could not complie 
+
+
+
+	template<class TResource>
+	bool ResourceManager::LoadResource(const std::string& path)
+	{
+		// based on resource type, select approptiate loader and call loader's LoadAsset method
+		switch (TResource::Type())
+		{
+		case EResourceType::RT_Image:
+			return GetLoader<ImageLoader>()->LoadAsset(path); // adds a resource to the register
+		case EResourceType::RT_Mesh:
+			return GetLoader<MeshLoader>()->LoadAsset(path);
+		default:
+			return false;
+		}
+	}
+
+	template <class TLoader>
+	void ResourceManager::AddLoader(std::unique_ptr<TLoader> loader)
+	{
+		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
+		{
+			loaders.push_back(std::move(loader));
+			LOGV("Added a loader of type " + ILoader::TypeToString(loaders.rbegin()->get()->GetType()));
+		}
+	}
+
+	template <class TLoader>
+	void ResourceManager::RemoveLoader(const TLoader* loader)
+	{
+		// loop over the loaders, finding the loader we want to remove
+		const auto iter = std::find_if(loaders.begin(), loaders.end(), [loader](const auto& ownedLoader) noexcept { return loader == ownedLoader.get(); });
+		// check the iterator isn't at the end, means we found a loader to remove
+		if (iter != loaders.end())
+		{
+			loaders.erase(iter); // deletes the unique pointer, which deletes its owned object
+		}
+	}
+
+	template <class TLoader>
+	TLoader* ResourceManager::GetLoader()
+	{
+		// loop over loaders, finding the type of loader requested
+		ELoaderType type = TLoader::Type();
+		const auto iter = std::find_if(loaders.begin(), loaders.end(), [type](const auto& ownedLoader) noexcept { return ownedLoader->GetType() == type; });
+		if (iter == loaders.end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			// cast to desired loader type
+			return dynamic_cast<TLoader*>(iter->get());
+		}
+	}
+
+
+
+	template<class TResource>
+	std::vector<std::shared_ptr<TResource>> ResourceManager::GetResources(const std::string& path)
+	{
+		std::vector<std::shared_ptr<IResource>> res;
+		GetResource(path, res);
+		return res;
+	}
+
+
+	template<class TResource>
+	void ResourceManager::GetResource(const std::string& path, std::vector<std::shared_ptr<TResource>>& out)
+	{
+		auto pr = resources.equal_range(path);
+		if (pr.first != resources.end())
+		{
+			for (auto iter = pr.first; iter != pr.second; ++iter)
+			{
+				out.emplace_back(std::static_pointer_cast<TResource>(iter->second));
+			}
+		}
+	}
+
+
+	template<class TResource>
+	std::shared_ptr<TResource> ResourceManager::GetResource(const std::string& path)
+	{
+		auto resourceIter = resources.find(path); // a key/value pair iterator
+		// check IResource pointer exists 
+		if (resourceIter == resources.end())
+		{
+			return nullptr;
+		}
+		else
+		{
+			// if resource is right type, return valid pointer, else nullptr
+			return std::static_pointer_cast<TResource>(resourceIter->second);
+		}
+	}
+
+
 }

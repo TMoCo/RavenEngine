@@ -5,11 +5,19 @@
 #pragma once
 
 #include "Scene/Component/Model.h"
-
 #include "ResourceManager/Resources/Mesh.h"
+#include "Engine.h"
+#include "ResourceManager/ResourceManager.h"
+
 
 namespace Raven
 {
+	Model::Model(const std::string & fileName)
+		: primitiveType(PrimitiveType::File), filePath(fileName)
+	{
+		LoadFile();
+	}
+
 	Model::~Model()
 	{
 		meshes.clear(); // calls the deleters for mesh objects
@@ -39,21 +47,24 @@ namespace Raven
 		}
 	}
 
-	// pointer to the vector of meshes
-	std::vector<std::shared_ptr<Mesh>>& Model::GetMeshes()
-	{
-		return meshes;
-	}
+
 
 	void Model::AddMesh(Mesh* mesh)
 	{
-		// add a single mesh to the model
 		meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
 	}
 
-	void Model::AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes)
+	void Model::AddMeshes(const std::vector<std::shared_ptr<Mesh>> & inputMeshes)
 	{
 		// for multiple meshes
 		meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
 	}
+
+	void Model::LoadFile()
+	{
+		auto res = Engine::Get().GetModule<ResourceManager>();
+		res->LoadResource<Mesh>(filePath);
+		res->GetResource(filePath, meshes);
+	}
+
 }

@@ -59,14 +59,22 @@ namespace Raven
 		if (regi->Button(startButtonCFG, startTextCFG, "Start Game")) {
 			LOGI("The start button has been pressed!");
 			// TODO: Add the scene switching code
-
+			if (callback) 
+			{
+				callback();
+			}
 		}
 		regi->EndPanel();
 
 		regi->EndFrame();
 	}
 
-	GUIInGame::GUIInGame() 
+	void GUIMenu::SetButtonCallback(const std::function<void()>& callf)
+	{
+		callback = callf;
+	}
+
+	GUIInGame::GUIInGame()
 	{
 		auto window = Engine::Get().GetModule<Window>();
 		glm::vec2 wSize = window->GetWindowSize();

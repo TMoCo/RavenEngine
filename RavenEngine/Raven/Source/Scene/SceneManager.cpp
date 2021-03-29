@@ -61,17 +61,16 @@ namespace Raven
 			if (allScenes.empty()) { 
 				AddScene(new Scene("default"));
 			}
+			queuedSceneIndex = 0;
 		}
 
-		if (currentScene == nullptr && allScenes.size() > 0) 
-		{
-			currentScene = allScenes.back().get();
-		}
-		else if (currentScene != nullptr) 
+		if (currentScene != nullptr) 
 		{
 			currentScene->OnClean();
 			currentScene = allScenes.back().get();
 		}
+
+		currentScene = allScenes[queuedSceneIndex].get();
 
 		currentScene->Load("./scenes/");
 

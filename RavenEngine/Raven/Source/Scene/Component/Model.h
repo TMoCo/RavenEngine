@@ -3,21 +3,23 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
-#include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/MeshFactory.h"
-
+#include <string>
+#include <vector>
+#include <memory>
 //
 // A class for 3D models and their related data such as meshes, and later materials
 //
 
 namespace Raven
 {
+	class Mesh;
 	enum class PrimitiveType;
 	class Model
 	{
 	public:
-		Model() {} 
+		Model() {}
+		Model(const std::string & fileName);
 
 		~Model();
 
@@ -26,10 +28,10 @@ namespace Raven
 		// return shared pointer to a mesh resource
 		std::shared_ptr<Mesh> GetMesh(size_t index);
 		// pointer to the vector of meshes
-		std::vector<std::shared_ptr<Mesh>>& GetMeshes();
+		inline auto& GetMeshes() { return meshes; };
 
 		void AddMesh(Mesh* mesh);
-		void AddMeshes(std::vector<std::shared_ptr<Mesh>> inputMeshes);
+		void AddMeshes(const std::vector<std::shared_ptr<Mesh>>& inputMeshes);
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
 		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }
@@ -59,13 +61,14 @@ namespace Raven
 			}
 			else
 			{
-				//TODO
-				LOGE("load from file did not implementation");
+				LoadFile();
 			}
 		}
 
 
 	private:
+
+		void LoadFile();
 
 		inline void SetFileName(const std::string& path) { filePath = path; }
 
@@ -75,4 +78,4 @@ namespace Raven
 
 		friend class ModelLoader; // for setting file name
 	};
-}
+};

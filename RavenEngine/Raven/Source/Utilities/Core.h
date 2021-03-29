@@ -10,7 +10,7 @@
 			LOGE("Assertion Failed : {0}", __VA_ARGS__);			\
 			__debugbreak(); 										\
 		}															\
-	}	
+	}
 
 #define NOCOPYABLE(Type)								\
     Type(const Type&) = delete;							\

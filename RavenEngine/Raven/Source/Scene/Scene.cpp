@@ -12,7 +12,6 @@
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/Model.h"
 #include "Core/CameraController.h"
-#include "ResourceManager/Resources/Model.h"
 
 #include "Utilities/StringUtils.h"
 #include "Core/Camera.h"

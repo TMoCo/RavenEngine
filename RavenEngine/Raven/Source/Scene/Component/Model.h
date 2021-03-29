@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/MeshFactory.h"
 
 //
 // A class for 3D models and their related data such as meshes, and later materials
@@ -34,6 +35,35 @@ namespace Raven
 		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }
 
 		inline auto GetFileName() const { return filePath; }
+
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			if (meshes.size() > 0)
+			{
+				archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
+			}
+		}
+
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+
+			archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
+
+			meshes.clear();
+
+			if (primitiveType != PrimitiveType::File)
+			{
+				AddMesh(MeshFactory::CreatePrimative(primitiveType));
+			}
+			else
+			{
+				//TODO
+				LOGE("load from file did not implementation");
+			}
+		}
+
 
 	private:
 

@@ -31,6 +31,7 @@ namespace Raven
 
 		inline auto& GetScenes() const { return allScenes; }
 
+
 		inline auto & GetSceneFilePaths() const { return sceneFilePaths; }
 
 		std::vector<std::string> GetSceneNames();
@@ -41,6 +42,8 @@ namespace Raven
 
 		void AddSceneFromFile(const std::string& filePath);
 		void AddScene(Scene* scene);
+		
+		Scene* GetSceneByName(const std::string& sceneName);
 
 		template<class T>
 		void AddScene(const std::string& name);

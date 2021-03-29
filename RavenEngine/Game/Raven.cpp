@@ -24,15 +24,22 @@ namespace Raven
 		auto scene = new Scene("default");
 		GetModule<SceneManager>()->AddScene(scene);
 		GetModule<SceneManager>()->AddSceneFromFile("scenes/deer2.raven");
+		auto deerScene = GetModule<SceneManager>()->GetSceneByName("deer2");
+
 		//more safety way
-		scene->SetInitCallback([](Scene * scene) {
-			auto guiEnt = scene->CreateEntity("GUI_Entity");
+		scene->SetInitCallback([](Scene * _scene) {
+			auto guiEnt = _scene->CreateEntity("GUI_Entity");
 			auto& menu = guiEnt.AddComponent<GUIMenu>();
 
 			menu.SetButtonCallback([]() {
 				GetModule<SceneManager>()->SwitchScene("deer2");
 			});
 
+		});
+
+		deerScene->SetInitCallback([](Scene* _scene) {
+			auto guiEnt = _scene->CreateEntity("GUI_Entity");
+			auto& menu = guiEnt.AddComponent<GUIInGame>();
 		});
 
 	}

@@ -105,6 +105,16 @@ namespace Raven
 		allScenes.emplace_back(std::shared_ptr<Scene>(scene));
 	}
 
+	// Function to return a scene given its name - Ben
+	Scene* SceneManager::GetSceneByName(const std::string& sceneName) 
+	{
+		for (auto& scene : allScenes)
+		{
+			if (scene.get()->GetName() == sceneName) 
+				return scene.get();
+		}
+	}
+
 
 	void SceneManager::LoadCurrentList()
 	{

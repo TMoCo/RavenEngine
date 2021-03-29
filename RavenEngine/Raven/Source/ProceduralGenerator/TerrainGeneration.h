@@ -6,6 +6,7 @@
 #include <glm/gtc/noise.hpp>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 namespace Raven {
 
@@ -25,7 +26,7 @@ namespace Raven {
 	private:
 		enum FileFormat
 		{
-			PNG, BMP, JPG, TGA, HDR
+			PNG, BMP, JPG, TGA
 		};
 
 		// initialise module
@@ -38,7 +39,7 @@ namespace Raven {
 		void Noise(int width, int height, FileFormat type);
 
 		// write out image in the specified format
-		void WriteImage(FileFormat type, int width, int height, const float* data);
+		void WriteImage(FileFormat type, int width, int height, const uint8_t* data);
 
 	};
 

@@ -1,4 +1,3 @@
-//#include <stb/stb.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 
@@ -16,7 +15,7 @@ namespace Raven {
 
 	void TerrainGeneration::Initialize()
 	{
-		FileFormat type = JPG;
+		FileFormat type = PNG;
 		const int width = 128;
 		const int height = 128;
 
@@ -39,6 +38,9 @@ namespace Raven {
 		//GLubyte* data = new GLubyte[width * height * octaves];
 		float* data;
 		data = (float*)malloc(width * height * octaves * sizeof(float));
+
+		uint8_t* heightFields;
+		heightFields = (uint8_t*)malloc(width * height * 4 * sizeof(uint8_t));
 
 		float xFactor = 1.0f / (width - 1);
 		float yFactor = 1.0f / (height - 1);
@@ -78,7 +80,7 @@ namespace Raven {
 			}
 		}
 
-		//std::ofstream out("height.ppm"); 
+		//std::ofstream out("heightmap.ppm");
 		//out << "P3 " << width << " " << height << " 255\n";
 
 		// add heights from all octaves
@@ -95,6 +97,10 @@ namespace Raven {
 					if (oct == 3)
 					{
 						sumHeight /= 4;
+
+						heightFields[(row * width + col) * 3] = sumHeight;
+						heightFields[((row * width + col) * 3) + 1] = sumHeight;
+						heightFields[((row * width + col) * 3) + 2] = sumHeight;
 						//out << (int)sumHeight << ' ' << (int)sumHeight << ' ' << (int)sumHeight << '\n';
 						sumHeight = 0;
 						//out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
@@ -104,7 +110,7 @@ namespace Raven {
 			}
 		}
 
-		WriteImage(type, width, height, data);
+		WriteImage(type, width, height, heightFields);
 		//out.close();
 		free(data);
 
@@ -117,7 +123,7 @@ namespace Raven {
 
 	}
 
-	void TerrainGeneration::WriteImage(FileFormat type, int width, int height, const float* data)
+	void TerrainGeneration::WriteImage(FileFormat type, int width, int height, const uint8_t* data)
 	{
 		// write heights to different image formats
 		switch (type)
@@ -133,9 +139,6 @@ namespace Raven {
 			break;
 		case TGA:
 			stbi_write_tga("heightmap.tga", width, height, 3, data);
-			break;
-		case HDR:
-			stbi_write_hdr("heightmap.hdr", width, height, 3, data);
 			break;
 		}
 	}

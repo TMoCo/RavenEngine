@@ -14,7 +14,6 @@
 #include "ResourceManager/Loaders/MeshLoader.h"
 
 #include "ResourceManager/Resources/Texture2D.h"
-#include "ResourceManager/Resources/Terrain.h"
 
 // definition of the ResourceManager module
 

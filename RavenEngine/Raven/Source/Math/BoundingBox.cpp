@@ -71,6 +71,7 @@ namespace Raven
 		glm::vec3 BoundingBox::RayIntersection(const glm::vec3 dir) const
 		{
 			// get intersection point with box, how to process no intersection?
+			return glm::vec3(0.0f);
 		}
 
 		void BoundingBox::UpdateCentre()

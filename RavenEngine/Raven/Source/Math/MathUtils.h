@@ -22,40 +22,39 @@ namespace Raven
 
 
 		// vec4 comparators
-		bool operator >=(const glm::vec4& left, const glm::vec4& other)
+		inline bool operator >=(const glm::vec4& left, const glm::vec4& other)
 		{
 			return left.x >= other.x && left.y >= other.y && left.z >= other.z && left.w >= other.w;
 		}
 
-		bool operator <=(const glm::vec4& left, const glm::vec4& other)
+		inline bool operator <=(const glm::vec4& left, const glm::vec4& other)
 		{
 			return left.x <= other.x && left.y <= other.y && left.z <= other.z && left.w <= other.w;;
 		}
 
 
 		// vec3 comparators
-		bool operator >=(const glm::vec3& left, const glm::vec3& other)
+		inline bool operator >=(const glm::vec3& left, const glm::vec3& other)
 		{
 			return left.x >= other.x && left.y >= other.y && left.z >= other.z;
 		}
 
-		bool operator <=(const glm::vec3& left, const glm::vec3& other)
+		inline bool operator <=(const glm::vec3& left, const glm::vec3& other)
 		{
 			return left.x <= other.x && left.y <= other.y && left.z <= other.z;
 		}
 
 
 		// vec3 comparators
-		bool operator >=(const glm::vec2& left, const glm::vec2& other)
+		inline bool operator >=(const glm::vec2& left, const glm::vec2& other)
 		{
 			return left.x >= other.x && left.y >= other.y ;
 		}
 
-		bool operator <=(const glm::vec2& left, const glm::vec2& other)
+		inline bool operator <=(const glm::vec2& left, const glm::vec2& other)
 		{
 			return left.x <= other.x && left.y <= other.y ;
 		}
-
 
 		//only support for float value and vector
 		template <class T>

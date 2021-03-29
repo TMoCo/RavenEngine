@@ -31,7 +31,7 @@ namespace Raven
     {
         int meshNum = 0;
         char buffer[100]; // up to 100 different meshes in a model
-        std::string meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
+        std::string meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
 
         if (resourceManager->HasResource(meshId))
         {
@@ -97,7 +97,7 @@ namespace Raven
             // once all vertices have been processed, update the bbox's centre
             mesh->bbox.UpdateCentre();
             resourceManager->AddResource(meshId, mesh); // file path is resource id
-            meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
+            meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
         }
         // TODO: process Material data
         return true;

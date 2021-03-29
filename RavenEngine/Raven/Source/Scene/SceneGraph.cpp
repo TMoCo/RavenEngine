@@ -44,19 +44,6 @@ namespace Raven
 			}
 		}
 
-		auto mGuiView = registry.view<GUIMenu>();
-		for (auto entity : mGuiView)
-		{
-			const auto mGUI = registry.try_get<GUIMenu>(entity);
-			if (mGUI) mGUI->UpdateGUI();
-		}
-
-		auto igGuiView = registry.view<GUIInGame>();
-		for (auto entity : igGuiView)
-		{
-			const auto mGUI = registry.try_get<GUIInGame>(entity);
-			if (mGUI) mGUI->UpdateGUI();
-		}
 	}
 
 	void SceneGraph::UpdateTransform(entt::entity entity, entt::registry& registry)

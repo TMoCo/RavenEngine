@@ -15,6 +15,7 @@
 #include "Scene/Scene.h"
 #include "Devices/Input.h"
 #include "Scene/System/SystemManager.h"
+#include "Scene/System/GUISystem.h"
 
 #include <memory>
 
@@ -145,7 +146,8 @@ namespace Raven
 
 //############	Register your system here ######################
 
-		
+		auto guiSystem = GetSystemManager()->AddSystem<GUISystem>();
+		guiSystem->OnInit();
 	
 
 

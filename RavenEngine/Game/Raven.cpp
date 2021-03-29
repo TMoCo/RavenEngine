@@ -10,6 +10,8 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Entity/Entity.h"
+#include "Scene/System/SystemManager.h"
+#include "Scene/System/GUISystem.h"
 
 #include "Scene/Component/GUIComponent.h"
 

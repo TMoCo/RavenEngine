@@ -39,7 +39,9 @@ namespace Raven
 		editorWindows.emplace_back(std::make_unique<PropertiesWindow>());
 		editorWindows.emplace_back(std::make_unique<AssetsWindow>());
 
-		GetModule<SceneManager>()->AddScene(new Scene("Test"));
+		//GetModule<SceneManager>()->AddScene(new Scene("Test"));
+
+	//	GetModule<SceneManager>()->AddSceneFromFile("Test.raven");
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
@@ -485,11 +487,19 @@ namespace Raven
 	void Editor::LoadCachedScene()
 	{
 		//load from disk
+		auto name = "./scenes/"+ GetModule<SceneManager>()->GetCurrentScene()->GetName() + ".raven";
+		struct stat fileInfo;
+		auto exists = (!stat(name.c_str(), &fileInfo)) != 0;
+		if (exists) 
+		{
+			GetModule<SceneManager>()->GetCurrentScene()->Load("./scenes/");
+		}
 	}
 
 	void Editor::CacheScene()
 	{
 		//Serialize the scene
+		GetModule<SceneManager>()->GetCurrentScene()->Save("./scenes/");
 	}
 };
 

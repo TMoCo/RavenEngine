@@ -42,6 +42,21 @@ namespace Raven
 
 		Ray GetScreenRay(float x, float y, const glm::mat4 & viewMatrix, bool invertY = false) const;
 
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::make_nvp("Scale", scale), cereal::make_nvp("Aspect", aspectRatio), cereal::make_nvp("FOV", fov), cereal::make_nvp("Near", near), cereal::make_nvp("Far", far));
+		}
+
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::make_nvp("Scale", scale), cereal::make_nvp("Aspect", aspectRatio), cereal::make_nvp("FOV", fov), cereal::make_nvp("Near", near), cereal::make_nvp("Far", far));
+
+			projectionDirty = true;
+		}
+
+
 	protected:
 		void UpdateProjectionMatrix();
 

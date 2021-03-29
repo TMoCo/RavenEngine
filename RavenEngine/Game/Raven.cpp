@@ -19,15 +19,15 @@ namespace Raven
 	{
 		Raven::Engine::Initialize();
 		//init code here for game 
-
-		auto scene = new Scene("Main Menu");
+		auto scene = new Scene("default");
 		GetModule<SceneManager>()->AddScene(scene);
-		scene->OnInit();
 
+		//more safety way
+		scene->SetInitCallback([](Scene * scene) {
+			auto guiEnt = scene->CreateEntity("GUI_Entity");
+			auto& menu = guiEnt.AddComponent<GUIMenu>();
+		});
 
-		auto guiEnt = scene->CreateEntity("GUI_Entity");
-		
-		guiEnt.AddComponent<GUIMenu>();
 	}
 
 	void RavenGame::OnImGui() 

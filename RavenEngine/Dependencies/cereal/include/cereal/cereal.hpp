@@ -540,6 +540,8 @@ namespace cereal
                                            (!(Flags & AllowEmptyClassElision) || ((Flags & AllowEmptyClassElision) && !std::is_empty<T>::value)))> = traits::sfinae> inline
       ArchiveType & processImpl(T const &)
       {
+       
+
         static_assert(traits::detail::count_output_serializers<T, ArchiveType>::value != 0,
             "cereal could not find any output serialization functions for the provided type and archive combination. \n\n "
             "Types must either have a serialize function, load/save pair, or load_minimal/save_minimal pair (you may not mix these). \n "
@@ -548,8 +550,8 @@ namespace cereal
             "  void serialize(Archive & ar) \n "
             "  { \n "
             "    ar( member1, member2, member3 ); \n "
-            "  } \n\n " );
-
+            "  } \n\n ");
+        
         static_assert(traits::detail::count_output_serializers<T, ArchiveType>::value < 2,
             "cereal found more than one compatible output serialization function for the provided type and archive combination. \n\n "
             "Types must either have a serialize function, load/save pair, or load_minimal/save_minimal pair (you may not mix these). \n "

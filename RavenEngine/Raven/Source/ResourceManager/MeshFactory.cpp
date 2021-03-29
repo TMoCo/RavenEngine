@@ -685,7 +685,7 @@ namespace Raven
 			return mesh;
 		}
 
-		Mesh* CreatePrimative(PrimitiveType type)
+		Mesh* CreatePrimitive(PrimitiveType type)
 		{
 			switch (type)
 			{

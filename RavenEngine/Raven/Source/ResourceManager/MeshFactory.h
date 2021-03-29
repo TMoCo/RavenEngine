@@ -19,7 +19,7 @@ namespace Raven
 
 	namespace MeshFactory
 	{
-		Mesh* CreatePrimative(PrimitiveType type);
+		Mesh* CreatePrimitive(PrimitiveType type);
 		Mesh* CreateQuad();
 		Mesh* CreateQuad(float x, float y, float width, float height);
 		Mesh* CreateQuad(const glm::vec2& position, const glm::vec2& size);

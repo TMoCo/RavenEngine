@@ -15,6 +15,7 @@ namespace Raven
 {
 	class Mesh;
 	enum class PrimitiveType;
+
 	class Model
 	{
 	public:
@@ -38,6 +39,7 @@ namespace Raven
 
 		inline auto GetFileName() const { return filePath; }
 
+		// serialization load and save
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
@@ -46,7 +48,6 @@ namespace Raven
 				archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
 			}
 		}
-
 		template<typename Archive>
 		void load(Archive& archive)
 		{
@@ -57,7 +58,7 @@ namespace Raven
 
 			if (primitiveType != PrimitiveType::File)
 			{
-				AddMesh(MeshFactory::CreatePrimative(primitiveType));
+				AddMesh(MeshFactory::CreatePrimitive(primitiveType));
 			}
 			else
 			{
@@ -72,10 +73,8 @@ namespace Raven
 
 		inline void SetFileName(const std::string& path) { filePath = path; }
 
-		std::vector<std::shared_ptr<Mesh>> meshes;
 		std::string filePath;
+		std::vector<std::shared_ptr<Mesh>> meshes;
 		PrimitiveType primitiveType;
-
-		friend class ModelLoader; // for setting file name
 	};
 };

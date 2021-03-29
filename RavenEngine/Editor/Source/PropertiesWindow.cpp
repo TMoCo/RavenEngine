@@ -129,7 +129,7 @@ namespace MM
 
 	}
 
-	std::string GetPrimativeName(PrimitiveType type)
+	std::string GetPrimitiveName(PrimitiveType type)
 	{
 		switch (type)
 		{
@@ -146,7 +146,7 @@ namespace MM
 		return "";
 	};
 
-	PrimitiveType GetPrimativeName(const std::string& type)
+	PrimitiveType GetPrimitiveName(const std::string& type)
 	{
 		if (type == "Cube")
 		{
@@ -197,7 +197,7 @@ namespace MM
 		ImGui::PushItemWidth(-1);
 
 		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
-		std::string shapeCurrent = GetPrimativeName(model.GetPrimitiveType());
+		std::string shapeCurrent = GetPrimitiveName(model.GetPrimitiveType());
 		if (ImGui::BeginCombo("", shapeCurrent.c_str(), 0))
 		{
 			for (auto n = 0; n < 8; n++)
@@ -208,9 +208,9 @@ namespace MM
 					meshes.clear();
 					if (strcmp(shapes[n], "File") != 0)
 					{
-							//add new mesh here..
-						meshes.emplace_back(MeshFactory::CreatePrimative(GetPrimativeName(shapes[n])));
-						model.SetPrimitiveType(GetPrimativeName(shapes[n]));
+						//add new mesh here..
+						meshes.emplace_back(MeshFactory::CreatePrimitive(GetPrimitiveName(shapes[n])));
+						model.SetPrimitiveType(GetPrimitiveName(shapes[n]));
 					}
 					else
 						model.SetPrimitiveType(PrimitiveType::File);

@@ -47,8 +47,6 @@ namespace Raven
 		}
 	}
 
-
-
 	void Model::AddMesh(Mesh* mesh)
 	{
 		meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
@@ -66,5 +64,4 @@ namespace Raven
 		res->LoadResource<Mesh>(filePath);
 		res->GetResource(filePath, meshes);
 	}
-
 }

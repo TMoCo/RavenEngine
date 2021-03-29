@@ -214,6 +214,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Update Mesh on GPU if not loaded yet.
 			if (!mesh->IsOnGPU())
 			{
+				mesh->renderRscMesh = new RenderRscMesh();
 				mesh->LoadOnGpu();
 			}
 

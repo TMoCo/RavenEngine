@@ -24,7 +24,10 @@ namespace Raven
 	public:
 		Mesh() : IResource(EResourceType::RT_Mesh, true) {}
 		// TODO: free data on destruction
-		virtual ~Mesh() = default;
+		virtual ~Mesh()
+		{
+			delete renderRscMesh;
+		}
 
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Mesh; } // return the resource type
 

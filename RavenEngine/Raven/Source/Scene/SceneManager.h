@@ -25,7 +25,7 @@ namespace Raven
 
 		inline auto GetCurrentScene() const { return currentScene; }
 
-		inline auto GetCurrentIndex() const {return sceneIdx; }
+		inline auto GetCurrentIndex() const { return sceneIdx; }
 
 		inline auto GetSceneCount() const { return static_cast<uint32_t>(allScenes.size()); }
 
@@ -37,7 +37,7 @@ namespace Raven
 
 		inline auto SetSwitchScene(bool switching){ switchingScenes = switching; }
 
-		inline auto IsSwitchingScene() const  {return switchingScenes; }
+		inline auto IsSwitchingScene() const  { return switchingScenes; }
 
 		void AddSceneFromFile(const std::string& filePath);
 		void AddScene(Scene* scene);
@@ -49,7 +49,6 @@ namespace Raven
 
 		void LoadCurrentList();
 
-
 		virtual void Initialize() override;
 
 		virtual void Destroy() override;
@@ -57,7 +56,6 @@ namespace Raven
 		static auto GetModuleType() { return MT_SceneManager; }
 
 	protected:
-
 		uint32_t sceneIdx = -1;
 		Scene* currentScene = nullptr;
 		std::vector<std::shared_ptr<Scene>> allScenes;

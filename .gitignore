@@ -3,9 +3,19 @@ bin/
 bin-int/
 build/
 
+<<<<<<< HEAD
+# Changes at every compilation
+gameProject/Raven.log
+gameProject/imgui.ini
+
+# Directories
+/RavenEngine/Build/
+/RavenEngine/.vs/
+=======
 # Change at every compilation
 gameProject/Raven.log
 gameProject/imgui.ini
+>>>>>>> master
 
 # Project and git
 !.gitignore

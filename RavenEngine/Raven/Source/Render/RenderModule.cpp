@@ -101,7 +101,6 @@ void RenderModule::Initialize()
 	// Render Scene.
 	rscene = std::make_shared<RenderScene>();
 	rscene->Setup();
-
 }
 
 
@@ -194,7 +193,6 @@ void RenderModule::Render()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
-
 
 	// Bind FBO For drawing...
 	rtScene->GetFBO()->Bind(EGLFrameBuffer::Framebuffer);

@@ -20,7 +20,7 @@
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
-#include "ResourceManager/Resources/Model.h"
+#include "Scene/Component/Model.h"
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -159,7 +159,6 @@ void RenderScene::Build(Scene* scene)
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);
-	
 }
 
 
@@ -215,13 +214,13 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Update Mesh on GPU if not loaded yet.
 			if (!mesh->IsOnGPU())
 			{
+				mesh->renderRscMesh = new RenderRscMesh();
 				mesh->LoadOnGpu();
 			}
 
-
 			RenderMesh* rmesh = NewPrimitive<RenderMesh>();
 			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-			rmesh->SetMesh(&mesh->renderRscMesh);
+			rmesh->SetMesh(mesh->renderRscMesh);
 
 			// TODO: Render with Model Materials...
 			rmesh->SetMaterial(defaultMaterail);
@@ -229,10 +228,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Add to opaque...
 			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
 		}
-
 	}
-
-
 }
 
 

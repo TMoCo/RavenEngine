@@ -81,7 +81,5 @@ namespace Raven
 
 		std::function<void(Scene *scene)> initCallback;
 	public:
-     
-
-};
+	};
 };

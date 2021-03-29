@@ -6,6 +6,8 @@
 #include "Utilities/StringUtils.h"
 #include "Scene/Scene.h"
 #include "Engine.h"
+#include "Entity/Entity.h"
+#include "Scene/Component/Model.h"
 
 namespace Raven 
 {

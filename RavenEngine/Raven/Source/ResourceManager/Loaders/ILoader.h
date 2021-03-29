@@ -24,7 +24,7 @@ namespace Raven
 	// the type of loader (for each type of resource)
 	enum class ELoaderType {
 		LT_Image,
-		LT_Model,
+		LT_Mesh,
 		LT_Material,
 		LT_Scene,
 		LT_Audio,
@@ -52,8 +52,8 @@ namespace Raven
 			{
 			case ELoaderType::LT_Image:
 				return "Type: Image Loader.";
-			case ELoaderType::LT_Model:
-				return "Type: Model Loader.";
+			case ELoaderType::LT_Mesh:
+				return "Type: Mesh Loader.";
 			case ELoaderType::LT_Material:
 				return "Type: Material Loader.";
 			case ELoaderType::LT_Scene:

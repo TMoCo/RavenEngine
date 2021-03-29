@@ -22,8 +22,9 @@ namespace Raven
 	class Texture2D : public IResource
 	{
 	public:
-		Texture2D(size_t initWidth, size_t initHeight, byte* initData = nullptr) : IResource(EResourceType::RT_Image, true),
-			width(initHeight), height(initHeight), data(initData) {}
+		Texture2D(size_t initWidth = 0, size_t initHeight = 0, EGLFormat format = EGLFormat::None, byte* initData = nullptr) 
+			: IResource(EResourceType::RT_Image, true), 
+			width(initHeight), height(initHeight), format(format), data(initData) {}
 
 		inline virtual ~Texture2D()
 		{
@@ -38,7 +39,7 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscTexture.Load(EGLTexture::Texture2D, EGLFormat::RGBA, glm::ivec2(width, height), data); // call interface method
+				renderRscTexture->Load(EGLTexture::Texture2D, EGLFormat::RGBA, glm::ivec2(width, height), data); // call interface method
 				onGPU = true;
 			}
 		}
@@ -46,12 +47,13 @@ namespace Raven
 		// return the resource type
 		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } 
 
-		size_t height; // image dimensions
+		size_t height;	  // image dimensions
 		size_t width;
+		EGLFormat format; // image format
 		
 		byte* data; // image data should be sizeof(byte) * height * width
 
-		RenderRscTexture renderRscTexture; // interface with renderer
+		RenderRscTexture* renderRscTexture; // interface with renderer
 		NOCOPYABLE(Texture2D);
 	};
 }

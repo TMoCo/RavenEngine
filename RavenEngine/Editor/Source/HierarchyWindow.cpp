@@ -9,12 +9,12 @@
 #include "Scene/Entity/EntityManager.h"
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/Model.h"
 #include "Core/Camera.h"
 #include "Scene/Component/Transform.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
 #include "Editor.h"
-#include "ResourceManager/Resources/Model.h"
 
 #include <imgui_internal.h>
 

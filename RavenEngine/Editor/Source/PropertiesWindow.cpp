@@ -9,7 +9,7 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
-#include "ResourceManager/Resources/Model.h"
+#include "Scene/Component/Model.h"
 #include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "ResourceManager/MeshFactory.h"
@@ -128,8 +128,6 @@ namespace MM
 		ImGui::PopStyleVar();
 
 	}
-
-
 
 	std::string GetPrimativeName(PrimitiveType type)
 	{

@@ -89,19 +89,19 @@ project "RavenEditor"
 		disablewarnings { 4307 }
 
 	filter "configurations:Debug"
-		defines { "LUMOS_DEBUG", "_DEBUG","TRACY_ENABLE","LUMOS_PROFILE", }
+		defines { "RAVEN_DEBUG", "_DEBUG","TRACY_ENABLE","RAVEN_PROFILE", }
 		symbols "On"
 		runtime "Debug"
 		optimize "Off"
 
 	filter "configurations:Release"
-		defines { "LUMOS_RELEASE","TRACY_ENABLE", "LUMOS_PROFILE",}
+		defines { "RAVEN_RELEASE","TRACY_ENABLE", "RAVEN_PROFILE",}
 		optimize "Speed"
 		symbols "On"
 		runtime "Release"
 
 	filter "configurations:Production"
-		defines "LUMOS_PRODUCTION"
+		defines "RAVEN_PRODUCTION"
 		symbols "Off"
 		optimize "Full"
 		runtime "Release"

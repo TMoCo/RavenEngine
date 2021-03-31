@@ -26,21 +26,16 @@ namespace Raven
 		if(Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight))
 		{
 			mouseSensitivity = 0.01f;
-			rotateVelocity = rotateVelocity + 
-				glm::vec2((xpos - previousCurserPos.x), (ypos - previousCurserPos.y)) * mouseSensitivity;
-
+			rotateVelocity = rotateVelocity + (glm::vec2{ xpos,ypos } - previousCurserPos) * mouseSensitivity;
         }
-        else
-        {
-        }
-            
+  
 				
 		glm::vec3 euler = glm::degrees(transform.GetLocalOrientation());
 		float pitch = euler.x - rotateVelocity.y;
 		float yaw = euler.y - rotateVelocity.x;
 			
-		pitch = std::min(pitch, 84.0f);
-		pitch = std::max(pitch, -84.0f);
+		pitch = std::min(pitch, 89.0f);
+		pitch = std::max(pitch, -89.0f);
 
         previousCurserPos = glm::vec2(xpos, ypos);
 

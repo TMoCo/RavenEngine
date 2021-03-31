@@ -25,15 +25,6 @@
 #include "cereal/archives/binary.hpp"
 
 
-
-template<typename Archive>
-static void serialize(Archive& archive, glm::vec3& v2)
-{
-	archive(v2.x, v2.y, v2.z);
-}
-
-
-
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
@@ -187,7 +178,7 @@ namespace Raven {
 	Camera* Scene::GetTargetCamera()
 	{
 		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
-		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		if ((!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play) || forceShow)
 		{
 			Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
 			return &sceneCam;
@@ -199,14 +190,16 @@ namespace Raven {
 	Raven::Transform* Scene::GetCameraTransform()
 	{
 		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
-		if (!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play)
+		if ((!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play) || forceShow)
 		{
 			Transform& sceneCamTr = camsEttView[0].GetComponent<Transform>();
-
 			return &sceneCamTr;
 		}
+
 		return overrideTransform;
 	}
+
+	
 
 	void Scene::CopyComponents(const Entity& from, const Entity& to)
 	{
@@ -226,23 +219,26 @@ namespace Raven {
 
 	}
 
-	void Scene::OnUpdate(float dt)
+	auto Scene::UpdateCameraController(float dt)
 	{
-		const auto mousePos = Input::GetInput()->GetMousePosition();
-
-		auto defaultCameraControllerView = entityManager->GetEntitiesWithType<CameraControllerComponent>();
-
-		if (!defaultCameraControllerView.Empty())
+		auto controller = entityManager->GetRegistry().group<CameraControllerComponent>(entt::get<Transform>);
+		for (auto entity : controller)
 		{
-			auto& cameraController = defaultCameraControllerView.Front().GetComponent<CameraControllerComponent>();
-			auto trans = defaultCameraControllerView.Front().TryGetComponent<Transform>();
-			if (Engine::Get().IsSceneActive() && trans && cameraController.GetController())
+			const auto mousePos = Input::GetInput()->GetMousePosition();
+			auto& [con, trans] = controller.get<CameraControllerComponent, Transform>(entity);
+			if (Engine::Get().IsSceneActive() && 
+				Engine::Get().GetEditorState() == EditorState::Play&&
+				con.GetController() )
 			{
-				cameraController.GetController()->HandleMouse(*trans, dt, mousePos.x, mousePos.y);
-				cameraController.GetController()->HandleKeyboard(*trans, dt);
+				con.GetController()->HandleMouse(trans, dt, mousePos.x, mousePos.y);
+				con.GetController()->HandleKeyboard(trans, dt);
 			}
 		}
+	}
 
+	void Scene::OnUpdate(float dt)
+	{
+		UpdateCameraController(dt);
 		sceneGraph->Update(entityManager->GetRegistry());
 	}
 

@@ -66,7 +66,7 @@ namespace Raven
 
 		auto win = GetModule<Raven::Window>();
 
-		NewGameScene();
+		//NewGameScene();
 
 		// Main Loop...
 		while (!win->ShouldClose())

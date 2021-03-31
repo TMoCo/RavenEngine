@@ -74,11 +74,13 @@ namespace Raven
 	{
 		Engine::OnUpdate(dt);
 
+		auto currentScene = GetModule<SceneManager>()->GetCurrentScene();
+
 		if (GetEditorState() == EditorState::Preview)
 		{
 			auto& registry = GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
 
-			if (IsSceneActive())
+			if (IsSceneActive() && !currentScene->IsPreviewMainCamera())
 			{
 				const auto mousePos = Input::GetInput()->GetMousePosition();
 
@@ -87,7 +89,10 @@ namespace Raven
 				
 			}
 
-			if (!Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight) && !ImGuizmo::IsUsing())
+			if (!Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight)
+				&& !ImGuizmo::IsUsing() && IsSceneActive()
+				&& selectedNode != entt::null
+				&& !currentScene->IsPreviewMainCamera())
 			{
 				if (Input::GetInput()->IsKeyPressed(KeyCode::Id::Q))
 				{
@@ -142,7 +147,7 @@ namespace Raven
 		auto view = glm::inverse(editorCameraTransform.GetWorldMatrix());
 		auto proj = camera->GetProjectionMatrix();
 
-		if (selectedNode == entt::null || imGuizmoOperation == 4)
+		if (selectedNode == entt::null || imGuizmoOperation == ImGuizmo::SELECT)
 			return;
 
 		if (showGizmos)

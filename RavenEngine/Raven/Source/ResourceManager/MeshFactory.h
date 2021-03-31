@@ -1,25 +1,49 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <string>
+#include <array>
 
 namespace Raven
 {
 	class Mesh;
-	enum class PrimitiveType : int32_t
+
+	namespace PrimitiveType 
 	{
-		Plane = 0,
-		Quad = 1,
-		Cube = 2,
-		Pyramid = 3,
-		Sphere = 4,
-		Capsule = 5,
-		Cylinder = 6,
-		Terrain = 7,
-		File = 8,
+		enum Id
+		{
+			Plane = 0,
+			Quad = 1,
+			Cube = 2,
+			Pyramid = 3,
+			Sphere = 4,
+			Capsule = 5,
+			Cylinder = 6,
+			Terrain = 7,
+			File = 8,
+			LENGTH
+		};
+
+		const std::array<std::string, LENGTH> NAMES = 
+		{
+			"Plane",
+			"Quad",
+			"Cube",
+			"Pyramid",
+			"Sphere",
+			"Capsule",
+			"Cylinder",
+			"Terrain",
+			"File",
+		};
+		std::string GetPrimativeName(PrimitiveType::Id type);
+		PrimitiveType::Id GetPrimativeName(const std::string& type);;
 	};
+
+
 
 	namespace MeshFactory
 	{
-		Mesh* CreatePrimitive(PrimitiveType type);
+		Mesh* CreatePrimitive(PrimitiveType::Id type);
 		Mesh* CreateQuad();
 		Mesh* CreateQuad(float x, float y, float width, float height);
 		Mesh* CreateQuad(const glm::vec2& position, const glm::vec2& size);

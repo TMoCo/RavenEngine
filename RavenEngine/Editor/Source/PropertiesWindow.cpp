@@ -10,6 +10,8 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/CameraControllerComponent.h"
+
 #include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "ResourceManager/MeshFactory.h"
@@ -129,56 +131,45 @@ namespace MM
 
 	}
 
-	std::string GetPrimitiveName(PrimitiveType type)
+	template<>
+	void ComponentEditorWidget<CameraControllerComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
-		switch (type)
-		{
-		case PrimitiveType::Cube: return "Cube";
-		case PrimitiveType::Plane: return "Plane";
-		case PrimitiveType::Quad: return "Quad";
-		case PrimitiveType::Sphere: return "Sphere";
-		case PrimitiveType::Pyramid: return "Pyramid";
-		case PrimitiveType::Capsule: return "Capsule";
-		case PrimitiveType::Cylinder: return "Cylinder";
-		case PrimitiveType::Terrain: return "Terrain";
-		case PrimitiveType::File: return "File";
-		}
-		return "";
-	};
+		auto& controllerComp = reg.get<CameraControllerComponent>(e);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
 
-	PrimitiveType GetPrimitiveName(const std::string& type)
-	{
-		if (type == "Cube")
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted("Controller Type");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+
+		const std::array<std::string,2> controllerTypes = { "FPS" ,"Editor"};
+		std::string currentController = CameraControllerComponent::TypeToString(controllerComp.GetType());
+		if (ImGui::BeginCombo("", currentController.c_str(), 0)) // The second parameter is the label previewed before opening the combo.
 		{
-			return PrimitiveType::Cube;
-		}
-		else if (type == "Quad")
-		{
-			return PrimitiveType::Quad;
-		}
-		else if (type == "Sphere")
-		{
-			return PrimitiveType::Sphere;
-		}
-		else if (type == "Pyramid")
-		{
-			return PrimitiveType::Pyramid;
-		}
-		else if (type == "Capsule")
-		{
-			return PrimitiveType::Capsule;
-		}
-		else if (type == "Cylinder")
-		{
-			return PrimitiveType::Cylinder;
-		}
-		else if (type == "Terrain")
-		{
-			return PrimitiveType::Terrain;
+			for (auto n = 0; n < controllerTypes.size(); n++)
+			{
+				bool isSelected = currentController == controllerTypes[n];
+				if (ImGui::Selectable(controllerTypes[n].c_str(), currentController.c_str()))
+				{
+					controllerComp.SetControllerType(CameraControllerComponent::StringToType(controllerTypes[n]));
+				}
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
 		}
 
-		return PrimitiveType::Cube;
-	};
+		if (controllerComp.GetController())
+			controllerComp.GetController()->OnImGui();
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
+	}
+
 
 	template<>
 	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
@@ -197,7 +188,8 @@ namespace MM
 		ImGui::PushItemWidth(-1);
 
 		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
-		std::string shapeCurrent = GetPrimitiveName(model.GetPrimitiveType());
+
+		std::string shapeCurrent = PrimitiveType::GetPrimativeName(model.GetPrimitiveType());
 		if (ImGui::BeginCombo("", shapeCurrent.c_str(), 0))
 		{
 			for (auto n = 0; n < 8; n++)
@@ -208,9 +200,9 @@ namespace MM
 					meshes.clear();
 					if (strcmp(shapes[n], "File") != 0)
 					{
-						//add new mesh here..
-						meshes.emplace_back(MeshFactory::CreatePrimitive(GetPrimitiveName(shapes[n])));
-						model.SetPrimitiveType(GetPrimitiveName(shapes[n]));
+							//add new mesh here..
+						meshes.emplace_back(MeshFactory::CreatePrimitive(PrimitiveType::GetPrimativeName(shapes[n])));
+						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(shapes[n]));
 					}
 					else
 						model.SetPrimitiveType(PrimitiveType::File);
@@ -341,6 +333,7 @@ namespace Raven
 		TRIVIAL_COMPONENT(Light);
 		TRIVIAL_COMPONENT(Camera);
 		TRIVIAL_COMPONENT(Model);
+		TRIVIAL_COMPONENT(CameraControllerComponent);
 		init = true;
 	}
 

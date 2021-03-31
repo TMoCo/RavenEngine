@@ -685,7 +685,8 @@ namespace Raven
 			return mesh;
 		}
 
-		Mesh* CreatePrimitive(PrimitiveType type)
+
+		Mesh* CreatePrimitive(PrimitiveType::Id type)
 		{
 			switch (type)
 			{
@@ -709,5 +710,45 @@ namespace Raven
 			return nullptr;
 		}
 	};
+
+	std::string PrimitiveType::GetPrimativeName(PrimitiveType::Id type)
+	{
+		return NAMES[(uint32_t)type];
+	};
+
+	PrimitiveType::Id PrimitiveType::GetPrimativeName(const std::string& type)
+	{
+		if (type == "Cube")
+		{
+			return PrimitiveType::Cube;
+		}
+		else if (type == "Quad")
+		{
+			return PrimitiveType::Quad;
+		}
+		else if (type == "Sphere")
+		{
+			return PrimitiveType::Sphere;
+		}
+		else if (type == "Pyramid")
+		{
+			return PrimitiveType::Pyramid;
+		}
+		else if (type == "Capsule")
+		{
+			return PrimitiveType::Capsule;
+		}
+		else if (type == "Cylinder")
+		{
+			return PrimitiveType::Cylinder;
+		}
+		else if (type == "Terrain")
+		{
+			return PrimitiveType::Terrain;
+		}
+
+		return PrimitiveType::Cube;
+	}
+
 };
 

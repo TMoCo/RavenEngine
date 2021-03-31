@@ -27,9 +27,9 @@ namespace Raven
 
 	protected:
     
-		glm::vec3 velocity;
-		glm::vec2 rotateVelocity;
-		glm::vec3 focalPoint;
+		glm::vec3 velocity = {0,0,0};
+		glm::vec2 rotateVelocity = { 0,0 };
+		glm::vec3 focalPoint = {0,0,0};
 
 		float zoomVelocity = 0.0f;
 		float cameraSpeed = 0.0f;

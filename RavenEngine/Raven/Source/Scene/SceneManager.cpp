@@ -26,6 +26,7 @@ namespace Raven
 		bool found = false;
 		switchingScenes = true;
 		uint32_t idx = 0;
+
 		for (uint32_t i = 0; !found && i < allScenes.size(); ++i)
 		{
 			if (allScenes[i]->GetName() == name)
@@ -64,7 +65,7 @@ namespace Raven
 			queuedSceneIndex = 0;
 		}
 
-		if (currentScene != nullptr) 
+		if (currentScene != nullptr) //clear before
 		{
 			currentScene->OnClean();
 			currentScene = allScenes.back().get();
@@ -110,9 +111,10 @@ namespace Raven
 	{
 		for (auto& scene : allScenes)
 		{
-			if (scene.get()->GetName() == sceneName) 
+			if (scene->GetName() == sceneName) 
 				return scene.get();
 		}
+		return nullptr;
 	}
 
 

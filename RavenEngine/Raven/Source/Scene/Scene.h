@@ -53,6 +53,8 @@ namespace Raven
 
 		inline auto SetOverrideCamera(Camera* overrideCamera) { this->overrideCamera = overrideCamera; }
 		inline auto SetOverrideTransform(Transform* overrideTransform) { this->overrideTransform = overrideTransform; }
+		inline auto SetForceCamera(bool forceShow) { this->forceShow = forceShow; }
+		inline auto IsPreviewMainCamera() const { return forceShow; }
 
 		template<typename Archive>
 		void save(Archive& archive) const
@@ -67,6 +69,10 @@ namespace Raven
 		}
 
 	private:
+
+		auto UpdateCameraController(float dt);
+
+		bool forceShow = false;
 		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
 		std::string name;

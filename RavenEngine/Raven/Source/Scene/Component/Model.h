@@ -14,7 +14,6 @@
 namespace Raven
 {
 	class Mesh;
-	enum class PrimitiveType;
 
 	class Model
 	{
@@ -35,7 +34,7 @@ namespace Raven
 		void AddMeshes(const std::vector<std::shared_ptr<Mesh>>& inputMeshes);
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
-		inline auto SetPrimitiveType(PrimitiveType type) { primitiveType = type; }
+		inline auto SetPrimitiveType(PrimitiveType::Id type) { primitiveType = type; }
 
 		inline auto GetFileName() const { return filePath; }
 
@@ -74,7 +73,12 @@ namespace Raven
 		inline void SetFileName(const std::string& path) { filePath = path; }
 
 		std::string filePath;
+
 		std::vector<std::shared_ptr<Mesh>> meshes;
-		PrimitiveType primitiveType;
+
+		PrimitiveType::Id primitiveType;
+
+		friend class ModelLoader; // for setting file name
+
 	};
 };

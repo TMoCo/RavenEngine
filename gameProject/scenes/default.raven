@@ -2,15 +2,16 @@
     "value0": {
         "SceneName": "default"
     },
-    "value1": 5,
+    "value1": 6,
     "value2": 2097152,
     "value3": 1,
     "value4": 2,
     "value5": 3,
     "value6": 4,
     "value7": 5,
-    "value8": 1,
-    "value9": {
+    "value8": 6,
+    "value9": 1,
+    "value10": {
         "Position": {
             "value0": 0.0,
             "value1": -1.6548752784729005,
@@ -27,11 +28,11 @@
             "value2": 1.0
         }
     },
-    "value10": 2097152,
-    "value11": {
+    "value11": 2097152,
+    "value12": {
         "Position": {
             "value0": 0.0,
-            "value1": 0.0,
+            "value1": 0.15000000596046449,
             "value2": 0.0
         },
         "Rotation": {
@@ -45,8 +46,8 @@
             "value2": 1.0
         }
     },
-    "value12": 2,
-    "value13": {
+    "value13": 2,
+    "value14": {
         "Position": {
             "value0": 0.1580737829208374,
             "value1": 0.5812418460845947,
@@ -63,8 +64,8 @@
             "value2": 1.0
         }
     },
-    "value14": 3,
-    "value15": {
+    "value15": 3,
+    "value16": {
         "Position": {
             "value0": 0.0,
             "value1": 0.6624006032943726,
@@ -81,8 +82,8 @@
             "value2": 1.0
         }
     },
-    "value16": 4,
-    "value17": {
+    "value17": 4,
+    "value18": {
         "Position": {
             "value0": 0.0,
             "value1": -1.6508461236953736,
@@ -99,42 +100,72 @@
             "value2": 1.0
         }
     },
-    "value18": 5,
-    "value19": 1,
+    "value19": 5,
     "value20": {
+        "Position": {
+            "value0": -1.653128981590271,
+            "value1": 0.9043235778808594,
+            "value2": 13.247275352478028
+        },
+        "Rotation": {
+            "value0": 0.0002592334058135748,
+            "value1": 0.0009765619761310518,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 0.9999999403953552,
+            "value2": 0.9999999403953552
+        }
+    },
+    "value21": 6,
+    "value22": 1,
+    "value23": {
         "Name": "Model2222"
     },
-    "value21": 2097152,
-    "value22": {
+    "value24": 2097152,
+    "value25": {
         "Name": "Light"
     },
-    "value23": 2,
-    "value24": {
+    "value26": 2,
+    "value27": {
         "Name": "Sphere"
     },
-    "value25": 3,
-    "value26": {
+    "value28": 3,
+    "value29": {
         "Name": "Pyramid"
     },
-    "value27": 4,
-    "value28": {
+    "value30": 4,
+    "value31": {
         "Name": "Empty Entity"
     },
-    "value29": 0,
-    "value30": 0,
-    "value31": 0,
-    "value32": 1,
-    "value33": 2097152,
-    "value34": {
+    "value32": 5,
+    "value33": {
+        "Name": "Camera"
+    },
+    "value34": 0,
+    "value35": 0,
+    "value36": 1,
+    "value37": 5,
+    "value38": {
+        "Scale": 1.0,
+        "Aspect": 1.3333333730697632,
+        "FOV": 45.0,
+        "Near": 0.009999999776482582,
+        "Far": 100.0
+    },
+    "value39": 1,
+    "value40": 2097152,
+    "value41": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
             "value2": 0.0
         },
         "value1": {
-            "value0": 0.03966914489865303,
-            "value1": 0.8021978139877319,
-            "value2": 0.8021978139877319,
+            "value0": 0.9564062356948853,
+            "value1": 0.9670329689979553,
+            "value2": 0.9670329689979553,
             "value3": 1.0
         },
         "value2": 0,
@@ -147,25 +178,29 @@
         "value5": 1.0,
         "value6": 1.0
     },
-    "value35": 0,
-    "value36": 4,
-    "value37": 1,
-    "value38": {
+    "value42": 1,
+    "value43": 5,
+    "value44": {
+        "ControllerType": 1
+    },
+    "value45": 4,
+    "value46": 1,
+    "value47": {
         "PrimitiveType": 2,
         "FilePath": ""
     },
-    "value39": 2,
-    "value40": {
+    "value48": 2,
+    "value49": {
         "PrimitiveType": 4,
         "FilePath": ""
     },
-    "value41": 3,
-    "value42": {
+    "value50": 3,
+    "value51": {
         "PrimitiveType": 3,
         "FilePath": ""
     },
-    "value43": 4,
-    "value44": {
+    "value52": 4,
+    "value53": {
         "PrimitiveType": 6,
         "FilePath": ""
     }

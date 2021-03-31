@@ -24,7 +24,7 @@ namespace Raven
 		static ControllerType StringToType(const std::string& type);
 
 		CameraControllerComponent()
-			: type(ControllerType::Custom)
+			: type(ControllerType::FPS)
 		{
 		}
 
@@ -53,7 +53,7 @@ namespace Raven
 		}
 
 	private:
-		ControllerType type = ControllerType::Custom;
+		ControllerType type = ControllerType::FPS;
 		std::shared_ptr<CameraController> cameraController;
 	};
 };

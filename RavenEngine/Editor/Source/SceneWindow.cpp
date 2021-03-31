@@ -46,7 +46,7 @@ namespace Raven
 
 		bool gameView = false;
 
-		if (editor.GetEditorState() == EditorState::Preview)
+		if (editor.GetEditorState() == EditorState::Preview && !showCamera)
 		{
 			camera = editor.GetCamera().get();
 			transform = &editor.GetEditorCameraTransform();
@@ -111,7 +111,7 @@ namespace Raven
 		ImGuizmo::SetRect(sceneViewPosition.x, sceneViewPosition.y, sceneViewSize.x, sceneViewSize.y);
 		ImGui::GetWindowDrawList()->PushClipRect(sceneViewPosition, { sceneViewSize.x + sceneViewPosition.x, sceneViewSize.y + sceneViewPosition.y - 2.0f });;
 
-		if (editor.GetEditorState() == EditorState::Preview) 
+		if (editor.GetEditorState() == EditorState::Preview && !showCamera && transform != nullptr)
 		{
 			const float* cameraViewPtr = glm::value_ptr(glm::inverse(transform->GetWorldMatrix()));
 
@@ -127,7 +127,7 @@ namespace Raven
 			float viewManipulateRight = sceneViewPosition.x + sceneViewSize.x;
 			float viewManipulateTop = sceneViewPosition.y;
 
-			ImGuizmo::ViewManipulate(const_cast<float*>(cameraViewPtr), 8, ImVec2(viewManipulateRight - 32, viewManipulateTop), ImVec2(32, 32), 0x10101010);
+			ImGuizmo::ViewManipulate(const_cast<float*>(cameraViewPtr), 8, ImVec2(viewManipulateRight - 70, viewManipulateTop + 32), ImVec2(64, 64), 0x10101010);
 
 			editor.OnImGuizmo();
 
@@ -266,6 +266,15 @@ namespace Raven
 
 		ImGui::SameLine();
 		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+		ImGui::SameLine();
+
+
+		if (ImGui::Checkbox("Preview Camera", &showCamera)) 
+		{
+			auto& editor = static_cast<Editor&>(Editor::Get());
+			auto currentScene = editor.GetModule<SceneManager>()->GetCurrentScene();
+			currentScene->SetForceCamera(showCamera);
+		}
 		ImGui::SameLine();
 
 		if (ImGui::Button("Gizmos " ICON_MDI_CHEVRON_DOWN))

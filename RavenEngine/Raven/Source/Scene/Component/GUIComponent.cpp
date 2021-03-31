@@ -62,6 +62,7 @@ namespace Raven
 			if (callback) 
 			{
 				callback();
+				Engine::Get().NewGameScene();
 			}
 		}
 		regi->EndPanel();

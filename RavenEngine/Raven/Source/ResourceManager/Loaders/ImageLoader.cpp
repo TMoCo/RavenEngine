@@ -52,8 +52,8 @@ namespace Raven
 		}
 
 		// create a new array of pixel data, Texture2D takes care of deleting the data
-		byte* data = new byte[static_cast<size_t>(width * height)];
-		memcpy(data, fromFile.get(), static_cast<size_t>(width * height) * sizeof(byte));
+		byte* data = new byte[static_cast<size_t>(width * height) * channelsInFile];
+		memcpy(data, fromFile.get(), static_cast<size_t>(width * height) * sizeof(byte) * channelsInFile);
 
 		// TODO: create the texture resource using a custom allocator
 		// for now, do everything on the big ugly heap >:^(

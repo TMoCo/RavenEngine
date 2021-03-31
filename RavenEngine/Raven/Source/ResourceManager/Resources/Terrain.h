@@ -23,7 +23,8 @@ namespace Raven
 	{
 	public:
 		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
-			heightMap(initHeight) // vector for textures, may want to swap container to a map
+			heightMap(initHeight), // vector for textures, may want to swap container to a map
+			renderRscTerrain(nullptr)
 		{
 			if (!IsValidHeightMap(initHeight))
 			{
@@ -38,6 +39,8 @@ namespace Raven
 				// TODO: free data in memory manager
 				// delete heightMap;
 			}
+
+			delete renderRscTerrain;
 		}
 
 		inline void LoadOnGPU()
@@ -46,6 +49,7 @@ namespace Raven
 			{
 				// load the height map data
 				renderRscTerrain->LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
+				renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), 200.0f, -50.0f);
 				onGPU = true;
 			}
 		}

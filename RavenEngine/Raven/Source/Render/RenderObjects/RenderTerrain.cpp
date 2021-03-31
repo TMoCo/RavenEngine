@@ -43,9 +43,9 @@ void RenderTerrain::SetTerrainRsc(RenderRscTerrain* terrain)
 void RenderTerrain::Draw(GLShader* shader) const
 {
 	//
-	shader->SetUniform("inScale", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	shader->SetUniform("inHeightFactor", terrainRsc->GetScale());
-	shader->SetUniform("inHeightMap", terrainRsc->GetHeight());
+	shader->SetUniform("inScale", terrainRsc->GetScale());
+	shader->SetUniform("inHeight", glm::vec2(terrainRsc->GetMinHeight(), terrainRsc->GetMaxHeight()));
+	shader->SetUniform("inHeightMap", 0);
 
 	//
 	terrainRsc->GetHeightMap()->Active(0);

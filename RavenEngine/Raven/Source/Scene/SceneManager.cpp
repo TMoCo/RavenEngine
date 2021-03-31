@@ -73,7 +73,8 @@ namespace Raven
 
 		currentScene = allScenes[queuedSceneIndex].get();
 
-		currentScene->Load("./scenes/");
+		if (!currentScene->dynamic)
+			currentScene->Load("./scenes/");
 
 		if(Engine::Get().GetEditorState() == EditorState::Play)
 			currentScene->OnInit();
@@ -101,9 +102,10 @@ namespace Raven
 		AddScene(scene);
 	}
 
-	void SceneManager::AddScene(Scene* scene)
+	uint32_t SceneManager::AddScene(Scene* scene)
 	{
 		allScenes.emplace_back(std::shared_ptr<Scene>(scene));
+		return allScenes.size() - 1;
 	}
 
 	// Function to return a scene given its name - Ben

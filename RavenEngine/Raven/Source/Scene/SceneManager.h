@@ -41,7 +41,7 @@ namespace Raven
 		inline auto IsSwitchingScene() const  { return switchingScenes; }
 
 		void AddSceneFromFile(const std::string& filePath);
-		void AddScene(Scene* scene);
+		uint32_t AddScene(Scene* scene);
 		
 		Scene* GetSceneByName(const std::string& sceneName);
 

@@ -77,6 +77,9 @@ namespace Raven
 
 		inline auto& GetSystemManager() { return systemManager; }
 
+		// 
+		void NewGameScene();
+
 	protected:
 		virtual void OnImGui();
 		virtual void OnUpdate(float dt);
@@ -110,8 +113,6 @@ namespace Raven
 		// Destroy all loaded modules
 		void DestoryModules();	
 
-		// 
-		void NewGameScene();
 
 	protected:
 

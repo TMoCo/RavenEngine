@@ -63,7 +63,7 @@ namespace Raven
 		// load a texture and give it a name
 		void LoadTexture(const std::string& path);
 
-		std::shared_ptr<Terrain> GetTerrainResource();
+		std::shared_ptr<Terrain> GetTerrainResource() const;
 
 	private:
 		std::vector<std::string> GetTexturePaths();

@@ -66,8 +66,6 @@ namespace Raven
 
 		auto win = GetModule<Raven::Window>();
 
-		//NewGameScene();
-
 		// Main Loop...
 		while (!win->ShouldClose())
 		{
@@ -208,10 +206,13 @@ namespace Raven
 		std::cout << terrain->heightMap->height << " \n";
 
 		Scene* newScene = new Scene("TerrainScene");
+		newScene->dynamic = true;
 
 		auto entity = newScene->CreateEntity("terrain");
 		entity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
 
-		GetModule<SceneManager>()->AddScene(newScene);
+		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
+		GetModule<SceneManager>()->SwitchScene(sceneIdx);
+
 	}
 };

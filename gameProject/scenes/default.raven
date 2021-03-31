@@ -13,18 +13,18 @@
     "value9": 1,
     "value10": {
         "Position": {
-            "value0": 0.0,
-            "value1": -1.6548752784729005,
-            "value2": 1.9446921348571778
+            "value0": 6.061657131795073e-7,
+            "value1": -1.6548724174499512,
+            "value2": 1.9446909427642823
         },
         "Rotation": {
             "value0": 0.0,
             "value1": -0.0,
-            "value2": 0.0
+            "value2": 0.29100126028060915
         },
         "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
+            "value0": 1.0000007152557374,
+            "value1": 1.0000007152557374,
             "value2": 1.0
         }
     },
@@ -32,18 +32,18 @@
     "value12": {
         "Position": {
             "value0": 0.0,
-            "value1": 0.15000000596046449,
+            "value1": 0.0,
             "value2": 0.0
         },
         "Rotation": {
             "value0": 0.0,
-            "value1": 0.0,
+            "value1": -0.9835665822029114,
             "value2": 0.0
         },
         "Scale": {
-            "value0": 1.0,
+            "value0": 1.0000007152557374,
             "value1": 1.0,
-            "value2": 1.0
+            "value2": 1.0000007152557374
         }
     },
     "value13": 2,
@@ -59,7 +59,7 @@
             "value2": 0.0
         },
         "Scale": {
-            "value0": 1.0,
+            "value0": 1.149999976158142,
             "value1": 1.0,
             "value2": 1.0
         }
@@ -103,19 +103,19 @@
     "value19": 5,
     "value20": {
         "Position": {
-            "value0": -1.653128981590271,
-            "value1": 0.9043235778808594,
-            "value2": 13.247275352478028
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
         },
         "Rotation": {
-            "value0": 0.0002592334058135748,
-            "value1": 0.0009765619761310518,
+            "value0": 0.0,
+            "value1": 0.0,
             "value2": 0.0
         },
         "Scale": {
             "value0": 1.0,
-            "value1": 0.9999999403953552,
-            "value2": 0.9999999403953552
+            "value1": 1.0,
+            "value2": 1.0
         }
     },
     "value21": 6,
@@ -141,67 +141,60 @@
     },
     "value32": 5,
     "value33": {
-        "Name": "Camera"
+        "Name": "Model"
     },
     "value34": 0,
     "value35": 0,
-    "value36": 1,
-    "value37": 5,
-    "value38": {
-        "Scale": 1.0,
-        "Aspect": 1.3333333730697632,
-        "FOV": 45.0,
-        "Near": 0.009999999776482582,
-        "Far": 100.0
-    },
-    "value39": 1,
-    "value40": 2097152,
-    "value41": {
+    "value36": 0,
+    "value37": 1,
+    "value38": 2097152,
+    "value39": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
             "value2": 0.0
         },
         "value1": {
-            "value0": 0.9564062356948853,
-            "value1": 0.9670329689979553,
-            "value2": 0.9670329689979553,
+            "value0": 0.03966914489865303,
+            "value1": 0.8021978139877319,
+            "value2": 0.8021978139877319,
             "value3": 1.0
         },
         "value2": 0,
         "value3": 0.0,
         "value4": {
-            "value0": 0.5289999842643738,
-            "value1": -1.0,
-            "value2": 0.0
+            "value0": -0.9169999957084656,
+            "value1": -0.25,
+            "value2": -0.16699999570846559
         },
         "value5": 1.0,
         "value6": 1.0
     },
+    "value40": 0,
+    "value41": 5,
     "value42": 1,
-    "value43": 5,
-    "value44": {
-        "ControllerType": 1
-    },
-    "value45": 4,
-    "value46": 1,
-    "value47": {
+    "value43": {
         "PrimitiveType": 2,
         "FilePath": ""
     },
-    "value48": 2,
-    "value49": {
-        "PrimitiveType": 4,
+    "value44": 2,
+    "value45": {
+        "PrimitiveType": 5,
         "FilePath": ""
     },
-    "value50": 3,
-    "value51": {
+    "value46": 3,
+    "value47": {
         "PrimitiveType": 3,
         "FilePath": ""
     },
-    "value52": 4,
-    "value53": {
+    "value48": 4,
+    "value49": {
         "PrimitiveType": 6,
         "FilePath": ""
+    },
+    "value50": 5,
+    "value51": {
+        "PrimitiveType": 8,
+        "FilePath": ".\\assets\\models\\deer.obj"
     }
 }

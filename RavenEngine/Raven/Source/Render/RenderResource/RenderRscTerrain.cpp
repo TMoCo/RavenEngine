@@ -16,9 +16,9 @@ namespace Raven {
 RenderRscTerrain::RenderRscTerrain()
 	: heightMap(nullptr)
 	, vertexArray(nullptr)
-	, vxarray(nullptr)
 	, numVerts(0)
-	, height(1.0f)
+	, minheight(0.0f)
+	, maxheight(0.0f)
 {
 
 }
@@ -26,7 +26,7 @@ RenderRscTerrain::RenderRscTerrain()
 
 RenderRscTerrain::~RenderRscTerrain()
 {
-	delete vxarray;
+	delete vertexArray;
 	delete positionBuffer;
 
 }
@@ -34,9 +34,9 @@ RenderRscTerrain::~RenderRscTerrain()
 
 void RenderRscTerrain::LoadHeightMap(int width, int height, const void* data)
 {
-	heightMap = GLTexture::Create(EGLTexture::Texture2D, EGLFormat::R);
-	heightMap->SetFilter(EGLFilter::Nearest);
-	heightMap->SetWrap(EGLWrap::Repeat);
+	heightMap = GLTexture::Create(EGLTexture::Texture2D, EGLFormat::RGB);
+	heightMap->SetFilter(EGLFilter::Linear);
+	heightMap->SetWrap(EGLWrap::Mirror);
 
 	heightMap->Bind();
 	heightMap->UpdateTexData(0, width, height, data);
@@ -45,10 +45,11 @@ void RenderRscTerrain::LoadHeightMap(int width, int height, const void* data)
 }
 
 
-void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, float inHeight)
+void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, float inMinHeight, float inMaxHeight)
 {
 	scale = inScale;
-	height = inHeight;
+	minheight = inMinHeight;
+	maxheight = inMaxHeight;
 	std::vector<glm::vec3> terrainVerts;
 
 	int vcount = glm::max(inRes, 10);
@@ -92,7 +93,7 @@ void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, 
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
 		{
-			positionBuffer,      // Buffers
+			positionBuffer,    // Buffers
 			0,                 // Index
 			3,                 // Type-Size
 			EGLTypes::Float,   // Type

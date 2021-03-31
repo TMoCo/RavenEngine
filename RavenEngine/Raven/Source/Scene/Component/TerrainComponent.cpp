@@ -129,7 +129,7 @@ namespace Raven
 		return paths;
 	}
 
-	std::shared_ptr<Terrain> TerrainComponent::GetTerrainResource()
+	std::shared_ptr<Terrain> TerrainComponent::GetTerrainResource() const
 	{
 		return terrain;
 	}

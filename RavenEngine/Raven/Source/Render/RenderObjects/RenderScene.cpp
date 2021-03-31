@@ -5,11 +5,13 @@
 #include "RenderTerrain.h"
 #include "Render/RenderResource/RenderRscMaterial.h"
 #include "Render/RenderResource/RenderRscShader.h"
+#include "Render/RenderResource/RenderRscTerrain.h"
 #include "Render/OpenGL/GLShader.h"
 #include "Render/OpenGL/GLBuffer.h"
 #include "RenderDebugPrimitive.h"
 #include "RenderPrimitive.h"
 #include "RenderMesh.h"
+#include "RenderTerrain.h"
 
 #include "Core/Camera.h"
 #include "Scene/Scene.h"
@@ -17,6 +19,7 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/TerrainComponent.h"
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
@@ -89,6 +92,8 @@ RenderScene::~RenderScene()
 	delete lightingUBO;
 	delete materialUBO;
 	delete defaultShader;
+	delete terrainMaterail;
+	delete terrainShader;
 	delete defaultMaterail;
 }
 
@@ -98,6 +103,10 @@ void RenderScene::Setup()
 	defaultShader = new RenderRscShader();
 	defaultShader->Load(ERenderShaderType::MaterialOpaque, "Default_Materail");
 	defaultMaterail = new RenderRscMaterial(defaultShader);
+
+	terrainShader = new RenderRscShader();
+	terrainShader->Load(ERenderShaderType::Terrain, "Default_Terrain");
+	terrainMaterail = new RenderRscMaterial(terrainShader);
 
 
 	// ~MinimalSolution --- ---- --- ---- --- ---- ---
@@ -157,6 +166,27 @@ void RenderScene::Build(Scene* scene)
 		lightData.lightPower = light.intensity;
 	}
 
+	// Terrain...
+	auto TerrainEttView = scene->GetRegistry().view<TerrainComponent>();
+
+	if (!TerrainEttView.empty())
+	{
+		auto entity = TerrainEttView.front();
+		const auto& theTerrain = TerrainEttView.get<TerrainComponent>(entity);
+		auto terrainRsc = theTerrain.GetTerrainResource();
+
+		if (!terrainRsc->IsOnGPU())
+		{
+			terrainRsc->renderRscTerrain = new RenderRscTerrain();
+			terrainRsc->LoadOnGPU();
+		}
+
+		RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
+		renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
+		renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
+		renderTerrain->SetMaterial(terrainMaterail);
+		GetBatch(ERSceneBatch::Opaque).Add(renderTerrain);
+	}
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);
@@ -247,7 +277,6 @@ void RenderScene::Clear()
 
 	dynamicPrimitive.clear();
 
-
 }
 
 
@@ -263,7 +292,6 @@ void RenderScene::Draw(ERSceneBatch type)
 	lightingUBO->UpdateSubData(sizeof(LightingUBO), 0, &lightData);
 	materialUBO->UpdateSubData(sizeof(MaterialUBO), 0, &matData);
 
-
 	for (auto& prim : batch.elements)
 	{
 		GLShader* shader = prim->GetMaterial()->GetShaderRsc()->GetShader();
@@ -278,6 +306,7 @@ void RenderScene::Draw(ERSceneBatch type)
 		shader->Use();
 		prim->Draw(shader);
 	}
+
 	//
 	glBindVertexArray(0);
 }

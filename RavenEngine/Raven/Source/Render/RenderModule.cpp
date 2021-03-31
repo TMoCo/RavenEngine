@@ -168,7 +168,8 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 	// ~TESTING-------------------------------------------------------
 	//glm::mat4 view = glm::mat4(1.f);
-	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 5.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 1000.0f, 
+		glm::vec3(500.0f, 0.0f, 500.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
 	
 	rscene->SetView(view);

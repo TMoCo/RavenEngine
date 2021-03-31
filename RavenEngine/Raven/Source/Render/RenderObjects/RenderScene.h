@@ -111,6 +111,10 @@ namespace Raven
 		// If primitives does not have materials, we use this one.
 		class RenderRscShader* defaultShader;
 		class RenderRscMaterial* defaultMaterail;
+
+		/** The Terrain in the Scene. */
+		RenderRscShader* terrainShader;
+		RenderRscMaterial* terrainMaterail;
 	};
 
 

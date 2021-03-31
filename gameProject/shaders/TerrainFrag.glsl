@@ -15,7 +15,7 @@ in VertexOutput
 
 
 // Uniforms...
-uniform sampler2D heightMap;
+uniform sampler2D inHeightMap;
 uniform vec4 color;
 
 
@@ -32,6 +32,8 @@ out vec4 fragColor;
 
 void main()
 {
-	fragColor = vec4(texture(heightMap, fgIn.texCoord).r);
+	fragColor = vec4(fgIn.normal * 0.5 + 0.5, 1.0);
+	fragColor = texture(inHeightMap, fgIn.texCoord);
+	//fragColor = vec4(fgIn.texCoord, 0.0, 1.0);
 }
 

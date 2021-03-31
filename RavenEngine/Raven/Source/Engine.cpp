@@ -52,6 +52,8 @@ namespace Raven
 
 		auto win = GetModule<Raven::Window>();
 
+		NewGameScene();
+
 		// Main Loop...
 		while (!win->ShouldClose())
 		{
@@ -75,7 +77,6 @@ namespace Raven
 			OnImGui();
 			GetModule<Raven::ImGuiEngine>()->Render();
 
-	
 			win->SwapBuffers();
 		}
 		// Clean Up..
@@ -175,6 +176,18 @@ namespace Raven
 
 	void Engine::OnSceneCreated(Scene* scene)
 	{
+
+	}
+
+	void Engine::NewGameScene()
+	{
+		// get the terrain generator and generate a height map
+		auto generator = GetModule<TerrainGeneration>();
+		generator->Noise(100, 100, TerrainGeneration::FileFormat::PNG);
+
+		Scene* newScene = new Scene("TerrainScene");
+		GetModule<SceneManager>()->AddScene(newScene);
+
 
 	}
 };

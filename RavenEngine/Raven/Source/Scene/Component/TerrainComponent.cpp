@@ -6,7 +6,7 @@
 
 #include "Engine.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Scene/Component/Terrain.h"
+#include "Scene/Component/TerrainComponent.h"
 
 //
 // A class for Terrain and their related data such as heightmaps, textures, later materials, entity placements...
@@ -14,12 +14,12 @@
 
 namespace Raven
 {
-	Terrain::Terrain(const std::string& path)
+	TerrainComponent::TerrainComponent(const std::string& path)
 	{
 		LoadHeightMap(path);
 	}
 
-	void Terrain::LoadOnGpu()
+	void TerrainComponent::LoadOnGpu()
 	{
 		// load the resources
 		terrain.get()->LoadOnGPU();
@@ -29,7 +29,7 @@ namespace Raven
 		}
 	}
 
-	void Terrain::SetHeightMap(Texture2D* heightMap)
+	void TerrainComponent::SetHeightMap(Texture2D* heightMap)
 	{
 		if (TerrainRsc::IsValidHeightMap(heightMap))
 		{
@@ -38,7 +38,7 @@ namespace Raven
 	}
 
 	// return shared pointer to a mesh resource
-	std::shared_ptr<Texture2D> Terrain::GetTexture(const std::string& name)
+	std::shared_ptr<Texture2D> TerrainComponent::GetTexture(const std::string& name)
 	{
 		auto iter = textures.find(name);
 		if (iter == textures.end())
@@ -52,7 +52,7 @@ namespace Raven
 	}
 
 	// get all textures
-	std::vector<std::shared_ptr<Texture2D>>& Terrain::GetTextures()
+	std::vector<std::shared_ptr<Texture2D>>& TerrainComponent::GetTextures()
 	{
 		// make a vector with the same number of textures as in the map
 		std::vector<std::shared_ptr<Texture2D>> tex(textures.size());
@@ -66,12 +66,12 @@ namespace Raven
 	}
 
 	// add a texture to the map
-	void Terrain::AddTexture(const std::string& name, Texture2D* newTexture)
+	void TerrainComponent::AddTexture(const std::string& name, Texture2D* newTexture)
 	{
 		textures.insert(std::make_pair(name, newTexture));		
 	}
 
-	bool Terrain::HasHeightMap() const
+	bool TerrainComponent::HasHeightMap() const
 	{
 		// true if terrain height map is not nullptr
 		if (terrain->heightMap != nullptr)
@@ -84,7 +84,7 @@ namespace Raven
 		}
 	}
 
-	void Terrain::LoadHeightMap(const std::string& path)
+	void TerrainComponent::LoadHeightMap(const std::string& path)
 	{
 		auto res = Engine::Get().GetModule<ResourceManager>();
 		res->LoadResource<Texture2D>(path);
@@ -98,7 +98,7 @@ namespace Raven
 	}
 
 	// load a texture and give it a name
-	void Terrain::LoadTexture(const std::string& path)
+	void TerrainComponent::LoadTexture(const std::string& path)
 	{
 		auto res = Engine::Get().GetModule<ResourceManager>();
 		// use return value to determine if need to process further
@@ -110,7 +110,7 @@ namespace Raven
 		}
 	}
 
-	std::vector<std::string> Terrain::GetTexturePaths()
+	std::vector<std::string> TerrainComponent::GetTexturePaths()
 	{
 		std::vector<std::string> paths(textures.size());
 		auto iter = paths.begin(); // start at the beginning of the vector
@@ -121,5 +121,10 @@ namespace Raven
 			std::next(iter); // increment the vector iterator
 		}
 		return paths;
+	}
+
+	std::shared_ptr<Terrain> TerrainComponent::GetTerrainResource()
+	{
+		return terrain;
 	}
 }

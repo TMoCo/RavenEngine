@@ -7,7 +7,7 @@
 #include <map>
 
 #include "ResourceManager/Resources/Texture2D.h"
-#include "ResourceManager/Resources/TerrainRsc.h"
+#include "ResourceManager/Resources/Terrain.h"
 
 //
 // A class for Terrain component and their related data such as heightmaps, textures, later materials, entity placements...
@@ -15,11 +15,11 @@
 
 namespace Raven
 {
-	class Terrain
+	class TerrainComponent
 	{
 	public:
-		Terrain() {}
-		Terrain(const std::string& fileName);
+		TerrainComponent() {}
+		TerrainComponent(const std::string& fileName);
 		// no destructor as resource lifetime is not decided by the component
 
 		void LoadOnGpu();
@@ -61,15 +61,16 @@ namespace Raven
 		// load a texture and give it a name
 		void LoadTexture(const std::string& path);
 
+		std::shared_ptr<Terrain> GetTerrainResource();
+
 	private:
 		std::vector<std::string> GetTexturePaths();
 
 		// file name string for accessing data from resource manager
 		std::string heightMapPath;
 
-		std::shared_ptr<TerrainRsc> terrain;
+		std::shared_ptr<Terrain> terrain;
 		// textures {"path", ptr}
 		std::map<std::string, Texture2D*> textures;
-	
 	};
 }

@@ -22,8 +22,6 @@ namespace Raven {
 		// return the type of the module
 		static EModuleType GetModuleType() { return MT_ProceduralGenerator; }
 
-
-	private:
 		enum FileFormat
 		{
 			PNG, BMP, JPG, TGA

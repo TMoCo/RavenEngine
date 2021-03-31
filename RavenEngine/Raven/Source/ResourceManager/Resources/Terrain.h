@@ -19,10 +19,10 @@
 
 namespace Raven
 {
-	class TerrainRsc : public IResource
+	class Terrain : public IResource
 	{
 	public:
-		TerrainRsc(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
+		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
 			heightMap(initHeight) // vector for textures, may want to swap container to a map
 		{
 			if (!IsValidHeightMap(initHeight))
@@ -31,7 +31,7 @@ namespace Raven
 			}
 		}
 		
-		inline virtual ~TerrainRsc()
+		inline virtual ~Terrain()
 		{
 			if (heightMap)
 			{
@@ -67,6 +67,6 @@ namespace Raven
 		// interface with renderer
 		RenderRscTerrain* renderRscTerrain = nullptr; 
 
-		NOCOPYABLE(TerrainRsc);
+		NOCOPYABLE(Terrain);
 	};
 }

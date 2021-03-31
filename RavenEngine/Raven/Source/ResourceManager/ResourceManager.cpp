@@ -81,7 +81,7 @@ namespace Raven {
 		for (auto& resource : resources)
 		{
 			// print resource path
-			LOGV(resource.first);
+			//LOGV(resource.first, resource.second.);
 		}
 	}
 

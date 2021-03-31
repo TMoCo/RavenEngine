@@ -110,6 +110,8 @@ namespace Raven
 		// Destroy all loaded modules
 		void DestoryModules();	
 
+		// 
+		void NewGameScene();
 
 	protected:
 

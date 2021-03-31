@@ -80,9 +80,6 @@ namespace Raven {
 			}
 		}
 
-		//std::ofstream out("heightmap.ppm");
-		//out << "P3 " << width << " " << height << " 255\n";
-
 		// add heights from all octaves
 		float sumHeight = 0;
 

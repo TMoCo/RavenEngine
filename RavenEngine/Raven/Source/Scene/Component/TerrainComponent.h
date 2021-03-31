@@ -19,7 +19,7 @@ namespace Raven
 	{
 	public:
 		TerrainComponent() {}
-		TerrainComponent(const std::string& fileName);
+		TerrainComponent(const std::string& fileName, std::shared_ptr<Terrain> newTerrain);
 		// no destructor as resource lifetime is not decided by the component
 
 		void LoadOnGpu();
@@ -31,7 +31,9 @@ namespace Raven
 
 		void SetHeightMap(Texture2D* heightMap);
 
-		void AddTexture(const std::string& name, Texture2D* newTexture);
+		void SetTerrainResource(std::shared_ptr<Terrain> newTerrain);
+
+		void AddTexture(const std::string& name, Ptr<Texture2D> newTexture);
 
 		// serialization save and load
 		template<typename Archive>
@@ -71,6 +73,6 @@ namespace Raven
 
 		std::shared_ptr<Terrain> terrain;
 		// textures {"path", ptr}
-		std::map<std::string, Texture2D*> textures;
+		std::map<std::string, std::shared_ptr<Texture2D>> textures;
 	};
 }

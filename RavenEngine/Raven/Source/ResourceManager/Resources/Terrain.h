@@ -36,7 +36,7 @@ namespace Raven
 			if (heightMap)
 			{
 				// TODO: free data in memory manager
-				delete heightMap;
+				// delete heightMap;
 			}
 		}
 

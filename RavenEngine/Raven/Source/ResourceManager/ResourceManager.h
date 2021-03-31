@@ -197,6 +197,4 @@ namespace Raven
 			return std::static_pointer_cast<TResource>(resourceIter->second);
 		}
 	}
-
-
 }

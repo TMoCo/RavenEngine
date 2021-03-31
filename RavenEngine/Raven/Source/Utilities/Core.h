@@ -1,7 +1,12 @@
 
 #pragma once
+
+#include <memory>
+
 #include "Logger/Console.h"
 
+template<class T>
+using Ptr = std::shared_ptr<T>;
 
 #define RAVEN_ASSERT(condition, ...)								\
 	{																\

@@ -14,9 +14,10 @@
 
 namespace Raven
 {
-	TerrainComponent::TerrainComponent(const std::string& path)
+	TerrainComponent::TerrainComponent(const std::string& path, std::shared_ptr<Terrain> newTerrain)
 	{
-		LoadHeightMap(path);
+		terrain = newTerrain;
+		//LoadHeightMap(path);
 	}
 
 	void TerrainComponent::LoadOnGpu()
@@ -31,10 +32,15 @@ namespace Raven
 
 	void TerrainComponent::SetHeightMap(Texture2D* heightMap)
 	{
-		if (TerrainRsc::IsValidHeightMap(heightMap))
+		if (Terrain::IsValidHeightMap(heightMap))
 		{
 			terrain->heightMap = heightMap;
 		}
+	}
+
+	void TerrainComponent::SetTerrainResource(std::shared_ptr<Terrain> newTerrain)
+	{
+		terrain = newTerrain;
 	}
 
 	// return shared pointer to a mesh resource
@@ -66,7 +72,7 @@ namespace Raven
 	}
 
 	// add a texture to the map
-	void TerrainComponent::AddTexture(const std::string& name, Texture2D* newTexture)
+	void TerrainComponent::AddTexture(const std::string& name, Ptr<Texture2D> newTexture)
 	{
 		textures.insert(std::make_pair(name, newTexture));		
 	}
@@ -106,7 +112,7 @@ namespace Raven
 		{
 			// insert the texture data if loaded
 			auto tex = res->GetResource<Texture2D>(path);
-			AddTexture(path, tex.get());
+			AddTexture(path, tex);
 		}
 	}
 

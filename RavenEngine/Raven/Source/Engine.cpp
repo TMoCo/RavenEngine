@@ -1,23 +1,37 @@
 //
+#include <memory>
+
+
+#include <GLFW/glfw3.h>
+
 
 #include "Engine.h"
 #include "IModule.h"
 
+#include "Utilities/StringUtils.h"
+
 #include "Window/Window.h"
+
 #include "Render/RenderModule.h"
 #include "Render/RenderTarget.h"
+
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/Terrain.h"
+
 #include "ImGui/ImGuiEngine.h"
-#include "Scene/SceneManager.h"
-#include "GUI/GUIModule.h"
-#include "ProceduralGenerator/TerrainGeneration.h"
-#include <GLFW/glfw3.h>
+
 #include "Scene/Scene.h"
-#include "Devices/Input.h"
+#include "Scene/SceneManager.h"
 #include "Scene/System/SystemManager.h"
 #include "Scene/System/GUISystem.h"
+#include "Scene/Component/TerrainComponent.h"
+#include "Scene/Entity/Entity.h"
 
-#include <memory>
+#include "GUI/GUIModule.h"
+
+#include "ProceduralGenerator/TerrainGeneration.h"
+
+#include "Devices/Input.h"
 
 
 namespace Raven 
@@ -184,10 +198,20 @@ namespace Raven
 		// get the terrain generator and generate a height map
 		auto generator = GetModule<TerrainGeneration>();
 		generator->Noise(100, 100, TerrainGeneration::FileFormat::PNG);
+		std::string path("heightmap.png");
+		// load the generated height map into resource manager
+		GetModule<ResourceManager>()->LoadResource<Texture2D>(path);
+
+		Terrain* terrain = new Terrain(GetModule<ResourceManager>()->GetResource<Texture2D>(path).get());
+
+		std::cout << terrain->heightMap->width << '\n';
+		std::cout << terrain->heightMap->height << " \n";
 
 		Scene* newScene = new Scene("TerrainScene");
+
+		auto entity = newScene->CreateEntity("terrain");
+		entity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
+
 		GetModule<SceneManager>()->AddScene(newScene);
-
-
 	}
 };

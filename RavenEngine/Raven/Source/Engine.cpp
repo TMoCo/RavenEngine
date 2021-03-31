@@ -124,7 +124,6 @@ namespace Raven
 		// Create...
 		systemManager = std::make_unique<SystemManager>();
 
-
 		CreateModule<Raven::ResourceManager>();
 		CreateModule<Raven::RenderModule>();
 		CreateModule<Raven::ImGuiEngine>();
@@ -149,13 +148,9 @@ namespace Raven
 		auto guiSystem = GetSystemManager()->AddSystem<GUISystem>();
 		guiSystem->OnInit();
 	
-
-
 //############	Register your system here ######################
 
 	}
-
-
 
 	void Engine::DestoryModules()
 	{
@@ -182,5 +177,4 @@ namespace Raven
 	{
 
 	}
-
 };

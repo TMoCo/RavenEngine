@@ -24,7 +24,6 @@ namespace Raven {
 
 	void ResourceManager::Initialize()
 	{
-		LOGV("Initialised the resource manager");
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
 		AddLoader(std::make_unique<MeshLoader>(*this));
 
@@ -48,29 +47,14 @@ namespace Raven {
 	{
 		FlushResourceRegister();
 		loaders.clear(); // removes the loaders
-		LOGV("Destroyed the resource manager");
 	}
-
-	//
-	// Loader management
-	//
 
 	//
 	// Resource loading and management
 	// 
 
-
-
 	void ResourceManager::RemoveResource(const std::string& id)
 	{
-		//if (HasResource(id))
-		//{
-			// free the resource
-		//	delete resources[id];
-			// then remove entry from register
-		//	resources.erase(id);
-		//}
-
 		resources.erase(id);
 	}
 
@@ -79,8 +63,6 @@ namespace Raven {
 		// then clear the map
 		resources.clear();
 	}
-
-
 
 	bool ResourceManager::HasResource(const std::string& id)
 	{
@@ -94,8 +76,13 @@ namespace Raven {
 		resources.emplace(id, resource);
 	}
 
-	//
-	// Resource getting
-	//
+	void ResourceManager::PrintResources()
+	{
+		for (auto& resource : resources)
+		{
+			// print resource path
+			LOGV(resource.first);
+		}
+	}
 
 }

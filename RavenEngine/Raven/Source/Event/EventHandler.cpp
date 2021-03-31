@@ -22,5 +22,4 @@ namespace Raven
 			eventDispatcher = nullptr;
 		}
 	}
-
 };

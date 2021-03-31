@@ -83,33 +83,19 @@ namespace Raven
 
 
 	private:
-		// cast the resource pointer to the right resource type (basically same as dynamic cast...)
-		template<class TResource>
-		inline TResource* CastTo(IResource* resource) 
-		{
-			if (TResource::Type() != resource->GetType()) // check that we can cast to desired resource type
-			{
-				//throw std::runtime_error("Bad resource cast!");
-				return nullptr;
-			}
-			return static_cast<TResource*>(resource);
-		}
-
 		// add and remove loader of a certain type
 		template <class TLoader>
 		void AddLoader(std::unique_ptr<TLoader> loader);
-
 		template <class TLoader>
 		void RemoveLoader(const TLoader* loader);
+
+		void PrintResources();
 
 		// get a loader of type T
 		template <class TLoader>
 		TLoader* GetLoader();
-
-		// for now the resource registers map an id to the resource in heap memory
-		//std::unordered_map<std::string, IResource*> resources;
-
-		//one to many
+				
+		// one to many 
 		std::unordered_multimap<std::string, std::shared_ptr<IResource>> resources;
 
 		// an array containing the resource loaders used
@@ -120,14 +106,8 @@ namespace Raven
 		NOCOPYABLE(ResourceManager); // delete copy constructor and = operator
 	};
 
-
-
-	//####################Note##########################
-	//template method should be implemented in *.h files rather than .*cpp files
-	//if implemented in cpp files ,the files could not complie 
-
-
-
+	// template method should be implemented in *.h files rather than .*cpp files
+	// if implemented in cpp files, the files could not complie 
 	template<class TResource>
 	bool ResourceManager::LoadResource(const std::string& path)
 	{
@@ -182,8 +162,6 @@ namespace Raven
 		}
 	}
 
-
-
 	template<class TResource>
 	std::vector<std::shared_ptr<TResource>> ResourceManager::GetResources(const std::string& path)
 	{
@@ -191,7 +169,6 @@ namespace Raven
 		GetResource(path, res);
 		return res;
 	}
-
 
 	template<class TResource>
 	void ResourceManager::GetResource(const std::string& path, std::vector<std::shared_ptr<TResource>>& out)
@@ -206,7 +183,6 @@ namespace Raven
 		}
 	}
 
-
 	template<class TResource>
 	std::shared_ptr<TResource> ResourceManager::GetResource(const std::string& path)
 	{
@@ -218,7 +194,6 @@ namespace Raven
 		}
 		else
 		{
-			// if resource is right type, return valid pointer, else nullptr
 			return std::static_pointer_cast<TResource>(resourceIter->second);
 		}
 	}

@@ -26,6 +26,8 @@ project "RavenEditor"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	sysincludedirs
@@ -40,6 +42,8 @@ project "RavenEditor"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	links
@@ -83,7 +87,7 @@ project "RavenEditor"
 		links
 		{
 			"glfw",
-			"OpenGL32",
+			"OpenGL32","lua"
 		}
 
 		disablewarnings { 4307 }

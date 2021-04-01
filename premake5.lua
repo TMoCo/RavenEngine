@@ -20,7 +20,8 @@ IncludeDir["cereal"] = "%{root_dir}/RavenEngine/Dependencies/cereal/include"
 IncludeDir["spdlog"] = "%{root_dir}/RavenEngine/Dependencies/spdlog/include"
 IncludeDir["glm"] = "%{root_dir}/RavenEngine/Dependencies/glm"
 IncludeDir["OpenFBX"] ="%{root_dir}/RavenEngine/Dependencies/OpenFBX/"
-
+IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
+IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
 workspace( settings.workspace_name )
 	location "build"
 	flags { 'MultiProcessorCompile' }
@@ -54,6 +55,8 @@ workspace( settings.workspace_name )
 		require("RavenEngine/Dependencies/GLFWpremake5")
 			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/OpenFBX/premake5")
+			SetRecommendedSettings()
+		require("RavenEngine/Dependencies/lua/premake5")
 			SetRecommendedSettings()
 			
 	filter {}

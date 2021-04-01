@@ -57,7 +57,7 @@ namespace Raven
 		template<class TModule>
 		static inline TModule* GetModule()
 		{
-			return static_cast<TModule*>(Get().engineModules[TModule::GetModuleType()]);
+			return static_cast<TModule*>(Get().engineModules[typeid(TModule).hash_code()]);
 		}
 
 		// MainThread Operation
@@ -89,22 +89,24 @@ namespace Raven
 		template<class TModule, typename...Args>
 		inline void CreateModule(Args&&... args)
 		{
-			engineModules[TModule::GetModuleType()] = new TModule(std::forward<Args>(args)...);
+			//engineModules[TModule::GetModuleType()] = new TModule(std::forward<Args>(args)...);
+			engineModules[typeid(TModule).hash_code()] = new TModule(std::forward<Args>(args)...);
+
 		}
 
 		// Initialise a module
 		template<class TModule>
 		inline void InitializeModule()
 		{
-			engineModules[TModule::GetModuleType()]->Initialize();
+			engineModules[typeid(TModule).hash_code()]->Initialize();
 		}
 
 		// Destroy a module
 		template<class TModule>
 		inline void DestroyModule()
 		{
-			engineModules[TModule::GetModuleType()]->Destroy();
-			delete engineModules[ TModule::GetModuleType() ];
+			engineModules[typeid(TModule).hash_code()]->Destroy();
+			delete engineModules[typeid(TModule).hash_code()];
 		}
 
 		// Load all modules 
@@ -121,7 +123,7 @@ namespace Raven
 		std::mutex executeMutex;
 
 		// Modules in the engine
-		std::array<IModule*, MT_MAX> engineModules;
+		std::unordered_map<size_t, IModule*> engineModules;
 
 		EditorState state = EditorState::Play; //default as Play, if editor is loaded, the state will be set as preview.
 

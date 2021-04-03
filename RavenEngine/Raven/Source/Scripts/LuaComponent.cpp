@@ -15,6 +15,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <fstream>
+#include <filesystem>
 
 
 namespace Raven 
@@ -22,6 +23,8 @@ namespace Raven
 	LuaComponent::LuaComponent(entt::entity entity, const std::string& file, Scene* initScene)
 		:scene(initScene),file(file), entity(entity)
 	{
+		table = nullptr;
+
 		Init();
 	}
 
@@ -66,6 +69,7 @@ return #name
 
 	void LuaComponent::Init()
 	{
+		
 		className = StringUtils::RemoveExtension(StringUtils::GetFileName(file));
 		auto vm = Engine::GetModule<LuaVirtualMachine>();
 		LoadScript();
@@ -83,6 +87,7 @@ return #name
 
 	void LuaComponent::OnInit()
 	{
+		//load prev values
 		if (onInitFunc && onInitFunc->isFunction())
 		{
 			try
@@ -93,7 +98,7 @@ return #name
 			{
 				LOGE("{0}",e.what());
 			}
-	
+			metaFile.Load(this, file + ".mata", scene);
 		}
 	}
 
@@ -113,12 +118,13 @@ return #name
 	}
 
 	void LuaComponent::Reload()
-	{
+	{	
 		LoadScript();
 	}
 
 	void LuaComponent::LoadScript()
 	{
+
 		auto vm = Engine::GetModule<LuaVirtualMachine>();
 		luaL_dofile(vm->GetState(), file.c_str());
 		table = std::make_shared<luabridge::LuaRef>(luabridge::LuaRef::fromStack(vm->GetState()));

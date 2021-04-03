@@ -13,6 +13,7 @@ extern "C" {
 #include <entt/entt.hpp>
 #include "Engine.h"
 #include "Scene/SceneManager.h"
+#include "MetaFile.h"
 
 namespace Raven 
 {
@@ -20,6 +21,7 @@ namespace Raven
 	class LuaComponent 
 	{
 	public:
+		friend class MetaFile;
 		LuaComponent(entt::entity entity,const std::string& file, Scene* scene);
 		LuaComponent();
 		~LuaComponent();
@@ -34,8 +36,9 @@ namespace Raven
 			archive(
 				cereal::make_nvp("FilePath", file),
 				cereal::make_nvp("Parent", entity)
-			
 			);
+
+			metaFile.Save(this,file + ".mata");
 		}
 
 		template<typename Archive>
@@ -56,6 +59,8 @@ namespace Raven
 		inline auto& GetFileName() const { return file; }
 
 	private:
+	
+
 		void SaveNewFile(const std::string & fileName);
 		void Init();
 		std::string file;
@@ -65,5 +70,7 @@ namespace Raven
 		std::shared_ptr<luabridge::LuaRef> onInitFunc;
 		std::shared_ptr<luabridge::LuaRef> onUpdateFunc;
 		Scene* scene = nullptr;
+
+		MetaFile metaFile;
 	};
 };

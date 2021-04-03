@@ -55,7 +55,6 @@ namespace Raven
 		}
 
 
-
 		std::string GetCurrentWorkingDirectory()
 		{
 			char currentPath[FILENAME_MAX];

@@ -125,17 +125,13 @@ namespace MM {
 
 			MM_IEEE_ENTITY_WIDGET(e, registry, true);
 
-			if (ImGui::Button("New")) {
+			/*if (ImGui::Button("New")) {
 				e = registry.create();
-			}
-			if (registry.valid(e)) {
+			}*/
+			/*if (registry.valid(e)) {
 				ImGui::SameLine();
 
-				// clone would go here
-				//if (ImGui::Button("Clone")) {
-					//auto old_e = e;
-					//e = registry.create();
-				//}
+				
 
 				ImGui::Dummy({ 10, 0 }); // space destroy a bit, to not accidentally click it
 				ImGui::SameLine();
@@ -149,7 +145,7 @@ namespace MM {
 					e = entt::null;
 				}
 				ImGui::PopStyleColor(3);
-			}
+			}*/
 
 			ImGui::Separator();
 
@@ -167,8 +163,8 @@ namespace MM {
 						else {
 							ImGui::SameLine();
 						}
-
-						if (ImGui::CollapsingHeader(ci.name.c_str())) {
+						
+						if (ImGui::CollapsingHeader(ci.name.c_str(),ImGuiTreeNodeFlags_DefaultOpen)) {
 							ImGui::Indent(30.f);
 							ImGui::PushID("Widget");
 							ci.widget(registry, e);

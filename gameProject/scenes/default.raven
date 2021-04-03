@@ -2,13 +2,14 @@
     "value0": {
         "SceneName": "default"
     },
-    "value1": 3,
+    "value1": 4,
     "value2": 0,
     "value3": 1,
     "value4": 2,
     "value5": 3,
-    "value6": 0,
-    "value7": {
+    "value6": 3,
+    "value7": 0,
+    "value8": {
         "Position": {
             "value0": 0.0,
             "value1": 0.0,
@@ -25,8 +26,8 @@
             "value2": 1.0
         }
     },
-    "value8": 1,
-    "value9": {
+    "value9": 1,
+    "value10": {
         "Position": {
             "value0": 0.0,
             "value1": 0.0,
@@ -43,8 +44,8 @@
             "value2": 1.0
         }
     },
-    "value10": 2,
-    "value11": {
+    "value11": 2,
+    "value12": {
         "Position": {
             "value0": 0.0,
             "value1": 0.550000011920929,
@@ -61,33 +62,37 @@
             "value2": 1.0
         }
     },
-    "value12": 3,
-    "value13": 0,
-    "value14": {
+    "value13": 4,
+    "value14": 0,
+    "value15": {
         "Name": "Model"
     },
-    "value15": 1,
-    "value16": {
+    "value16": 1,
+    "value17": {
         "Name": "Light"
     },
-    "value17": 2,
-    "value18": {
+    "value18": 2,
+    "value19": {
         "Name": "Camera"
     },
-    "value19": 0,
-    "value20": 0,
-    "value21": 1,
-    "value22": 2,
-    "value23": {
+    "value20": 3,
+    "value21": {
+        "Name": "Empty Entity"
+    },
+    "value22": 0,
+    "value23": 0,
+    "value24": 1,
+    "value25": 2,
+    "value26": {
         "Scale": 1.0,
         "Aspect": 1.3333333730697632,
         "FOV": 45.0,
         "Near": 0.009999999776482582,
         "Far": 100.0
     },
-    "value24": 1,
-    "value25": 1,
-    "value26": {
+    "value27": 1,
+    "value28": 1,
+    "value29": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
@@ -109,20 +114,20 @@
         "value5": 1.0,
         "value6": 1.0
     },
-    "value27": 1,
-    "value28": 2,
-    "value29": {
-        "ControllerType": 1
-    },
     "value30": 1,
-    "value31": 0,
+    "value31": 2,
     "value32": {
-        "PrimitiveType": 2,
-        "FilePath": ""
+        "ControllerType": 1
     },
     "value33": 1,
     "value34": 0,
     "value35": {
+        "PrimitiveType": 2,
+        "FilePath": ""
+    },
+    "value36": 1,
+    "value37": 0,
+    "value38": {
         "FilePath": "./scripts/Test.lua",
         "Parent": 0
     }

@@ -1,13 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
-
+#include "IconsMaterialDesignIcons.h"
 #include "LuaComponent.h"
 #include "LuaVirtualMachine.h"
 #include "Engine.h"
 #include "Utilities/StringUtils.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "Scene/Entity/Entity.h"
+#include "Scene/Component/Model.h"
+#include "Scene/Component/Light.h"
+#include "Core/Camera.h"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <fstream>
@@ -207,10 +211,22 @@ return #name
 						Entity* v = pair.second;
 						if (v->GetHandle() != entt::null)
 						{
-							auto entityName = v->GetComponent<NameComponent>().name;
+							auto icon = 
+								v->HasComponent<Camera>() ?
+								ICON_MDI_CAMERA : 
+								v->HasComponent<Model>() ?
+								ICON_MDI_SQUARE : 
+								v->HasComponent<Light>() ?
+								ICON_MDI_LIGHTBULB :
+								v->HasComponent<LuaComponent>() ?
+								ICON_MDI_SCRIPT : ICON_MDI_CUBE
+								;
+
+							auto entityName = icon + v->GetComponent<NameComponent>().name;
 							memcpy(modelName, entityName.c_str(), entityName.length() + 1);
 						}
 
+			
 						ImGui::TextUnformatted(name.c_str());
 						ImGui::NextColumn();
 						ImGui::PushItemWidth(-1);

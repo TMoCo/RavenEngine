@@ -118,4 +118,4 @@ end
 
 <img src="pic/3.jpg">
 
-##### 4. for the third one, I will generate a meta file to save params when you modified them in editor. (Not implementation)
+##### 4. for the third one, it will generate a meta file to save params when you modified them in editor.

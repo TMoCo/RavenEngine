@@ -10,6 +10,10 @@ extern "C" {
 # include "lauxlib.h"
 # include "lualib.h"
 }
+
+
+#include <string>
+
 namespace Raven 
 {
 	class LuaVirtualMachine final : public IModule
@@ -18,10 +22,10 @@ namespace Raven
 		LuaVirtualMachine();
 		void Initialize() override;
 		void Destroy() override;
-
 		inline auto GetState() { return L; }
-
 	private:
+
+
 		lua_State * L = nullptr;
 	};
 };

@@ -10,6 +10,7 @@
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
+#include "Scripts/LuaComponent.h"
 #include "Core/Camera.h"
 #include "Scene/Component/Transform.h"
 #include "ImGui/ImGuiHelpers.h"
@@ -67,6 +68,7 @@ namespace Raven
 					camera.SetAspectRatio(4 / 3.f);
 					entity.GetOrAddComponent<Transform>();
 				}
+
 
 				ImGui::EndPopup();
 			}
@@ -329,20 +331,22 @@ namespace Raven
 				}
 				ImGui::EndPopup();
 			}
-
+			
+			draging = false;
 			if (!doubleClicked && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
 			{
 				auto ptr = node;
 				ImGui::SetDragDropPayload("Drag_Entity", &ptr, sizeof(entt::entity*));
 				ImGui::Text(ICON_MDI_ARROW_UP);
 				ImGui::EndDragDropSource();
+				draging = true;
 			}
 
 			const ImGuiPayload* payload = ImGui::GetDragDropPayload();
 			if (payload != NULL && payload->IsDataType("Drag_Entity"))
 			{
+				draging = true;
 				bool acceptable;
-
 				RAVEN_ASSERT(payload->DataSize == sizeof(entt::entity*), "Error ImGUI drag entity");
 				auto entity = *reinterpret_cast<entt::entity*>(payload->Data);
 				auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
@@ -373,11 +377,11 @@ namespace Raven
 					ImGui::EndDragDropTarget();
 				}
 
-				if (editor.GetSelected() == entity)
-					editor.SetSelected(entt::null);
+				//if (editor.GetSelected() == entity)
+				//	editor.SetSelected(entt::null);
 			}
 
-			if (ImGui::IsItemClicked() && !deleteEntity)
+			if (ImGui::IsMouseReleased(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_None) && !deleteEntity)
 				editor.SetSelected(node);
 			else if (doubleClickedEntity == node && ImGui::IsMouseClicked(0) && !ImGui::IsItemHovered(ImGuiHoveredFlags_None))
 				doubleClickedEntity = entt::null;

@@ -12,6 +12,7 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Entity/Entity.h"
+#include "Scripts/LuaComponent.h"
 
 #include "ResourceManager/MeshFactory.h"
 
@@ -34,20 +35,18 @@ namespace Raven
 	{
 		Engine::Initialize();
 
-		editorWindows.emplace_back(std::make_unique<SceneWindow>());
-		editorWindows.emplace_back(std::make_unique<HierarchyWindow>());
-		editorWindows.emplace_back(std::make_unique<PropertiesWindow>());
-		editorWindows.emplace_back(std::make_unique<AssetsWindow>());
+		editorWindows.emplace(typeid(SceneWindow).hash_code(),std::make_shared<SceneWindow>());
+		editorWindows.emplace(typeid(HierarchyWindow).hash_code(),std::make_shared<HierarchyWindow>());
+		editorWindows.emplace(typeid(PropertiesWindow).hash_code(),std::make_shared<PropertiesWindow>());
+		editorWindows.emplace(typeid(AssetsWindow).hash_code(),std::make_shared<AssetsWindow>());
 
-		//GetModule<SceneManager>()->AddScene(new Scene("Test"));
-
-	//	GetModule<SceneManager>()->AddSceneFromFile("Test.raven");
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
 		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
@@ -64,7 +63,7 @@ namespace Raven
 		BeginDockSpace();
 		for (auto& win : editorWindows)
 		{
-			win->OnImGui();
+			win.second->OnImGui();
 		}
 		EndDockSpace();
 		Engine::OnImGui();
@@ -126,6 +125,7 @@ namespace Raven
 
 	void Editor::SetSelected(const entt::entity& node)
 	{
+		prevSelectedNode = selectedNode;
 		selectedNode = node;
 	}
 
@@ -138,7 +138,7 @@ namespace Raven
 	{
 		for (auto & w : editorWindows)
 		{
-			w->OnSceneCreated(scene);
+			w.second->OnSceneCreated(scene);
 		}
 	}
 

@@ -15,6 +15,7 @@ namespace Raven
 	public:
 		HierarchyWindow();
 		virtual void OnImGui()  override;
+		inline auto IsDraging() const { return draging; }
 	private:
 		void DrawName();
 		void DrawFilter();
@@ -26,6 +27,6 @@ namespace Raven
 		entt::entity doubleClickedEntity =  entt::null;
 		entt::entity droppedEntity = entt::null;
 		entt::entity recentDroppedEntity = entt::null;
-
+		bool draging = false;
 	};
 };

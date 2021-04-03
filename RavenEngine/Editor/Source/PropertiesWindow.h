@@ -22,6 +22,7 @@ namespace Raven
 		virtual void OnSceneCreated(Scene* scene) override;
 	private:
 		bool init = false;
-		MM::ImGuiEntityEditor<entt::entity> enttEditor;
+		//MM::ImGuiEntityEditor<entt::entity> enttEditor;
+		MM::EntityEditor<entt::entity> enttEditor;
 	};
 };

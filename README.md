@@ -22,11 +22,11 @@ the inspiration comes from [Click to watch](https://www.youtube.com/watch?v=sULV
 
 #### [Script Module](./RavenEngine/Raven/Source/Scripts/ReadMe.md)
 
-#### [ResourceManager Module](./RavenEngine/Raven/Source/Source/ResourceManager/README.md)
+#### [ResourceManager Module](./RavenEngine/Raven/Source/ResourceManager/README.md)
 
-#### [ECS Module](./RavenEngine/Raven/Source/Source/Scene/ReadMe.md)
+#### [ECS Module](./RavenEngine/Raven/Source/Scene/ReadMe.md)
 
-#### [Events](./RavenEngine/Raven/Source/Source/Event/ReadMe.md)
+#### [Events](./RavenEngine/Raven/Source/Event/ReadMe.md)
 
 
 

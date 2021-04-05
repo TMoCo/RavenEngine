@@ -245,7 +245,6 @@ namespace Raven
 
 	void Editor::OpenFile(const std::string& filePath)
 	{
-
 		if (StringUtils::IsTextFile(filePath)) 
 		{
 			LOGW("OpenFile file : {0} did not implement",filePath);
@@ -263,7 +262,9 @@ namespace Raven
 		}
 		else if (StringUtils::IsSceneFile(filePath))
 		{
-			LOGW("OpenFile file : {0} did not implement", filePath);
+			CacheScene();//save 
+			GetModule<SceneManager>()->AddSceneFromFile(filePath);
+			GetModule<SceneManager>()->SwitchScene();
 		}
 		else if (StringUtils::IsTextureFile(filePath))
 		{

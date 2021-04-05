@@ -38,6 +38,11 @@ namespace Raven
 			auto pos = filePath.find_last_of('/');
 			if (pos != std::string::npos)
 				return filePath.substr(pos + 1);
+
+			pos = filePath.find_last_of('\\');
+			if (pos != std::string::npos)
+				return filePath.substr(pos + 1);
+
 			return filePath;
 		}
 

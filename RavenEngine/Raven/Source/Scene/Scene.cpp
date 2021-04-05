@@ -31,7 +31,7 @@ namespace Raven {
 	Scene::Scene(const std::string& initName)
 		:name(initName)
 	{
-		LOGV("{0}", __FUNCTION__);
+		LOGV("{0} {1}", __FUNCTION__,initName);
 		entityManager = std::make_shared<EntityManager>(this);
 
 		entityManager->AddDependency<Camera, Transform>();

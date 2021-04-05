@@ -237,8 +237,10 @@ namespace Raven
 
 			else
 			{
-				LOGW("Open File {0} did not implementation {1}", currentDir[dirIndex].absolutePath,__FUNCTION__);
+				//LOGW("Open File {0} did not implementation {1}", currentDir[dirIndex].absolutePath,__FUNCTION__);
 				//openFile
+				editor.OpenFile(currentDir[dirIndex].absolutePath);
+
 			}
 		}
 

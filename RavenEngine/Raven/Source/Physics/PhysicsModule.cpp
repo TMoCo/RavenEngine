@@ -14,7 +14,6 @@ namespace Raven
 
 	void PhysicsModule::Destroy()
 	{
-		// instantiate the physics world
-
+		
 	}
 }

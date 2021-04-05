@@ -22,7 +22,7 @@ namespace Raven
 
 	glm::vec3 Transform::GetUpDirection() const
 	{
-		return GetWorldOrientation() * UP;
+		return GetWorldOrientation() * UP;	
 	}
 
 

@@ -66,6 +66,9 @@ namespace Raven
 
 		static glm::vec3 GetScaleFromMatrix(const glm::mat4& mat);
 
+		// get an empty transform
+		static Transform Identity();
+
 
 		template<typename Archive>
 		void save(Archive& archive) const

@@ -23,7 +23,7 @@ namespace Raven
 		static EModuleType GetModuleType() { return EModuleType::MT_Physics; }
 
 	private:
-		// singleton class for physics library memory allocation etc
+		// singleton class for physics library's memory allocation etc
 		rp3d::PhysicsCommon physicsCommon;
 		// physics world where collisions and simulations are run
 		rp3d::PhysicsWorld* world; 

@@ -40,6 +40,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.rp3d}"
 	}
 
 	sysincludedirs
@@ -54,12 +55,14 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.rp3d}"
 	}
 
 	links
 	{
 		"imgui",
 		"spdlog",
+		"rp3d"
 	}
 
 

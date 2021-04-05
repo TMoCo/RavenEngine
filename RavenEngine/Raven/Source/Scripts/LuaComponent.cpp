@@ -82,7 +82,7 @@ return #name
 
 	LuaComponent::~LuaComponent()
 	{
-
+	
 	}
 
 	void LuaComponent::OnInit()
@@ -124,26 +124,27 @@ return #name
 
 	void LuaComponent::LoadScript()
 	{
-
 		auto vm = Engine::GetModule<LuaVirtualMachine>();
 		luaL_dofile(vm->GetState(), file.c_str());
-		table = std::make_shared<luabridge::LuaRef>(luabridge::LuaRef::fromStack(vm->GetState()));
-		onInitFunc = std::make_shared<luabridge::LuaRef>((*table)["OnInit"]);
-		onUpdateFunc = std::make_shared<luabridge::LuaRef>((*table)["OnUpdate"]);
-		(*table)["parent"] = Entity(entity,scene);
+		try
+		{
+			table = std::make_shared<luabridge::LuaRef>(luabridge::LuaRef::fromStack(vm->GetState()));
+			onInitFunc = std::make_shared<luabridge::LuaRef>((*table)["OnInit"]);
+			onUpdateFunc = std::make_shared<luabridge::LuaRef>((*table)["OnUpdate"]);
+			(*table)["parent"] = Entity(entity, scene);
+		}
+		catch (const std::exception& e)
+		{
+			LOGE("{0}", e.what());
+		}
 		OnInit();
 	}
-
 
 
 	void LuaComponent::OnImGui()
 	{
 
-		if (ImGui::Button(IsLoaded() ? "Reload" : "Load", ImVec2(ImGui::GetContentRegionAvail().x, 0.0f)))
-		{
-			Reload();
-		}
-
+	
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
@@ -245,8 +246,7 @@ return #name
 
 						ImGui::PopItemWidth();
 						ImGui::NextColumn();
-
-
+					
 						const ImGuiPayload* payload = ImGui::GetDragDropPayload();
 						if (payload != NULL && payload->IsDataType("Drag_Entity"))
 						{
@@ -262,11 +262,12 @@ return #name
 								ImGui::EndDragDropTarget();
 							}
 						}
-
-
-
 					}
+					
 				}
+
+
+			
 			}
 		}
 

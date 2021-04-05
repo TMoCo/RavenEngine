@@ -175,13 +175,13 @@ namespace Raven
 	{
 		// Destroy - Here order matter.
 		DestroyModule<TerrainGeneration>();
-		DestroyModule<LuaVirtualMachine>();
 		DestroyModule<RenderModule>();
 		DestroyModule<SceneManager>();
 		DestroyModule<GUIModule>();
 		DestroyModule<ImGuiEngine>();
 		DestroyModule<ResourceManager>();
 		DestroyModule<Window>();
+		DestroyModule<LuaVirtualMachine>();
 	}
 
 	std::future<bool> Engine::Post(const std::function<bool()>& callback)

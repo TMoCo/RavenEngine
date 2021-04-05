@@ -33,7 +33,6 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
-
 		return updated;
 	}
 
@@ -50,6 +49,7 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
+
 
 		return updated;
 	}

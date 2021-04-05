@@ -102,7 +102,10 @@ namespace MM
 	void ComponentEditorWidget<LuaComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
 		auto& lua = reg.get<LuaComponent>(e);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
 		ImGui::PushItemWidth(-1);
+		
 		if (ImGui::BeginCombo("", lua.GetFileName().c_str(), 0))
 		{
 
@@ -130,6 +133,15 @@ namespace MM
 			}
 			ImGui::EndCombo();
 		}
+		ImGui::NextColumn();
+		//ImGui::PushItemWidth(-1);
+		if (ImGui::Button(lua.IsLoaded() ? "Reload" : "Load"))
+		{
+			lua.Reload();
+		}
+		ImGui::PopItemWidth();
+		ImGui::Columns(1);
+		ImGui::PopStyleVar();
 
 		lua.OnImGui();
 

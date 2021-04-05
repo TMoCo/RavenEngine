@@ -26,6 +26,6 @@ namespace Raven
 		// singleton class for physics library memory allocation etc
 		rp3d::PhysicsCommon physicsCommon;
 		// physics world where collisions and simulations are run
-		rp3d::PhyscisWorld* world; 
+		rp3d::PhysicsWorld* world; 
 	};
 }

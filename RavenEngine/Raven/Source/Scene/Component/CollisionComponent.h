@@ -7,3 +7,8 @@
 //
 // Component to attach to an entity that needs to be collided with another
 //
+
+class CollisionComponent
+{
+
+};

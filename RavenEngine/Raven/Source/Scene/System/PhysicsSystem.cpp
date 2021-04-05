@@ -12,11 +12,11 @@
 
 namespace Raven
 {
-	class GUISystem : public ISystem
+	class PhysicsSystem : public ISystem
 	{
 	public:
-		GUISystem();
-		~GUISystem() override;
+		PhysicsSystem();
+		~PhysicsSystem() override;
 		virtual void OnInit() override;
 
 		virtual void OnUpdate(float dt, Scene* scene)override;

@@ -213,6 +213,5 @@ namespace Raven
 
 		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
 		GetModule<SceneManager>()->SwitchScene(sceneIdx);
-
 	}
 };

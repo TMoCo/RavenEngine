@@ -21,7 +21,6 @@
 #include <array>		 // array container
 #include <vector>
 
-
 #include "Utilities/Core.h"
 
 #include "IModule.h"

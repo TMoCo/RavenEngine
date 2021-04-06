@@ -98,7 +98,7 @@ return #name
 			{
 				LOGE("{0}",e.what());
 			}
-			metaFile.Load(this, file + ".mata", scene);
+			metaFile.Load(this, file + ".meta", scene);
 		}
 	}
 
@@ -180,12 +180,29 @@ return #name
 				}
 				else if (pair.second.isTable()) 
 				{
-					ImGui::TextUnformatted("isTable");
-					/*bool value = pair.second;
-					if (ImGuiHelper::Property(pair.first.tostring(), value))
+					ImGui::TextUnformatted(name.c_str());
+					ImGui::NextColumn();
+					ImGui::PushItemWidth(-1);
+
+					std::string id =  name + " not support now";
+
+					try
 					{
-						(*table)[pair.first.tostring()] = value;
-					}*/
+						std::string cname = pair.second["__cname"];
+						memcpy(modelName, cname.c_str(), cname.size() + 1);
+					}
+					catch (...)
+					{
+						
+					}
+					
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(200, 200, 200)));
+					ImGui::InputText(id.c_str(), modelName, 255, ImGuiInputTextFlags_ReadOnly);
+					ImGui::PopStyleColor();
+
+					ImGui::PopItemWidth();
+					ImGui::NextColumn();
+
 				}
 				else if (pair.second.isUserdata())
 				{

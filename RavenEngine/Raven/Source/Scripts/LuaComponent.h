@@ -38,7 +38,7 @@ namespace Raven
 				cereal::make_nvp("Parent", entity)
 			);
 
-			metaFile.Save(this,file + ".mata");
+			metaFile.Save(this,file + ".meta");
 		}
 
 		template<typename Archive>

@@ -37,8 +37,8 @@ namespace Raven
 				}
 				else if (pair.second.isTable())
 				{
-					PRINT_FUNC();
-					LOGC("Table serialization Not implementation");
+					//PRINT_FUNC();
+					LOGW("Table serialization Not implementation");
 				}
 				else if (pair.second.isUserdata())
 				{

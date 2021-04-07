@@ -16,4 +16,22 @@ namespace Raven
 	{
 		
 	}
+
+	void PhysicsModule::Step(float deltaTime)
+	{
+		// Add the time difference in the accumulator 
+		accumulator += deltaTime;
+
+		// While there is enough accumulated time to take one or several physics steps 
+		while (accumulator >= timeStep) {
+
+			// Update the Dynamics world with a constant time step 
+			world->update(timeStep);
+
+			// Decrease the accumulated time 
+			accumulator -= timeStep;
+		}
+
+		// slerp between world states using the remaining accumulated time
+	}
 }

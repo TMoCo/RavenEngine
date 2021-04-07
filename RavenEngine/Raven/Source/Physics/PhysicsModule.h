@@ -4,12 +4,17 @@
 
 #pragma once
 
-#include <rp3d/include/reactphysics3d/reactphysics3d.h> 
+#include <rp3d/include/reactphysics3d/reactphysics3d.h>
 
 #include "IModule.h"
 
+#include "Scene/Component/Collider.h"
+
 namespace Raven
 {
+	// ideal time step of 1 / 60 s
+	constexpr float timeStep = 1.0f / 60.0f;
+
 	class PhysicsModule : public IModule
 	{
 	public:
@@ -20,12 +25,18 @@ namespace Raven
 		virtual void Initialize() override;
 		virtual void Destroy() override;
 
+		// when we want to update the physics world
+		void Step(float deltaTime);
+
 		static EModuleType GetModuleType() { return EModuleType::MT_Physics; }
 
 	private:
 		// singleton class for physics library's memory allocation etc
 		rp3d::PhysicsCommon physicsCommon;
 		// physics world where collisions and simulations are run
-		rp3d::PhysicsWorld* world; 
+		rp3d::PhysicsWorld* world;
+
+		// where we accumulate time between frames
+		float accumulator;
 	};
 }

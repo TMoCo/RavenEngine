@@ -1,0 +1,13 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include <rp3d/include/reactphysics3d/reactphysics3d.h>
+
+class CollisionBody {
+public:
+	CollisionBody();
+	~CollisionBody();
+};

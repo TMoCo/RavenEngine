@@ -1,17 +1,23 @@
 #include "RenderScene.h"
 
 #include "Engine.h"
-#include "RenderPrimitive.h"
-#include "RenderTerrain.h"
-#include "Render/RenderResource/RenderRscMaterial.h"
-#include "Render/RenderResource/RenderRscShader.h"
-#include "Render/RenderResource/RenderRscTerrain.h"
-#include "Render/OpenGL/GLShader.h"
+#include "Primitives/RenderPrimitive.h"
+#include "Primitives/RenderTerrain.h"
+#include "Primitives/RenderDebugPrimitive.h"
+#include "Primitives/RenderPrimitive.h"
+#include "Primitives/RenderMesh.h"
+#include "Primitives/RenderTerrain.h"
+#include "Render/RenderResource/Shader/RenderRscShader.h" 
+#include "Render/RenderResource/Shader/RenderRscMaterial.h"
+#include "Render/RenderResource/Shader/UniformBuffer.h"
+
+
 #include "Render/OpenGL/GLBuffer.h"
-#include "RenderDebugPrimitive.h"
-#include "RenderPrimitive.h"
-#include "RenderMesh.h"
-#include "RenderTerrain.h"
+#include "Render/OpenGL/GLShader.h"
+
+#include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/Resources/Material.h"
+
 
 #include "Core/Camera.h"
 #include "Scene/Scene.h"
@@ -23,12 +29,10 @@
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
-#include "Scene/Component/Model.h"
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "ResourceManager/Resources/Mesh.h"
 
 
 namespace Raven {
@@ -40,38 +44,20 @@ namespace Raven {
 struct TransformUBO
 {
 	glm::mat4 modelMatrix;
-	glm::mat4 viewMatrix;
-	glm::mat4 projectionMatrix;
-};
+	glm::mat4 normalMatrix;
+	glm::mat4 viewProjMatrix;
+} trData;
 
 
 struct LightingUBO
 {
-	// View
-	glm::vec4 viewDir;
-	glm::vec4 viewPos;
-
 	// Dir-Light
 	glm::vec4 lightDir;
 	glm::vec4 lightColor;
 	float lightPower;
-};
+} lightData;
 
 
-struct MaterialUBO
-{
-	glm::vec4 diffuse;
-	glm::vec4 specular;
-	glm::vec4 emission;
-	float shininess;
-	float ambient;
-	float alpha;
-};
-
-
-TransformUBO trData;
-LightingUBO lightData;
-MaterialUBO matData;
 // ~MinimalSolution --- ---- --- ---- --- ---- ---
 
 
@@ -81,6 +67,8 @@ MaterialUBO matData;
 RenderScene::RenderScene()
 	: trUBO(nullptr)
 	, lightingUBO(nullptr)
+	, commonUBO(nullptr)
+	, time(0.0f)
 {
 
 }
@@ -90,7 +78,7 @@ RenderScene::~RenderScene()
 {
 	delete trUBO;
 	delete lightingUBO;
-	delete materialUBO;
+	delete commonUBO;
 	delete defaultShader;
 	delete terrainMaterail;
 	delete terrainShader;
@@ -100,31 +88,41 @@ RenderScene::~RenderScene()
 
 void RenderScene::Setup()
 {
-	defaultShader = new RenderRscShader();
-	defaultShader->Load(ERenderShaderType::MaterialOpaque, "Default_Materail");
-	defaultMaterail = new RenderRscMaterial(defaultShader);
+	// Default Mesh
+	{
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::Opaque;
+		shaderData.name = "Default_Material";
 
-	terrainShader = new RenderRscShader();
-	terrainShader->Load(ERenderShaderType::Terrain, "Default_Terrain");
-	terrainMaterail = new RenderRscMaterial(terrainShader);
+		// Add Default Materail Function
+		shaderData.AddFunction(EGLShaderStageBit::FragmentBit, "shaders/Materials/DefaultMaterial.glsl");
+
+		defaultShader = RenderRscShader::Create(ERenderShaderDomain::Mesh, shaderData);
+		defaultShader->BindBlockInputs();
+		defaultShader->BindSamplers();
+
+		defaultMaterail = new RenderRscMaterial(defaultShader);
+	}
+
+	{
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::Opaque;
+		shaderData.name = "Terrain_Material";
+
+		// Add Terrain Materail Function
+
+		terrainShader = RenderRscShader::Create(ERenderShaderDomain::Terrain, shaderData);
+		terrainShader->BindBlockInputs();
+		terrainShader->BindSamplers();
+
+		terrainMaterail = new RenderRscMaterial(terrainShader);
+	}
 
 
 	// ~MinimalSolution --- ---- --- ---- --- ---- ---
-	trUBO = GLBuffer::Create(EGLBufferType::Uniform, sizeof(TransformUBO), EGLBufferUsage::DynamicDraw);
-	trUBO->BindBase(ShaderInput::TRANSFORM_BINDING);
-
-	lightingUBO = GLBuffer::Create(EGLBufferType::Uniform, sizeof(LightingUBO), EGLBufferUsage::DynamicDraw);
-	lightingUBO->BindBase(ShaderInput::LGHTING_BINDING);
-
-	materialUBO = GLBuffer::Create(EGLBufferType::Uniform, sizeof(MaterialUBO), EGLBufferUsage::DynamicDraw);
-	materialUBO->BindBase(2);
-
-	matData.diffuse = glm::vec4(0.7f);
-	matData.ambient = 0.05f;
-	matData.specular = glm::vec4(1.0f);
-	matData.shininess = 32.0f;
-	matData.emission = glm::vec4(0.0f);
-	matData.alpha = 1.0f;
+	commonUBO = UniformBuffer::Create(RenderShaderInput::CommonBlock);
+	trUBO = UniformBuffer::Create(RenderShaderInput::TransfromBlock);
+	lightingUBO = UniformBuffer::Create(RenderShaderInput::LightingBlock);
 	// ~MinimalSolution --- ---- --- ---- --- ---- ---
 
 
@@ -148,9 +146,8 @@ void RenderScene::Build(Scene* scene)
 		camTr = glm::inverse(view);
 	}
 
-	lightData.viewDir = glm::normalize(camTr  * glm::vec4(Raven::FORWARD, 0.0f));
-	lightData.viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
+	viewDir = glm::normalize(camTr  * glm::vec4(Raven::FORWARD, 0.0f));
+	viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Lights...
 	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
@@ -231,7 +228,7 @@ void RenderScene::TraverseScene(Scene* scene)
 
 
 	// Iterate over all Models in the scene.
-	// TODO: Culling should be here, for both the view and lights shadow frustums.
+	// TODO: Culling should be here, for both the view, lights, and shadow frustums.
 	for (auto entity : group)
 	{
 		const auto& [model, trans] = group.get<Model, Transform>(entity);
@@ -253,8 +250,23 @@ void RenderScene::TraverseScene(Scene* scene)
 			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
 			rmesh->SetMesh(mesh->renderRscMesh);
 
-			// TODO: Render with Model Materials...
-			rmesh->SetMaterial(defaultMaterail);
+			// Mesh Materail...
+			Material* meshMaterail = model.GetMaterial(i);
+
+			if (meshMaterail)
+			{
+				// Update Material Paramters if Dirty.
+				if (meshMaterail->IsDirty())
+				{
+					meshMaterail->Update();
+				}
+
+				rmesh->SetMaterial( meshMaterail->GetRenderRsc() );
+			}
+			else
+			{
+				rmesh->SetMaterial( defaultMaterail );
+			}
 
 			// Add to opaque...
 			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
@@ -284,25 +296,60 @@ void RenderScene::Draw(ERSceneBatch type)
 {
 	const RenderBatch& batch = GetBatch(type);
 
-	trData.modelMatrix = glm::mat4(1.0f);
-	trData.viewMatrix = view;
-	trData.projectionMatrix = projection;
-	trUBO->UpdateSubData(sizeof(TransformUBO), 0, &trData);
+	{
+		// Testing the Block..................................
+		int32_t inputIdx = commonUBO->GetInputIndex("viewDir");
+		commonUBO->UpdateData(
+			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
+			commonUBO->GetInputOffset(inputIdx),
+			glm::value_ptr(viewDir)
+		);
 
-	lightingUBO->UpdateSubData(sizeof(LightingUBO), 0, &lightData);
-	materialUBO->UpdateSubData(sizeof(MaterialUBO), 0, &matData);
+		inputIdx = commonUBO->GetInputIndex("viewPos");
+		commonUBO->UpdateData(
+			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
+			commonUBO->GetInputOffset(inputIdx),
+			glm::value_ptr(viewPos)
+		);
+
+		inputIdx = commonUBO->GetInputIndex("time");
+		commonUBO->UpdateData(
+			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
+			commonUBO->GetInputOffset(inputIdx),
+			&time
+		);
+
+		commonUBO->BindBase();
+	}
+
+
+
+	trData.modelMatrix = glm::mat4(1.0f);
+	trData.viewProjMatrix = projection * view;
+	trUBO->UpdateData(sizeof(TransformUBO), 0, &trData);
+	trUBO->BindBase();
+
+	lightingUBO->UpdateData(sizeof(LightingUBO), 0, &lightData);
+	lightingUBO->BindBase();
+
 
 	for (auto& prim : batch.elements)
 	{
+		// Transfromation...
+		trData.modelMatrix = prim->GetWorldMatrix();
+		trData.normalMatrix = prim->GetWorldMatrix();
+		trUBO->UpdateData( sizeof(glm::mat4) * 2, 0, &trData); // Model & Normal Matrix.
+
+		// Materail...
+		RenderRscMaterial* material = prim->GetMaterial();
+
+		if (material->HasMaterialData())
+		{
+			material->GetUniformBuffer()->BindBase();
+			material->UpdateUniformBuffer();
+		}
+
 		GLShader* shader = prim->GetMaterial()->GetShaderRsc()->GetShader();
-
-		// Model Matrix...
-		trUBO->UpdateSubData(
-			sizeof(glm::mat4), 
-			offsetof(TransformUBO, modelMatrix), 
-			glm::value_ptr(prim->GetWorldMatrix())
-		);
-
 		shader->Use();
 		prim->Draw(shader);
 	}

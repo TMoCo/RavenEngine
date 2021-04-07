@@ -23,8 +23,10 @@ namespace Raven
 	class RenderDebug;
 	class Scene;
 	class RenderTarget;
-	class Camera;
 	class Transform;
+
+
+
 	// RenderModule:
 	//		- The Engine Render Manager.
 	//
@@ -80,13 +82,13 @@ namespace Raven
 		bool isRendering;
 
 		// 
-		std::shared_ptr<RenderScene> rscene;
+		Ptr<RenderScene> rscene;
 
 		// Render Debug, used for debug drawing.
-		std::unique_ptr<RenderDebug> rdebug;
+		Ptr<RenderDebug> rdebug;
 
 		// The Render Target we draw our scene on.
-		std::shared_ptr<RenderTarget> rtScene;
+		Ptr<RenderTarget> rtScene;
 
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;

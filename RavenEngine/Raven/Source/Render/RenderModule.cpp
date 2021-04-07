@@ -8,11 +8,6 @@
 #include "RenderTarget.h"
 
 #include "RenderObjects/RenderScene.h"
-#include "Render/RenderObjects/RenderTerrain.h"
-#include "Render/RenderResource/RenderRscTerrain.h"
-#include "Render/RenderResource/RenderRscMaterial.h"
-#include "Render/RenderResource/RenderRscShader.h"
-#include "Render/RenderObjects/RenderTerrain.h"
 
 
 #include "OpenGL/GLShader.h"
@@ -167,11 +162,16 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 
 	// ~TESTING-------------------------------------------------------
-	//glm::mat4 view = glm::mat4(1.f);
+#if 1
 	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 1000.0f, 
 		glm::vec3(500.0f, 0.0f, 500.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
 	
+#else
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
+#endif
+
 	rscene->SetView(view);
 	rscene->SetProjection(proj);
 
@@ -182,6 +182,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 	// Build Render Data form the scene...
 	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );
 	rscene->Build(scene);
+	rscene->SetTime(Engine::Get().GetEngineTime());
 }
 
 

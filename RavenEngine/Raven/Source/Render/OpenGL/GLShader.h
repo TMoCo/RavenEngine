@@ -29,8 +29,8 @@ namespace Raven
 	// Code for a specific shader stage, could be code or file.
 	struct GLShaderCode
 	{
-		// The shader stage this code belongs to.
-		EGLShaderStage stage;
+		// The shader stages this code belongs to.
+		EGLShaderStageBit stages;
 
 		// The source or a path to the shader source file.
 		std::string src;
@@ -71,14 +71,14 @@ namespace Raven
 		void SetSourceFile(EGLShaderStage stage, const std::string& src);
 
 		// Add extra code to the shader. 
-		void AddExSource(const std::string& tag, EGLShaderStage stage, const std::string& src);
-		void AddExSourceFile(const std::string& tag, EGLShaderStage stage, const std::string& src);
+		void AddExSource(uint32_t sortTag, EGLShaderStageBit stages, const std::string& src);
+		void AddExSourceFile(uint32_t sortTag, EGLShaderStageBit stages, const std::string& src);
 
 		// Remove the main source of a specific shader stage.
-		void RemoveExSource(EGLShaderStage stage);
+		void RemoveSource(EGLShaderStage stage);
 
 		// Remove extra code previously added. 
-		void RemoveExSource(const std::string& tag);
+		void RemoveExSource(uint32_t sortTag);
 
 		// Add preprocessor definition to the shader sources.
 		void AddPreprocessor(const std::string& def);
@@ -91,6 +91,20 @@ namespace Raven
 
 		// Use this shader's program. Make it the current one.
 		void Use();
+
+		// Convert a stage type to matching string name.
+		static std::string ToString(EGLShaderStage stage);
+
+	private:
+		// Convert a stage to its corresponding stage bit.
+		static EGLShaderStageBit ToStageBit(EGLShaderStage stage);
+
+		// Return true if the shader bit has a specific stage in it.
+		inline static bool HasStage(EGLShaderStageBit stages, EGLShaderStage stage)
+		{
+			auto stageBit = ToStageBit(stage);
+			return (stages & stageBit) == stageBit;
+		}
 
 	public:
 		// Set a Uniform value.
@@ -128,7 +142,7 @@ namespace Raven
 		std::map<EGLShaderStage, GLShaderCode> source;
 
 		// Extra code that will be embedded into the shader.
-		std::map<std::string, GLShaderCode> exSource;
+		std::map<uint32_t, GLShaderCode> exSource;
 
 		// Preprocessor that will be added at the beggining of the main source file
 		// for example "#define COMPUTE_MATERIAL 0"

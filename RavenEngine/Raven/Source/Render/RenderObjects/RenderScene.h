@@ -15,9 +15,8 @@ namespace Raven
 {
 	class RenderPrimitive;
 	class RenderTerrain;
+	class UniformBuffer;
 	class Scene;
-
-	class GLBuffer;
 
 
 
@@ -70,6 +69,9 @@ namespace Raven
 		// Return true if the batch is empty.
 		inline bool IsEmpty(ERSceneBatch batch) { return batches[(uint32_t)batch].IsEmpty(); }
 
+		// Set application time to be used while rendering.
+		inline void SetTime(float val) { time = val; }
+
 	private:
 		//
 		void TraverseScene(Scene* scene);
@@ -90,7 +92,7 @@ namespace Raven
 
 
 	private:
-		// Render Scene Batches.
+		// The main render batches of the scene.
 		RenderBatch batches[3];
 
 		// Main View
@@ -102,10 +104,19 @@ namespace Raven
 		// Dynamic Primitives Container.
 		std::vector<RenderPrimitive*> dynamicPrimitive;
 
+		//
+		glm::vec3 viewDir;
+
+		//
+		glm::vec3 viewPos;
+
+		//
+		float time;
+
 		// ~MinimalSolution --- ---- --- ---- --- ---- ---
-		GLBuffer* trUBO;
-		GLBuffer* lightingUBO;
-		GLBuffer* materialUBO;
+		UniformBuffer* commonUBO;
+		UniformBuffer* trUBO;
+		UniformBuffer* lightingUBO;
 		// ~MinimalSolution --- ---- --- ---- --- ---- ---
 
 		// If primitives does not have materials, we use this one.

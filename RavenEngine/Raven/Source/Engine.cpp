@@ -25,11 +25,18 @@
 #include "Scene/System/SystemManager.h"
 #include "Scene/System/GUISystem.h"
 #include "Scene/Component/TerrainComponent.h"
+#include "Scene/Component/Model.h"
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Light.h"
 #include "Scene/Entity/Entity.h"
 
 #include "GUI/GUIModule.h"
 
 #include "ProceduralGenerator/TerrainGeneration.h"
+#include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/Resources/MaterialShader.h"
+#include "ResourceManager/Resources/Material.h"
+
 
 #include "Devices/Input.h"
 
@@ -39,6 +46,7 @@
 namespace Raven 
 {
 	Engine::Engine()
+		: engineTime(0.0f)
 	{
 
 	}
@@ -64,8 +72,6 @@ namespace Raven
 
 	int Engine::Run()
 	{
-		static double enginetime = 0;
-
 		auto win = GetModule<Raven::Window>();
 
 		// Main Loop...
@@ -81,8 +87,8 @@ namespace Raven
 			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			//time could be refactor with chrono
-			double dt = glfwGetTime() - enginetime;
-			enginetime = glfwGetTime();
+			double dt = glfwGetTime() - engineTime;
+			engineTime = glfwGetTime();
 
 			GetModule<Raven::SceneManager>()->Apply();
 
@@ -213,11 +219,86 @@ namespace Raven
 		Scene* newScene = new Scene("TerrainScene");
 		newScene->dynamic = true;
 
-		auto entity = newScene->CreateEntity("terrain");
-		entity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
+		auto terrainEntity = newScene->CreateEntity("terrain");
+		terrainEntity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
 
+		auto& lightEntity = newScene->CreateEntity("sun");
+		auto& lightComp = lightEntity.GetOrAddComponent<Light>();
+		lightComp.type = (int32_t)LightType::DirectionalLight;
+		lightComp.direction = glm::normalize(glm::vec3(-1.0f));
+		lightComp.intensity = 1.0f;
+
+
+		// Basic Material...
+		Ptr<MaterialShader> basicMatShader( new MaterialShader() );
+		basicMatShader->SetDomain(ERenderShaderDomain::Mesh);
+		basicMatShader->SetType(ERenderShaderType::Opaque);
+		basicMatShader->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
+		basicMatShader->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
+		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
+		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
+		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
+		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
+		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
+		basicMatShader->GetBlockInput().EndUniformBlock();
+		basicMatShader->AddSampler("colorTexture");
+		basicMatShader->LoadOnGpu();
+
+
+		glm::vec4 randomColors[8] = {
+			glm::vec4(0.0f, 0.0f, 0.0f, 1.0),
+			glm::vec4(1.0f, 1.0f, 1.0f, 1.0),
+			glm::vec4(1.0f, 0.0f, 0.0f, 1.0),
+			glm::vec4(0.0f, 1.0f, 0.0f, 1.0),
+			glm::vec4(0.0f, 0.0f, 1.0f, 1.0),
+			glm::vec4(0.0f, 1.0f, 1.0f, 1.0),
+			glm::vec4(1.0f, 0.0f, 1.0f, 1.0),
+			glm::vec4(1.0f, 1.0f, 0.0f, 1.0),
+		};
+
+
+		//
+		int res = 25;
+		glm::vec2 size(1000.0f);
+		Ptr<Mesh> sphereMesh(MeshFactory::CreateSphere());
+
+		for (int32_t x = 0; x < res; ++x)
+		{
+			for (int32_t y = 0; y < res; ++y)
+			{
+				float fx = (float)x / (float)(res - 1);
+				float fy = (float)y / (float)(res - 1);
+
+				//
+				glm::vec3 pos = glm::vec3(size.x * fx, 100.0f, size.y * fy);
+
+				auto meshEntity = newScene->CreateEntity("Model_" + std::to_string(x+y*res));
+				auto& tr = meshEntity.GetOrAddComponent<Transform>();
+				tr.SetLocalPosition(pos);
+				tr.SetLocalScale(glm::vec3(10.0f));
+
+
+				Ptr<Material> basicMat(new Material(basicMatShader));
+				basicMat->SetColor("color", randomColors[rand() % 8]);
+
+				glm::vec4 matColor;
+				basicMat->GetColor("color", matColor);
+
+				basicMat->SetColor("emission", matColor);
+				basicMat->SetScalar("roughness", 0.0f);
+				basicMat->SetScalar("metallic", 0.0f);
+				basicMat->SetScalar("specular", 1.0f);
+				basicMat->LoadOnGpu();
+
+				auto& model = meshEntity.GetOrAddComponent<Model>();
+				model.AddMesh(sphereMesh);
+				model.SetMaterial(0, basicMat);
+			}
+		}
+
+
+		// Switch the scene....
 		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
 		GetModule<SceneManager>()->SwitchScene(sceneIdx);
-
 	}
 };

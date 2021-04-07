@@ -49,7 +49,7 @@ namespace Raven
 			{
 				// load the height map data
 				renderRscTerrain->LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
-				renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), 200.0f, -50.0f);
+				renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), -50.0f, 200.0f);
 				onGPU = true;
 			}
 		}

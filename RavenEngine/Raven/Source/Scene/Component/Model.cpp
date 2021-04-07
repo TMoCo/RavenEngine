@@ -47,15 +47,37 @@ namespace Raven
 		}
 	}
 
-	void Model::AddMesh(Mesh* mesh)
+	void Model::AddMesh(Ptr<Mesh> mesh)
 	{
-		meshes.emplace_back(std::shared_ptr<Mesh>(mesh));
+		meshes.emplace_back(mesh);
 	}
 
-	void Model::AddMeshes(const std::vector<std::shared_ptr<Mesh>> & inputMeshes)
+	void Model::AddMeshes(const std::vector< Ptr<Mesh> > & inputMeshes)
 	{
 		// for multiple meshes
 		meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
+	}
+
+	void Model::SetMaterial(uint32_t index, Ptr<Material> mat)
+	{
+		if (materials.size() < index + 1)
+			materials.resize(index + 1);
+
+		materials[index] = mat;
+	}
+
+	Material* Model::GetMaterial(uint32_t index)
+	{
+		// Invalid Index?
+		if (index >= materials.size() || index < 0)
+			return nullptr;
+
+		return materials[index].get();
+	}
+
+	const Material* Model::GetMaterial(uint32_t index) const
+	{
+		return const_cast<Model*>(this)->GetMaterial(index);
 	}
 
 	void Model::LoadFile()

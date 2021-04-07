@@ -80,6 +80,10 @@ namespace Raven
 		// 
 		void NewGameScene();
 
+		// Return current engine time.
+		inline float GetEngineTime() const { return engineTime; }
+
+
 	protected:
 		virtual void OnImGui();
 		virtual void OnUpdate(float dt);
@@ -133,6 +137,8 @@ namespace Raven
 
 		bool sceneActive = false;
 
+		// Engine Time since it started.
+		double engineTime;
 	};
 };
 

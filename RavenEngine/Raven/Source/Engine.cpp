@@ -27,6 +27,8 @@
 #include "Scene/Component/TerrainComponent.h"
 #include "Scene/Entity/Entity.h"
 
+#include "Physics/PhysicsModule.h"
+
 #include "GUI/GUIModule.h"
 
 #include "ProceduralGenerator/TerrainGeneration.h"
@@ -144,6 +146,7 @@ namespace Raven
 		CreateModule<Raven::SceneManager>();
 		CreateModule<Raven::GUIModule>();
 		CreateModule<Raven::TerrainGeneration>();
+		CreateModule<Raven::PhysicsModule>();
 
 		Input::Create();
 

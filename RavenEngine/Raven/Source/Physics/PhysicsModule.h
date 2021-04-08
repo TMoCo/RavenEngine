@@ -25,10 +25,10 @@ namespace Raven
 		virtual void Initialize() override;
 		virtual void Destroy() override;
 
-		// when we want to update the physics world
-		void Step(float deltaTime);
-
 		static EModuleType GetModuleType() { return EModuleType::MT_Physics; }
+		
+		// update the physics world
+		void Step(float deltaTime);
 
 	private:
 		// singleton class for physics library's memory allocation etc

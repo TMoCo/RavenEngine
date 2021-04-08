@@ -4,25 +4,51 @@
 
 #include <rp3d/include/reactphysics3d/mathematics/Vector3.h> 
 
-#include "Scene/Component/Collider.h"
+#include "Engine.h"
+
+#include "Physics/PhysicsModule.h"
+#include "Physics/Collider.h"
 
 namespace Raven
 {
-	Collider::Collider(rp3d::PhysicsWorld* initWorld)
+	//
+	// Collider base class
+	//
+
+	Collider::Collider(ColliderPrimitive::Type shapeType) :
+		type(shapeType),							   // When creating a new collider, specify the type
+		relativeTransform(rp3d::Transform::identity()) // initialise the relative transform to the identity matrix
+	{}
+
+	// when removing the collider
+	Collider::~Collider()
 	{
-		world = std::make_shared<rp3d::PhysicsWorld>(initWorld);
-		// attempt to add a collider to the component on creation
+		// takes care of deleting the data for us
+		body->removeCollider(collider);
+	}
+
+	void Collider::SetBody(rp3d::CollisionBody* parentBody)
+	{
+		body = parentBody;
 	}
 
 	void Collider::SetTransform(const Transform& transform)
 	{
-
+		relativeTransform = ToRp3d::ToRp3dTransform(transform);
 	}
 
-	void Collider::SetShapeType(ColliderPrimitive::Type shapeType)
-	{
-		type = shapeType;
-	}
+	//
+	// Box collider class
+	//
+
+	BoxCollider::BoxCollider() : 
+		Collider(ColliderPrimitive::Box)
+	{}
+
+
+	//
+	// Collider shape factory
+	//
 
 	namespace ColliderShapeFactory
 	{
@@ -72,6 +98,10 @@ namespace Raven
 			);
 		}
 	}
+
+	//
+	// Collider shape primitives
+	//
 
 	namespace ColliderPrimitive
 	{

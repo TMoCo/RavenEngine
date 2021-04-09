@@ -2,110 +2,54 @@
     "value0": {
         "SceneName": "default"
     },
-    "value1": 6,
-    "value2": 2097152,
+    "value1": 4,
+    "value2": 0,
     "value3": 1,
     "value4": 2,
     "value5": 3,
-    "value6": 4,
-    "value7": 5,
-    "value8": 6,
+    "value6": 3,
+    "value7": 0,
+    "value8": {
+        "Position": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        }
+    },
     "value9": 1,
     "value10": {
         "Position": {
-            "value0": 6.061657131795073e-7,
-            "value1": -1.6548724174499512,
-            "value2": 1.9446909427642823
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
         },
         "Rotation": {
             "value0": 0.0,
-            "value1": -0.0,
-            "value2": 0.29100126028060915
+            "value1": 0.0,
+            "value2": 0.0
         },
         "Scale": {
-            "value0": 1.0000007152557374,
-            "value1": 1.0000007152557374,
+            "value0": 1.0,
+            "value1": 1.0,
             "value2": 1.0
         }
     },
-    "value11": 2097152,
+    "value11": 2,
     "value12": {
         "Position": {
             "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": -0.9835665822029114,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0000007152557374,
-            "value1": 1.0,
-            "value2": 1.0000007152557374
-        }
-    },
-    "value13": 2,
-    "value14": {
-        "Position": {
-            "value0": 0.1580737829208374,
-            "value1": 0.5812418460845947,
-            "value2": 2.282174587249756
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": -0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.149999976158142,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value15": 3,
-    "value16": {
-        "Position": {
-            "value0": 0.0,
-            "value1": 0.6624006032943726,
-            "value2": -1.1623176336288453
-        },
-        "Rotation": {
-            "value0": -1.5760324001312256,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value17": 4,
-    "value18": {
-        "Position": {
-            "value0": 0.0,
-            "value1": -1.6508461236953736,
-            "value2": -1.024407982826233
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": -0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value19": 5,
-    "value20": {
-        "Position": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
+            "value1": 0.550000011920929,
+            "value2": 14.25
         },
         "Rotation": {
             "value0": 0.0,
@@ -118,83 +62,73 @@
             "value2": 1.0
         }
     },
-    "value21": 6,
-    "value22": 1,
-    "value23": {
-        "Name": "Model2222"
-    },
-    "value24": 2097152,
-    "value25": {
-        "Name": "Light"
-    },
-    "value26": 2,
-    "value27": {
-        "Name": "Sphere"
-    },
-    "value28": 3,
-    "value29": {
-        "Name": "Pyramid"
-    },
-    "value30": 4,
-    "value31": {
-        "Name": "Empty Entity"
-    },
-    "value32": 5,
-    "value33": {
+    "value13": 4,
+    "value14": 0,
+    "value15": {
         "Name": "Model"
     },
-    "value34": 0,
-    "value35": 0,
-    "value36": 0,
-    "value37": 1,
-    "value38": 2097152,
-    "value39": {
+    "value16": 1,
+    "value17": {
+        "Name": "Light"
+    },
+    "value18": 2,
+    "value19": {
+        "Name": "Camera"
+    },
+    "value20": 3,
+    "value21": {
+        "Name": "Empty Entity"
+    },
+    "value22": 0,
+    "value23": 0,
+    "value24": 1,
+    "value25": 2,
+    "value26": {
+        "Scale": 1.0,
+        "Aspect": 1.3333333730697632,
+        "FOV": 45.0,
+        "Near": 0.009999999776482582,
+        "Far": 100.0
+    },
+    "value27": 1,
+    "value28": 1,
+    "value29": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
             "value2": 0.0
         },
         "value1": {
-            "value0": 0.03966914489865303,
-            "value1": 0.8021978139877319,
-            "value2": 0.8021978139877319,
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0,
             "value3": 1.0
         },
         "value2": 0,
         "value3": 0.0,
         "value4": {
-            "value0": -0.9169999957084656,
-            "value1": -0.25,
-            "value2": -0.16699999570846559
+            "value0": 0.28600001335144045,
+            "value1": -1.0,
+            "value2": -1.0
         },
         "value5": 1.0,
         "value6": 1.0
     },
-    "value40": 0,
-    "value41": 5,
-    "value42": 1,
-    "value43": {
+    "value30": 1,
+    "value31": 2,
+    "value32": {
+        "ControllerType": 1
+    },
+    "value33": 1,
+    "value34": 0,
+    "value35": {
         "PrimitiveType": 2,
         "FilePath": ""
     },
-    "value44": 2,
-    "value45": {
-        "PrimitiveType": 5,
-        "FilePath": ""
-    },
-    "value46": 3,
-    "value47": {
-        "PrimitiveType": 3,
-        "FilePath": ""
-    },
-    "value48": 4,
-    "value49": {
-        "PrimitiveType": 6,
-        "FilePath": ""
-    },
-    "value50": 5,
-    "value51": {
-        "PrimitiveType": 8,
-        "FilePath": ".\\assets\\models\\deer.obj"
+    "value36": 1,
+    "value37": 0,
+    "value38": {
+        "FilePath": "./scripts/Test.lua",
+        "Parent": 0
     }
 }

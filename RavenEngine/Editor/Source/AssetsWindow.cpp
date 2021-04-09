@@ -237,8 +237,10 @@ namespace Raven
 
 			else
 			{
-				LOGW("Open File {0} did not implementation {1}", currentDir[dirIndex].absolutePath,__FUNCTION__);
+				//LOGW("Open File {0} did not implementation {1}", currentDir[dirIndex].absolutePath,__FUNCTION__);
 				//openFile
+				editor.OpenFile(currentDir[dirIndex].absolutePath);
+
 			}
 		}
 
@@ -248,8 +250,8 @@ namespace Raven
 
 			ImGui::SameLine();
 			ImGui::TextUnformatted(currentDir[dirIndex].fileName.c_str());
-			size_t size = sizeof(const char*) + strlen(currentDir[dirIndex].absolutePath.c_str());
-			ImGui::SetDragDropPayload("AssetFile", currentDir[dirIndex].absolutePath.c_str(), size);
+			size_t size = currentDir[dirIndex].absolutePath.length();
+			ImGui::SetDragDropPayload("AssetFile", currentDir[dirIndex].absolutePath.c_str(), size + 1);
 			isDragging = true;
 			ImGui::EndDragDropSource();
 		}

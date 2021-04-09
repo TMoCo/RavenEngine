@@ -41,6 +41,8 @@ project "RavenEngine"
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.rp3d}"
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	sysincludedirs
@@ -56,6 +58,8 @@ project "RavenEngine"
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.rp3d}"
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	links
@@ -113,7 +117,7 @@ project "RavenEngine"
 
 		links
 		{
-			"glfw","glew32"
+			"glfw","glew32","lua"
 		}
 
 		buildoptions

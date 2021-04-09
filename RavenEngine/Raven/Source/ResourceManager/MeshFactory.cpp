@@ -713,6 +713,9 @@ namespace Raven
 
 	std::string PrimitiveType::GetPrimativeName(PrimitiveType::Id type)
 	{
+		if (type >= NAMES.size() || type < 0){
+			return "";
+		}
 		return NAMES[(uint32_t)type];
 	};
 

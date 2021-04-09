@@ -34,6 +34,9 @@
 #include "ProceduralGenerator/TerrainGeneration.h"
 
 #include "Devices/Input.h"
+#include "Scripts/LuaSystem.h"
+
+#include "Scripts/LuaVirtualMachine.h"
 
 
 namespace Raven 
@@ -140,6 +143,7 @@ namespace Raven
 		systemManager = std::make_unique<SystemManager>();
 
 		CreateModule<Raven::ResourceManager>();
+		CreateModule<Raven::LuaVirtualMachine>();
 		CreateModule<Raven::RenderModule>();
 		CreateModule<Raven::ImGuiEngine>();
 		CreateModule<Raven::Window>("Raven");
@@ -152,6 +156,7 @@ namespace Raven
 
 		// Initialize - Here order matter.
 		InitializeModule<Raven::Window>();
+		InitializeModule<Raven::LuaVirtualMachine>();
 		InitializeModule<Raven::ResourceManager>();
 		InitializeModule<Raven::RenderModule>();
 		InitializeModule<Raven::ImGuiEngine>();
@@ -162,6 +167,7 @@ namespace Raven
 //############	Register your system here ######################
 
 		auto guiSystem = GetSystemManager()->AddSystem<GUISystem>();
+		GetSystemManager()->AddSystem<LuaSystem>();
 		guiSystem->OnInit();
 	
 //############	Register your system here ######################
@@ -178,6 +184,7 @@ namespace Raven
 		DestroyModule<ImGuiEngine>();
 		DestroyModule<ResourceManager>();
 		DestroyModule<Window>();
+		DestroyModule<LuaVirtualMachine>();
 	}
 
 	std::future<bool> Engine::Post(const std::function<bool()>& callback)

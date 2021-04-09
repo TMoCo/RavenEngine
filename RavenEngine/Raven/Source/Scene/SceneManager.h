@@ -59,7 +59,7 @@ namespace Raven
 		static auto GetModuleType() { return MT_SceneManager; }
 
 	protected:
-		uint32_t sceneIdx = -1;
+		uint32_t sceneIdx = 0;
 		Scene* currentScene = nullptr;
 		std::vector<std::shared_ptr<Scene>> allScenes;
 		std::vector<std::string> sceneFilePaths;

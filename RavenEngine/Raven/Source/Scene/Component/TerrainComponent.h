@@ -48,7 +48,7 @@ namespace Raven
 		{
 			std::vector<std::string> paths;
 			// load the paths for terrain height map and textures from the serialized file
-			archive(cerreal::make_nvp("HeightMap"), heightMapPath, cereal::make_nvp("Textures"), paths);
+			archive(cereal::make_nvp("HeightMap"), heightMapPath, cereal::make_nvp("Textures"), paths);
 			// now load the data 
 			LoadHeightMap(heightMapPath);
 			for (auto& path : paths)

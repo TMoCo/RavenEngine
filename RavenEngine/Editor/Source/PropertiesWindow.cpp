@@ -6,11 +6,13 @@
 #include "PropertiesWindow.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
+#include "Scene/Entity/Entity.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/CameraControllerComponent.h"
+#include "Scripts/LuaComponent.h"
 
 #include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
@@ -21,6 +23,11 @@
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "Engine.h"
+#include "Utilities/StringUtils.h"
+
+#include <filesystem>
+#include "HierarchyWindow.h"
+
 
 
 namespace MM 
@@ -86,7 +93,59 @@ namespace MM
 	void ComponentEditorWidget<Light>(entt::registry& reg, entt::registry::entity_type e)
 	{
 		auto& light = reg.get<Light>(e);
+	
+
 		light.OnImGui();
+	}
+
+	template<>
+	void ComponentEditorWidget<LuaComponent>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& lua = reg.get<LuaComponent>(e);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::PushItemWidth(-1);
+		
+		if (ImGui::BeginCombo("", lua.GetFileName().c_str(), 0))
+		{
+
+			for (const auto& entry : std::filesystem::directory_iterator("./scripts/"))
+			{
+				
+				if (!StringUtils::IsLuaFile(entry.path().string()))
+				{
+					continue;
+				}
+
+				bool isDir = std::filesystem::is_directory(entry);
+				auto isSelected = StringUtils::GetFileName(lua.GetFileName()) == StringUtils::GetFileName(entry.path().string());
+
+				if (!isDir && !isSelected)
+				{
+					if (ImGui::Selectable(entry.path().string().c_str()))
+					{
+						lua.SetFilePath(entry.path().string());
+					}
+				}
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+
+			}
+			ImGui::EndCombo();
+		}
+		ImGui::NextColumn();
+		//ImGui::PushItemWidth(-1);
+		if (ImGui::Button(lua.IsLoaded() ? "Reload" : "Load"))
+		{
+			lua.Reload();
+		}
+		ImGui::PopItemWidth();
+		ImGui::Columns(1);
+		ImGui::PopStyleVar();
+
+		lua.OnImGui();
+
+		
 	}
 
 	template<>
@@ -267,6 +326,8 @@ namespace Raven
 		auto& editor = static_cast<Editor&>(Engine::Get());
 
 		auto& registry = editor.GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+
+
 		auto selected = editor.GetSelected();
 
 		if (ImGui::Begin(title.c_str(), &active))
@@ -276,6 +337,7 @@ namespace Raven
 				ImGui::End();
 				return;
 			}
+
 
 			auto activeComponent = registry.try_get<ActiveComponent>(selected);
 			bool active = activeComponent ? activeComponent->active : true;
@@ -305,7 +367,27 @@ namespace Raven
 
 			ImGui::Separator();
 
-			enttEditor.RenderImGui(registry, selected);
+			//enttEditor.RenderImGui(registry, selected);
+			enttEditor.renderEditor(registry, selected);
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				auto data = ImGui::AcceptDragDropPayload("AssetFile", ImGuiDragDropFlags_None);
+				if (data)
+				{
+					std::string file = (char*)data->Data;
+					if (StringUtils::IsLuaFile(file))
+					{
+						auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
+						auto name = StringUtils::GetFileName(file);
+						registry.emplace<LuaComponent>(selected, selected, file, scene);
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+
+		
+
 		}
 		ImGui::End();
 	}
@@ -334,6 +416,7 @@ namespace Raven
 		TRIVIAL_COMPONENT(Camera);
 		TRIVIAL_COMPONENT(Model);
 		TRIVIAL_COMPONENT(CameraControllerComponent);
+		TRIVIAL_COMPONENT(LuaComponent);
 		init = true;
 	}
 

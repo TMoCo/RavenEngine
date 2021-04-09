@@ -19,6 +19,7 @@ namespace ImGuiHelper
 	void Tooltip(const char * str);
 
 	bool Property(const std::string& name, bool& value);
+	bool Property(const std::string& name, std::string & value);
 	bool Property(const std::string& name, float& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
 	bool Property(const std::string& name, glm::vec2& value, PropertyFlag flags);
 	bool Property(const std::string& name, glm::vec2& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);

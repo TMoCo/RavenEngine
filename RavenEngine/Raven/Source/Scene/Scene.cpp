@@ -11,6 +11,7 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/Model.h"
+#include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"
 
 #include "Utilities/StringUtils.h"
@@ -30,7 +31,7 @@ namespace Raven {
 	Scene::Scene(const std::string& initName)
 		:name(initName)
 	{
-		LOGV("{0}", __FUNCTION__);
+		LOGV("{0} {1}", __FUNCTION__,initName);
 		entityManager = std::make_shared<EntityManager>(this);
 
 		entityManager->AddDependency<Camera, Transform>();
@@ -52,7 +53,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -180,7 +181,7 @@ namespace Raven {
 		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
 		if ((!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play) || forceShow)
 		{
-			Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
+			Camera& sceneCam = camsEttView.Front().GetComponent<Camera>();
 			return &sceneCam;
 		}
 
@@ -212,6 +213,13 @@ namespace Raven {
 		{
 			initCallback(this);
 		}
+		auto view = GetRegistry().view<LuaComponent>();
+		for (auto v : view)
+		{
+			auto& lua = GetRegistry().get<LuaComponent>(v);
+			lua.OnInit();
+		}
+
 	}
 
 	void Scene::OnClean()

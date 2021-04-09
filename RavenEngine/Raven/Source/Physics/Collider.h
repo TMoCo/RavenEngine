@@ -53,7 +53,7 @@ namespace Raven
 	}
 
 	// collider shape factory, needs access to the physics common object from physics module
-	namespace ColliderFactory
+	namespace ColliderShapeFactory
 	{
 		rp3d::CollisionShape* CreateCollisionShape(rp3d::PhysicsCommon* physicsCommon, ColliderPrimitive::Type type);
 		rp3d::CollisionShape* CreateBoxShape      (rp3d::PhysicsCommon* physicsCommon, rp3d::Vector3 extent = rp3d::Vector3(1.0f, 1.0f, 1.0f));

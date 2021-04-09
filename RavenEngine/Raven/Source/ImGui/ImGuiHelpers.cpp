@@ -33,7 +33,6 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
-
 		return updated;
 	}
 
@@ -50,6 +49,7 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
+
 
 		return updated;
 	}
@@ -155,6 +155,28 @@ namespace ImGuiHelper
 		{
 			if (ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max))
 				updated = true;
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		return updated;
+	}
+
+	bool Property(const std::string& name, std::string& value)
+	{
+		bool updated = false;
+		ImGui::TextUnformatted(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		static char obj[256] = {};
+		strcpy(obj, value.c_str());
+		if (ImGui::InputText(id.c_str(), obj, 256)) 
+		{
+			updated = true;
+			value = obj;
 		}
 
 		ImGui::PopItemWidth();

@@ -1,20 +1,75 @@
 {
     "value0": {
-        "SceneName": "deer2"
+        "SceneName": "default22222"
     },
-    "value1": 5,
-    "value2": 2097152,
+    "value1": 6,
+    "value2": 0,
     "value3": 1,
     "value4": 2,
     "value5": 3,
-    "value6": 1048580,
+    "value6": 2097151,
     "value7": 5,
-    "value8": 1,
-    "value9": {
+    "value8": 4,
+    "value9": 0,
+    "value10": {
         "Position": {
             "value0": 0.0,
-            "value1": -1.6548752784729005,
-            "value2": 1.9446921348571778
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        }
+    },
+    "value11": 1,
+    "value12": {
+        "Position": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        }
+    },
+    "value13": 2,
+    "value14": {
+        "Position": {
+            "value0": 6.045249938964844,
+            "value1": 7.702093124389648,
+            "value2": 0.5890412330627441
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": -0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 0.9999945163726807,
+            "value1": 0.9999964833259583,
+            "value2": 1.0000007152557374
+        }
+    },
+    "value15": 5,
+    "value16": {
+        "Position": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": -22.968482971191408
         },
         "Rotation": {
             "value0": 0.0,
@@ -27,146 +82,86 @@
             "value2": 1.0
         }
     },
-    "value10": 2097152,
-    "value11": {
-        "Position": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value12": 2,
-    "value13": {
-        "Position": {
-            "value0": 0.1580737829208374,
-            "value1": 0.5812418460845947,
-            "value2": 2.282174587249756
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": -0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value14": 3,
-    "value15": {
-        "Position": {
-            "value0": 0.0,
-            "value1": 0.6624006032943726,
-            "value2": -1.1623176336288453
-        },
-        "Rotation": {
-            "value0": -1.5760324001312256,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        }
-    },
-    "value16": 1048580,
-    "value17": {
-        "Position": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 0.05000000074505806,
-            "value1": 0.05000000074505806,
-            "value2": 0.05000000074505806
-        }
-    },
-    "value18": 5,
-    "value19": 1,
-    "value20": {
-        "Name": "Model2222"
-    },
-    "value21": 2097152,
-    "value22": {
-        "Name": "Light"
-    },
-    "value23": 2,
-    "value24": {
-        "Name": "Sphere"
-    },
-    "value25": 3,
-    "value26": {
-        "Name": "Pyramid"
-    },
-    "value27": 1048580,
-    "value28": {
+    "value17": 5,
+    "value18": 0,
+    "value19": {
         "Name": "Model"
     },
+    "value20": 1,
+    "value21": {
+        "Name": "Light"
+    },
+    "value22": 2,
+    "value23": {
+        "Name": "Camera"
+    },
+    "value24": 3,
+    "value25": {
+        "Name": "Empty Entity"
+    },
+    "value26": 5,
+    "value27": {
+        "Name": "Model"
+    },
+    "value28": 0,
     "value29": 0,
-    "value30": 0,
-    "value31": 0,
-    "value32": 1,
-    "value33": 2097152,
-    "value34": {
+    "value30": 1,
+    "value31": 2,
+    "value32": {
+        "Scale": 1.0,
+        "Aspect": 1.3333333730697632,
+        "FOV": 45.0,
+        "Near": 0.009999999776482582,
+        "Far": 100.0
+    },
+    "value33": 1,
+    "value34": 1,
+    "value35": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
             "value2": 0.0
         },
         "value1": {
-            "value0": 0.03966914489865303,
-            "value1": 0.8021978139877319,
-            "value2": 0.8021978139877319,
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0,
             "value3": 1.0
         },
         "value2": 0,
         "value3": 0.0,
         "value4": {
-            "value0": 0.5289999842643738,
+            "value0": 0.28600001335144045,
             "value1": -1.0,
-            "value2": 0.0
+            "value2": -1.0
         },
         "value5": 1.0,
         "value6": 1.0
     },
-    "value35": 0,
-    "value36": 4,
-    "value37": 1,
+    "value36": 2,
+    "value37": 2,
     "value38": {
+        "ControllerType": 1
+    },
+    "value39": 5,
+    "value40": {
+        "ControllerType": 1
+    },
+    "value41": 2,
+    "value42": 0,
+    "value43": {
         "PrimitiveType": 2,
         "FilePath": ""
     },
-    "value39": 2,
-    "value40": {
-        "PrimitiveType": 4,
-        "FilePath": ""
-    },
-    "value41": 3,
-    "value42": {
-        "PrimitiveType": 3,
-        "FilePath": ""
-    },
-    "value43": 1048580,
-    "value44": {
+    "value44": 5,
+    "value45": {
         "PrimitiveType": 8,
-        "FilePath": ".\\assets\\models\\deer.obj"
+        "FilePath": ".\\assets\\models\\vases.obj"
+    },
+    "value46": 1,
+    "value47": 0,
+    "value48": {
+        "FilePath": "./scripts/Test.lua",
+        "Parent": 0
     }
 }

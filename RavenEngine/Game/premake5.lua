@@ -26,6 +26,8 @@ project "Game"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	includedirs
@@ -39,6 +41,8 @@ project "Game"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.LuaBridge}",
+		"%{IncludeDir.lua}",
 	}
 
 	links
@@ -80,7 +84,8 @@ project "Game"
 		links
 		{
 			"glfw",
-			"OpenGL32",
+			"OpenGL32","lua"
+			
 		}
 
 		disablewarnings { 4307 }

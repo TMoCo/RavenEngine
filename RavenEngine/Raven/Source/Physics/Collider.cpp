@@ -20,13 +20,20 @@ namespace Raven
 		relativeTransform(rp3d::Transform::identity()) // initialise the relative transform to the identity matrix
 	{}
 
-	// when removing the collider
+	// when deleting the collider, remove it from the
 	Collider::~Collider()
 	{
-		// takes care of deleting the data for us
-		body->removeCollider(collider);
+		if (collider)
+			body->removeCollider(collider); // takes care of deleting the data for us
 	}
 
+	// creates the collider by adding it to the body 
+	void Collider::CreateCollider(rp3d::CollisionShape* shape)
+	{
+		collider = body->addCollider(shape, relativeTransform);
+	}
+
+	// call this when creating a collider 
 	void Collider::SetBody(rp3d::CollisionBody* parentBody)
 	{
 		body = parentBody;
@@ -45,6 +52,42 @@ namespace Raven
 		Collider(ColliderPrimitive::Box)
 	{}
 
+
+	void BoxCollider::SetExtent(const rp3d::Vector3& vec)
+	{
+		extents = vec;
+	}
+
+	//
+	// Sphere collider class
+	//
+
+	SphereCollider::SphereCollider() :
+		Collider(ColliderPrimitive::Sphere)
+	{}
+
+	void SphereCollider::SetRadius(const float& r)
+	{
+		radius = r;
+	}
+
+	//
+	// Capsule collider class
+	//
+
+	CapsuleCollider::CapsuleCollider() :
+		Collider(ColliderPrimitive::Capsule)
+	{}
+
+	void CapsuleCollider::SetRadius(const float& r)
+	{
+		radius = r;
+	}
+
+	void CapsuleCollider::SetHeight(const float& h)
+	{
+		height = h;
+	}
 
 	//
 	// Collider shape factory

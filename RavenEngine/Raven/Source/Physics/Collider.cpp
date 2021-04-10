@@ -2,7 +2,7 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <rp3d/include/reactphysics3d/mathematics/Vector3.h> 
+#include <reactphysics3d/mathematics/Vector3.h> 
 
 #include "Engine.h"
 
@@ -20,7 +20,7 @@ namespace Raven
 		relativeTransform(rp3d::Transform::identity()) // initialise the relative transform to the identity matrix
 	{}
 
-	// when deleting the collider, remove it from the
+	// when deleting the collider, remove it from the body it's attached to
 	Collider::~Collider()
 	{
 		if (collider)
@@ -42,6 +42,16 @@ namespace Raven
 	void Collider::SetTransform(const Transform& transform)
 	{
 		relativeTransform = ToRp3d::ToRp3dTransform(transform);
+	}
+
+	rp3d::CollisionShape* Collider::GetShape()
+	{
+		return shape;
+	}
+
+	rp3d::Transform Collider::GetRelativeTransform()
+	{
+		return relativeTransform;
 	}
 
 	//

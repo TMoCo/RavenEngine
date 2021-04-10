@@ -1,5 +1,3 @@
-
-
 project "rp3d"
     kind "StaticLib"
     language "C++"
@@ -8,10 +6,12 @@ project "rp3d"
 
     files {
         "src/**.c",
-        "src/**.cpp"
+        "src/**.cpp",
+        "include/**.h"
     }
 
-    includedirs {
+    sysincludedirs 
+    {
         "include"
     }
 

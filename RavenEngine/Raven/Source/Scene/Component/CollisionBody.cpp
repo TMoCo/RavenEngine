@@ -31,7 +31,7 @@ namespace Raven
 		if (ExistsInWorld())
 		{
 			// add the collider to the body, returns pointer to the collider
-			auto pCollider = body->addCollider(collider.shape, collider.relativeTransform);
+			auto pCollider = body->addCollider(collider.GetShape(), collider.GetRelativeTransform());
 			// add it to the vector of colliders
 			colliders.emplace_back(pCollider);
 		}

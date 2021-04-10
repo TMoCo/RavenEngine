@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include <rp3d/include/reactphysics3d/reactphysics3d.h>
+#include <reactphysics3d/reactphysics3d.h>
 
 #include "IModule.h"
-
-#include "Scene/Component/Collider.h"
 
 namespace Raven
 {

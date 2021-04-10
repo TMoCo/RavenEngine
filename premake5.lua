@@ -20,7 +20,7 @@ IncludeDir["cereal"] = "%{root_dir}/RavenEngine/Dependencies/cereal/include"
 IncludeDir["spdlog"] = "%{root_dir}/RavenEngine/Dependencies/spdlog/include"
 IncludeDir["glm"] = "%{root_dir}/RavenEngine/Dependencies/glm"
 IncludeDir["OpenFBX"] ="%{root_dir}/RavenEngine/Dependencies/OpenFBX/"
-IncludeDir["ReactPhysics3D"] = "%{root_dir}/RavenEngine/Dependencies/rp3d/inlcude"
+IncludeDir["rp3d"] = "%{root_dir}/RavenEngine/Dependencies/rp3d/include"
 IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
 IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
 workspace( settings.workspace_name )

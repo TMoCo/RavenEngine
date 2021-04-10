@@ -78,6 +78,10 @@ namespace Raven
 		// use a transform to place the collider relative to the body it should be attached to
 		void SetTransform(const Transform& transform);
 
+		rp3d::CollisionShape* GetShape();
+
+		rp3d::Transform GetRelativeTransform();
+
 	protected:
 		// pointer to the collider, set by the collision body class
 		rp3d::Collider* collider;
@@ -197,5 +201,4 @@ namespace Raven
 	{
 		archive(cereal::make_nvp("Radius", radius), cereal::make_nvp("Height", height));
 	}
-
 }

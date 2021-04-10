@@ -40,9 +40,9 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.rp3d}"
+		"%{IncludeDir.rp3d}",
 		"%{IncludeDir.LuaBridge}",
-		"%{IncludeDir.lua}",
+		"%{IncludeDir.lua}"
 	}
 
 	sysincludedirs
@@ -57,9 +57,9 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.rp3d}"
+		"%{IncludeDir.rp3d}",
 		"%{IncludeDir.LuaBridge}",
-		"%{IncludeDir.lua}",
+		"%{IncludeDir.lua}"
 	}
 
 	links

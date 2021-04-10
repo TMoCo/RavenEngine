@@ -8,8 +8,8 @@
 #include <array>
 #include <memory>
 
-#include <rp3d/include/reactphysics3d/reactphysics3d.h>
-#include <rp3d/include/reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/reactphysics3d.h>
+#include <reactphysics3d/mathematics/Transform.h>
 
 #include <cereal/cereal.hpp>
 
@@ -65,6 +65,8 @@ namespace Raven
 	// base collider class
 	class Collider
 	{
+		friend CollisionBody;
+		friend RigidBody;
 	public:
 		Collider(ColliderPrimitive::Type shapeType);
 		~Collider();

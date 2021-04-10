@@ -10,7 +10,7 @@
 
 namespace Raven
 {
-	CollisionBody::CollisionBody(Ptr<rp3d::PhysicsWorld> physWorld, Transform& transform) :
+	CollisionBody::CollisionBody(rp3d::PhysicsWorld* physWorld, Transform& transform) :
 		world(physWorld),
 		body(nullptr) // initialise the body pointer to nullptr
 	{
@@ -26,14 +26,14 @@ namespace Raven
 	}
 
 	// add a collider to the collision body
-	void CollisionBody::AddCollider(Collider& collider)
+	void CollisionBody::AddCollider(Collider* collider)
 	{
 		if (ExistsInWorld())
 		{
-			// add the collider to the body, returns pointer to the collider
-			auto pCollider = body->addCollider(collider.GetShape(), collider.GetRelativeTransform());
+			// add the collider to the body, returns pointer to the collider which we set in the wrapper Collider class
+			//collider->collider = body->addCollider(collider->shape, collider->relativeTransform);
 			// add it to the vector of colliders
-			colliders.emplace_back(pCollider);
+			colliders.emplace_back( collider);
 		}
 	}
 

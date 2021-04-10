@@ -120,5 +120,10 @@ namespace Raven
 		return localScale;
 	}
 
+	Transform Transform::Identity()
+	{
+		return Transform(glm::mat4(1.0f));
+	}
+
 };
 

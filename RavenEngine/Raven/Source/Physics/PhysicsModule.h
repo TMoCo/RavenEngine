@@ -8,6 +8,8 @@
 
 #include "IModule.h"
 
+#include "Utilities/Core.h"
+
 namespace Raven
 {
 	// ideal time step of 1 / 60 s

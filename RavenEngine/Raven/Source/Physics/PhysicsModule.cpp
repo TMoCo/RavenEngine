@@ -3,6 +3,9 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Physics/PhysicsModule.h"
+#include "Physics/Collider.h"
+
+#include "Scene/Component/CollisionBody.h"
 
 namespace Raven
 {
@@ -10,6 +13,19 @@ namespace Raven
 	{
 		// instantiate the physics world
 		world = physicsCommon.createPhysicsWorld();
+
+		// create a collision body at the origin
+		CollisionBody* body = new CollisionBody(world, Transform::Identity());
+
+		// declare a box collider 
+		Collider* collider = new Collider(ColliderPrimitive::Type::Box);
+		// set the body the collider should belong to
+		collider->SetBody(body->body);
+		// create the collider shape with physics common
+		collider->CreateCollider(ColliderShapeFactory::CreateBoxShape(&physicsCommon));
+
+		// assign the collider to the body
+		body->AddCollider(collider);
 	}
 
 	void PhysicsModule::Destroy()

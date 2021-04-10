@@ -2,6 +2,8 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include <reactphysics3d/mathematics/Vector3.h> 
 
 #include "Engine.h"
@@ -30,6 +32,7 @@ namespace Raven
 	// creates the collider by adding it to the body 
 	void Collider::CreateCollider(rp3d::CollisionShape* shape)
 	{
+		std::cout << (int)shape->getType();
 		collider = body->addCollider(shape, relativeTransform);
 	}
 
@@ -121,9 +124,9 @@ namespace Raven
 			}
 		}
 
-		rp3d::CollisionShape* CreateBoxShape(rp3d::PhysicsCommon* physicsCommon, float extentX, float extentY, float extentZ) 
+		rp3d::CollisionShape* CreateBoxShape(rp3d::PhysicsCommon* physicsCommon, rp3d::Vector3 extent)
 		{
-			return physicsCommon->createBoxShape(rp3d::Vector3(extentX, extentY, extentZ));
+			return physicsCommon->createBoxShape(extent);
 		}
 
 		rp3d::CollisionShape* CreateSphereShape(rp3d::PhysicsCommon* physicsCommon, float radius)

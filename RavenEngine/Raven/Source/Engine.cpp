@@ -163,6 +163,7 @@ namespace Raven
 		InitializeModule<Raven::SceneManager>();
 		InitializeModule<Raven::GUIModule>();
 		InitializeModule<Raven::TerrainGeneration>();
+		InitializeModule<Raven::PhysicsModule>();
 
 //############	Register your system here ######################
 

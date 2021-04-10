@@ -16,14 +16,16 @@
 
 namespace Raven
 {
+	class PhysicsModule;
 	class CollisionBody {
+		friend PhysicsModule;
 	public:
 		// a collision body needs a transform to exist
-		CollisionBody(Ptr<rp3d::PhysicsWorld> physWorld, Transform& transform);
+		CollisionBody(rp3d::PhysicsWorld* physWorld, Transform& transform);
 		~CollisionBody();
 
 		// add a collider to the collision body
-		void AddCollider(Collider& collider);
+		void AddCollider(Collider* collider);
 		// remove the specified collider from the collision body
 		void RemoveCollider(uint32_t index);
 
@@ -41,7 +43,7 @@ namespace Raven
 
 	private:
 		// world the body belongs to
-		Ptr<rp3d::PhysicsWorld> world;
+		rp3d::PhysicsWorld* world;
 
 		// keep the body as a raw pointer, managed in our deleter to destroy
 		// it in the physics world

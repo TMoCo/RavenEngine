@@ -65,6 +65,9 @@ struct MaterialOutput
 	// The emission value.
 	vec3 emission;
 	
+	// The normal in tangent space.
+	vec3 normal;
+	
 	// Material Roughness -> [0.0, 1.0].
 	float roughness;
 	
@@ -74,8 +77,8 @@ struct MaterialOutput
 	// Specular value, controls the overall specularity.
 	float specular;
 	
-	// The normal in tangent space.
-	vec3 normal;
+	// Alpha value, used for translucent and masked materials.
+	float alpha;
 };
 
 
@@ -87,10 +90,11 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
 	outParams.color = vec3(1.0, 0.0, 0.0);
 	outParams.emission = vec3(0.0);
+	outParams.normal = vec3(0.0, 0.0, 1.0);
 	outParams.roughness = 0.0;
 	outParams.metallic = 0.0;
 	outParams.specular = 1.0;
-	outParams.normal = vec3(0.0, 0.0, 1.0);
+	outParams.alpha = 1.0;
 }
 #endif
 

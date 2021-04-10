@@ -1,5 +1,5 @@
 #include "RenderTerrain.h"
-#include "Render/RenderResource/RenderRscTerrain.h"
+#include "Render/RenderResource/Primitives/RenderRscTerrain.h"
 
 #include "Render/OpenGL/GLShader.h"
 #include "Render/OpenGL/GLVertexArray.h"

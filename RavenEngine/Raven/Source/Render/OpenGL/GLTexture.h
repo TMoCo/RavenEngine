@@ -41,7 +41,7 @@ namespace Raven
 
 	  // Update Texture data depending on its type and with multiple layers
 		// Note: this assume that the texture is currently bounded.
-		void UpdateTexData(int level, int newWidth, int newHeight, int numLayers, const void* data);
+		void UpdateTexData(int level, int newWidth, int newHeight, int layer, const void* data);
 
 		// Update Texture parameters
 	  // Note: this assume that the texture is currently bounded.

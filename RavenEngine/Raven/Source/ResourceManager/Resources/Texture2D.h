@@ -39,7 +39,7 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscTexture->Load(EGLTexture::Texture2D, EGLFormat::RGBA, glm::ivec2(width, height), data); // call interface method
+				renderRscTexture->Load(EGLTexture::Texture2D, format, glm::ivec2(width, height), data); // call interface method
 				onGPU = true;
 			}
 		}

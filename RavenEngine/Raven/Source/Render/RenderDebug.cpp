@@ -1,5 +1,5 @@
 #include "RenderDebug.h"
-#include "RenderResource/RenderRscDebugMesh.h"
+#include "RenderResource/Primitives/RenderRscDebugMesh.h"
 #include "RenderObjects/Primitives/RenderDebugPrimitive.h"
 
 #include "RenderResource/Shader/RenderRscShader.h"

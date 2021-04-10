@@ -37,7 +37,7 @@ void main()
 	vec4 wolrdNormal = inNormalMatrix * vec4(inNormal, 0.0);
 	
 	//
-	gl_Position = inViewProjMatrix * worldPos;
+	gl_Position = inCommon.viewProjMatrix * worldPos;
 	
 	// Set Vertex-Output...
 	outVertex.position = worldPos.xyz;

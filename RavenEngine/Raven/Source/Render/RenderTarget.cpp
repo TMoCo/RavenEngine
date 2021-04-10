@@ -12,7 +12,6 @@ namespace Raven {
 
 RenderTarget::RenderTarget(EGLTexture type, EGLFormat format)
 	: fbo(nullptr)
-	, rtDepth(nullptr)
 	, dirty(true)
 {
 	RAVEN_ASSERT(type == EGLTexture::Texture2D, "NOT SUPPORTED YET....");
@@ -23,7 +22,6 @@ RenderTarget::RenderTarget(EGLTexture type, EGLFormat format)
 RenderTarget::~RenderTarget()
 {
 	delete rtTexture;
-	delete rtDepth;
 	delete fbo;
 }
 
@@ -74,34 +72,11 @@ void RenderTarget::Update()
 	rtTexture->Unbind();
 
 
-	// Is Target Resized?
-	if (rtResize)
-	{
-		// Not Created?
-		if (!rtDepth)
-		{
-			rtDepth = GLRenderBuffer::Create(EGLFormat::Depth32, size.x, size.y);
-		}
-		else
-		{
-			// Update Depth Target.
-			rtDepth->Bind();
-			rtDepth->UpdateStorage(EGLFormat::Depth32, size.x, size.y);
-			rtDepth->Unbind();
-		}
-	}
-
-
 	// Framebuffer...
 	if (!fbo)
 	{
 		fbo = GLFrameBuffer::Create();
 		fbo->Attach(EGLAttachment::Color0, 0, rtTexture, 0);
-
-		// Attach Depth.
-		if (rtDepth)
-			fbo->Attach(EGLAttachment::Depth, rtDepth);
-
 		fbo->Update();
 	}
 

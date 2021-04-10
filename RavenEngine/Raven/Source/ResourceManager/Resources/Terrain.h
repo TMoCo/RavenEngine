@@ -11,7 +11,7 @@
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h" 
 #include "ResourceManager/Resources/Texture2D.h" // for height map
-#include "Render/RenderResource/RenderRscTerrain.h"
+#include "Render/RenderResource/Primitives/RenderRscTerrain.h"
 
 //
 // A class for a Terrain, with height map and other features to come later

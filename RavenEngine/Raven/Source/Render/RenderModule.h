@@ -21,9 +21,27 @@ namespace Raven
 	class GLContext;
 	class RenderScene;
 	class RenderDebug;
-	class Scene;
 	class RenderTarget;
-	class Transform;
+	class Scene;
+	class RenderPipeline;
+	class RenderRscMaterial;
+	class Material;
+
+
+
+
+	// The Renderer Default Materials.
+	struct RenderDefaultMaterials
+	{
+		// The Default Material for meshes.
+		Ptr<Material> model;
+
+		// The Default Material for terrain.
+		Ptr<Material> terrain;
+	};
+
+
+
 
 
 
@@ -54,6 +72,9 @@ namespace Raven
 		// if true will resize the render target with engine window.
 		inline void SetRTToWindow(bool value) { isRTToWindow = value; }
 
+		//  Return default materails.
+		inline const RenderDefaultMaterials& GetDefaultMaterials() { return defaultMaterials; }
+
 	public:
 		// Update render.
 		void Update(float dt);
@@ -66,6 +87,9 @@ namespace Raven
 
 		// End and clean up the render.
 		void EndRender();
+
+		// Create/Setup default materials.
+		void CreateDefaultMaterials();
 
 	private:
 		// Module Initialize.
@@ -81,19 +105,23 @@ namespace Raven
 		// if true the engine currently rendering.
 		bool isRendering;
 
-		// 
+		// ???
 		Ptr<RenderScene> rscene;
+
+		// ??? 
+		Ptr<RenderTarget> rtScene;
 
 		// Render Debug, used for debug drawing.
 		Ptr<RenderDebug> rdebug;
 
-		// The Render Target we draw our scene on.
-		Ptr<RenderTarget> rtScene;
+		// The Engine Render Pipeline.
+		Ptr<RenderPipeline> pipeline;
 
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;
 
-
+		// The default materials.
+		RenderDefaultMaterials defaultMaterials;
 	};
 
 }

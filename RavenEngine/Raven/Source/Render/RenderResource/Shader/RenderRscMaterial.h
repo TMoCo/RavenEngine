@@ -64,6 +64,9 @@ namespace Raven
 		// Update the uniform buffer with the materail data.
 		void UpdateUniformBuffer();
 
+		// Make Material Textures the current active ones.
+		void MakeTexturesActive();
+
 	private:
 		// The shader resource this material is.
 		RenderRscShader* shader;

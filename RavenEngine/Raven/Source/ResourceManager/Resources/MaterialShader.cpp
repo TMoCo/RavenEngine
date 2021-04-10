@@ -54,14 +54,18 @@ void MaterialShader::LoadOnGpu()
 	renderRsc = RenderRscShader::Create(domain, rscData); // Build Shader
 
 	// Shader Input...
-	blockInput.binding = RenderShaderInput::MaterialBlockBinding;
-	renderRsc->GetInput().AddBlockInput(blockInput);
+	if (blockInput.size != -1)
+	{
+		blockInput.binding = RenderShaderInput::MaterialBlockBinding;
+		renderRsc->GetInput().AddBlockInput(blockInput);
+
+		// Create a unifrom buffer for the block input.
+		materialUBO = Ptr<UniformBuffer>(UniformBuffer::Create(blockInput, false));
+	}
+
 	renderRsc->GetInput().AddSamplerInputs(samplers);
 	renderRsc->BindBlockInputs();
 	renderRsc->BindSamplers();
-
-	// Create a unifrom buffer 
-	materialUBO = Ptr<UniformBuffer>( UniformBuffer::Create(blockInput) );
 
 }
 

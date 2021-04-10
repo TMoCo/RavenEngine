@@ -14,6 +14,7 @@
 
 
 
+
 namespace Raven
 {
 	class GLBuffer;
@@ -31,7 +32,8 @@ namespace Raven
 		~UniformBuffer();
 
 		// Create a unifrom buffer from a block description.
-		static UniformBuffer* Create(const RSInputBlockDescription& block);
+		// @param isCPU: if true the unfirom has a cpu buffer for holding the data before updating if needed.
+		static UniformBuffer* Create(const RSInputBlockDescription& block, bool isCreateCPU);
 
 		// Return true if this unifrom block description valid.
 		inline bool HasValidBlock() const { return blockDescription.size != -1; }
@@ -54,6 +56,27 @@ namespace Raven
 		// Get an input offset from the start of the block.
 		inline int32_t GetInputOffset(int32_t idx) const { return blockDescription.inputs[idx].second; }
 
+		// Return true if the this uniform has buffer on cpu.
+		inline bool HasCPUBuffer() { return cpuData != nullptr; }
+
+		// Set data on cpu buffer.
+		void SetData(int32_t offset, int32_t size, const void* data);
+		
+		//  Set a value for the cpu buffer to be used while updating the OpenGL Unfirom Buffer.
+		template<class T>
+		void SetDataValue(int32_t index, const T& value)
+		{
+			const auto& input = GetInput(index);
+			int32_t offset = GetInputOffset(index);
+			int32_t size = RenderShaderInput::GetSize(input.inputType);
+			RAVEN_ASSERT(input.count == 1, "Invalid Operation - trying to set a value as an array.");
+			RAVEN_ASSERT(sizeof(T) == size, "Invalid DataType - Size does not match.");
+
+			SetData(offset, size, &value);
+		}
+
+		// Update the the unfriom buffer from the cpu buffer.
+		void Update();
 
 	private:
 		// OpenGL Uniform Buffer.
@@ -61,6 +84,9 @@ namespace Raven
 
 		// The Input Block Description used to create this unifrom match.
 		RSInputBlockDescription blockDescription;
+
+		// Holding the data before updating if needed.
+		uint8_t* cpuData;
 	};
 
 }

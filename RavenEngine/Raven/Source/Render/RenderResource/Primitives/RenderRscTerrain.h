@@ -2,7 +2,7 @@
 
 
 #include "RenderRscPrimitive.h"
-#include "RenderRscTexture.h"
+#include "Render/RenderResource/RenderRscTexture.h"
 
 
 #include "glm/vec2.hpp"

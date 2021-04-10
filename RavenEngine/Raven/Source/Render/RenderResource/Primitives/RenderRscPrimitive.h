@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "IRenderResource.h"
+#include "Render/RenderResource/IRenderResource.h"
 
 
 

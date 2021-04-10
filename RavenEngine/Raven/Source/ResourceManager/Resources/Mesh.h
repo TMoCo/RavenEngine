@@ -9,7 +9,7 @@
 #include "Math/BoundingBox.h"
 
 #include "ResourceManager/Resources/IResource.h"
-#include "Render/RenderResource/RenderRscMesh.h"
+#include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
 //
 // A class for a 3D mesh and its data

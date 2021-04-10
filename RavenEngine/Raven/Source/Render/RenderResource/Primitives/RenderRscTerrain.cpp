@@ -80,7 +80,7 @@ void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, 
 	}
 
 
-	numVerts = terrainVerts.size();
+	numVerts = static_cast<uint32_t>(terrainVerts.size());
 	positionBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
 		(int)(terrainVerts.size() * sizeof(glm::vec3)),

@@ -1,6 +1,8 @@
 #include "GLTexture.h"
+#include "Utilities/Core.h"
 
 #include "GL/glew.h"
+
 
 
 
@@ -88,32 +90,11 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, const vo
 
 void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, const void* data)
 {
-	width = newWidth;
-	height = newHeight;
-
-	// Get pixel information about based on the current format
-	GLENUM pixelFormat;
-	GLENUM pixelType;
-	int alignment = 4;
-	GetPixelInfo(format, pixelFormat, pixelType, alignment);
-
-	// Pixel Data Alignment...
-	if (alignment != 4)
-		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-
-
-	// Texture Data...
-	glTexImage2D((GLENUM)type, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
-
-	
-	// Reset alignment back to default.
-	if (alignment != 4)
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
+	UpdateTexData(level, newWidth, newHeight, 0, data);
 }
 
 
-void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLayers, const void* data)
+void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int layer, const void* data)
 {
 	width = newWidth;
 	height = newHeight;
@@ -129,16 +110,16 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLay
 		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
 
 
-	// For now only cubemap...
+	// Update Texture Data...
 	if (type == EGLTexture::CubeMap)
 	{
-		for (int i = 0; i < numLayers; ++i)
-		{
-			// Texture Data...
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
-		}
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
 	}
-
+	else
+	{
+		RAVEN_ASSERT(layer == 0, "Layer should be zero for non-layered textuers.");
+		glTexImage2D((GLENUM)type, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
+	}
 
 
 	// Reset alignment back to default.
@@ -196,6 +177,11 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 		pixelType = GL_FLOAT;
 		break;
 
+	case EGLFormat::RG16F:
+		pixelFormat = GL_RG;
+		pixelType = GL_FLOAT;
+		break;
+
 	case EGLFormat::RGB16F:
 		pixelFormat = GL_RGB;
 		pixelType = GL_FLOAT;
@@ -224,8 +210,8 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 
 void GLTexture::Active(int i)
 {
-	glBindTexture((GLENUM)type, id);
 	glActiveTexture(GL_TEXTURE0 + i);
+	glBindTexture((GLENUM)type, id);
 }
 
 

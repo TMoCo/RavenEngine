@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Utilities/Core.h"
+#include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/MeshFactory.h"
 #include <string>
 #include <vector>
@@ -70,6 +71,7 @@ namespace Raven
 				archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
 			}
 		}
+
 		template<typename Archive>
 		void load(Archive& archive)
 		{

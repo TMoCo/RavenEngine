@@ -1,7 +1,12 @@
 #include "RenderRscMaterial.h"
 #include "RenderRscShader.h"
 #include "UniformBuffer.h"
+
+#include "Render/OpenGL/GLTexture.h"
+
 #include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Resources/Texture2D.h"
+
 
 
 #include "glm/gtc/type_ptr.hpp"
@@ -70,6 +75,10 @@ void RenderRscMaterial::MapParamter(const std::string& name, Texture2D** texture
 
 void RenderRscMaterial::MapParamter(const std::string& name, const float* scalar)
 {
+	// No Input Block?
+	if (blockIndex == -1)
+		return;
+
 	int32_t idx = shader->GetInput().GetBlockInput(blockIndex).GetInputIndex(name);
 
 	// No input with that name?
@@ -93,6 +102,10 @@ void RenderRscMaterial::MapParamter(const std::string& name, const float* scalar
 
 void RenderRscMaterial::MapParamter(const std::string& name, const glm::vec4* color)
 {
+	// No Input Block?
+	if (blockIndex == -1)
+		return;
+
 	int32_t idx = shader->GetInput().GetBlockInput(blockIndex).GetInputIndex(name);
 
 	// No input with that name?
@@ -150,6 +163,20 @@ void RenderRscMaterial::UpdateUniformBuffer()
 	// Update the unifrom buffer with the material data.
 	ubo->UpdateData(blockInput.size, 0, materialBuffer);
 }
+
+
+void RenderRscMaterial::MakeTexturesActive()
+{
+	for (const auto& inputTex : matInputTexturesMap)
+	{
+		if (!inputTex.second)
+			continue;
+
+		RenderRscTexture* rtex = (*inputTex.second)->renderRscTexture;
+		rtex->GetTexture()->Active(inputTex.first);
+	}
+}
+
 
 
 

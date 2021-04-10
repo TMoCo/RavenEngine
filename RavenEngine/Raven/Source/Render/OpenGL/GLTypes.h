@@ -123,6 +123,7 @@ namespace Raven
 		RGBA = 0x1908,
 
 		R16F = 0x822D,
+		RG16F = 0x822F,
 		RGB16F = 0x881B,
 		RGBA16F = 0x881A,
 

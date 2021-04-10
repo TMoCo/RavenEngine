@@ -3,6 +3,7 @@
 
 
 
+#include "Utilities/Core.h"
 #include "RenderBatch.h"
 
 #include "glm/matrix.hpp"
@@ -31,6 +32,19 @@ namespace Raven
 	};
 
 
+	// The Environment Properties of the scene.
+	struct RenderSceneEnvironment
+	{
+		//
+		glm::vec3 sunDir;
+
+		//
+		glm::vec3 sunColor;
+
+		//
+		float sunPower;
+	};
+
 
 
 	// RenderScene:
@@ -55,7 +69,7 @@ namespace Raven
 		void SetView(const glm::mat4& mtx);
 
 		// Set scene projection.
-		void SetProjection(const glm::mat4& mtx);
+		void SetProjection(const glm::mat4& mtx, float n, float f);
 
 		// Draw a specific batch.
 		void Draw(ERSceneBatch type);
@@ -69,10 +83,34 @@ namespace Raven
 		// Return true if the batch is empty.
 		inline bool IsEmpty(ERSceneBatch batch) { return batches[(uint32_t)batch].IsEmpty(); }
 
-		// Set application time to be used while rendering.
-		inline void SetTime(float val) { time = val; }
+		// Return the view projection matrix.
+		inline const glm::mat4& GetViewProjection() const { return viewProjMatrix; }
+
+		// Return the inverse of the view projection matrix.
+		inline const glm::mat4& GetViewProjectionInverse() const { return viewProjMatrixInverse; }
+
+		// Return the view direction.
+		inline const glm::vec3& GetViewDir() const { return viewDir; }
+
+		// Return the view position.
+		inline const glm::vec3& GetViewPos() const { return viewPos; }
+
+		// Return the scene enviornment.
+		inline const RenderSceneEnvironment& GetEnvironment() const { return environment; }
+
+		// Return near clipping plane.
+		inline const float& GetNear() const { return near; }
+
+		// Return far clipping plane.
+		inline const float& GetFar() const { return far; }
 
 	private:
+		// Collect view & projection from the scene.
+		void CollectSceneView(Scene* scene);
+
+		// Collect lights from the scene.
+		void CollectSceneLights(Scene* scene);
+
 		//
 		void TraverseScene(Scene* scene);
 
@@ -95,37 +133,39 @@ namespace Raven
 		// The main render batches of the scene.
 		RenderBatch batches[3];
 
-		// Main View
+		// The View Matrix.
 		glm::mat4 view;
 
 		// Main Project.
 		glm::mat4 projection;
-		
+
+		// View & Projection Matrix
+		glm::mat4 viewProjMatrix;
+
+		// View & Projection Matrix Inverse
+		glm::mat4 viewProjMatrixInverse;
+
+		// The View Direction.
+		glm::vec3 viewDir;
+
+		// The View Position.
+		glm::vec3 viewPos;
+
+		// Near Clipping Plane.
+		float near;
+
+		// Far Clipping Plane.
+		float far;
+
+		// Scene Enviornment Data.
+		RenderSceneEnvironment environment;
+
 		// Dynamic Primitives Container.
 		std::vector<RenderPrimitive*> dynamicPrimitive;
 
-		//
-		glm::vec3 viewDir;
+		// Transform Uniform Buffer.
+		Ptr<UniformBuffer> transformUB;
 
-		//
-		glm::vec3 viewPos;
-
-		//
-		float time;
-
-		// ~MinimalSolution --- ---- --- ---- --- ---- ---
-		UniformBuffer* commonUBO;
-		UniformBuffer* trUBO;
-		UniformBuffer* lightingUBO;
-		// ~MinimalSolution --- ---- --- ---- --- ---- ---
-
-		// If primitives does not have materials, we use this one.
-		class RenderRscShader* defaultShader;
-		class RenderRscMaterial* defaultMaterail;
-
-		/** The Terrain in the Scene. */
-		RenderRscShader* terrainShader;
-		RenderRscMaterial* terrainMaterail;
 	};
 
 

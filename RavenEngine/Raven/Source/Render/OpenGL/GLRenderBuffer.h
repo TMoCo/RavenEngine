@@ -4,6 +4,7 @@
 
 
 #include "GLTypes.h"
+#include "glm/vec2.hpp"
 
 
 
@@ -35,8 +36,11 @@ namespace Raven
 		// Unbind currently bounded render buffer.
 		void Unbind();
 
-		// Update RenderBuffer storage.
-		void UpdateStorage(EGLFormat format, int width, int height);
+		// Update RenderBuffer storage with new size.
+		void UpdateStorage(int width, int height);
+
+		// Return current render buffer size.
+		inline const glm::ivec2& GetSize() const { return size; }
 
 	private:
 		// OpenGL Object ID.
@@ -45,11 +49,9 @@ namespace Raven
 		// RenderBuffer Storage Format.
 		EGLFormat format;
 
-		// RenderBuffer Storage width.
-		int width;
+		// RenderBuffer Storage size.
+		glm::ivec2 size;
 
-		// RenderBuffer Storage height.
-		int height;
 	};
 
 }

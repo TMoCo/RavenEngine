@@ -53,12 +53,30 @@ void RSInputBlockDescription::EndUniformBlock()
 
 	// Compute Block Size
 	size = inputs.back().second;
-	size += RenderShaderInput::GetSize(inputs.back().first.inputType);
+	int32_t prevCount = inputs.back().first.count;
+
+	// Is Array?
+	if (prevCount > 1)
+	{
+		// Each element in the array is aligned with vec4.
+		size += prevCount * RenderShaderInput::GetSize(EShaderInputType::Vec4);
+	}
+	else
+	{
+		size += RenderShaderInput::GetSize(inputs.back().first.inputType);
+	}
+
 	size = RenderShaderInput::AlignOffset(size, 16); // always align the final size with 16.
 }
 
 
 void RSInputBlockDescription::AddInput(EShaderInputType inputType, const std::string& inputName, int32_t offset)
+{
+	AddInputArray(inputType, inputName, 1, offset);
+}
+
+
+void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, int32_t offset)
 {
 	RAVEN_ASSERT(!name.empty(), "You must begin block to be able to add input.");
 
@@ -73,8 +91,20 @@ void RSInputBlockDescription::AddInput(EShaderInputType inputType, const std::st
 		{
 			// Compute Current Offset...
 			int32_t size = inputs.back().second;
-			size += RenderShaderInput::GetSize(inputs.back().first.inputType);
-			offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(inputType));
+			int32_t prevCount = inputs.back().first.count;
+
+			// Is Array?
+			if (prevCount > 1)
+			{
+				// Each element in the array is aligned with vec4.
+				size += prevCount * RenderShaderInput::GetSize(EShaderInputType::Vec4);
+				offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(EShaderInputType::Vec4));
+			}
+			else
+			{
+				size += RenderShaderInput::GetSize(inputs.back().first.inputType);
+				offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(inputType));
+			}
 		}
 	}
 
@@ -83,6 +113,7 @@ void RSInputBlockDescription::AddInput(EShaderInputType inputType, const std::st
 	blockInput.first.uniformType = EShaderUniformType::UniformBlock;
 	blockInput.first.inputType = inputType;
 	blockInput.first.name = inputName;
+	blockInput.first.count = count;
 	blockInput.second = offset;
 	inputs.push_back(blockInput);
 }
@@ -105,8 +136,14 @@ RSInputBlockDescription RSInputBlockDescription::MakeCommonBlock()
 	RSInputBlockDescription inputblock;
 	inputblock.binding = COMMON_BLOCK_BINDING;
 	inputblock.BeginUniformBlock("CommonBlock");
+	inputblock.AddInput(EShaderInputType::Mat4, "viewProjMatrix");
+	inputblock.AddInput(EShaderInputType::Mat4, "viewProjMatrixInverse");
 	inputblock.AddInput(EShaderInputType::Vec3, "viewDir");
 	inputblock.AddInput(EShaderInputType::Vec3, "viewPos");
+	inputblock.AddInput(EShaderInputType::Vec4, "viewport");
+	inputblock.AddInput(EShaderInputType::Vec4, "sunDir");
+	inputblock.AddInput(EShaderInputType::Vec4, "sunColorAndPower");
+	inputblock.AddInput(EShaderInputType::Vec2, "nearFar");
 	inputblock.AddInput(EShaderInputType::Float, "time");
 	inputblock.EndUniformBlock();
 
@@ -121,7 +158,6 @@ RSInputBlockDescription RSInputBlockDescription::MakeTransfromBlock()
 	inputblock.BeginUniformBlock("TransformBlock");
 	inputblock.AddInput(EShaderInputType::Mat4, "inModelMatrix");
 	inputblock.AddInput(EShaderInputType::Mat4, "inNormalMatrix");
-	inputblock.AddInput(EShaderInputType::Mat4, "inViewProjMatrix");
 	inputblock.EndUniformBlock();
 
 	return inputblock;
@@ -133,9 +169,12 @@ RSInputBlockDescription RSInputBlockDescription::MakeLightingBlock()
 	RSInputBlockDescription inputblock;
 	inputblock.binding = LIGHTING_BLOCK_BINDING;
 	inputblock.BeginUniformBlock("LightingBlock");
-	inputblock.AddInput(EShaderInputType::Vec4, "lightDir");
-	inputblock.AddInput(EShaderInputType::Vec4, "lightColor");
-	inputblock.AddInput(EShaderInputType::Float, "lightPower");
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataA", 64);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataB", 64);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataC", 64);
+	inputblock.AddInput(EShaderInputType::Int, "pointLightStartIndex");
+	inputblock.AddInput(EShaderInputType::Int, "spotLightStartIndex");
+	inputblock.AddInput(EShaderInputType::Int, "numLights");
 	inputblock.EndUniformBlock();
 
 	return inputblock;
@@ -183,6 +222,7 @@ void RenderShaderInput::AddInput(EShaderInputType inputType, const std::string& 
 		newInput.uniformType = EShaderUniformType::Uniform;
 		newInput.inputType = inputType;
 		newInput.name = name;
+		newInput.count = 1;
 		inputs.push_back(newInput);
 	}
 }

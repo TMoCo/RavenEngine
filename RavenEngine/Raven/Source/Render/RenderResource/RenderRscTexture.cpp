@@ -12,6 +12,7 @@ namespace Raven {
 
 
 RenderRscTexture::RenderRscTexture()
+	: tex(nullptr)
 {
 
 }

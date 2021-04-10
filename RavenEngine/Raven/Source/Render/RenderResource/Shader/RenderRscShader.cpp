@@ -105,6 +105,11 @@ RenderRscShader* RenderRscShader::CreateCustom(const RenderRscShaderDomainCreate
 		rsc->shader->SetSourceFile(src.first, src.second);
 	}
 
+
+	// ...
+	rsc->shader->AddPreprocessor("#define RENDER_SHADER_CUSTOM 1");
+
+
 	// Build OpenGL Shader/Program.
 	rsc->shader->Build();
 	rsc->shader->Use();
@@ -123,10 +128,6 @@ void RenderRscShader::SetupShaderForDomain()
 			EGLShaderStageBit::VertexBit,
 			"shaders/VertexTransform.glsl");
 
-		shader->AddExSourceFile(IMPORT_LIGHTING_TAG,
-			EGLShaderStageBit::FragmentBit,
-			"shaders/Lighting.glsl");
-
 		shader->AddExSourceFile(IMPORT_MATERIAL_FUNCTION_BASE_TAG,
 			EGLShaderStageBit::VertexBit | EGLShaderStageBit::FragmentBit,
 			"shaders/Materials/MaterialFunctions.glsl");
@@ -138,13 +139,14 @@ void RenderRscShader::SetupShaderForDomain()
 		// Add Input...
 		input.AddBlockInput(RenderShaderInput::CommonBlock);
 		input.AddBlockInput(RenderShaderInput::TransfromBlock);
-		input.AddBlockInput(RenderShaderInput::LightingBlock);
 	}
 		break;
 
 
 	case ERenderShaderDomain::Terrain:
 	{
+		RAVEN_ASSERT(type == ERenderShaderType::Opaque, "Terrain can only be Opaque.");
+
 		shader->AddExSourceFile(IMPORT_TRANSFORM_VERTEX_TAG,
 			EGLShaderStageBit::VertexBit,
 			"shaders/VertexTransform.glsl");
@@ -173,7 +175,30 @@ void RenderRscShader::SetupShaderForDomain()
 
 void RenderRscShader::SetupShaderForType()
 {
+	switch (type)
+	{
+	case ERenderShaderType::Opaque:
+		shader->AddPreprocessor("#define RENDER_PASS_DEFERRED 1");
+		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_OPAQUE 1");
+		break;
 
+	case ERenderShaderType::Masked:
+		RAVEN_ASSERT(0, "Shader Masked type not supported yet.");
+		shader->AddPreprocessor("#define RENDER_PASS_FORWARD 1");
+		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_MASKED 1");
+		break;
+
+	case ERenderShaderType::Translucent:
+		RAVEN_ASSERT(0, "Shader Translucent type not supported yet.");
+		shader->AddPreprocessor("#define RENDER_PASS_FORWARD 1");
+		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_TRANSLUCENT 1");
+		break;
+
+	case ERenderShaderType::PostProcessing:
+		RAVEN_ASSERT(0, "Shader PostProcessing type not supported yet.");
+		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_POSTPROCESSING 1");
+		break;
+	}
 }
 
 

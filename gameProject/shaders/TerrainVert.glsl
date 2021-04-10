@@ -14,7 +14,6 @@ out VertexOutput
 	vec3 position;
 	vec3 normal;
 	vec2 texCoord;
-	
 } outVertex;
 
 
@@ -27,20 +26,20 @@ uniform sampler2D inHeightMap;
 
 
 
-// -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
+
 // -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
 
 
 
 vec3 ComputeNormal(vec2 texCoord)
 {
-	vec2 texelSize = textureSize(inHeightMap, 0);
+	vec2 texelSize = 1.0 / textureSize(inHeightMap, 0);
 	
-	float h0 = texture(inHeightMap, texCoord - vec2(texelSize.x, 0.0)).r;
-	float h1 = texture(inHeightMap, texCoord + vec2(texelSize.x, 0.0)).r;
+	float h0 = texture(inHeightMap, texCoord - vec2(texelSize.x, 0.0)).r * (inHeight.y - inHeight.x) + inHeight.x;
+	float h1 = texture(inHeightMap, texCoord + vec2(texelSize.x, 0.0)).r * (inHeight.y - inHeight.x) + inHeight.x;
 	
-	float h2 = texture(inHeightMap, texCoord - vec2(0.0, texelSize.y)).r; 
-	float h3 = texture(inHeightMap, texCoord + vec2(0.0, texelSize.y)).r; 
+	float h2 = texture(inHeightMap, texCoord - vec2(0.0, texelSize.y)).r * (inHeight.y - inHeight.x) + inHeight.x; 
+	float h3 = texture(inHeightMap, texCoord + vec2(0.0, texelSize.y)).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	
 	return normalize( vec3(h1 - h0, 2.0, h3 - h2) * 0.5 );
 }
@@ -55,12 +54,12 @@ void main()
 	float height = texture(inHeightMap, uv).r * (inHeight.y - inHeight.x) + inHeight.x; 
 
 	vec4 worldPos = inModelMatrix * vec4(inPosition.x, height , inPosition.z, 1.0);
-	vec4 worldNormal = inNormalMatrix * vec4(ComputeNormal(uv), 1.0);
+	vec4 worldNormal = inNormalMatrix * vec4(ComputeNormal(uv), 0.0);
 	
-	gl_Position = inViewProjMatrix * worldPos;
+	gl_Position = inCommon.viewProjMatrix * worldPos;
 	
 	outVertex.position = worldPos.xyz;
-	outVertex.normal = worldNormal.xyz;
+	outVertex.normal = ComputeNormal(uv);
 	outVertex.texCoord = uv;
 }
 

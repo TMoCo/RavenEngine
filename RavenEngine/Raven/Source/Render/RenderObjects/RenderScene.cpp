@@ -1,19 +1,21 @@
 #include "RenderScene.h"
 
 #include "Engine.h"
+#include "Render/RenderModule.h"
+
 #include "Primitives/RenderPrimitive.h"
 #include "Primitives/RenderTerrain.h"
 #include "Primitives/RenderDebugPrimitive.h"
 #include "Primitives/RenderPrimitive.h"
 #include "Primitives/RenderMesh.h"
 #include "Primitives/RenderTerrain.h"
+
 #include "Render/RenderResource/Shader/RenderRscShader.h" 
 #include "Render/RenderResource/Shader/RenderRscMaterial.h"
 #include "Render/RenderResource/Shader/UniformBuffer.h"
-
-
 #include "Render/OpenGL/GLBuffer.h"
 #include "Render/OpenGL/GLShader.h"
+
 
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/Resources/Material.h"
@@ -39,36 +41,22 @@ namespace Raven {
 
 
 
-
-// ~MinimalSolution --- ---- --- ---- --- ---- ---
-struct TransformUBO
+// Data reflect TransformVertex Uniform Block.
+struct TransformVertexData
 {
 	glm::mat4 modelMatrix;
 	glm::mat4 normalMatrix;
-	glm::mat4 viewProjMatrix;
 } trData;
 
 
-struct LightingUBO
-{
-	// Dir-Light
-	glm::vec4 lightDir;
-	glm::vec4 lightColor;
-	float lightPower;
-} lightData;
-
-
-// ~MinimalSolution --- ---- --- ---- --- ---- ---
 
 
 
 
 
 RenderScene::RenderScene()
-	: trUBO(nullptr)
-	, lightingUBO(nullptr)
-	, commonUBO(nullptr)
-	, time(0.0f)
+	: near(0.0f)
+	, far(0.0f)
 {
 
 }
@@ -76,55 +64,14 @@ RenderScene::RenderScene()
 
 RenderScene::~RenderScene()
 {
-	delete trUBO;
-	delete lightingUBO;
-	delete commonUBO;
-	delete defaultShader;
-	delete terrainMaterail;
-	delete terrainShader;
-	delete defaultMaterail;
+
 }
 
 
 void RenderScene::Setup()
 {
-	// Default Mesh
-	{
-		RenderRscShaderCreateData shaderData;
-		shaderData.type = ERenderShaderType::Opaque;
-		shaderData.name = "Default_Material";
-
-		// Add Default Materail Function
-		shaderData.AddFunction(EGLShaderStageBit::FragmentBit, "shaders/Materials/DefaultMaterial.glsl");
-
-		defaultShader = RenderRscShader::Create(ERenderShaderDomain::Mesh, shaderData);
-		defaultShader->BindBlockInputs();
-		defaultShader->BindSamplers();
-
-		defaultMaterail = new RenderRscMaterial(defaultShader);
-	}
-
-	{
-		RenderRscShaderCreateData shaderData;
-		shaderData.type = ERenderShaderType::Opaque;
-		shaderData.name = "Terrain_Material";
-
-		// Add Terrain Materail Function
-
-		terrainShader = RenderRscShader::Create(ERenderShaderDomain::Terrain, shaderData);
-		terrainShader->BindBlockInputs();
-		terrainShader->BindSamplers();
-
-		terrainMaterail = new RenderRscMaterial(terrainShader);
-	}
-
-
-	// ~MinimalSolution --- ---- --- ---- --- ---- ---
-	commonUBO = UniformBuffer::Create(RenderShaderInput::CommonBlock);
-	trUBO = UniformBuffer::Create(RenderShaderInput::TransfromBlock);
-	lightingUBO = UniformBuffer::Create(RenderShaderInput::LightingBlock);
-	// ~MinimalSolution --- ---- --- ---- --- ---- ---
-
+	// Transfrom Vertex Uniform 
+	transformUB = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransfromBlock, false) );
 
 }
 
@@ -132,36 +79,10 @@ void RenderScene::Setup()
 void RenderScene::Build(Scene* scene)
 {
 	// View & Projection...
-	glm::mat4 camTr;
-
-	// Has Camera? 
-	if (scene->GetTargetCamera())
-	{
-		SetProjection(scene->GetTargetCamera()->GetProjectionMatrix());
-		camTr = scene->GetCameraTransform()->GetWorldMatrix();
-		SetView(glm::inverse(camTr));
-	}
-	else
-	{
-		camTr = glm::inverse(view);
-	}
-
-	viewDir = glm::normalize(camTr  * glm::vec4(Raven::FORWARD, 0.0f));
-	viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	CollectSceneView(scene);
 
 	// Lights...
-	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
-
-	for (auto entity : lightsEttView)
-	{
-		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
-		if (light.type != (int32_t)LightType::DirectionalLight)
-			continue;
-
-		lightData.lightDir = glm::normalize(glm::vec4(light.direction, 0.0f));
-		lightData.lightColor = light.color;
-		lightData.lightPower = light.intensity;
-	}
+	CollectSceneLights(scene);
 
 	// Terrain...
 	auto TerrainEttView = scene->GetRegistry().view<TerrainComponent>();
@@ -181,7 +102,11 @@ void RenderScene::Build(Scene* scene)
 		RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
 		renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
 		renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
-		renderTerrain->SetMaterial(terrainMaterail);
+
+		// Default Terrain Material.
+		const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+		renderTerrain->SetMaterial( defaultMaterials.terrain->GetRenderRsc() );
+
 		GetBatch(ERSceneBatch::Opaque).Add(renderTerrain);
 	}
 
@@ -196,9 +121,11 @@ void RenderScene::SetView(const glm::mat4& mtx)
 }
 
 
-void RenderScene::SetProjection(const glm::mat4& mtx)
+void RenderScene::SetProjection(const glm::mat4& mtx, float n, float f)
 {
 	projection = mtx;
+	near = n;
+	far = f;
 }
 
 
@@ -216,15 +143,14 @@ void RenderScene::AddDebugPrimitives(const std::vector<RenderPrimitive*>& primit
 
 void RenderScene::TraverseScene(Scene* scene)
 {
+	// Default Materials.
+	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+
+
 	// Get All models in the scene
 	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
 	if (group.empty())
 		return; 
-
-	// ~Testing---------------------------------------
-	// Clear Debug just for testing...
-	GetBatch(ERSceneBatch::Debug).Clear();
-	// ~Testing---------------------------------------
 
 
 	// Iterate over all Models in the scene.
@@ -253,7 +179,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Mesh Materail...
 			Material* meshMaterail = model.GetMaterial(i);
 
-			if (meshMaterail)
+			if (meshMaterail && 0)
 			{
 				// Update Material Paramters if Dirty.
 				if (meshMaterail->IsDirty())
@@ -265,12 +191,55 @@ void RenderScene::TraverseScene(Scene* scene)
 			}
 			else
 			{
-				rmesh->SetMaterial( defaultMaterail );
+				rmesh->SetMaterial( defaultMaterials.model->GetRenderRsc() );
 			}
 
 			// Add to opaque...
 			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
 		}
+	}
+}
+
+
+void RenderScene::CollectSceneView(Scene* scene)
+{
+	glm::mat4 camTr;
+
+	// Has Camera? 
+	if (scene->GetTargetCamera())
+	{
+		const auto& targetCam = scene->GetTargetCamera();
+		SetProjection(targetCam->GetProjectionMatrix(), targetCam->GetNear(), targetCam->GetFar());
+		camTr = scene->GetCameraTransform()->GetWorldMatrix();
+		SetView(glm::inverse(camTr));
+	}
+	else
+	{
+		camTr = glm::inverse(view);
+	}
+
+	viewDir = glm::normalize(camTr * glm::vec4(Raven::FORWARD, 0.0f));
+	viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	viewProjMatrix = projection * view;
+	viewProjMatrixInverse = glm::inverse(viewProjMatrix);
+
+}
+
+
+void RenderScene::CollectSceneLights(Scene* scene)
+{
+	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
+
+	for (auto entity : lightsEttView)
+	{
+		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
+		if (light.type != (int32_t)LightType::DirectionalLight)
+			continue;
+
+		environment.sunDir = glm::normalize(glm::vec4(light.direction, 0.0f));
+		environment.sunColor = light.color;
+		environment.sunPower = light.intensity;
 	}
 }
 
@@ -289,6 +258,9 @@ void RenderScene::Clear()
 
 	dynamicPrimitive.clear();
 
+	//...
+	near = 0.0f;
+	far = 0.0f;
 }
 
 
@@ -296,41 +268,8 @@ void RenderScene::Draw(ERSceneBatch type)
 {
 	const RenderBatch& batch = GetBatch(type);
 
-	{
-		// Testing the Block..................................
-		int32_t inputIdx = commonUBO->GetInputIndex("viewDir");
-		commonUBO->UpdateData(
-			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
-			commonUBO->GetInputOffset(inputIdx),
-			glm::value_ptr(viewDir)
-		);
-
-		inputIdx = commonUBO->GetInputIndex("viewPos");
-		commonUBO->UpdateData(
-			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
-			commonUBO->GetInputOffset(inputIdx),
-			glm::value_ptr(viewPos)
-		);
-
-		inputIdx = commonUBO->GetInputIndex("time");
-		commonUBO->UpdateData(
-			RenderShaderInput::GetSize(commonUBO->GetInput(inputIdx).inputType),
-			commonUBO->GetInputOffset(inputIdx),
-			&time
-		);
-
-		commonUBO->BindBase();
-	}
-
-
-
-	trData.modelMatrix = glm::mat4(1.0f);
-	trData.viewProjMatrix = projection * view;
-	trUBO->UpdateData(sizeof(TransformUBO), 0, &trData);
-	trUBO->BindBase();
-
-	lightingUBO->UpdateData(sizeof(LightingUBO), 0, &lightData);
-	lightingUBO->BindBase();
+	// Bind Transform UB
+	transformUB->BindBase();
 
 
 	for (auto& prim : batch.elements)
@@ -338,10 +277,13 @@ void RenderScene::Draw(ERSceneBatch type)
 		// Transfromation...
 		trData.modelMatrix = prim->GetWorldMatrix();
 		trData.normalMatrix = prim->GetWorldMatrix();
-		trUBO->UpdateData( sizeof(glm::mat4) * 2, 0, &trData); // Model & Normal Matrix.
+		transformUB->UpdateData( sizeof(TransformVertexData), 0, &trData ); // Model & Normal Matrix.
 
-		// Materail...
+		// Shader & Materail...
 		RenderRscMaterial* material = prim->GetMaterial();
+		GLShader* shader = material->GetShaderRsc()->GetShader();
+		shader->Use();
+
 
 		if (material->HasMaterialData())
 		{
@@ -349,8 +291,11 @@ void RenderScene::Draw(ERSceneBatch type)
 			material->UpdateUniformBuffer();
 		}
 
-		GLShader* shader = prim->GetMaterial()->GetShaderRsc()->GetShader();
-		shader->Use();
+
+		material->MakeTexturesActive(); // Material Textures...
+
+
+		// Draw...
 		prim->Draw(shader);
 	}
 

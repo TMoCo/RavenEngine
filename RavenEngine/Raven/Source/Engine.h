@@ -81,7 +81,7 @@ namespace Raven
 		void NewGameScene();
 
 		// Return current engine time.
-		inline float GetEngineTime() const { return engineTime; }
+		inline float GetEngineTime() const { return static_cast<float>(engineTime); }
 
 
 	protected:

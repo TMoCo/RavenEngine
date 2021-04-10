@@ -75,10 +75,19 @@ void GLFrameBuffer::Update()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, id);
 
+	// List of color attachments...
+	std::vector<GLENUM> colorAttachments;
+
 	// Attachments...
 	for (const auto& data : attachments)
 	{
 		const auto& att = data.second;
+
+		// Is Color Attachment?
+		if (att.target >= EGLAttachment::Color0 && att.target <= EGLAttachment::Color9)
+		{
+			colorAttachments.push_back((GLENUM)att.target);
+		}
 
 		// Texture Attachment?
 		if (att.texRef)
@@ -126,11 +135,11 @@ void GLFrameBuffer::Update()
 
 	}
 
-
+	// Color attachments to draw.
+	glDrawBuffers(colorAttachments.size(), colorAttachments.data());
 
 	// Validate Completion of Framebuffer.
 	ValidateStatus();
-
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

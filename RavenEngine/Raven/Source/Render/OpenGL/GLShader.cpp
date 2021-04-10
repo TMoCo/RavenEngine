@@ -265,6 +265,7 @@ GLUINT GLShader::BuildStage(EGLShaderStage stage)
 	LOGE("GLShader({0}) - Failed To Compile {1}: \n{2}", name.c_str(), ToString(stage).c_str(), log.c_str());
 
 	glDeleteShader(shaderID);
+	RAVEN_ASSERT(0, "Failed to compile.");
 	return 0;
 }
 

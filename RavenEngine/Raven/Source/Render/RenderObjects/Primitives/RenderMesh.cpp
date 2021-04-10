@@ -1,5 +1,5 @@
 #include "RenderMesh.h"
-#include "Render/RenderResource/RenderRscMesh.h"
+#include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
 
 #include "Render/OpenGL/GLVertexArray.h"

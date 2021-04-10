@@ -57,6 +57,9 @@ namespace Raven
 
 		// The input name.
 		std::string name;
+
+		// If greater than one, it means that this input is an array and this is the size.
+		int32_t count;
 	};
 
 
@@ -94,6 +97,7 @@ namespace Raven
 		// Specify the input in a unifrom block, if offset is -1 then it will compute the offset based on the previous input.
 		// This is called between Begin/End uniform block.
 		void AddInput(EShaderInputType inputType, const std::string& inputName, int32_t offset = -1);
+		void AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, int32_t offset = -1);
 
 		// Return the index of an input with that name.
 		int32_t GetInputIndex(const std::string& name);

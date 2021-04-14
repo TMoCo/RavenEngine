@@ -24,6 +24,7 @@ namespace Raven
 	class RenderTarget;
 	class Scene;
 	class RenderPipeline;
+	class RenderTexFilter;
 	class RenderRscMaterial;
 	class Material;
 
@@ -115,7 +116,10 @@ namespace Raven
 		Ptr<RenderDebug> rdebug;
 
 		// The Engine Render Pipeline.
-		Ptr<RenderPipeline> pipeline;
+		Ptr<RenderPipeline> rpipeline;
+
+		// The Engine Render Texture Filter, used to filter textures.
+		Ptr<RenderTexFilter> rfilter;
 
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;

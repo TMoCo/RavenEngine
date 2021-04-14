@@ -2,7 +2,9 @@
 
 #include "RenderTarget.h"
 #include "RenderObjects/RenderScene.h"
+#include "RenderObjects/RenderLight.h"
 #include "RenderObjects/RenderScreen.h"
+#include "RenderObjects/RenderSphere.h"
 #include "RenderObjects/RenderPass.h"
 #include "RenderResource/Shader/UniformBuffer.h"
 #include "RenderResource/Shader/RenderRscShader.h"
@@ -11,7 +13,7 @@
 #include "OpenGL/GLShader.h"
 #include "OpenGL/GLFrameBuffer.h"
 
-
+#include "Engine.h"
 
 #include "GL/glew.h"
 
@@ -22,9 +24,11 @@ namespace Raven {
 
 
 
-RenderPipeline::RenderPipeline()
+RenderPipeline::RenderPipeline(Ptr<RenderScreen> screen, Ptr<RenderSphere> sphere)
 	: rtarget(nullptr)
 	, rscene(nullptr)
+	, rscreen(screen)
+	, rsphere(sphere)
 {
 
 }
@@ -38,25 +42,22 @@ RenderPipeline::~RenderPipeline()
 
 void RenderPipeline::Initialize()
 {
-	// Create Render Screen
-	rscreen = Ptr<RenderScreen>( RenderScreen::Create() );
-
 	// Setup...
 	SetupRenderPasses();
 	SetupShaders();
 
 	// Uniforms...
 	uniforms.common = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::CommonBlock, true) );
-	uniforms.light = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightingBlock, true) );
-	
+	uniforms.light_DEFERRED = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightingBlock_DEFERRED, true) );
+	uniforms.light_FORWARD = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightingBlock_FORWARD, true) );
 }
 
 
 void RenderPipeline::Destroy()
 {
-	rscreen.reset();
 	uniforms.common.reset();
-	uniforms.light.reset();
+	uniforms.light_DEFERRED.reset();
+	uniforms.light_FORWARD.reset();
 
 
 }
@@ -75,11 +76,13 @@ void RenderPipeline::Begin(RenderTarget* target, RenderScene* scene, float time)
 	viewport.w = (float)rtarget->GetSize().y;
 
 	// Render Target Clear Color
-	gbuffer->SetClearColor(0, rtarget->GetClearColor());
+	glm::vec4 clearColor = rtarget->GetClearColor();
+	clearColor.a = 0.0f;
+	gbufferPass->SetClearColor(0, clearColor);
 
 
 	// Check render passe target size, and resize it if needed.
-	if (gbuffer->GetSize().x < viewport.z || gbuffer->GetSize().y < viewport.w)
+	if (gbufferPass->GetSize().x < viewport.z || gbufferPass->GetSize().y < viewport.w)
 	{
 		glm::ivec2 newSize(viewport.z, viewport.w);
 		Resize(newSize);
@@ -114,7 +117,7 @@ void RenderPipeline::End()
 	blitViewport.y1 = (int)viewport.w;
 
 	// Blit...
-	lighting->GetFBO()->Blit(
+	lightingPass->GetFBO()->Blit(
 		rtarget->GetFBO(),
 		EGLAttachment::Color0,
 		EGLAttachment::Color0,
@@ -145,7 +148,7 @@ void RenderPipeline::Render()
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Deferred: G-Buffer Pass
 	{
-		gbuffer->Begin(viewport, true);
+		gbufferPass->Begin(viewport, true);
 
 		// Draw the opaque part of the scene to the G-Buffer
 		rscene->Draw(ERSceneBatch::Opaque);
@@ -163,43 +166,53 @@ void RenderPipeline::Render()
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Deferred: Lighting Pass
 	{
+		UpdateLights_DEFERRED();
+		uniforms.light_DEFERRED->BindBase();
+
 		GLShader* shader = lightingShader->GetShader();
-		lighting->Begin(viewport, false);
+		lightingPass->Begin(viewport, false);
 
 		// Set G-Buffer Textures
 		shader->Use();
-		gbuffer->GetTexture(0)->Active(0); // Albedo + Specular.
-		gbuffer->GetTexture(1)->Active(1); // Normal.
-		gbuffer->GetTexture(2)->Active(2); // BRDF.
-		gbuffer->GetDepthTexture()->Active(3); // Depth.
+		gbufferPass->GetTexture(0)->Active(0); // Albedo + Specular.
+		gbufferPass->GetTexture(1)->Active(1); // Normal.
+		gbufferPass->GetTexture(2)->Active(2); // BRDF.
+		gbufferPass->GetDepthTexture()->Active(3); // Depth.
+
+		// ~Testing----------------------------------------------------------------------------
+		testEnv->Active(4);
+		testBRDF->Active(5);
+		// ~Testing----------------------------------------------------------------------------
+
 
 		//
-		rscreen->SetRTSize( gbuffer->GetSize() );
+		rscreen->SetRTSize( gbufferPass->GetSize() );
 		rscreen->Draw(shader);
 	}
 
 
 
-
+	// End...
+	RenderPass::End();
 }
 
 
 void RenderPipeline::Resize(const glm::ivec2& newSize)
 {
-	gbuffer->Resize(newSize);
-	lighting->Resize(newSize);
+	gbufferPass->ResizeTargets(newSize);
+	lightingPass->ResizeTargets(newSize);
 	//forward->Resize(newSize);
 }
 
 
 void RenderPipeline::SetupRenderPasses()
 {
-	glm::ivec2 size(128, 128);
+	glm::ivec2 size(1920, 1080);
 
 	// G-Buffer Rende Pass
 	{
-		// Albedo + Specular
-		Ptr<GLTexture> albedoSpecularTarget0 = Ptr<GLTexture>(GLTexture::Create2D(
+		// Albedo(RGB) + EmissionPower(B)
+		Ptr<GLTexture> target0Albedo = Ptr<GLTexture>(GLTexture::Create2D(
 			EGLFormat::RGBA,
 			size.x, size.y,
 			EGLFilter::Nearest,
@@ -207,15 +220,15 @@ void RenderPipeline::SetupRenderPasses()
 		));
 
 		// Normal
-		Ptr<GLTexture> normalTarget1 = Ptr<GLTexture>(GLTexture::Create2D(
+		Ptr<GLTexture> target1Normal = Ptr<GLTexture>(GLTexture::Create2D(
 			EGLFormat::RGB16F,
 			size.x, size.y,
 			EGLFilter::Nearest,
 			EGLWrap::ClampToEdge
 		));
 
-		// BRDF: Roughness + Metallic + ??
-		Ptr<GLTexture> brdfTarget2 = Ptr<GLTexture>(GLTexture::Create2D(
+		// BRDF: Roughness(R) + Metallic(G) + Specular(B)
+		Ptr<GLTexture> target2BRDF = Ptr<GLTexture>(GLTexture::Create2D(
 			EGLFormat::RGBA,
 			size.x, size.y,
 			EGLFilter::Nearest,
@@ -223,7 +236,7 @@ void RenderPipeline::SetupRenderPasses()
 		));
 
 		// Depth
-		Ptr<GLTexture> depthTarget = Ptr<GLTexture>(GLTexture::Create2D(
+		Ptr<GLTexture> targetDepth = Ptr<GLTexture>(GLTexture::Create2D(
 			EGLFormat::Depth32,
 			size.x, size.y,
 			EGLFilter::Nearest,
@@ -231,13 +244,15 @@ void RenderPipeline::SetupRenderPasses()
 		));
 
 
-		gbuffer = Ptr<RenderPass>(new RenderPass());
-		gbuffer->AddTexture(0, albedoSpecularTarget0);
-		gbuffer->AddTexture(1, normalTarget1);
-		gbuffer->AddTexture(2, brdfTarget2);
-		gbuffer->SetDepthTexture(depthTarget, false);
-		gbuffer->SetSize(size);
-		gbuffer->Build();
+		gbufferPass = Ptr<RenderPass>(new RenderPass());
+		
+		// Targets...
+		gbufferPass->AddTexture(0, target0Albedo);
+		gbufferPass->AddTexture(1, target1Normal);
+		gbufferPass->AddTexture(2, target2BRDF);
+		gbufferPass->SetDepthTexture(targetDepth, false);
+		gbufferPass->SetSize(size);
+		gbufferPass->Build();
 	}
 
 
@@ -252,10 +267,10 @@ void RenderPipeline::SetupRenderPasses()
 		));
 
 
-		lighting = Ptr<RenderPass>(new RenderPass());
-		lighting->AddTexture(0, lightingTexture);
-		lighting->SetSize(size);
-		lighting->Build();
+		lightingPass = Ptr<RenderPass>(new RenderPass());
+		lightingPass->AddTexture(0, lightingTexture);
+		lightingPass->SetSize(size);
+		lightingPass->Build();
 	}
 
 }
@@ -268,6 +283,10 @@ void RenderPipeline::SetupShaders()
 		RenderRscShaderDomainCreateData shaderDomainData;
 		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/ScreenTriangleVert.glsl");
 		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/DeferredLighting.glsl");
+		shaderDomainData.AddImport(EGLShaderStageBit::FragmentBit, "shaders/CommonLight.glsl");
+		shaderDomainData.AddImport(EGLShaderStageBit::FragmentBit, "shaders/Lighting.glsl");
+		shaderDomainData.AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_DEFERRED_MAX_LIGHTS));
+		shaderDomainData.AddPreprocessor("#define SCALE_UV_WITH_TARGET 1");
 
 		// Shader Type Data
 		RenderRscShaderCreateData shaderData;
@@ -276,14 +295,57 @@ void RenderPipeline::SetupShaders()
 
 		lightingShader = Ptr<RenderRscShader>( RenderRscShader::CreateCustom(shaderDomainData, shaderData) );
 		lightingShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
-		lightingShader->GetInput().AddSamplerInput("inAlbedoSpecular");
+		lightingShader->GetInput().AddBlockInput(RenderShaderInput::LightingBlock_DEFERRED);
+		lightingShader->GetInput().AddSamplerInput("inAlbedo");
 		lightingShader->GetInput().AddSamplerInput("inNormal");
 		lightingShader->GetInput().AddSamplerInput("inBRDF");
 		lightingShader->GetInput().AddSamplerInput("inDepth");
+		lightingShader->GetInput().AddSamplerInput("inSkyEnvironment");
+		lightingShader->GetInput().AddSamplerInput("inEnvBRDF");
 		lightingShader->BindBlockInputs();
 		lightingShader->BindSamplers();
 	}
+
 }
+
+
+
+
+void RenderPipeline::UpdateLights_DEFERRED()
+{
+	std::vector<glm::vec4> lightPos(RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	std::vector<glm::vec4> lightDir(RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	std::vector<glm::vec4> lightPower(RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	std::vector<glm::vec4> lightData(RENDER_PASS_DEFERRED_MAX_LIGHTS);
+
+
+	for (int32_t i = 0; i < RENDER_PASS_DEFERRED_MAX_LIGHTS; ++i)
+	{
+		if (i >= rscene->GetLights().size())
+		{
+			lightData[i].r = 0.0f; // No Light.
+			continue;
+		}
+		
+		const auto& light =  rscene->GetLights()[i];
+		lightPos[i] = glm::vec4(light->postion, 0.0f);
+		lightDir[i] = glm::vec4(light->dir, 0.0f);
+		lightData[i].r = light->type;
+		lightData[i].g = light->innerAngle;
+		lightData[i].b = light->outerAngle;
+		lightData[i].a = light->radius;
+		lightPower[i] = light->colorAndPower;
+	}
+
+
+
+	uniforms.light_DEFERRED->SetDataValues(0, lightDir);
+	uniforms.light_DEFERRED->SetDataValues(1, lightPos);
+	uniforms.light_DEFERRED->SetDataValues(2, lightPower);
+	uniforms.light_DEFERRED->SetDataValues(3, lightData);
+	uniforms.light_DEFERRED->Update();
+}
+
 
 
 

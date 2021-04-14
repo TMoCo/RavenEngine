@@ -12,6 +12,7 @@
 
 #include "Window/Window.h"
 
+#include "Render/RenderDebug.h"
 #include "Render/RenderModule.h"
 #include "Render/RenderTarget.h"
 
@@ -43,8 +44,16 @@
 #include "Scripts/LuaVirtualMachine.h"
 
 
+
+
+
 namespace Raven 
 {
+	Ptr<Material> TESTING_MAT;
+
+
+
+
 	Engine::Engine()
 		: engineTime(0.0f)
 	{
@@ -118,6 +127,39 @@ namespace Raven
 
 		// Update Render...
 		GetModule<RenderModule>()->Update(dt);
+
+
+
+
+		// ~TESTING---------------------------------------------------------------------------------------------
+		if (TESTING_MAT)
+		{
+			static float roughnessTime = 0.0f;
+			roughnessTime += dt;
+			TESTING_MAT->SetScalar("roughness", glm::abs(glm::sin(roughnessTime * 0.4f)));
+		}
+
+		auto lightsEttView = GetModule<Raven::SceneManager>()->GetCurrentScene()->GetRegistry().group<Light>(entt::get<Transform>);
+
+		//
+		bool isSearchForSun = true;
+
+		// Iterate over all lights in the scene.
+		for (auto entity : lightsEttView)
+		{
+			const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
+
+			if (light.type == 0)
+				continue;
+
+			GetModule<RenderModule>()->GetDebug()->DrawBox(light.position, glm::vec3(10.0), light.color);
+		}
+
+		// ~TESTING---------------------------------------------------------------------------------------------
+
+
+
+
 	}
 
 	void Engine::OnRender()
@@ -222,11 +264,16 @@ namespace Raven
 		auto terrainEntity = newScene->CreateEntity("terrain");
 		terrainEntity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
 
-		auto& lightEntity = newScene->CreateEntity("sun");
-		auto& lightComp = lightEntity.GetOrAddComponent<Light>();
-		lightComp.type = (int32_t)LightType::DirectionalLight;
-		lightComp.direction = glm::normalize(glm::vec3(-1.0f));
-		lightComp.intensity = 1.0f;
+		{
+			auto& lightEntity = newScene->CreateEntity("THE_SUN");
+			auto& lightComp = lightEntity.GetOrAddComponent<Light>();
+			auto& tr = lightEntity.GetOrAddComponent<Transform>();
+
+			lightComp.type = (int32_t)LightType::DirectionalLight;
+			lightComp.color = glm::vec4(1.0f, 0.95f, 0.8f, 1.0f);
+			lightComp.intensity = 1.2f;
+			lightComp.direction = glm::normalize(glm::vec3(-1.0f));
+		}
 
 
 		// Basic Material...
@@ -245,8 +292,37 @@ namespace Raven
 		basicMatShader->LoadOnGpu();
 
 
+		//
+		int res = 7;
+		glm::vec2 size(1000.0f);
+		Ptr<Mesh> sphereMesh(MeshFactory::CreateSphere());
+
+		{
+			glm::vec3 pos = glm::vec3(size.x * 0.5, 220.0f, size.y * 0.5);
+
+			auto meshEntity = newScene->CreateEntity("Middle_Sphere");
+			auto& tr = meshEntity.GetOrAddComponent<Transform>();
+			tr.SetLocalPosition(pos);
+			tr.SetLocalScale(glm::vec3(150.0f));
+
+
+			TESTING_MAT = Ptr<Material>(new Material(basicMatShader));
+			TESTING_MAT->SetColor("color", glm::vec4(0.1));
+			TESTING_MAT->SetColor("emission", glm::vec4(0.0));
+			TESTING_MAT->SetScalar("roughness", 0.05f);
+			TESTING_MAT->SetScalar("metallic", 1.0f);
+			TESTING_MAT->SetScalar("specular", 1.0f);
+			TESTING_MAT->LoadOnGpu();
+
+			auto& model = meshEntity.GetOrAddComponent<Model>();
+			model.AddMesh(sphereMesh);
+			model.SetMaterial(0, TESTING_MAT);
+		}
+		
+
+
 		glm::vec4 randomColors[8] = {
-			glm::vec4(0.0f, 0.0f, 0.0f, 1.0),
+			glm::vec4(0.1f, 0.1f, 0.1f, 1.0),
 			glm::vec4(1.0f, 1.0f, 1.0f, 1.0),
 			glm::vec4(1.0f, 0.0f, 0.0f, 1.0),
 			glm::vec4(0.0f, 1.0f, 0.0f, 1.0),
@@ -257,36 +333,33 @@ namespace Raven
 		};
 
 
-		//
-		int res = 25;
-		glm::vec2 size(1000.0f);
-		Ptr<Mesh> sphereMesh(MeshFactory::CreateSphere());
+
 
 		for (int32_t x = 0; x < res; ++x)
 		{
+
 			for (int32_t y = 0; y < res; ++y)
 			{
+				if (!(x == 0 || x == res - 1 || y == 0 || y == res - 1))
+					continue;
+
 				float fx = (float)x / (float)(res - 1);
 				float fy = (float)y / (float)(res - 1);
 
 				//
-				glm::vec3 pos = glm::vec3(size.x * fx, 100.0f, size.y * fy);
+				glm::vec3 pos = glm::vec3(size.x * fx, 200.0f, size.y * fy);
 
 				auto meshEntity = newScene->CreateEntity("Model_" + std::to_string(x+y*res));
 				auto& tr = meshEntity.GetOrAddComponent<Transform>();
 				tr.SetLocalPosition(pos);
-				tr.SetLocalScale(glm::vec3(10.0f));
+				tr.SetLocalScale(glm::vec3(80.0f));
 
 
 				Ptr<Material> basicMat(new Material(basicMatShader));
-				basicMat->SetColor("color", randomColors[rand() % 8]);
-
-				glm::vec4 matColor;
-				basicMat->GetColor("color", matColor);
-
-				basicMat->SetColor("emission", matColor);
-				basicMat->SetScalar("roughness", 0.0f);
-				basicMat->SetScalar("metallic", 0.0f);
+				basicMat->SetColor("color", glm::vec4(0.4f));
+				basicMat->SetColor("emission", glm::vec4(0.0f));
+				basicMat->SetScalar("roughness", fx);
+				basicMat->SetScalar("metallic", fy);
 				basicMat->SetScalar("specular", 1.0f);
 				basicMat->LoadOnGpu();
 
@@ -296,6 +369,30 @@ namespace Raven
 			}
 		}
 
+
+
+		for (int32_t i = 0; i < 16; ++i)
+		{
+			float f = (float)i / (float)(16 - 1);
+			f *= 6.15132f;
+
+			auto& lightEntity = newScene->CreateEntity("light");
+			auto& lightComp = lightEntity.GetOrAddComponent<Light>();
+			lightComp.type = (int32_t)LightType::PointLight;
+			lightComp.intensity = 40000.0f;
+			lightComp.radius = 450.0f;
+			lightComp.position = glm::vec3(cos(f), 0.4, sin(f)) * 500.0f + glm::vec3(500.0f, 150.0f, 500.0f);
+
+			lightComp.direction = glm::normalize(glm::vec3(500.0f, 100.0f, 500.0f) - lightComp.position);
+
+			lightComp.color = glm::vec4(randomColors[i % 8]);
+			lightComp.innerAngle = 20.0f;
+			lightComp.outerAngle = 25.0f;
+
+			auto& lightTransfrom = lightEntity.GetOrAddComponent<Transform>();
+			lightTransfrom.SetLocalPosition(lightComp.position);
+
+		}
 
 		// Switch the scene....
 		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);

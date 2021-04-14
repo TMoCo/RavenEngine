@@ -169,7 +169,7 @@ void RenderRscMaterial::MakeTexturesActive()
 {
 	for (const auto& inputTex : matInputTexturesMap)
 	{
-		if (!inputTex.second)
+		if (!inputTex.second || !(*inputTex.second))
 			continue;
 
 		RenderRscTexture* rtex = (*inputTex.second)->renderRscTexture;

@@ -21,7 +21,7 @@ uniform sampler2D colorTexture;
 void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
 	outParams.color = inMaterial.color.rgb;	
-	outParams.emission = inMaterial.emission.rgb * (0.3 * abs(sin(inCommon.time * 2.0)));
+	outParams.emission = inMaterial.emission.rgb;
 	outParams.roughness = inMaterial.roughness;
 	outParams.metallic = inMaterial.metallic;
 	outParams.specular = inMaterial.specular;

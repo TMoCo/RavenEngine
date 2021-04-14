@@ -44,7 +44,7 @@ namespace Raven
 		, intensity(intensity)
 		, radius(radius)
 		, type(int32_t(type))
-		, angle(angle)
+		, outerAngle(angle)
 	{
 	}
 	
@@ -54,19 +54,23 @@ namespace Raven
 		ImGui::Columns(2);
 		ImGui::Separator();
 
-		if (type != 0)
-			ImGuiHelper::Property("Position", position);
+		//if (type != 0)
+		//	ImGuiHelper::Property("Position", position);
 
-		if (type != 2)
-			ImGuiHelper::Property("Direction", direction);
+		//if (type != 2)
+		//	ImGuiHelper::Property("Direction", direction);
 
 		if (type != 0)
 			ImGuiHelper::Property("Radius", radius, 0.0f, 100.0f);
+
 		ImGuiHelper::Property("Color", color, true, ImGuiHelper::PropertyFlag::ColorProperty);
 		ImGuiHelper::Property("Intensity", intensity, 0.0f, 100.0f);
 
 		if (type == 1)
-			ImGuiHelper::Property("Angle", angle, -1.0f, 1.0f);
+			ImGuiHelper::Property("Inner Angle", innerAngle, 0.0f, 1.0f);
+
+		if (type == 1)
+			ImGuiHelper::Property("Outer Angle", outerAngle, 0.0f, 1.0f);
 
 		ImGui::AlignTextToFramePadding();
 		ImGui::TextUnformatted("Light Type");

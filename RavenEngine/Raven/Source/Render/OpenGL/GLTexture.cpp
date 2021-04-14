@@ -18,6 +18,8 @@ GLTexture::GLTexture()
 	, format(EGLFormat::None)
 	, filter(EGLFilter::Nearest)
 	, wrap(EGLWrap::ClampToEdge)
+	, baseMipLevel(0)
+	, maxMipLevel(1000)
 {
 
 }
@@ -130,10 +132,14 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int layer,
 
 void GLTexture::UpdateTexParams()
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLINT)filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLINT)filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLINT)wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLINT)wrap);
+	EGLFilter magFilter = filter == EGLFilter::TriLinear ? EGLFilter::Linear : filter;
+
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MAG_FILTER, (GLINT)magFilter);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MIN_FILTER, (GLINT)filter);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_WRAP_S, (GLINT)wrap);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_WRAP_T, (GLINT)wrap);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_BASE_LEVEL, baseMipLevel);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MAX_LEVEL, maxMipLevel);
 }
 
 
@@ -208,6 +214,26 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 }
 
 
+int GLTexture::GetBPP(EGLFormat format)
+{
+	switch (format)
+	{
+	case EGLFormat::R16F: return sizeof(float) * 8;
+	case EGLFormat::RG16F: return sizeof(float) * 16;
+	case EGLFormat::RGB16F: return sizeof(float) * 24;
+	case EGLFormat::RGBA16F: return sizeof(float) * 32;
+
+	case EGLFormat::R: return sizeof(uint8_t) * 8;
+	case EGLFormat::RGB: return sizeof(uint8_t) * 24;
+	case EGLFormat::RGBA: return sizeof(uint8_t) * 32;
+	}
+
+	RAVEN_ASSERT(0, "No BPP Info.");
+	return -1;
+}
+
+
+
 void GLTexture::Active(int i)
 {
 	glActiveTexture(GL_TEXTURE0 + i);
@@ -226,6 +252,12 @@ void GLTexture::SetWrap(EGLWrap value)
 	wrap = value;
 }
 
+
+void GLTexture::SetMipLevels(int base, int max)
+{
+	baseMipLevel = base;
+	maxMipLevel = max;
+}
 
 
 } // End of namespace Raven.

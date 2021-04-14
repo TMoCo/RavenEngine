@@ -94,10 +94,16 @@ namespace Raven
 		inline GLFrameBuffer* GetFBO() const { return fbo.get(); }
 
 		// Resize all the render pass targets to a new size.
-		void Resize(const glm::ivec2& newSize);
+		void ResizeTargets(const glm::ivec2& newSize);
 
 		// Begin the render pass.
 		void Begin(const glm::ivec4& viewport, bool isClear);
+
+		//
+		void ReplaceTarget(uint32_t index, const Ptr<GLTexture>& inTex, int32_t level = 0, int32_t layer = 0);
+
+		// Finish Any/All render passess, called at the end of the pipeline.
+		static void End();
 
 	private:
 		// Framebuffer of the render pass.

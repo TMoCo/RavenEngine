@@ -8,6 +8,7 @@
 #include "Render/OpenGL/GLTypes.h"
 #include "RenderShaderInput.h"
 
+#include "glm/vec4.hpp"
 
 
 
@@ -74,6 +75,9 @@ namespace Raven
 
 			SetData(offset, size, &value);
 		}
+
+		// Set a vector of vec4 at index.
+		void SetDataValues(int32_t index, const std::vector<glm::vec4>& values);
 
 		// Update the the unfriom buffer from the cpu buffer.
 		void Update();

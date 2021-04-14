@@ -13,6 +13,11 @@
 
 
 
+#define RENDER_PASS_DEFERRED_MAX_LIGHTS 32
+#define RENDER_PASS_FORWARD_MAX_LIGHTS 4
+
+
+
 
 
 namespace Raven
@@ -106,7 +111,8 @@ namespace Raven
 		// Utility functions for making specific/global uniform blocks to a shader input.
 		static RSInputBlockDescription MakeCommonBlock();
 		static RSInputBlockDescription MakeTransfromBlock();
-		static RSInputBlockDescription MakeLightingBlock();
+		static RSInputBlockDescription MakeLightingBlock_DEFERRED();
+		static RSInputBlockDescription MakeLightingBlock_FORWARD();
 	};
 
 
@@ -174,7 +180,8 @@ namespace Raven
 		// Global Uniform Buffer Description...
 		static RSInputBlockDescription CommonBlock;
 		static RSInputBlockDescription TransfromBlock;
-		static RSInputBlockDescription LightingBlock;
+		static RSInputBlockDescription LightingBlock_DEFERRED;
+		static RSInputBlockDescription LightingBlock_FORWARD;
 
 		// The binding for the material shader unifrom block input.
 		static int32_t MaterialBlockBinding;

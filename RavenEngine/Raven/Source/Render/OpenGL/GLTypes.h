@@ -140,7 +140,7 @@ namespace Raven
 	{
 		Nearest = 0x2600,
 		Linear = 0x2601,
-		TriLinear = 0x2703,
+		TriLinear = 0x2703
 	};
 
 

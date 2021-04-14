@@ -80,6 +80,20 @@ void UniformBuffer::Update()
 	buffer->UpdateSubData(blockDescription.size, 0, cpuData);
 }
 
+
+void UniformBuffer::SetDataValues(int32_t index, const std::vector<glm::vec4>& values)
+{
+	const auto& input = GetInput(index);
+	int32_t offset = GetInputOffset(index);
+	int32_t size = RenderShaderInput::GetSize(input.inputType);
+	RAVEN_ASSERT(input.count > 1, "Invalid Operation - not an array.");
+	RAVEN_ASSERT(sizeof(glm::vec4) == size, "Invalid DataType - Size does not match.");
+
+	size = size * input.count;
+	SetData(offset, size, values.data());
+}
+
+
 } // End of namespace Raven.
 
 

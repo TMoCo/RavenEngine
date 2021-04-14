@@ -8,12 +8,16 @@ layout(location=1) in vec2 inTexCoord;
 
 
 
+#ifndef SCALE_UV_WITH_TARGET
+#define SCALE_UV_WITH_TARGET 0
+#endif
+
 
 
 // Vertex Shader Output.
 out VertexOutput
 {
-	vec2 texCoord;
+	vec2 rtCoord;
 } outVertex;
 
 
@@ -34,7 +38,12 @@ void main()
 	//
 	gl_Position = vec4(inPosition.x, inPosition.y, 0.5, 1.0);
 	
+#if SCALE_UV_WITH_TARGET
 	// Set Vertex-Output...
-	outVertex.texCoord = (inCommon.viewport.zw / inRTSize) * inTexCoord.xy;
+	outVertex.rtCoord = (inCommon.viewport.zw / inRTSize) * inTexCoord.xy;
+#else
+	outVertex.rtCoord = inTexCoord.xy;
+#endif
+	
 }
 

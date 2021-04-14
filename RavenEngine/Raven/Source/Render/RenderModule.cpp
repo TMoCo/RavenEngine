@@ -13,11 +13,13 @@
 #include "RenderDebug.h"
 #include "RenderTarget.h"
 #include "RenderPipeline.h"
+#include "RenderTexFilter.h"
 #include "Render/RenderResource/Shader/RenderRscShader.h"
 #include "Render/RenderResource/Shader/UniformBuffer.h"
 #include "RenderObjects/RenderScene.h"
 #include "RenderObjects/RenderPass.h"
 #include "RenderObjects/RenderScreen.h"
+#include "RenderObjects/RenderSphere.h"
 
 
 #include "OpenGL/GLContext.h"
@@ -43,6 +45,9 @@
 #include "glm/gtx/transform.hpp"
 
 
+// ~Testing----------------------------------------------------------------------------
+#include "ResourceManager/ResourceManager.h"
+// ~Testing----------------------------------------------------------------------------
 
 
 
@@ -64,7 +69,7 @@ RenderModule::RenderModule()
 	, isRTToWindow(true)
 {
 	rdebug.reset(new RenderDebug());
-	pipeline.reset(new RenderPipeline());
+
 }
 
 
@@ -91,11 +96,18 @@ void RenderModule::Initialize()
 	// Setup Render Debug.
 	rdebug->Setup();
 
-	// Initialize the pipeline.
-	pipeline->Initialize();
 
 
 	// ...
+	Ptr<RenderScreen> rscreen = Ptr<RenderScreen>(RenderScreen::Create());
+	Ptr<RenderSphere> rsphere = Ptr<RenderSphere>(RenderSphere::Create());
+
+	rpipeline = Ptr<RenderPipeline>(new RenderPipeline(rscreen, rsphere));
+	rpipeline->Initialize();
+
+	rfilter = Ptr<RenderTexFilter>(new RenderTexFilter(rscreen, rsphere) );
+	rfilter->Initialize();
+
 	CreateDefaultMaterials();
 
 
@@ -110,6 +122,37 @@ void RenderModule::Initialize()
 	rscene = std::make_shared<RenderScene>();
 	rscene->Setup();
 
+
+
+	// ~Testing----------------------------------------------------------------------------
+	// load the generated height map into resource manager
+	std::string evnTexPath = "assets/textures/T_Default_Environment_Map.jpg";
+	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>(evnTexPath);
+	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(evnTexPath).get();
+	envTexture->renderRscTexture = new RenderRscTexture();
+	envTexture->LoadOnGpu();
+	envTexture->renderRscTexture->GetTexture()->Bind();
+	envTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Mirror);
+	envTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::Linear);
+	envTexture->renderRscTexture->GetTexture()->UpdateTexParams();
+	envTexture->renderRscTexture->GetTexture()->Unbind();
+
+	RenderRscTexture* envMap = new RenderRscTexture();
+	rfilter->GenCubeMap(envTexture->renderRscTexture, envMap, true);
+
+	RenderRscTexture* specularEnvMap = new RenderRscTexture();
+	rfilter->FilterSpecularIBL(envMap, specularEnvMap);
+
+	RenderRscTexture* brdfLUTTex = new RenderRscTexture();
+	rfilter->GenBRDFLUT(brdfLUTTex);
+
+	rpipeline->testEnv = specularEnvMap->GetTexture().get();
+	rpipeline->testBRDF = brdfLUTTex->GetTexture().get();
+	
+	delete envMap;
+	// ~Testing----------------------------------------------------------------------------
+
+
 }
 
 
@@ -122,7 +165,10 @@ void RenderModule::Destroy()
 	rtScene.reset();
 
 	// Destroy pipeline
-	pipeline->Destroy();
+	rpipeline->Destroy();
+
+	// Destroy render filter.
+	rfilter->Destroy();
 }
 
 
@@ -151,7 +197,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 
 	// ~TESTING-------------------------------------------------------
-	float near = 0.01f, far = 10000.0f;
+	float near = 1.0f, far = 32000.0f;
 	float camRot = Engine::Get().GetEngineTime();
 	camRot *= 0.1f;
 
@@ -185,13 +231,13 @@ void RenderModule::Render()
 	float time = Engine::Get().GetEngineTime();
 
 	// Begin The Pipeline for rendering a scene.
-	pipeline->Begin(rtScene.get(), rscene.get(), time);
+	rpipeline->Begin(rtScene.get(), rscene.get(), time);
 
 	// Rendering...
-	pipeline->Render();
+	rpipeline->Render();
 
 	// End The Pipeline Render.
-	pipeline->End();
+	rpipeline->End();
 
 
 	if (isRTToWindow)
@@ -238,10 +284,10 @@ void RenderModule::CreateDefaultMaterials()
 	// TODO: Better texture system.
 	checkerTexture->renderRscTexture->GetTexture()->Bind();
 	checkerTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Repeat);
-	checkerTexture->renderRscTexture->GetTexture()->GenerateMipmaps();
+	checkerTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::TriLinear);
 	checkerTexture->renderRscTexture->GetTexture()->UpdateTexParams();
+	checkerTexture->renderRscTexture->GetTexture()->GenerateMipmaps();
 	checkerTexture->renderRscTexture->GetTexture()->Unbind();
-
 
 	// Default Mesh Material...
 	{

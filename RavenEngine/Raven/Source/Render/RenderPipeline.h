@@ -18,6 +18,7 @@ namespace Raven
 	class RenderScene;
 	class RenderPass;
 	class RenderScreen;
+	class RenderSphere;
 	class RenderRscShader;
 	class UniformBuffer;
 
@@ -28,8 +29,11 @@ namespace Raven
 		// Common Uniform Buffer - used by all shaders.
 		Ptr<UniformBuffer> common;
 
-		//
-		Ptr<UniformBuffer> light;
+		// Light framebuffer used for deferred lighting data.
+		Ptr<UniformBuffer> light_DEFERRED;
+
+		// Light framebuffer used for forward lighting data.
+		Ptr<UniformBuffer> light_FORWARD;
 	};
 
 
@@ -46,7 +50,7 @@ namespace Raven
 		friend class RenderModule;
 
 		// Private Construct, @see RenderModule.
-		RenderPipeline();
+		RenderPipeline(Ptr<RenderScreen> screen, Ptr<RenderSphere> sphere);
 
 	public:
 		// Destruct.
@@ -77,21 +81,27 @@ namespace Raven
 		// Resize all render passes.
 		void Resize(const glm::ivec2& newSize);
 
+		//
+		void UpdateLights_DEFERRED();
+
 	private:
 		// Deferred Render Pass - G-Buffer.
-		Ptr<RenderPass> gbuffer;
+		Ptr<RenderPass> gbufferPass;
 
 		// Deferred Render Pass - Lighting.
-		Ptr<RenderPass> lighting;
+		Ptr<RenderPass> lightingPass;
 
 		// Forward Rendering Pass - used mostly for translucent.
-		Ptr<RenderPass> forward;
+		Ptr<RenderPass> forwardPass;
 
 		// Lighting shader for the lighting render pass.
 		Ptr<RenderRscShader> lightingShader;
 
 		// Screen triangle used to render the entire screen, used by render passes and post-processing.
 		Ptr<RenderScreen> rscreen;
+
+		// Sphere.
+		Ptr<RenderSphere> rsphere;
 
 		// Uniforms of the pipeline.
 		RenderPipelineUniforms uniforms;
@@ -104,6 +114,13 @@ namespace Raven
 
 		// The viewport used for rendering.
 		glm::vec4 viewport;
+		
+	public:
+		// ~Testing----------------------------------------------------------------------------
+		class GLTexture* testEnv;
+		class GLTexture* testBRDF;
+		// ~Testing----------------------------------------------------------------------------
+
 	};
 
 

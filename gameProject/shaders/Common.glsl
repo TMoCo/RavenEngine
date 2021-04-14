@@ -119,6 +119,14 @@ layout(std140) uniform CommonBlock
 #define FAR_VALUE inCommon.nearFar.y
 
 
+#define PI 3.14159265
+#define TWO_PI 6.2831853
+#define HALF_PI 1.5707963
+#define ONE_OVER_PI 0.3183099
+#define SMALL_NUM 0.000001
+
+
+
 // --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 
 
@@ -129,7 +137,10 @@ layout(std140) uniform CommonBlock
 vec3 ComputeWorldPos(vec2 coord, float depth)
 {
 	depth = depth * 2.0 - 1.0;
-	return (inCommon.viewProjMatrixInverse * vec4(coord, depth, 1.0)).xyz;
+	coord = coord * 2.0 - 1.0;
+	
+	vec4 wpos = inCommon.viewProjMatrixInverse * vec4(coord, depth, 1.0);
+	return wpos.xyz / wpos.w;
 }
 
 
@@ -142,6 +153,38 @@ float DepthToLinaer(float depth)
 
 
 
+#if STAGE_FRAGMENT_SHADER
+
+// Return the coordinate [0, 1] for the currrent fragment.
+vec2 ComputeScreenCoord()
+{
+	return gl_FragCoord.xy / inCommon.viewport.zw;
+}
+
+#endif
+
+
+// Compute Direction from polar coordinate in OpenGL Cooridnate.
+// @param theta: Horziotnal Angle.
+// @param phi: Vertical Angle.
+vec3 ComputePolarDir(float theta, float phi)
+{
+	float cosPhi = cos(phi);	
+	return vec3(cosPhi * sin(theta), sin(phi), cosPhi * cos(theta));
+}
+
+
+// Convert Equirectangular Texture Coordinate from direction.
+vec2 ComputeEquiCoord(vec3 normal)
+{
+	vec2 uv;
+	
+	// Convert to polar angles and divide by 2PI, PI respectively
+	uv.x = atan(normal.z, normal.x) * 0.1591549;
+	uv.y = asin(normal.y) * 0.3183099;
+	
+	return uv + 0.5;
+}
 
 
 

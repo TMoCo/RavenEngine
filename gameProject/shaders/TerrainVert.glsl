@@ -41,7 +41,7 @@ vec3 ComputeNormal(vec2 texCoord)
 	float h2 = texture(inHeightMap, texCoord - vec2(0.0, texelSize.y)).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	float h3 = texture(inHeightMap, texCoord + vec2(0.0, texelSize.y)).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	
-	return normalize( vec3(h1 - h0, 2.0, h3 - h2) * 0.5 );
+	return normalize( vec3(h0 - h1, 2.0, h2 - h3) * 0.5 );
 }
 
 
@@ -59,7 +59,7 @@ void main()
 	gl_Position = inCommon.viewProjMatrix * worldPos;
 	
 	outVertex.position = worldPos.xyz;
-	outVertex.normal = ComputeNormal(uv);
+	outVertex.normal = worldNormal.xyz;
 	outVertex.texCoord = uv;
 }
 

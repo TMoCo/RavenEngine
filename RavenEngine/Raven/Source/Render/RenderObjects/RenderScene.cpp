@@ -1,6 +1,7 @@
 #include "RenderScene.h"
 
 #include "Engine.h"
+#include "Render/RenderDebug.h"
 #include "Render/RenderModule.h"
 
 #include "Primitives/RenderPrimitive.h"
@@ -9,6 +10,8 @@
 #include "Primitives/RenderPrimitive.h"
 #include "Primitives/RenderMesh.h"
 #include "Primitives/RenderTerrain.h"
+#include "RenderLight.h"
+
 
 #include "Render/RenderResource/Shader/RenderRscShader.h" 
 #include "Render/RenderResource/Shader/RenderRscMaterial.h"
@@ -51,6 +54,25 @@ struct TransformVertexData
 
 
 
+// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
+
+
+
+
+void RenderSceneEnvironment::Reset()
+{
+	sunColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	sunDir = glm::normalize(glm::vec4(-1.0f));
+	sunPower = 1.0f;
+}
+
+
+
+
+
+// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
+
+
 
 
 
@@ -58,7 +80,7 @@ RenderScene::RenderScene()
 	: near(0.0f)
 	, far(0.0f)
 {
-
+	environment.Reset();
 }
 
 
@@ -179,7 +201,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Mesh Materail...
 			Material* meshMaterail = model.GetMaterial(i);
 
-			if (meshMaterail && 0)
+			if (meshMaterail)
 			{
 				// Update Material Paramters if Dirty.
 				if (meshMaterail->IsDirty())
@@ -231,16 +253,43 @@ void RenderScene::CollectSceneLights(Scene* scene)
 {
 	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
 
+	//
+	bool isSearchForSun = true;
+
+
+	// Iterate over all lights in the scene.
 	for (auto entity : lightsEttView)
 	{
 		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
-		if (light.type != (int32_t)LightType::DirectionalLight)
-			continue;
 
-		environment.sunDir = glm::normalize(glm::vec4(light.direction, 0.0f));
-		environment.sunColor = light.color;
-		environment.sunPower = light.intensity;
+		// TODO: Add Scene Environment Settings to collect sun lights from.
+		if (isSearchForSun && light.type == (int32_t)LightType::DirectionalLight)
+		{
+			// Check if it is the sun
+			const auto nameComponent = scene->GetRegistry().try_get<NameComponent>(entity);
+
+			if (nameComponent && nameComponent->name == "THE_SUN")
+			{
+				environment.sunDir = light.direction;
+				environment.sunColor = light.color;
+				environment.sunPower = light.intensity;
+
+				isSearchForSun = false;
+				continue;
+			}
+		}
+
+
+		RenderLight* newLight = NewLight<RenderLight>();
+		newLight->type = light.type + 1;
+		newLight->colorAndPower = glm::vec4(light.color.x, light.color.y, light.color.z, light.intensity);
+		newLight->postion = trans.GetWorldPosition();
+		newLight->dir = light.direction;
+		newLight->radius = light.radius;
+		newLight->innerAngle = glm::cos(glm::radians(light.innerAngle));
+		newLight->outerAngle = glm::cos(glm::radians(light.outerAngle));
 	}
+
 }
 
 
@@ -252,13 +301,18 @@ void RenderScene::Clear()
 		batch.Clear();
 	}
 
-	// Clear/Delete Dynamic Render Primitives created while building render scene...
+	// Delete Dynamic Render Primitives created while building render scene...
 	for (auto& prim : dynamicPrimitive)
 		delete prim;
 
-	dynamicPrimitive.clear();
+	// Delete Render Lights created while building render scene...
+	for (auto& light : lights)
+		delete light;
 
 	//...
+	dynamicPrimitive.clear();
+	lights.clear();
+	environment.Reset();
 	near = 0.0f;
 	far = 0.0f;
 }

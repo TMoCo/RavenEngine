@@ -38,11 +38,11 @@ namespace Raven
 		void SetRTSize(const glm::vec2& size) { rtSize = size; }
 
 	private:
-		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
-		GLVertexArray* vxarray;
+		// The OpenGL Vertex Array
+		GLVertexArray* vxArray;
 
-		// OpeGL Buffer for Mesh Positions.
-		GLBuffer* positionBuffer;
+		// OpenGL Vertex Buffer for Positions + UV.
+		GLBuffer* vxBuffer;
 
 		// The render target actual size, used to scale the uv to correctly sample targets.
 		glm::vec2 rtSize;

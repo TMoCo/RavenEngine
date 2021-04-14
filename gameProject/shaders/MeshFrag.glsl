@@ -29,7 +29,7 @@ layout(location=0) out vec4 outFinalColor;
 
 #if RENDER_PASS_DEFERRED
 // Output G-Buffer...
-layout(location=0) out vec4 outAlbedoSpecular;
+layout(location=0) out vec4 outAlbedo;
 layout(location=1) out vec3 outNormal;
 layout(location=2) out vec3 outBRDF;
 #endif
@@ -76,14 +76,7 @@ void main()
 	
 #if RENDER_PASS_FORWARD
 	// Forward-Lighting...
-	LightOutput lightOut;
-	ComputeDirLight(normal, inFrag.position, lightOut);
-	
-
-	outFinalColor.rgb = 
-	  matOut.color * lightOut.diffuse 
-	+ (1.0 - matOut.roughness) * lightOut.specular 
-	+ matOut.emission;
+	outFinalColor.rgb = vec3(0.0);
 	
 #if RENDER_SHADER_TYPE_TRANSLUCENT
 	outFinalColor.a = matOut.alpha;
@@ -95,9 +88,12 @@ void main()
 
 #if RENDER_PASS_DEFERRED
 	// Output G-Buffer...
-	outAlbedoSpecular.rgb = matOut.color;
-	outAlbedoSpecular.a = matOut.specular;
-	outNormal.xyz = normal;
+	outAlbedo.rgb = matOut.color + matOut.emission;
+	outAlbedo.a = length(matOut.emission) * 0.1;
+	outNormal.rgb = normal;
+	outBRDF.r = matOut.roughness;
+	outBRDF.g = matOut.metallic;
+	outBRDF.b = matOut.specular;
 #endif
 
 	

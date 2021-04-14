@@ -191,7 +191,7 @@ void RenderPass::SetRenderBufferForDepth(bool val, bool isWithStencil)
 }
 
 
-void RenderPass::Resize(const glm::ivec2& newSize)
+void RenderPass::ResizeTargets(const glm::ivec2& newSize)
 {
 	SetSize(newSize);
 
@@ -283,6 +283,42 @@ void RenderPass::Begin(const glm::ivec4& viewport, bool isClear)
 			glClear(clearFlag);
 	}
 
+}
+
+
+void RenderPass::ReplaceTarget(uint32_t index, const Ptr<GLTexture>& inTex, int32_t level, int32_t layer)
+{
+	bool rebuild = isBuilt;
+	isBuilt = false;
+
+	// Replace...
+	AddTexture(index, inTex, level, layer);
+
+	// Need Rebuilding?
+	if (rebuild)
+	{
+		// Attach Target.
+		fbo->Attach(
+			static_cast<EGLAttachment>((GLUINT)EGLAttachment::Color0 + index),
+			textures[index].level,
+			textures[index].texture.get(),
+			textures[index].layer
+		);
+
+		fbo->Update();
+		isBuilt = true;
+	}
+	else
+	{
+		Build();
+	}
+
+}
+
+
+void RenderPass::End()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

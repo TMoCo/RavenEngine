@@ -38,7 +38,7 @@ RenderScreen* RenderScreen::Create()
 		glm::vec2(-1.0f, 3.0f), glm::vec2(0.0f, 2.0f),
 	};
 
-	scr->positionBuffer = GLBuffer::Create(
+	scr->vxBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
 		(int)(verts.size() * sizeof(glm::vec2)),
 		verts.data(),
@@ -49,7 +49,7 @@ RenderScreen* RenderScreen::Create()
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
 		{
-			scr->positionBuffer,   // Buffers
+			scr->vxBuffer,         // Buffers
 			0,                     // Index
 			2,                     // Type-Size
 			EGLTypes::Float,       // Type
@@ -59,7 +59,7 @@ RenderScreen* RenderScreen::Create()
 
 		// Attribute 1 - Texture Coordinate
 		{
-			scr->positionBuffer,   // Buffers
+			scr->vxBuffer,         // Buffers
 			1,                     // Index
 			2,                     // Type-Size
 			EGLTypes::Float,       // Type
@@ -69,8 +69,8 @@ RenderScreen* RenderScreen::Create()
 	};
 
 
-	scr->vxarray = GLVertexArray::Create();
-	scr->vxarray->Build(attributes, nullptr);
+	scr->vxArray = GLVertexArray::Create();
+	scr->vxArray->Build(attributes, nullptr);
 
 	return scr;
 }
@@ -80,7 +80,7 @@ RenderScreen* RenderScreen::Create()
 void RenderScreen::Draw(GLShader* shader)
 {
 	shader->SetUniform("inRTSize", rtSize);
-	vxarray->Bind();
+	vxArray->Bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 

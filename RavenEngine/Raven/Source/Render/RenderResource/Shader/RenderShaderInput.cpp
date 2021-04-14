@@ -27,9 +27,10 @@ namespace Raven {
 
 
 
-RSInputBlockDescription RenderShaderInput::TransfromBlock = RSInputBlockDescription::MakeTransfromBlock();
-RSInputBlockDescription RenderShaderInput::LightingBlock = RSInputBlockDescription::MakeLightingBlock();
 RSInputBlockDescription RenderShaderInput::CommonBlock = RSInputBlockDescription::MakeCommonBlock();
+RSInputBlockDescription RenderShaderInput::TransfromBlock = RSInputBlockDescription::MakeTransfromBlock();
+RSInputBlockDescription RenderShaderInput::LightingBlock_DEFERRED = RSInputBlockDescription::MakeLightingBlock_DEFERRED();
+RSInputBlockDescription RenderShaderInput::LightingBlock_FORWARD = RSInputBlockDescription::MakeLightingBlock_FORWARD();
 
 int32_t RenderShaderInput::MaterialBlockBinding = MATERIAL_BLOCK_BINDING;
 
@@ -164,23 +165,34 @@ RSInputBlockDescription RSInputBlockDescription::MakeTransfromBlock()
 }
 
 
-RSInputBlockDescription RSInputBlockDescription::MakeLightingBlock()
+RSInputBlockDescription RSInputBlockDescription::MakeLightingBlock_FORWARD()
 {
 	RSInputBlockDescription inputblock;
 	inputblock.binding = LIGHTING_BLOCK_BINDING;
 	inputblock.BeginUniformBlock("LightingBlock");
-	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataA", 64);
-	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataB", 64);
-	inputblock.AddInputArray(EShaderInputType::Vec4, "lightsDataC", 64);
-	inputblock.AddInput(EShaderInputType::Int, "pointLightStartIndex");
-	inputblock.AddInput(EShaderInputType::Int, "spotLightStartIndex");
-	inputblock.AddInput(EShaderInputType::Int, "numLights");
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightDir", RENDER_PASS_FORWARD_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPos", RENDER_PASS_FORWARD_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPower", RENDER_PASS_FORWARD_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightData", RENDER_PASS_FORWARD_MAX_LIGHTS);
 	inputblock.EndUniformBlock();
 
 	return inputblock;
 }
 
 
+RSInputBlockDescription RSInputBlockDescription::MakeLightingBlock_DEFERRED()
+{
+	RSInputBlockDescription inputblock;
+	inputblock.binding = LIGHTING_BLOCK_BINDING;
+	inputblock.BeginUniformBlock("LightingBlock");
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightDir", RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPos", RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPower", RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	inputblock.AddInputArray(EShaderInputType::Vec4, "lightData", RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	inputblock.EndUniformBlock();
+
+	return inputblock;
+}
 
 
 

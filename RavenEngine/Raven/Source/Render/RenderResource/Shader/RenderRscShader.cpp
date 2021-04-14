@@ -183,15 +183,15 @@ void RenderRscShader::SetupShaderForType()
 		break;
 
 	case ERenderShaderType::Masked:
-		RAVEN_ASSERT(0, "Shader Masked type not supported yet.");
-		shader->AddPreprocessor("#define RENDER_PASS_FORWARD 1");
+		shader->AddPreprocessor("#define RENDER_PASS_DEFERRED 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_MASKED 1");
 		break;
 
 	case ERenderShaderType::Translucent:
-		RAVEN_ASSERT(0, "Shader Translucent type not supported yet.");
 		shader->AddPreprocessor("#define RENDER_PASS_FORWARD 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_TRANSLUCENT 1");
+		shader->AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_FORWARD_MAX_LIGHTS));
+		input.AddBlockInput(RenderShaderInput::LightingBlock_FORWARD);
 		break;
 
 	case ERenderShaderType::PostProcessing:

@@ -59,6 +59,9 @@ namespace Raven
 
 		// Pixel information based on the texture format.
 		static void GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixelType, int& alignment);
+
+		// Return format Bit Per Pixel.
+		static int GetBPP(EGLFormat format);
 		 
 		// Return the opengl id of the buffer.
 		inline GLUINT GetID() const { return id; }
@@ -87,6 +90,9 @@ namespace Raven
 		// Set texture wrap mode.
 		void SetWrap(EGLWrap value);
 
+		// Set min & max mip levels.
+		void SetMipLevels(int base, int max);
+
 	private:
 		// OpenGL Object ID.
 		GLUINT id;
@@ -108,6 +114,12 @@ namespace Raven
 
 		// Texture height.
 		int height;
+
+		// The first mip level of this texture.
+		int baseMipLevel;
+
+		// The maximum mip level of this texture.
+		int maxMipLevel;
 	};
 
 }

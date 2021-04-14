@@ -15,7 +15,7 @@
 namespace Raven
 {
 	class RenderPrimitive;
-	class RenderTerrain;
+	class RenderLight;
 	class UniformBuffer;
 	class Scene;
 
@@ -43,6 +43,9 @@ namespace Raven
 
 		//
 		float sunPower;
+
+		// Reset All Environment Properties.
+		void Reset();
 	};
 
 
@@ -104,6 +107,9 @@ namespace Raven
 		// Return far clipping plane.
 		inline const float& GetFar() const { return far; }
 
+		// Return the light in the scene.
+		inline const std::vector<RenderLight*>& GetLights() { return lights; }
+
 	private:
 		// Collect view & projection from the scene.
 		void CollectSceneView(Scene* scene);
@@ -126,6 +132,17 @@ namespace Raven
 			dynamicPrimitive.push_back(prim);
 
 			return prim;
+		}
+
+		// Create New Primitive to render.
+		template<class LightType>
+		inline LightType* NewLight()
+		{
+			// TODO: Memeory management for lights.
+			LightType* light = new LightType();
+			lights.push_back(light);
+
+			return light;
 		}
 
 
@@ -166,6 +183,8 @@ namespace Raven
 		// Transform Uniform Buffer.
 		Ptr<UniformBuffer> transformUB;
 
+		// Lights in the scene.
+		std::vector<RenderLight*> lights;
 	};
 
 

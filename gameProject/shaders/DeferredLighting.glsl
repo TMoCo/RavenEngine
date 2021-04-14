@@ -5,18 +5,17 @@
 // Vertex Shader Output.
 in VertexOutput
 {
-	vec2 texCoord;
-	
+	//
+	vec2 rtCoord;
 } inFrag;
 
 
 
 // Input G-Buffer...
-uniform sampler2D inAlbedoSpecular;
+uniform sampler2D inAlbedo;
 uniform sampler2D inNormal;
 uniform sampler2D inBRDF;
 uniform sampler2D inDepth;
-
 
 
 layout(location=0) out vec4 outFinalColor;
@@ -30,14 +29,51 @@ layout(location=0) out vec4 outFinalColor;
 
 
 void main()
-{
-	vec3 normal = texture(inNormal, inFrag.texCoord).xzy;
+{	
+	vec2 screenCoord = ComputeScreenCoord();
 	
-	if (normal.x != 0.0 || normal.y != 0.0 || normal.z != 0.0)
-		outFinalColor.rgb = normal * 0.5 + 0.5;
-		
-	outFinalColor.rgb = texture(inAlbedoSpecular, inFrag.texCoord).rgb;
+	// G-Buffer.
+	vec4 gAlbedo = texture(inAlbedo, inFrag.rtCoord);
+	vec4 gBRDF = texture(inBRDF, inFrag.rtCoord);
+	float gDepth = texture(inDepth, inFrag.rtCoord).r;
 	
-	//outFinalColor = vec4(1.0 - DepthToLinaer(texture(inDepth, inFrag.texCoord).r) * 0.001);
-	//outFinalColor = vec4(sin(inCommon.time), 1.0 - sin(inCommon.time), 0.0, 1.0);
+	// Surface Data from G-Buffer used for lighting the surface.
+	LightSurfaceData surface;
+	surface.n = texture(inNormal, inFrag.rtCoord).xyz;
+	surface.albedo = gAlbedo.rgb;
+	surface.specular = gBRDF.b;
+	surface.roughness = max(gBRDF.r, 0.01);
+	surface.metallic = gBRDF.g;
+	
+	// Reconstruct World Position from depth.
+	surface.p = ComputeWorldPos(screenCoord, gDepth);
+	
+	// View Direction Vector.
+	surface.v = normalize(inCommon.viewPos - surface.p);
+	surface.NDotV = max(dot(surface.n, surface.v), 0.0001);
+	
+	// Base Reflective Index, 0.04 similar to UE4
+	surface.f0 = mix(vec3(0.04), surface.albedo, surface.metallic); 
+	
+	
+	// Compute Lighting on the surface
+	vec3 lighting = ComputeLighting(surface);
+	
+	// Add Emission
+	lighting += surface.albedo * (gAlbedo.a * 10.0);
+	
+	// Final Output Color.
+	outFinalColor.rgb = lighting;
+	
+	if (gDepth == 1.0)
+	{
+		outFinalColor.rgb = textureLod(inSkyEnvironment, -surface.v, 1.0).rgb;
+	}
+	
+	// TEMP Gamma Correction........
+	outFinalColor.rgb = pow(outFinalColor.rgb, vec3(1.0 / 2.2));
+	
+
 }
+
+

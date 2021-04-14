@@ -12,6 +12,11 @@
 #include <reactphysics3d/mathematics/Transform.h>
 
 #include <cereal/cereal.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/archives/json.hpp>
 
 #include "Utilities/Core.h"
 #include "Utilities/ToRp3d.h"
@@ -52,16 +57,6 @@ namespace Raven
 		ColliderPrimitive::Type GetColliderPrimitiveName(const std::string& type);
 	}
 
-	// collider shape factory, needs access to the physics common object from physics module
-	namespace ColliderShapeFactory
-	{
-		rp3d::CollisionShape* CreateCollisionShape(rp3d::PhysicsCommon* physicsCommon, ColliderPrimitive::Type type);
-		rp3d::CollisionShape* CreateBoxShape      (rp3d::PhysicsCommon* physicsCommon, rp3d::Vector3 extent = rp3d::Vector3(1.0f, 1.0f, 1.0f));
-		rp3d::CollisionShape* CreateSphereShape   (rp3d::PhysicsCommon* physicsCommon, float radius = 1.0f);
-		rp3d::CollisionShape* CreateCapsuleShape  (rp3d::PhysicsCommon* physicsCommon, float radius = 1.0f, float height = 1.0f);
-		rp3d::CollisionShape* CreateHeightShape	  (rp3d::PhysicsCommon* physicsCommon, Ptr<TerrainComponent> terrain);
-	};
-
 	// base collider class
 	class Collider
 	{
@@ -69,10 +64,10 @@ namespace Raven
 		friend RigidBody;
 	public:
 		Collider(ColliderPrimitive::Type shapeType);
-		~Collider();
+		virtual ~Collider();
 
 		// creates the collider and adds it to the body 
-		void CreateCollider(rp3d::CollisionShape* shape);
+		virtual void CreateCollider(rp3d::CollisionShape* shape) = 0;
 
 		// set the body the collider belongs to (should only be called by the body's AddCollider prior to calling CreateCollider)
 		void SetBody(rp3d::CollisionBody* parentBody);
@@ -81,6 +76,8 @@ namespace Raven
 		void SetTransform(const Transform& transform);
 
 		rp3d::CollisionShape* GetShape();
+
+		ColliderPrimitive::Type GetColliderType() const;
 
 		rp3d::Transform GetRelativeTransform();
 
@@ -107,10 +104,13 @@ namespace Raven
 		BoxCollider();
 		~BoxCollider() = default;
 
-		void SetExtent(const rp3d::Vector3& vec);
+		void CreateCollider(rp3d::CollisionShape* shape) override;
+
+		void SetExtents(const rp3d::Vector3& vec);
+		rp3d::Vector3 GetExtents() const;
 
 		template<class Archive>
-		void save(Archive& archive);
+		void save(Archive& archive) const;
 
 		template<class Archive>
 		void load(Archive& archive);
@@ -121,11 +121,9 @@ namespace Raven
 	};
 
 	template<class Archive>
-	void BoxCollider::save(Archive& archive)
+	void BoxCollider::save(Archive& archive) const
 	{
-		// get the extents from the shape
-		extents = static_cast<rp3d::BoxShape*>(shape)->getHaflExtents();
-		// then archive the collider
+		// archive the collider
 		archive(cereal::make_nvp("Half extents", extents));
 	}
 
@@ -142,10 +140,13 @@ namespace Raven
 		SphereCollider();
 		~SphereCollider() = default;
 
+		void CreateCollider(rp3d::CollisionShape* shape) override;
+
 		void SetRadius(const float& r);
+		float GetRadius() const;
 
 		template<class Archive>
-		void save(Archive& archive);
+		void save(Archive& archive) const;
 
 		template<class Archive>
 		void load(Archive& archive);
@@ -155,10 +156,8 @@ namespace Raven
 	};
 
 	template<class Archive>
-	void SphereCollider::save(Archive& archive)
+	void SphereCollider::save(Archive& archive) const
 	{
-		// get the extents from the shape
-		radius = static_cast<rp3d::SphereShape*>(shape)->getRadius();
 		// then archive the collider
 		archive(cereal::make_nvp("Radius", radius));
 	}
@@ -175,11 +174,16 @@ namespace Raven
 		CapsuleCollider();
 		~CapsuleCollider() = default;
 
+		void CreateCollider(rp3d::CollisionShape* shape) override;
+
 		void SetRadius(const float& r);
 		void SetHeight(const float& h);
 
+		float GetRadius() const;
+		float GetHeight() const;
+
 		template<class Archive>
-		void save(Archive& archive);
+		void save(Archive& archive) const;
 
 		template<class Archive>
 		void load(Archive& archive);
@@ -190,10 +194,8 @@ namespace Raven
 	};
 
 	template<class Archive>
-	void CapsuleCollider::save(Archive& archive)
+	void CapsuleCollider::save(Archive& archive) const
 	{
-		// get the extents from the shape
-		radius = static_cast<rp3d::CapsuleShape*>(shape)->getRadius();
 		// then archive the collider
 		archive(cereal::make_nvp("Radius", radius), cereal::make_nvp("Height", height));
 	}
@@ -203,4 +205,25 @@ namespace Raven
 	{
 		archive(cereal::make_nvp("Radius", radius), cereal::make_nvp("Height", height));
 	}
+
+	// collider shape factory, needs access to the physics common object from physics module
+	namespace ColliderShapeFactory
+	{
+		rp3d::CollisionShape* CreateCollisionShape(rp3d::PhysicsCommon* physicsCommon, Collider* collider);
+		rp3d::CollisionShape* CreateBoxShape(rp3d::PhysicsCommon* physicsCommon, BoxCollider* collider);
+		rp3d::CollisionShape* CreateSphereShape(rp3d::PhysicsCommon* physicsCommon, SphereCollider* collider);
+		rp3d::CollisionShape* CreateCapsuleShape(rp3d::PhysicsCommon* physicsCommon, CapsuleCollider* collider);
+		rp3d::CollisionShape* CreateHeightShape(rp3d::PhysicsCommon* physicsCommon, Ptr<TerrainComponent> terrain);
+	};
 }
+
+// declare relationships between classes for cereal
+CEREAL_REGISTER_TYPE(Raven::BoxCollider);
+CEREAL_REGISTER_TYPE(Raven::SphereCollider);
+CEREAL_REGISTER_TYPE(Raven::CapsuleCollider);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Raven::Collider, Raven::BoxCollider)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Raven::Collider, Raven::SphereCollider)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Raven::Collider, Raven::CapsuleCollider)
+
+

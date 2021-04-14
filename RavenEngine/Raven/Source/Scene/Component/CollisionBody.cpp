@@ -21,6 +21,8 @@ namespace Raven
 
 	CollisionBody::~CollisionBody()
 	{
+		// clear the collider shapes first (collider destructors require valid collision body)
+		colliders.clear();
 		// make sure the body is removed from the world on desruction
 		RemoveBodyFromWorld();
 	}
@@ -32,8 +34,9 @@ namespace Raven
 		{
 			// add the collider to the body, returns pointer to the collider which we set in the wrapper Collider class
 			//collider->collider = body->addCollider(collider->shape, collider->relativeTransform);
+			//collider->SetBody(this->body);
 			// add it to the vector of colliders
-			colliders.emplace_back( collider);
+			colliders.emplace_back(collider);
 		}
 	}
 

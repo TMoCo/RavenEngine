@@ -6,6 +6,8 @@
 
 #include <reactphysics3d/reactphysics3d.h>
 
+#include <cereal/types/vector.hpp>
+
 #include "Physics/Collider.h"
 
 #include "Scene/Component/Transform.h"
@@ -29,12 +31,14 @@ namespace Raven
 		// remove the specified collider from the collision body
 		void RemoveCollider(uint32_t index);
 
+
 		// removes the body and its colliders from the physics world
 		void RemoveBodyFromWorld();
-
 		// check that the collision body exists in the physics world
 		bool ExistsInWorld();
 
+
+		// load and save the colliders attached to the body
 		template<class Archive>
 		void save(Archive& archive) const;
 
@@ -56,16 +60,15 @@ namespace Raven
 	template<class Archive>
 	void CollisionBody::save(Archive& archive) const
 	{
-		for (auto* pCollider : colliders)
-		{
-			archive(cereal::make_nvp("Colliders", ));
-		}
+		archive(cereal::make_nvp("Colliders", colliders));
 	}
 
 	template<class Archive>
 	void CollisionBody::load(Archive& archive)
 	{
-
+		// nb, this only loads shape data and creates instances of the collider objects.
+		// we need to initialise them using the 
+		archive(cereal::make_nvp("Colliders", colliders));
 	}
 
 }

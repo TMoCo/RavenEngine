@@ -28,29 +28,6 @@ namespace Raven
 
 		// assign the collider to the body
 		bodyA->AddCollider(colliderA);
-
-		// declare a box collider 
-		SphereCollider* colliderB = new SphereCollider();
-		// set the body the collider should belong to
-		colliderB->SetBody(bodyA->body);
-		// set a radius
-		colliderB->SetRadius(15.0f);
-		// create the collider shape with physics common
-		colliderB->CreateCollider(ColliderShapeFactory::CreateSphereShape(&physicsCommon, colliderB));
-
-		// assign the collider to the body
-		bodyA->AddCollider(colliderB);
-
-		// declare a box collider 
-		CapsuleCollider* colliderC = new CapsuleCollider();
-		// set the body the collider should belong to
-		colliderC->SetBody(bodyA->body);
-		// create the collider shape with physics common
-		colliderC->CreateCollider(ColliderShapeFactory::CreateCapsuleShape(&physicsCommon, colliderC));
-
-		// assign the collider to the body
-		bodyA->AddCollider(colliderC);
-
 		{
 			std::ofstream os("firstSave.json");
 			cereal::JSONOutputArchive oArchive(os);
@@ -76,8 +53,16 @@ namespace Raven
 				c->CreateCollider(ColliderShapeFactory::CreateCollisionShape(&physicsCommon, c.get()));
 			}
 		}
+		
+		// declare a box collider 
+		CapsuleCollider* colliderC = new CapsuleCollider();
+		// set the body the collider should belong to
+		colliderC->SetBody(bodyB->body);
+		// create the collider shape with physics common
+		colliderC->CreateCollider(ColliderShapeFactory::CreateCapsuleShape(&physicsCommon, colliderC));
 
-		LOGE(bodyB->colliders.size());
+		// assign the collider to the body
+		bodyB->AddCollider(colliderC);
 
 		{
 			std::ofstream os("secondSave.json");

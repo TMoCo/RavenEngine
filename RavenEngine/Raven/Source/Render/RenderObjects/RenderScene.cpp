@@ -286,16 +286,17 @@ void RenderScene::TraverseScene(Scene* scene)
 			continue;
 		}
 
+		auto& skeleton = renderer.getSkeleton();
 		// Update Mesh on GPU if not loaded yet.
 		if (!mesh->IsOnGPU())
 		{
 			mesh->renderRscMesh = new RenderSkinnedMesh();
 			mesh->LoadOnGpu();
-			static_cast<RenderSkinnedMesh*>(mesh->renderRscMesh)->bones.resize(Bone::MAX_COUNT);
+			static_cast<RenderSkinnedMesh*>(mesh->renderRscMesh)->bones.resize(skeleton.GetBoneSize());
 		}
 
 		//need to be optimized.
-		auto & skeleton = renderer.getSkeleton();
+		
 		for (auto i = 0; i < skeleton.GetBoneSize(); i++)
 		{
 			auto & bone = skeleton.GetBone(i);

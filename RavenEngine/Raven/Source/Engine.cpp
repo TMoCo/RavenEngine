@@ -83,6 +83,7 @@ namespace Raven
 			// Draw..
 			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
+
 			//time could be refactor with chrono
 			double dt = glfwGetTime() - enginetime;
 			enginetime = glfwGetTime();
@@ -109,10 +110,16 @@ namespace Raven
 
 	void Engine::OnUpdate(float dt)
 	{
+		// Dispatch events
 		eventDispatcher.DispatchEvents();
+
+		// Update the system managers
 		systemManager->OnUpdate(dt, GetModule<Raven::SceneManager>()->GetCurrentScene());
+
 		GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 
+		// Update physics world
+		GetModule<PhysicsModule>()->Step(dt);
 		// Update Render...
 		GetModule<RenderModule>()->Update(dt);
 	}

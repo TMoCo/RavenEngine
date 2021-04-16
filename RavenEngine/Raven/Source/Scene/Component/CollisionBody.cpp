@@ -32,9 +32,6 @@ namespace Raven
 	{
 		if (ExistsInWorld())
 		{
-			// add the collider to the body, returns pointer to the collider which we set in the wrapper Collider class
-			//collider->collider = body->addCollider(collider->shape, collider->relativeTransform);
-			//collider->SetBody(this->body);
 			// add it to the vector of colliders
 			colliders.emplace_back(collider);
 		}
@@ -54,6 +51,12 @@ namespace Raven
 	bool CollisionBody::IsTrigger(uint32_t index)
 	{
 		return colliders[index]->collider->getIsTrigger();
+	}
+
+	void CollisionBody::SetTransform(const Transform& t)
+	{
+		// set the underlying rp3d body's transform to specified
+		body->setTransform(ToRp3d::ToRp3dTransform(t));
 	}
 
 	void CollisionBody::RemoveBodyFromWorld()

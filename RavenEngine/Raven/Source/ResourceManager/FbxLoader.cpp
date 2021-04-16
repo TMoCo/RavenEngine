@@ -260,8 +260,10 @@ namespace Raven {
 	{
 		if (skeleton == nullptr)
 		{
-			skeleton = std::make_shared<Skeleton>();
-			SkeletonCache::Get().Save(file,skeleton);
+			skeleton = SkeletonCache::Get().Save(file, {});
+			//create a skeleton in cache
+			//just keep the skeleton structure
+			//in every skinnedMeshRenderer, it will be copied.
 		}
 
 		bones.clear();
@@ -281,21 +283,21 @@ namespace Raven {
 			auto boneIndex = skeleton->IndexOf(link->name);//create a bone if missing
 			if (boneIndex == -1)
 			{
-				Bone* bone = new Bone();
-				bone->name = link->name;
-				bone->offsetMatrix = glm::inverse(GetOffsetMatrix(fbxMesh, link));
+				
+				auto & bone = skeleton->AddBone(skeleton->IndexOf(link->getParent()->name));
+
+				bone.name = link->name;
+				bone.offsetMatrix = glm::inverse(GetOffsetMatrix(fbxMesh, link));
 				if (rootEntity) 
 				{
 					auto entity = rootEntity.FindByPath(GetBonePath(link));
-					bone->localTransform = entity.TryGetComponent<Transform>();
-					if (entity.Valid() && bone->localTransform)
+					bone.localTransform = entity.TryGetComponent<Transform>();
+					if (entity.Valid() && bone.localTransform)
 					{
-						bone->localTransform->SetOffsetTransform(bone->offsetMatrix);
+						bone.localTransform->SetOffsetTransform(bone.offsetMatrix);
 					}
 				}
-
 				bones.emplace_back(link);
-				skeleton->AddBone(bone, skeleton->IndexOf(link->getParent()->name));
 			}
 		}
 	}
@@ -440,7 +442,7 @@ namespace Raven {
 					auto& sk = ent.AddComponent<SkinnedMeshRenderer>();
 					sk.mesh = ret;
 					sk.meshIndex = model->GetMeshes().size() - 1;
-					sk.skeleton = skeleton;
+					sk.skeleton = *skeleton;//copy a skeleton
 				}
 				else
 				{

@@ -38,7 +38,7 @@ namespace Raven
 		void LoadBones();
 
 		ofbx::IScene* scene = nullptr;
-		std::shared_ptr<Skeleton> skeleton;
+		Skeleton * skeleton = nullptr;
 		std::shared_ptr<Animation> animation;
 		std::vector<const ofbx::Object*> bones;
 		std::string file;

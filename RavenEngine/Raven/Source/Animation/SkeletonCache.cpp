@@ -10,21 +10,21 @@ namespace Raven
 		return cache;
 	}
 
-	void SkeletonCache::Save(const std::string& name, const std::shared_ptr<Skeleton>& skeleton)
+	Skeleton* SkeletonCache::Save(const std::string& name, const Skeleton& skeleton)
 	{
-		skeletons.emplace(std::piecewise_construct,
+		return &skeletons.emplace(std::piecewise_construct,
 			std::forward_as_tuple(name),
-			std::forward_as_tuple(skeleton));
+			std::forward_as_tuple(skeleton)).first->second;
 	}
 
-	std::shared_ptr<Skeleton> SkeletonCache::Get(const std::string& name)
+	Skeleton* SkeletonCache::Get(const std::string& name)
 	{
 		auto iter = skeletons.find(name);
 		if (iter == skeletons.end())
 		{
 			return nullptr;
 		}
-		return iter->second;
+		return &iter->second;
 	}
 
 };

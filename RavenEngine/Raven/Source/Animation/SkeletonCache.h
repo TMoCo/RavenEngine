@@ -5,21 +5,20 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
-
+#include "Skeleton.h"
 
 namespace Raven
 {
-	class Skeleton;
 
 	class SkeletonCache final
 	{
 	public:
 		static SkeletonCache& Get();
-		std::shared_ptr<Skeleton> Get(const std::string& name);
-		void Save(const std::string& name,const std::shared_ptr<Skeleton> & skeleton);
+		Skeleton* Get(const std::string& name);
+		Skeleton* Save(const std::string& name,const Skeleton & skeleton);
 	private:
 		SkeletonCache()= default;
-		std::unordered_map<std::string, std::shared_ptr<Skeleton>> skeletons;
+		std::unordered_map<std::string, Skeleton> skeletons;
 	};
 
 };

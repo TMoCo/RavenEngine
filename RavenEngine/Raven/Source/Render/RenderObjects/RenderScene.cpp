@@ -295,14 +295,12 @@ void RenderScene::TraverseScene(Scene* scene)
 		}
 
 		//need to be optimized.
-		if (auto skeleton = renderer.getSkeleton()) 
+		auto & skeleton = renderer.getSkeleton();
+		for (auto i = 0; i < skeleton.GetBoneSize(); i++)
 		{
-			for (auto i = 0; i < skeleton->GetBoneSize(); i++)
-			{
-				auto bone = skeleton->GetBone(i);
-				static_cast<RenderSkinnedMesh*>(mesh->renderRscMesh)->bones[i] = 
-					bone->localTransform->GetWorldMatrix() * bone->offsetMatrix;
-			}
+			auto & bone = skeleton.GetBone(i);
+			static_cast<RenderSkinnedMesh*>(mesh->renderRscMesh)->bones[i] =
+				bone.localTransform->GetWorldMatrix() * bone.offsetMatrix;
 		}
 
 		RenderMesh* rmesh = NewPrimitive<RenderMesh>();
@@ -399,7 +397,7 @@ void RenderScene::Draw(ERSceneBatch type)
 		if (skinned) 
 		{
 			skinnedTrData.modelMatrix = prim->GetWorldMatrix();
-			memcpy(&skinnedTrData.bones, skinned->bones.data(), sizeof(glm::mat4) * 52);
+			memcpy(&skinnedTrData.bones, skinned->bones.data(), sizeof(glm::mat4) * skinned->bones.size());
 			skinnedUBO->UpdateData(sizeof(SkinnedTransformUBO), (void*)(&skinnedTrData));
 		}
 		else 

@@ -1,4 +1,7 @@
 #include "GUIModule.h"
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/Texture2D.h"
+#include "Render/OpenGL/GLTexture.h"
 
 namespace Raven {
 
@@ -19,9 +22,6 @@ namespace Raven {
 		// Get a list of all the fonts loaded by the GUI
 		ImGuiIO& io = ImGui::GetIO();
 		loadedFonts.push_back(io.Fonts->AddFontDefault());
-
-		// This font loading is a temporary system but works for now
-		loadFont("../RavenEngine/Raven/Source/GUI/FONTS_TEMP/DroidSans.ttf", 50);
 	}
 
 	/** Responsible for cleaning up the ImGui context and any other memory used by the module
@@ -64,20 +64,25 @@ namespace Raven {
     
 
 
-	void GUIModule::BeginPanel(GUIPanelConfig config)
+	void GUIModule::BeginPanel(GUIWidgetConfig config)
 	{
 		int winW, winH;
 		glfwGetWindowSize(Engine::GetModule<Raven::Window>()->GetNativeWindow(), &winW, &winH);
 
+		auto pixSize = PercentToPix(config.size, ImVec2(winW, winH));
+		auto pixPadding = PercentToPix(config.padding, pixSize);
+		auto pixPos = PercentToPix(config.position, ImVec2(winW, winH));
+
 		// Style the Window
 		// Using push/pop style will allow us to not affect the style in the rest of the programs ImGui usage
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, config.rounding);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, config.padding);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, pixPadding);
 		ImGui::PushStyleColor(ImGuiCol_Border, config.border_col);
 		ImGui::PushStyleColor(ImGuiCol_WindowBg, config.bg_col);
 
-		ImGui::SetNextWindowPos(config.position);
-		ImGui::SetNextWindowSize(config.size);
+		ImGui::SetNextWindowPos(pixPos);
+		ImGui::SetNextWindowSize(pixSize);
 
 		char panelName[33];
 		char* panelText = "Panel ";
@@ -97,11 +102,10 @@ namespace Raven {
 		ImGui::PopStyleVar(2);
 	}
 
-	void GUIModule::Text(GUITextConfig config, const char* fmt, ...)
+	void GUIModule::Text(GUIWidgetConfig config, size_t fontID, const char* fmt, ...)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Text, config.color);
-		ImGui::PushFont(config.font);
-
+		ImGui::PushStyleColor(ImGuiCol_Text, config.text_col);
+		ImGui::PushFont(getFont(fontID));
 
 		// Horizontal Text Alignment Logic
 		if (config.text_align.x != 0) {
@@ -111,10 +115,9 @@ namespace Raven {
 			ImGui::SameLine(config.text_align.x * (ImGui::GetWindowWidth() - b_width));
 		}
 
-
 		va_list args;
 		va_start(args, fmt);
-		// Pass the format string and the args to the ve_list compatible text
+		// Pass the format string and the args to the va_list compatible text
 		ImGui::TextV(fmt, args);
 		va_end(args);
 
@@ -122,35 +125,58 @@ namespace Raven {
 		ImGui::PopStyleColor();
 	}
 
-	bool GUIModule::Button(GUIButtonConfig b_config, GUITextConfig t_config, const char* text)
+	bool GUIModule::Button(GUIWidgetConfig config, size_t fontID, const char* text)
 	{
+		auto pixSize = PercentToPix(config.size, ImGui::GetWindowSize());
+		auto pixPos = PercentToPix(config.position, ImGui::GetWindowSize());
+
 		// Configure the button
-		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, t_config.text_align);
-		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, b_config.rounding);
-		ImGui::PushStyleColor(ImGuiCol_Button, b_config.color);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, b_config.color_hover);
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, b_config.color_active);
-		ImGui::PushStyleColor(ImGuiCol_Text, t_config.color);
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, config.text_align);
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, config.rounding);
+		ImGui::PushStyleColor(ImGuiCol_Button, config.bg_col);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, config.hover_col);
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, config.active_col);
+		ImGui::PushStyleColor(ImGuiCol_Text, config.text_col);
 
 		// Configure the button text
-		ImGui::PushFont(t_config.font);
+		ImGui::PushFont(getFont(fontID));
 
-		// Button Alignment Logic
-		if (b_config.h_align != 0) {
-			ImGui::Spacing();
-			// Calculate the position of the right alligned button
-			float b_width = ImGui::CalcTextSize(text).x + (2 * ImGui::GetStyle().FramePadding.x);
-			if (b_config.size.x > b_width) b_width = b_config.size.x;
-			ImGui::SameLine(b_config.h_align * (ImGui::GetWindowWidth() - (b_width + ImGui::GetStyle().WindowPadding.x)));
-		}
+		ImGui::SetCursorPos(pixPos);
 
-		bool ret = ImGui::Button(text, b_config.size);
+		bool ret = ImGui::Button(text, pixSize);
 
 		ImGui::PopFont();
 		ImGui::PopStyleColor(4);
 		ImGui::PopStyleVar(2);
 
 		return ret;
+	}
+
+	void GUIModule::Image(GUIWidgetConfig config, Ptr<Texture2D> img)
+	{
+		if (img == NULL)
+		{
+			LOGC("No image loaded");
+			return;
+		}
+
+		auto pixPos = PercentToPix(config.position, ImGui::GetWindowSize());
+		auto pixSize = PercentToPix(config.size, ImGui::GetWindowSize());
+
+		ImGui::SetCursorPos(pixPos);
+
+		// TODO: Refactor this code when Ammar has fully implemented
+		// the textures
+		if (img->renderRscTexture == NULL)
+		{
+			img->renderRscTexture = new RenderRscTexture();
+		}
+		img->LoadOnGpu();
+
+		auto imgPointer = img->renderRscTexture->GetTexture()->GetID();
+		auto imgW = img->renderRscTexture->GetTexture()->GetWidth();
+		auto imgH = img->renderRscTexture->GetTexture()->GetHeight();
+		ImGui::Image((void*)(intptr_t)imgPointer, pixSize);
 	}
 
 	ImDrawData* GUIModule::GetDrawData() {

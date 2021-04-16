@@ -29,6 +29,7 @@
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/Loaders/ImageLoader.h"
 #include "ResourceManager/Loaders/MeshLoader.h"
+#include "ResourceManager/Loaders/LayoutLoader.h"
 
 namespace Raven
 {
@@ -118,6 +119,8 @@ namespace Raven
 			return GetLoader<ImageLoader>()->LoadAsset(path); // adds a resource to the register
 		case EResourceType::RT_Mesh:
 			return GetLoader<MeshLoader>()->LoadAsset(path);
+		case EResourceType::RT_GuiLayout:
+			return GetLoader<LayoutLoader>()->LoadAsset(path);
 		default:
 			return false;
 		}

@@ -28,6 +28,7 @@ namespace Raven
 		LT_Material,
 		LT_Scene,
 		LT_Audio,
+		LT_GuiLayout,
 		LT_MAX
 	};
 
@@ -60,6 +61,8 @@ namespace Raven
 				return "Type: Scene Loader.";
 			case ELoaderType::LT_Audio:
 				return "Type: Audio Loader.";
+			case ELoaderType::LT_GuiLayout:
+				return "Type: GUI Layout Loader.";
 			default:
 				return "Loader type not recognised";
 			}

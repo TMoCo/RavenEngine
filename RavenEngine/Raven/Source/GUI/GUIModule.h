@@ -15,54 +15,114 @@
 #include "Engine.h"
 #include "Window/Window.h"
 
+#include "Utilities/Serialization.h"
+
+#include <string>
 #include <vector>
+
+#include <ResourceManager/Resources/Texture2D.h>
 
 namespace Raven {
 
 	class GUIModule : public IModule
 	{
 	public:
-		// Widget Configuration Structs
-		struct GUIPanelConfig {
-			// Configuration variables
+		enum EWidgetType {
+			WT_None = 0,
+			WT_Panel = 1,
+			WT_PanelEnd = 2, // Special widget type that signifies the end of a panel
+			WT_Text = 3,
+			WT_Button = 4,
+			WT_Image = 5
+		};
+
+		// Widget Configuration Struct
+		struct GUIWidgetConfig
+		{
+			EWidgetType type = WT_None;
+
+			// General Configuration variables
 			ImVec4 bg_col = ImVec4(0., 0., 0., 0.);
 			ImVec4 border_col = ImVec4(0., 0., 0., 0.);
-			ImVec2 padding = ImVec2(0., 0.); // Internal padding of panel given in pixels
-			ImVec2 position = ImVec2(0., 0.); // Position in pizels of top left
-			ImVec2 size = ImVec2(0., 0.); // (0,0) will make panel auto size
-			float rounding = 0;
+			ImVec2 padding = ImVec2(0., 0.); // Internal padding of panel given in percentage of glfw window
+			ImVec2 position = ImVec2(0., 0.); // Position in percentage relative to top left of parent
+			ImVec2 size = ImVec2(0., 0.); // Size in percent of parent
+										  // 0 in a dimention for a panel will make autosize
+			                              // 0 in a dimention for a button will resize to text
+			float rounding = 0; // Rounding of the element
 
-			// Constructor to get ImGui's current styles
-			GUIPanelConfig() {
+			// Text Config
+			ImVec4 text_col = ImVec4(0., 0., 0., 0.); // Color of the text of a widget
+			ImVec2 text_align = ImVec2(0., 0.); // Text align given as percentages in x, and y direction
+			std::string font_path = ""; // Pointer ot the ImGui font to be used
+			float font_size = 0;
+
+			// Buton Config
+			ImVec4 hover_col = ImVec4(0., 0., 0., 0.);
+			ImVec4 active_col = ImVec4(0., 0., 0., 0.);
+
+			// Image COnfig
+			std::string image_path = "";
+
+			GUIWidgetConfig(EWidgetType _type = WT_None) {
+				type = _type;
+
 				bg_col = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
 				border_col = ImGui::GetStyleColorVec4(ImGuiCol_Border);
-				padding = ImGui::GetStyle().WindowPadding;
+				padding = ImVec2(0,0);
 				rounding = ImGui::GetStyle().WindowRounding;
-			}
-		};
-		struct GUITextConfig {
-			ImVec4 color = ImVec4(0., 0., 0., 0.);
-			ImVec2 text_align = ImVec2(0., 0.); // Text align given as percentages in x, and y direction
-			ImFont* font = NULL;
 
-			GUITextConfig() {
-				color = ImGui::GetStyleColorVec4(ImGuiCol_Text);
-				font = ImGui::GetFont();
-			}
-		};
-		struct GUIButtonConfig {
-			ImVec4 color = ImVec4(0., 0., 0., 0.);
-			ImVec4 color_hover = ImVec4(0., 0., 0., 0.);
-			ImVec4 color_active = ImVec4(0., 0., 0., 0.);
-			ImVec2 size = ImVec2(0., 0.); // If a dimention is = 0 then that axis will auto size to fit the text
-			float h_align = 0; // Horizontal alignment, percentage based
-			float rounding = 0; // Horizontal alignment, percentage based
+				text_col = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+				font_size = ImGui::GetFontSize();
 
-			GUIButtonConfig() {
-				color = ImGui::GetStyleColorVec4(ImGuiCol_Button);
-				color_hover = ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered);
-				color_active = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
-				rounding = ImGui::GetStyle().FrameRounding;
+				if (_type == WT_Button) bg_col = ImGui::GetStyleColorVec4(ImGuiCol_Button);
+				hover_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered);
+				active_col = ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive);
+			}
+
+			template<typename Archive>
+			void save(Archive& archive) const
+			{
+				archive(cereal::make_nvp("Widget Type", (int)type),
+					cereal::make_nvp("Background Colour", bg_col),
+					cereal::make_nvp("Border Colour", border_col),
+					cereal::make_nvp("Padding Width", padding),
+					cereal::make_nvp("Position", position),
+					cereal::make_nvp("Size", size),
+					cereal::make_nvp("Rounding", rounding),
+					cereal::make_nvp("Text Colour", text_col),
+					cereal::make_nvp("Font Size", font_size),
+					cereal::make_nvp("Text Alignment", text_align),
+					cereal::make_nvp("Button Hover Colour", hover_col),
+					cereal::make_nvp("Button Active Color", active_col),
+					cereal::make_nvp("Image File Path", image_path),
+					cereal::make_nvp("Font File Path", font_path));
+			}
+
+			template<typename Archive>
+			void load(Archive& archive)
+			{
+				archive(cereal::make_nvp("Widget Type", (EWidgetType)type),
+					cereal::make_nvp("Background Colour", bg_col),
+					cereal::make_nvp("Border Colour", border_col),
+					cereal::make_nvp("Padding Width", padding),
+					cereal::make_nvp("Position", position),
+					cereal::make_nvp("Size", size),
+					cereal::make_nvp("Rounding", rounding),
+					cereal::make_nvp("Text Colour", text_col),
+					cereal::make_nvp("Font Size", font_size),
+					cereal::make_nvp("Text Alignment", text_align),
+					cereal::make_nvp("Button Hover Colour", hover_col),
+					cereal::make_nvp("Button Active Color", active_col),
+					cereal::make_nvp("Image File Path", image_path),
+					cereal::make_nvp("Font File Path", font_path));
+			}
+
+			GUIWidgetConfig End()
+			{
+				GUIWidgetConfig tmp = *this;
+				tmp.type = WT_PanelEnd;
+				return tmp;
 			}
 		};
 
@@ -83,19 +143,39 @@ namespace Raven {
 		/** Module Destroy. */
 		virtual void Destroy() override;
 
+		ImVec2 PixToPercent(ImVec2 value, ImVec2 max)
+		{
+			if (max.x * max.y == 0)
+			{
+				LOGE("Divide by zero error while converting pixels to percentages");
+				return ImVec2();
+			}
+
+			return ImVec2(value.x / max.x,
+				value.y / max.y);
+		}
+		ImVec2 PercentToPix(ImVec2 value, ImVec2 max)
+		{
+			return ImVec2(value.x * max.x,
+				value.y * max.y);
+		}
+
+
 	public:
 
 		void BeginFrame();
 
 		void EndFrame();
 
-		void BeginPanel(GUIPanelConfig config);
+		void BeginPanel(GUIWidgetConfig config);
 
 		void EndPanel();
 
-		void Text(GUITextConfig config, const char* fmt, ...);
+		void Text(GUIWidgetConfig config, size_t fontID, const char* fmt, ...);
 
-		bool Button(GUIButtonConfig b_config, GUITextConfig t_config, const char* text);
+		bool Button(GUIWidgetConfig config, size_t fontID, const char* text);
+
+		void Image(GUIWidgetConfig config, Ptr<Texture2D> img);
 
 		ImDrawData* GetDrawData();
 
@@ -123,5 +203,6 @@ namespace Raven {
 
 		std::vector<ImFont*> loadedFonts;
 	};
+
 
 }

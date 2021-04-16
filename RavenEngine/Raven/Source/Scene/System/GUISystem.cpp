@@ -24,18 +24,10 @@ namespace Raven
 		auto& registry = scene->GetRegistry();
 
 		// Look for all GUIMenu component entities
-		auto mGuiView = registry.view<GUIMenu>();
-		for (auto entity : mGuiView)
+		auto guiView = registry.view<GUIComponent>();
+		for (auto entity : guiView)
 		{
-			const auto mGUI = registry.try_get<GUIMenu>(entity);
-			if (mGUI) mGUI->UpdateGUI();
-		}
-
-		// Look for all GUIInGame component entities
-		auto igGuiView = registry.view<GUIInGame>();
-		for (auto entity : igGuiView)
-		{
-			const auto mGUI = registry.try_get<GUIInGame>(entity);
+			const auto mGUI = registry.try_get<GUIComponent>(entity);
 			if (mGUI) mGUI->UpdateGUI();
 		}
 	}

@@ -23,7 +23,8 @@ namespace Raven
 		RT_Terrain,
 		RT_Material,
 		RT_Shader,
-		RT_Audio
+		RT_Audio,
+		RT_GuiLayout
 	};
 
 	//

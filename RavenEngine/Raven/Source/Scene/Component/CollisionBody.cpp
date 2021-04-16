@@ -46,6 +46,16 @@ namespace Raven
 		colliders.erase(colliders.begin() + index); // deletes the pointer
 	}
 
+	void CollisionBody::SetIsTrigger(uint32_t index, bool b)
+	{
+		colliders[index]->collider->setIsTrigger(b);
+	}
+
+	bool CollisionBody::IsTrigger(uint32_t index)
+	{
+		return colliders[index]->collider->getIsTrigger();
+	}
+
 	void CollisionBody::RemoveBodyFromWorld()
 	{
 		// check the body exists

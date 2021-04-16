@@ -31,6 +31,10 @@ namespace Raven
 		// remove the specified collider from the collision body
 		void RemoveCollider(uint32_t index);
 
+		// set the collider to be a trigger (does not collide, only reports overlap)
+		void SetIsTrigger(uint32_t index, bool b);
+		bool IsTrigger(uint32_t index);
+
 
 		// removes the body and its colliders from the physics world
 		void RemoveBodyFromWorld();

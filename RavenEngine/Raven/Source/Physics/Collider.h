@@ -64,7 +64,7 @@ namespace Raven
 		friend RigidBody;
 	public:
 		Collider(ColliderPrimitive::Type shapeType);
-		virtual ~Collider();
+		~Collider();
 
 		// creates the collider and adds it to the body 
 		virtual void CreateCollider(rp3d::CollisionShape* shape) = 0;

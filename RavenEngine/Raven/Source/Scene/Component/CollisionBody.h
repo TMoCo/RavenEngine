@@ -59,7 +59,7 @@ namespace Raven
 		rp3d::CollisionBody* body;
 
 		// vector of the colliders attached to the collision body
-		std::vector<std::unique_ptr<Collider>> colliders;
+		std::vector<std::shared_ptr<Collider>> colliders;
 	};
 
 	template<class Archive>

@@ -43,7 +43,10 @@ namespace Raven
 		PostProcessing,
 
 		// Debug Drawing Shader.
-		Debug
+		Debug,
+
+		SkinnedMesh
+
 	};
 
 

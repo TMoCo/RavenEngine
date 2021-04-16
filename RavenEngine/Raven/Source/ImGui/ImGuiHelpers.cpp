@@ -163,7 +163,7 @@ namespace ImGuiHelper
 		return updated;
 	}
 
-	bool Property(const std::string& name, std::string& value)
+	bool Property(const std::string& name, std::string& value, bool disable )
 	{
 		bool updated = false;
 		ImGui::TextUnformatted(name.c_str());
@@ -172,12 +172,24 @@ namespace ImGuiHelper
 
 		std::string id = "##" + name;
 		static char obj[256] = {};
-		strcpy(obj, value.c_str());
+		memcpy(obj, value.c_str(), value.length() + 1);
+
+		ImGuiInputTextFlags flags = ImGuiInputTextFlags_None;
+		if (disable) 
+		{
+			flags = ImGuiInputTextFlags_ReadOnly;
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(200, 200, 200)));
+		}
+
 		if (ImGui::InputText(id.c_str(), obj, 256)) 
 		{
 			updated = true;
 			value = obj;
 		}
+
+		if (disable)
+			ImGui::PopStyleColor();
+
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();

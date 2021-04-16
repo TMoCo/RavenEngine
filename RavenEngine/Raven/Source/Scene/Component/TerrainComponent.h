@@ -8,14 +8,14 @@
 
 #include "ResourceManager/Resources/Texture2D.h"
 #include "ResourceManager/Resources/Terrain.h"
-
+#include "Component.h"
 //
 // A class for Terrain component and their related data such as heightmaps, textures, later materials, entity placements...
 //
 
 namespace Raven
 {
-	class TerrainComponent
+	class TerrainComponent : public Component
 	{
 	public:
 		TerrainComponent() {}

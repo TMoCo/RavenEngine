@@ -21,7 +21,7 @@ namespace Raven
 		{
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Quad";
 			mesh->positions.resize(4);
 			mesh->texCoords.resize(4);
 
@@ -50,6 +50,7 @@ namespace Raven
 		Mesh* CreateQuad()
 		{
 			Mesh* mesh = new Mesh();
+			mesh->name = "Quad";
 			mesh->positions.resize(4);
 			mesh->texCoords.resize(4);
 
@@ -80,6 +81,7 @@ namespace Raven
 			//  |/      |/
 			//  v2------v3
 			Mesh* mesh = new Mesh();
+			mesh -> name= "Cube";
 			mesh->texCoords.resize(24);
 			mesh->normals.resize(24);
 			mesh->positions.resize(24);
@@ -264,6 +266,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
+			mesh->name = "Pyramid";
 
 			mesh->indices = {
 				0,1,2,
@@ -297,7 +300,7 @@ namespace Raven
 			float radius = 1.0f;
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Sphere";
 			for (int i = 0; i <= stackCount; ++i)
 			{
 				float stackAngle = M_PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
@@ -357,7 +360,7 @@ namespace Raven
 		{
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Plane";
 			glm::vec3 vec = normal * 90.0f;
 			glm::quat rotation =
 				glm::quat(vec.z, glm::vec3(1.0f, 0.0f, 0.0f)) *
@@ -410,7 +413,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Capsule";
 
 			point = 0;
 
@@ -557,7 +560,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Cylinder";
 			thisrow = 0;
 			prevrow = 0;
 			for (j = 0; j <= (rings + 1); j++)

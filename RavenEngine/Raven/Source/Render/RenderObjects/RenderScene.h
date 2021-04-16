@@ -104,6 +104,7 @@ namespace Raven
 
 		// ~MinimalSolution --- ---- --- ---- --- ---- ---
 		GLBuffer* trUBO;
+		GLBuffer* skinnedUBO;
 		GLBuffer* lightingUBO;
 		GLBuffer* materialUBO;
 		// ~MinimalSolution --- ---- --- ---- --- ---- ---
@@ -115,6 +116,11 @@ namespace Raven
 		/** The Terrain in the Scene. */
 		RenderRscShader* terrainShader;
 		RenderRscMaterial* terrainMaterail;
+
+
+		/** The Terrain in the Scene. */
+		RenderRscShader* skinnedShader;
+		RenderRscMaterial* skinnedMaterail;
 	};
 
 

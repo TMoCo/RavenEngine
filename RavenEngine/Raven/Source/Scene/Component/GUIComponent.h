@@ -2,10 +2,11 @@
 #include "GUI/GUIModule.h"
 #include "Engine.h"
 #include <functional>
+#include "Component.h"
 
 namespace Raven
 {
-	class GUIComponent
+	class GUIComponent : public Component
 	{
 	public:
 		GUIComponent();

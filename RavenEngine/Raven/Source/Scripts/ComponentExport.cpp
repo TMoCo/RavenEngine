@@ -7,8 +7,11 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
+#include "Animation/Animator.h"
+
 #include "Scene/Entity/Entity.h"
 #include "Scene/Entity/EntityManager.h"
+
 
 namespace Raven
 {
@@ -48,6 +51,7 @@ namespace Raven
 				.EXPORT_COMPONENTS(ActiveComponent)
 				.EXPORT_COMPONENTS(Transform)
 				.EXPORT_COMPONENTS(Light)
+				.EXPORT_COMPONENTS(Animator)
 
 				.endClass()
 
@@ -70,7 +74,14 @@ namespace Raven
 
 				.beginClass<ActiveComponent>("ActiveComponent")
 				.addProperty("active", &ActiveComponent::active)
-				.endClass();
+				.endClass()
+				
+				.beginClass<Animator>("Animator")
+				.addFunction("SetValue", &Animator::SetValue<float>)
+				.addFunction("SetValue", &Animator::SetValue<int32_t>)
+				.addFunction("SetValue", &Animator::SetValue<std::string>)
+				.addFunction("SetValue", &Animator::SetValue<bool>)
+				;
 		}
 	};
 };

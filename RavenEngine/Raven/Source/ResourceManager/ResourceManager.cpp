@@ -70,10 +70,12 @@ namespace Raven {
 		return resources.count(id);
 	}
 
-	void ResourceManager::AddResource(const std::string& id, IResource* resource)
+	std::shared_ptr<IResource> ResourceManager::AddResource(const std::string& id, IResource* resource)
 	{
 		//resources.insert(std::make_pair(id, resource));
-		resources.emplace(id, resource);
+		std::shared_ptr<IResource> re(resource);
+		resources.emplace(id, re);
+		return re;
 	}
 
 	void ResourceManager::PrintResources()

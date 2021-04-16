@@ -11,6 +11,8 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/MeshRenderer.h"
+
 #include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"
 
@@ -18,12 +20,15 @@
 #include "Core/Camera.h"
 #include "Devices/Input.h"
 
+#include "Animation/Animator.h"
+
 #include <fstream>
 #include "Engine.h"
 #include "Utilities/Serialization.h"
 // for serialization
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
+
 
 
 namespace Raven { 
@@ -37,6 +42,7 @@ namespace Raven {
 		entityManager->AddDependency<Camera, Transform>();
 		entityManager->AddDependency<Model, Transform>();
 		entityManager->AddDependency<Light, Transform>();
+		entityManager->AddDependency<MeshRenderer, Transform>();
 
 		sceneGraph = std::make_shared<SceneGraph>();
 		sceneGraph->Init(entityManager->GetRegistry());
@@ -53,7 +59,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -123,26 +129,28 @@ namespace Raven {
 			path += std::string(".raven");
 
 			std::ifstream in(path);
-			if (!in.good())
+			if (in.good())
+			{
+
+				std::string data;
+				in.seekg(0, std::ios::end);
+				auto len = in.tellg();
+				in.seekg(0, std::ios::beg);
+				data.resize(len);
+				in.read(data.data(), len);
+				in.close();
+
+				std::istringstream istr;
+				istr.str(data);
+				cereal::JSONInputArchive input(istr);
+				input(*this);
+				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
+			}
+			else 
 			{
 				LOGE("No saved scene file found {0}", path);
 				in.close();
-				return;
 			}
-			std::string data;
-			in.seekg(0, std::ios::end);
-			auto len = in.tellg();
-			in.seekg(0, std::ios::beg);
-			data.resize(len);
-			in.read(data.data(), len);
-			in.close();
-
-			std::istringstream istr;
-			istr.str(data);
-			cereal::JSONInputArchive input(istr);
-			input(*this);
-
-			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 		}
 
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());

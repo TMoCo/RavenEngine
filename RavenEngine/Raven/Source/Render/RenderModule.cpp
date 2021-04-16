@@ -177,7 +177,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 	// ~TESTING-------------------------------------------------------
 
-
+	 
 
 	// Build Render Data form the scene...
 	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );

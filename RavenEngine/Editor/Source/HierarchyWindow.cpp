@@ -10,6 +10,7 @@
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/MeshRenderer.h"
 #include "Scripts/LuaComponent.h"
 #include "Core/Camera.h"
 #include "Scene/Component/Transform.h"
@@ -34,50 +35,24 @@ namespace Raven
 
 		ImGui::Begin(title.c_str(), &active, flags);
 		{
-			auto scene = Editor::Get().GetModule<SceneManager>()->GetCurrentScene();
-			auto& registry = scene->GetRegistry();
-	
-			if (ImGui::BeginPopupContextWindow())
-			{
-				if (ImGui::Selectable("Add Empty Entity"))
-				{
-					scene->CreateEntity("Empty Entity");
-				}
-
-				if (ImGui::Selectable("Add Light"))
-				{
-					auto entity = scene->CreateEntity("Light");
-					entity.AddComponent<Light>();
-					entity.GetOrAddComponent<Transform>();
-				}
-
-				if (ImGui::Selectable("Add Model"))
-				{
-					auto entity = scene->CreateEntity("Model");
-					entity.AddComponent<Model>();
-					entity.GetOrAddComponent<Transform>();
-				}
-
-				if (ImGui::Selectable("Add Camera"))
-				{
-					auto entity = scene->CreateEntity("Camera");
-					auto & camera = entity.AddComponent<Camera>();
-					camera.SetFov(45.f);
-					camera.SetFar(100);
-					camera.SetNear(0.01);
-					camera.SetAspectRatio(4 / 3.f);
-					entity.GetOrAddComponent<Transform>();
-				}
-
-
-				ImGui::EndPopup();
+		
+			if (ImGui::IsMouseClicked(1)) {
+				ImGui::OpenPopup("HierarchyWindow::PopupWindow");
 			}
+			PopupWindow();
+		
 			DrawName();
+			
+
 			DrawFilter();
 			DragEntity();
+
+		
 		}
 		ImGui::End();
 	}
+
+
 
 	void HierarchyWindow::DrawName()
 	{
@@ -93,6 +68,60 @@ namespace Raven
 		if (ImGui::InputText("##Name", objName, IM_ARRAYSIZE(objName), 0))
 			scene->SetName(objName);
 		ImGui::Separator();
+	}
+
+	void HierarchyWindow::PopupWindow()
+	{
+		auto scene = Editor::Get().GetModule<SceneManager>()->GetCurrentScene();
+		auto& registry = scene->GetRegistry();
+		if (ImGui::BeginPopupContextWindow("HierarchyWindow::PopupWindow"))
+		{
+			if (ImGui::Selectable("Add Empty Entity"))
+			{
+				scene->CreateEntity("Empty Entity");
+			}
+
+			if (ImGui::Selectable("Add Light"))
+			{
+				auto entity = scene->CreateEntity("Light");
+				entity.AddComponent<Light>();
+				entity.GetOrAddComponent<Transform>();
+			}
+
+			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "Quad" };
+
+
+			if (ImGui::BeginMenu("Add 3D Object"))
+			{
+				for (auto name : shapes)
+				{
+					if (ImGui::MenuItem(name))
+					{
+						auto entity = scene->CreateEntity(name);
+						auto & model = entity.AddComponent<Model>();
+						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(name));
+						auto mesh = model.AddMesh(MeshFactory::CreatePrimitive(model.GetPrimitiveType()));
+						auto& render = entity.AddComponent<MeshRenderer>();
+						render.mesh = mesh;
+						render.meshIndex = 0;
+					}
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::Selectable("Add Camera"))
+			{
+				auto entity = scene->CreateEntity("Camera");
+				auto& camera = entity.AddComponent<Camera>();
+				camera.SetFov(45.f);
+				camera.SetFar(100);
+				camera.SetNear(0.01);
+				camera.SetAspectRatio(4 / 3.f);
+				entity.GetOrAddComponent<Transform>();
+			}
+
+
+			ImGui::EndPopup();
+		}
 	}
 
 	void HierarchyWindow::DrawFilter()
@@ -133,7 +162,7 @@ namespace Raven
 			{
 				auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
 
-				if (!hierarchyComponent || hierarchyComponent->Parent() == entt::null)
+				if (!hierarchyComponent|| hierarchyComponent->Parent() == entt::null)
 					DrawNode(entity, registry);
 			}
 		});
@@ -257,8 +286,8 @@ namespace Raven
 
 
 
-
 			bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)entt::to_integral(node), nodeFlags, (icon + " %s").c_str(), doubleClicked ? "" : (name).c_str());
+
 
 			if (doubleClicked)
 			{
@@ -373,12 +402,8 @@ namespace Raven
 							droppedEntity = node;
 						}
 					}
-
 					ImGui::EndDragDropTarget();
 				}
-
-				//if (editor.GetSelected() == entity)
-				//	editor.SetSelected(entt::null);
 			}
 
 			if (ImGui::IsMouseReleased(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_None) && !deleteEntity)

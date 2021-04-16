@@ -1,0 +1,165 @@
+{
+    "value0": {
+        "animatorNodes": [
+            {
+                "key": 100,
+                "value": {
+                    "in": 0,
+                    "out": 101,
+                    "nodeId": 100,
+                    "name": ""
+                }
+            },
+            {
+                "key": 109,
+                "value": {
+                    "in": 110,
+                    "out": 111,
+                    "nodeId": 109,
+                    "name": ".\\assets\\Idle.fbx"
+                }
+            },
+            {
+                "key": 103,
+                "value": {
+                    "in": 104,
+                    "out": 105,
+                    "nodeId": 103,
+                    "name": ".\\assets\\Sitting.fbx"
+                }
+            },
+            {
+                "key": 106,
+                "value": {
+                    "in": 107,
+                    "out": 108,
+                    "nodeId": 106,
+                    "name": ".\\assets\\Walking.fbx"
+                }
+            }
+        ],
+        "linkInfo": [
+            {
+                "key": 120,
+                "value": {
+                    "id": 120,
+                    "from": 103,
+                    "to": 109,
+                    "conditions": [
+                        {
+                            "key": "isWalking",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        },
+                        {
+                            "key": "isSetting",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "key": 113,
+                "value": {
+                    "id": 113,
+                    "from": 109,
+                    "to": 103,
+                    "conditions": [
+                        {
+                            "key": "isWalking",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        },
+                        {
+                            "key": "isSetting",
+                            "value": {
+                                "value": "1",
+                                "type": 2
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "key": 121,
+                "value": {
+                    "id": 121,
+                    "from": 100,
+                    "to": 106,
+                    "conditions": []
+                }
+            },
+            {
+                "key": 114,
+                "value": {
+                    "id": 114,
+                    "from": 109,
+                    "to": 106,
+                    "conditions": [
+                        {
+                            "key": "isWalking",
+                            "value": {
+                                "value": "1",
+                                "type": 2
+                            }
+                        },
+                        {
+                            "key": "isSetting",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "key": 115,
+                "value": {
+                    "id": 115,
+                    "from": 106,
+                    "to": 109,
+                    "conditions": [
+                        {
+                            "key": "isWalking",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        },
+                        {
+                            "key": "isSetting",
+                            "value": {
+                                "value": "0",
+                                "type": 2
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "conditions": [
+            {
+                "key": "isSetting",
+                "value": {
+                    "value": "0",
+                    "type": 2
+                }
+            },
+            {
+                "key": "isWalking",
+                "value": {
+                    "value": "1",
+                    "type": 2
+                }
+            }
+        ]
+    }
+}

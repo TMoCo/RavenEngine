@@ -20,8 +20,8 @@
 
 namespace Raven 
 {
-	LuaComponent::LuaComponent(entt::entity entity, const std::string& file, Scene* initScene)
-		:scene(initScene),file(file), entity(entity)
+	LuaComponent::LuaComponent( const std::string& file, Scene* initScene)
+		:scene(initScene),file(file)
 	{
 		table = nullptr;
 
@@ -69,7 +69,6 @@ return #name
 
 	void LuaComponent::Init()
 	{
-		
 		className = StringUtils::RemoveExtension(StringUtils::GetFileName(file));
 		auto vm = Engine::GetModule<LuaVirtualMachine>();
 		LoadScript();
@@ -143,8 +142,6 @@ return #name
 
 	void LuaComponent::OnImGui()
 	{
-
-	
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
@@ -233,7 +230,7 @@ return #name
 					else if ((pair.second.isInstance<Entity>() && name != "parent"))
 					{
 						Entity* v = pair.second;
-						if (v->GetHandle() != entt::null)
+						if (v != nullptr && v->GetHandle() != entt::null)
 						{
 							auto icon = 
 								v->HasComponent<Camera>() ?
@@ -280,11 +277,7 @@ return #name
 							}
 						}
 					}
-					
 				}
-
-
-			
 			}
 		}
 
@@ -299,4 +292,4 @@ return #name
 		return table != nullptr && !table->isNil();
 	}
 
-	};
+};

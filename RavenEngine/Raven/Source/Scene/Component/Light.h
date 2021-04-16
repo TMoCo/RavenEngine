@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <glm/glm.hpp>
-
+#include "Component.h"
 namespace Raven 
 {
 	enum class  LightType
@@ -13,8 +13,9 @@ namespace Raven
 		PointLight = 2
 	};
 
-	struct Light
+	class Light : public Component
 	{
+	public:
 		Light(const glm::vec3& direction = glm::vec3(0.0f), const glm::vec4& color = glm::vec4(1.0f), float intensity = 1.0f, const LightType& type = LightType::DirectionalLight, const glm::vec3& position = glm::vec3(), float radius = 1.0f, float angle = 0.0f);
 
 		void OnImGui();
@@ -30,7 +31,7 @@ namespace Raven
 		template<class Archive>
 		void serialize(Archive& archive)
 		{
-			archive(position, color, type, angle, direction,intensity, radius);
+			archive(position, color, type, angle, direction,intensity, radius,entity);
 		}
 	};
 };

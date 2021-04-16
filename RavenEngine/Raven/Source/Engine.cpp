@@ -33,7 +33,7 @@
 
 #include "Devices/Input.h"
 #include "Scripts/LuaSystem.h"
-
+#include "Animation/AnimationSystem.h"
 #include "Scripts/LuaVirtualMachine.h"
 
 
@@ -165,6 +165,7 @@ namespace Raven
 
 		auto guiSystem = GetSystemManager()->AddSystem<GUISystem>();
 		GetSystemManager()->AddSystem<LuaSystem>();
+		GetSystemManager()->AddSystem<AnimationSystem>()->OnInit();
 		guiSystem->OnInit();
 	
 //############	Register your system here ######################

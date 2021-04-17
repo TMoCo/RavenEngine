@@ -1,5 +1,31 @@
 ## ECS Architecture
 
+
+```mermaid
+classDiagram
+    ISystem <|-- AnimationSystem
+    ISystem <|-- GUISystem
+    ISystem <|-- LuaSystem
+    ISystem <|-- AnimationSystem
+    Component <|-- Animator
+    Component <|-- Transfrom
+    Component <|-- Light
+    Component <|-- LuaComponent
+    Component <|-- SkinnedMeshRenderer
+    Component <|-- MeshRenderer
+    Component <|-- Material
+    Component <|-- Hierarchy
+    Component <|-- CameraControllerComponent
+    Component: -entity
+    
+    class Entity
+
+    ISystem: -OnUpdate(float dt,Scene *)
+    ISystem: -OnInit()
+ 
+```
+
+
 #### [Entity](./Entity/Entity.h)
 
 
@@ -167,3 +193,51 @@ the manager of systems and manage the lifecycle of systems.
 
 
 ```
+
+
+### How to add component into editor
+
+##### [Open PropertiesWindow.cpp](../../../Editor/Source/PropertiesWindow.cpp)
+
+
+```c++
+void PropertiesWindow::OnSceneCreated(Scene* scene)
+{
+.........................
+    TRIVIAL_COMPONENT(Transform,true);
+    TRIVIAL_COMPONENT(Light, true);
+    TRIVIAL_COMPONENT(Camera, true);
+    TRIVIAL_COMPONENT(CameraControllerComponent, true);
+    TRIVIAL_COMPONENT(MeshRenderer, false);
+    TRIVIAL_COMPONENT(SkinnedMeshRenderer, false);
+    TRIVIAL_COMPONENT(LuaComponent, true);
+    TRIVIAL_COMPONENT(Animator, true);
+    //Add your Component in here. The second param means whether it shows in editor
+    //Becase for some Component like SkinnedMeshRenderer, there is no need to show 
+    //in editor
+
+    enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
+        auto lua = r.try_get<LuaComponent>(entity);
+        if (lua) 
+        {
+            lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
+        }
+    });
+}
+
+```
+**If you want to serialize your component with scene, add your component int Scene.cpp**
+
+```c++
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
+
+Append your component behind them.
+
+```
+
+
+
+
+
+
+

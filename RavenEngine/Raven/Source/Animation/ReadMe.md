@@ -6,6 +6,24 @@ The animation is based on skinnedMesh and read from FBX file.
 
 for the animation, it has two components, one is **Animation Clip**, another one is **Animation Curve**.
 
+## Architecture
+
+```mermaid
+classDiagram
+    ISystem <|-- AnimationSystem
+    Component <|-- Animator
+    Component: -entity
+
+    ISystem: -OnUpdate(float dt,Scene *)
+    ISystem: -OnInit()
+    AnimationSystem : -OnUpdate(float dt,Scene *)
+    AnimationSystem : -OnInit()
+    class Animation
+    class AnimationController
+    class Curve
+    class Bone
+```
+
 
 ### [Animation System](./AnimationSystem.h)
 

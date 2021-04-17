@@ -6,6 +6,12 @@ The animation is based on skinnedMesh and read from FBX file.
 
 for the animation, it has two components, one is **Animation Clip**, another one is **Animation Curve**.
 
+
+### [Animation System](./AnimationSystem.h)
+
+In animation system, it is implemented from ISystem interface. So it handles objects which own the **Animator Component**
+
+
 ###  Animation Clip
 Animation Clips are the smallest building blocks of animation. They represent an isolated piece of motion, such as RunLeft, Jump, or Crawl, and can be manipulated and combined in various ways to produce lively end results.
 

@@ -64,15 +64,6 @@
                 }
             },
             {
-                "key": 121,
-                "value": {
-                    "id": 121,
-                    "from": 100,
-                    "to": 106,
-                    "conditions": []
-                }
-            },
-            {
                 "key": 113,
                 "value": {
                     "id": 113,
@@ -94,6 +85,15 @@
                             }
                         }
                     ]
+                }
+            },
+            {
+                "key": 121,
+                "value": {
+                    "id": 121,
+                    "from": 100,
+                    "to": 106,
+                    "conditions": []
                 }
             },
             {
@@ -149,14 +149,14 @@
             {
                 "key": "isSetting",
                 "value": {
-                    "value": "0",
+                    "value": "1",
                     "type": 2
                 }
             },
             {
                 "key": "isWalking",
                 "value": {
-                    "value": "1",
+                    "value": "0",
                     "type": 2
                 }
             }

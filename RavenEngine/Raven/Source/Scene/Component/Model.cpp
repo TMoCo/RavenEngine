@@ -106,18 +106,23 @@ namespace Raven
 
 			for (auto i = 0; i < meshes.size(); i++)
 			{
-				auto entity = currentScene->CreateEntity(meshes[i]->name);
+				auto entity = ent.GetChildInChildren(meshes[i]->name);
+				if (!entity.Valid())
+					entity = currentScene->CreateEntity(meshes[i]->name);
+
 				if (!meshes[i]->blendIndices.empty() ||
 					!meshes[i]->blendWeights.empty())
 				{
-					auto& render = entity.AddComponent<SkinnedMeshRenderer>();
+					auto& render = entity.GetOrAddComponent<SkinnedMeshRenderer>();
 					render.mesh = meshes[i];
 					render.meshIndex = i;
-					render.skeleton = SkeletonCache::Get().Get(filePath);
+					//skeleton should be copy for every skinned mesh.
+					render.skeleton = *SkeletonCache::Get().Get(filePath); //copy a skeleton
+					render.skeleton.ResetTransfromTarget(ent);
 				}
 				else
 				{
-					auto& render = entity.AddComponent<MeshRenderer>();
+					auto& render = entity.GetOrAddComponent<MeshRenderer>();
 					render.mesh = meshes[i];
 					render.meshIndex = i;
 				}
@@ -137,7 +142,7 @@ namespace Raven
 		{
 			if (meshes.size() == 1)
 			{
-				auto& render = ent.AddComponent<MeshRenderer>();
+				auto& render = ent.GetOrAddComponent<MeshRenderer>();
 				render.mesh = meshes[0];
 				render.meshIndex = 0;
 			}
@@ -145,7 +150,10 @@ namespace Raven
 			{
 				for (auto i = 0; i < meshes.size(); i++)
 				{
-					auto entity = currentScene->CreateEntity(meshes[i]->name);
+					auto entity = ent.GetChildInChildren(meshes[i]->name);
+					if (!entity.Valid())
+						entity = currentScene->CreateEntity(meshes[i]->name);
+
 					auto& render = entity.AddComponent<MeshRenderer>();
 					render.mesh = meshes[i];
 					render.meshIndex = i;

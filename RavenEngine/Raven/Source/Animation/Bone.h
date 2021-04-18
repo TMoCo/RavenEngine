@@ -19,7 +19,7 @@ namespace Raven
 	{
 		enum { MAX_COUNT = 196 };
 		explicit Bone()
-			: parentIdx(-1)
+			: parentIdx(-1),localTransform(nullptr)
 		{
 		}
 
@@ -27,6 +27,7 @@ namespace Raven
 		void load(Archive& archive)
 		{
 			archive(name, offsetMatrix, parentIdx, id);
+			localTransform = nullptr;
 		}
 
 		template<class Archive>
@@ -38,7 +39,7 @@ namespace Raven
 	
 			
 		std::string name;
-		Transform * localTransform = nullptr;
+		Transform* localTransform;
 		glm::mat4 offsetMatrix;
 		int32_t parentIdx;
 		int32_t id;

@@ -70,11 +70,11 @@ namespace Raven
 		void OnImGui();
 
 		void GetMeshFromModel();
-		inline auto getSkeleton() { return skeleton; }
+		inline auto& getSkeleton() const { return skeleton; }
 
 		int32_t meshIndex;
 		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Skeleton> skeleton;
+		Skeleton skeleton;
 	private:
 	};
 

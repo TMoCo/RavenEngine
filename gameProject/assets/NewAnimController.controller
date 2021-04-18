@@ -149,14 +149,14 @@
             {
                 "key": "isSetting",
                 "value": {
-                    "value": "0",
+                    "value": "1",
                     "type": 2
                 }
             },
             {
                 "key": "isWalking",
                 "value": {
-                    "value": "1",
+                    "value": "0",
                     "type": 2
                 }
             }

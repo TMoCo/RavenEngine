@@ -495,6 +495,7 @@ namespace Raven
 			ImGuiID DockMiddle = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.8f, nullptr, &dock_main_id);
 
 			ImGui::DockBuilderDockWindow("Scene", DockMiddle);
+			ImGui::DockBuilderDockWindow("Animator", DockMiddle);
 
 			ImGui::DockBuilderDockWindow("Properties", DockRight);
 

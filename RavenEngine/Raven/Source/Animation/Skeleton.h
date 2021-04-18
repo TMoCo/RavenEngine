@@ -11,20 +11,21 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
+#include "Bone.h"
 
 namespace Raven 
 {
-	struct Bone;
+	class Entity;
 
 	class Skeleton final
 	{
 	public:
-		int32_t AddBone(Bone* bone, int32_t parentId);
+		Bone& AddBone(int32_t parentId);
 		int32_t IndexOf(const std::string& name);
 		inline auto GetBoneSize() const { return bones.size(); }
 		inline auto& GetBones() const { return bones; }
 		inline auto& GetBones() { return bones; }
-		inline auto GetBone(int32_t i) { return bones[i]; }
+		inline auto& GetBone(int32_t i) const { return bones[i]; }
 		inline auto GetRoot() { return root; }
 
 		template<class Archive>
@@ -35,9 +36,9 @@ namespace Raven
 			);
 			for (auto & bone : bones)
 			{
-				if (bone->parentIdx == -1) 
+				if (bone.parentIdx == -1) 
 				{
-					root = bone;
+					root = &bone;
 					break;
 				}
 			}
@@ -51,9 +52,11 @@ namespace Raven
 			);
 		}
 
+		void ResetTransfromTarget(Entity entity);
+
 	private:
-		std::vector<std::shared_ptr<Bone>> bones;
-		std::shared_ptr<Bone> root;
+		std::vector<Bone> bones;
+		Bone* root = nullptr;
 	};
 
 

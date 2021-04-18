@@ -6,8 +6,8 @@
 #include "Scene/Entity/EntityManager.h"
 #include "Model.h"
 #include "ImGui/ImGuiHelpers.h"
+#include "Scene/Component/Transform.h"
 #include <imgui.h>
-
 
 
 namespace Raven
@@ -45,7 +45,7 @@ namespace Raven
 		std::string name = "No root bone";
 		
 		ImGuiHelper::Property("Root Bone", 
-			skeleton && skeleton->GetRoot() ? skeleton->GetRoot()->name :
+			skeleton.GetRoot() ? skeleton.GetRoot()->name :
 			name
 		);
 
@@ -67,40 +67,24 @@ namespace Raven
 		if (auto render = ent.TryGetComponent<Model>())
 		{
 			mesh = render->GetMesh(meshIndex);
-			if (skeleton->GetRoot()->localTransform == nullptr) 
+			if (skeleton.GetRoot()->localTransform == nullptr) 
 			{
-				for (auto & bone : skeleton->GetBones())
-				{
-					auto entity = ent.GetChildInChildren(bone->name);
-					if (entity.Valid()) {
-						bone->localTransform = entity.TryGetComponent<Transform>();
-					}
-				}
+				skeleton.ResetTransfromTarget(ent);
 			}
 		}
 		else
 		{
 			auto parent = ent.GetParent();
 			if (parent.Valid()) {
-
 				if (auto render = parent.TryGetComponent<Model>())
 				{
 					mesh = render->GetMesh(meshIndex);
-					if (skeleton->GetRoot()->localTransform == nullptr)
+					if (skeleton.GetRoot()->localTransform == nullptr)
 					{
-						for (auto& bone : skeleton->GetBones())
-						{
-							auto entity = parent.GetChildInChildren(bone->name);
-							if (entity.Valid()) {
-								bone->localTransform = entity.TryGetComponent<Transform>();
-							}
-						}
+						skeleton.ResetTransfromTarget(parent);
 					}
 				}
 			}
 		}
 	}
-
-
-
 };

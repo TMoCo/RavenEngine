@@ -10,6 +10,11 @@
 
 namespace Raven {
 
+	enum class FileFormat
+	{
+		PNG, BMP, JPG, TGA
+	};
+
 	class TerrainGeneration : public IModule
 	{
 	public:
@@ -21,11 +26,6 @@ namespace Raven {
 
 		// return the type of the module
 		static EModuleType GetModuleType() { return MT_ProceduralGenerator; }
-
-		enum FileFormat
-		{
-			PNG, BMP, JPG, TGA
-		};
 
 		// initialise module
 		virtual void Initialize() override;

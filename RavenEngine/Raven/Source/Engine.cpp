@@ -202,7 +202,7 @@ namespace Raven
 	{
 		// get the terrain generator and generate a height map
 		auto generator = GetModule<TerrainGeneration>();
-		generator->Noise(100, 100, TerrainGeneration::FileFormat::PNG);
+		generator->Noise(100, 100, FileFormat::PNG);
 		std::string path("heightmap.png");
 		// load the generated height map into resource manager
 		GetModule<ResourceManager>()->LoadResource<Texture2D>(path);

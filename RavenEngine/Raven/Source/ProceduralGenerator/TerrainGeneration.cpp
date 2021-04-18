@@ -15,7 +15,7 @@ namespace Raven {
 
 	void TerrainGeneration::Initialize()
 	{
-		FileFormat type = PNG;
+		FileFormat type = FileFormat::PNG;
 		const int width = 128;
 		const int height = 128;
 
@@ -30,9 +30,11 @@ namespace Raven {
 	{	
 		const int octaves = 4;
 		// seeds
-		float a = 0.5;
-		float b = 1.0;
-		bool periodic = false;
+		float a = 7.5;	// higher value increases bumpiness; originally 0.5
+		float b = 1.5;	// higher value increases smoothness; originally 1.0
+		// a needs to be much higher than b for a bumpy terrain
+
+		bool periodic = false;	// for seamless noise
 
 		// buffer to store noise data
 		//GLubyte* data = new GLubyte[width * height * octaves];
@@ -82,7 +84,7 @@ namespace Raven {
 
 		// add heights from all octaves
 		float sumHeight = 0;
-
+		// compute the average height and store as RGB data
 		for (int row = 0; row < height; row++)
 		{
 			for (int col = 0; col < width; col++)
@@ -98,7 +100,6 @@ namespace Raven {
 						heightFields[(row * width + col) * 3] = sumHeight;
 						heightFields[((row * width + col) * 3) + 1] = sumHeight;
 						heightFields[((row * width + col) * 3) + 2] = sumHeight;
-						//out << (int)sumHeight << ' ' << (int)sumHeight << ' ' << (int)sumHeight << '\n';
 						sumHeight = 0;
 						//out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
 					}
@@ -124,16 +125,16 @@ namespace Raven {
 		// write heights to different image formats
 		switch (type)
 		{
-		case PNG:
+		case FileFormat::PNG:
 			stbi_write_png("heightmap.png", width, height, 3, data, width * 3);	// last parameter is stride in bytes
 			break;
-		case BMP:
+		case FileFormat::BMP:
 			stbi_write_bmp("heightmap.bmp", width, height, 3, data);
 			break;
-		case JPG:
+		case FileFormat::JPG:
 			stbi_write_jpg("heightmap.jpg", width, height, 3, data, 100);	// int quality
 			break;
-		case TGA:
+		case FileFormat::TGA:
 			stbi_write_tga("heightmap.tga", width, height, 3, data);
 			break;
 		}

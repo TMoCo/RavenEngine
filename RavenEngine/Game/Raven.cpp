@@ -4,6 +4,8 @@
 #include "Logger/Console.h"
 #include "GUI/GUIModule.h"
 
+#include "ResourceManager/ResourceManager.h"
+
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Component/Component.h"
@@ -14,33 +16,14 @@
 #include "Scene/System/GUISystem.h"
 
 #include "Scene/Component/GUIComponent.h"
+#include "ResourceManager/Resources/Texture2D.h"
+
 
 namespace Raven
 {
 	void RavenGame::Initialize()
 	{
 		Raven::Engine::Initialize();
-		//init code here for game 
-		auto scene = new Scene("default");
-		GetModule<SceneManager>()->AddScene(scene);
-		GetModule<SceneManager>()->AddSceneFromFile("scenes/deer2.raven");
-		auto deerScene = GetModule<SceneManager>()->GetSceneByName("deer2");
-
-		//more safety way
-		scene->SetInitCallback([](Scene * _scene) {
-			auto guiEnt = _scene->CreateEntity("GUI_Entity");
-			auto& menu = guiEnt.AddComponent<GUIMenu>();
-
-			menu.SetButtonCallback([]() {
-				GetModule<SceneManager>()->SwitchScene("deer2");
-			});
-
-		});
-
-		deerScene->SetInitCallback([](Scene* _scene) {
-			auto guiEnt = _scene->CreateEntity("GUI_Entity");
-			auto& menu = guiEnt.AddComponent<GUIInGame>();
-		});
 
 	}
 

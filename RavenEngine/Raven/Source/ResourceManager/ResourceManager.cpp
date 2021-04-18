@@ -26,21 +26,7 @@ namespace Raven {
 	{
 		AddLoader(std::make_unique<ImageLoader>(*this)); // create an image loader (resource manager as constructor argument
 		AddLoader(std::make_unique<MeshLoader>(*this));
-
-		/*
-		std::string path = StringUtils::GetCurrentWorkingDirectory() + std::string("\\assets\\models\\mallard.obj");
-		GetLoader<MeshLoader>()->LoadAsset(path);
-		// test that all the models can be accessed
-		int meshNum = 0;
-		char buffer[100]; // up to 100 different meshes in a model
-		std::string id = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
-		while ( HasResource(id) )
-		{
-			LOGV(id);
-			LOGV(GetResource<Mesh>(id)->indices.size());
-			id = path + std::string(StringUtils::IntToString(meshNum++, buffer, 10));
-		}
-		*/
+		AddLoader(std::make_unique<LayoutLoader>(*this));
 	}
 
 	void ResourceManager::Destroy()

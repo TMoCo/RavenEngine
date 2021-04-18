@@ -19,8 +19,12 @@ namespace Raven
 	class RenderPass;
 	class RenderScreen;
 	class RenderSphere;
+	class RenderGrid;
 	class RenderRscShader;
 	class UniformBuffer;
+	class GLTexture;
+	class GLShader;
+
 
 
 	// Uniforms of the render pipline.
@@ -35,6 +39,8 @@ namespace Raven
 		// Light framebuffer used for forward lighting data.
 		Ptr<UniformBuffer> light_FORWARD;
 	};
+
+
 
 
 
@@ -81,8 +87,11 @@ namespace Raven
 		// Resize all render passes.
 		void Resize(const glm::ivec2& newSize);
 
-		//
+		// Update Light Unifrom Buffer for deferred lighting.
 		void UpdateLights_DEFERRED();
+
+		// Do a final post processing and use the final render target.
+		void DoPostProcessFinal(int32_t hdrTargetIndex);
 
 	private:
 		// Deferred Render Pass - G-Buffer.
@@ -94,8 +103,20 @@ namespace Raven
 		// Forward Rendering Pass - used mostly for translucent.
 		Ptr<RenderPass> forwardPass;
 
+		// The final post-processing step.
+		Ptr<RenderPass> finalPostProcessPass;
+
+		// Pipeline HDR Render Targets.
+		Ptr<GLTexture> hdrTarget[2];
+
 		// Lighting shader for the lighting render pass.
 		Ptr<RenderRscShader> lightingShader;
+
+		// Final post processing shader used to do Gamma correct, tone mapping etc...
+		Ptr<RenderRscShader> finalPostProcessShader;
+
+		// Fast Approximate Anti-Aliasing executed on the final pos-tprocesing step
+		Ptr<RenderRscShader> fxaaShader;
 
 		// Screen triangle used to render the entire screen, used by render passes and post-processing.
 		Ptr<RenderScreen> rscreen;
@@ -114,12 +135,18 @@ namespace Raven
 
 		// The viewport used for rendering.
 		glm::vec4 viewport;
+
+		// Render Pipeline targets size;
+		glm::ivec2 size;
+
+		// The Render Grid.
+		Ptr<RenderGrid> rgrid;
 		
 	public:
-		// ~Testing----------------------------------------------------------------------------
+		// ~ITERATION_0----------------------------------
 		class GLTexture* testEnv;
 		class GLTexture* testBRDF;
-		// ~Testing----------------------------------------------------------------------------
+		// ~ITERATION_0----------------------------------
 
 	};
 

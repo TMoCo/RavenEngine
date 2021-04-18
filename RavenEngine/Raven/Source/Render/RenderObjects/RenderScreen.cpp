@@ -23,7 +23,8 @@ RenderScreen::RenderScreen()
 
 RenderScreen::~RenderScreen()
 {
-
+	delete vxArray;
+	delete vxBuffer;
 }
 
 

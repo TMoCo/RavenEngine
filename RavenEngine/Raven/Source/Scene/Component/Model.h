@@ -57,6 +57,12 @@ namespace Raven
 		auto& GetMaterials() { return materials; }
 		const auto& GetMaterials() const { return materials; }
 
+		// Recompute/Update the bounding box the model.
+		void UpdateBounds();
+
+		// Return the current local bounds of the model.
+		inline const auto& GetLocalBounds() { return localBounds; }
+
 		inline auto GetPrimitiveType() const { return primitiveType; }
 		inline auto SetPrimitiveType(PrimitiveType::Id type) { primitiveType = type; }
 
@@ -108,5 +114,8 @@ namespace Raven
 		std::vector< Ptr<Material> > materials;
 
 		PrimitiveType::Id primitiveType;
+
+		// The local bounding box of the model that contain all its meshes.
+		MathUtils::BoundingBox localBounds;
 	};
 };

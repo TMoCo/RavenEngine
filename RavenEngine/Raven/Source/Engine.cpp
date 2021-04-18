@@ -136,7 +136,6 @@ namespace Raven
 		{
 			static float roughnessTime = 0.0f;
 			roughnessTime += dt;
-			TESTING_MAT->SetScalar("roughness", glm::abs(glm::sin(roughnessTime * 0.4f)));
 		}
 
 		auto lightsEttView = GetModule<Raven::SceneManager>()->GetCurrentScene()->GetRegistry().group<Light>(entt::get<Transform>);
@@ -271,128 +270,186 @@ namespace Raven
 
 			lightComp.type = (int32_t)LightType::DirectionalLight;
 			lightComp.color = glm::vec4(1.0f, 0.95f, 0.8f, 1.0f);
-			lightComp.intensity = 1.2f;
+			lightComp.intensity = 0.0f;
 			lightComp.direction = glm::normalize(glm::vec3(-1.0f));
 		}
 
 
 		// Basic Material...
-		Ptr<MaterialShader> basicMatShader( new MaterialShader() );
-		basicMatShader->SetDomain(ERenderShaderDomain::Mesh);
-		basicMatShader->SetType(ERenderShaderType::Opaque);
-		basicMatShader->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
-		basicMatShader->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
-		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
-		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
-		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
-		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
-		basicMatShader->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
-		basicMatShader->GetBlockInput().EndUniformBlock();
-		basicMatShader->AddSampler("colorTexture");
-		basicMatShader->LoadOnGpu();
+		Ptr<MaterialShader> basicMatShader_1( new MaterialShader() );
+		basicMatShader_1->SetDomain(ERenderShaderDomain::Mesh);
+		basicMatShader_1->SetType(ERenderShaderType::Opaque);
+		basicMatShader_1->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
+		basicMatShader_1->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
+		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "alpha");
+		basicMatShader_1->GetBlockInput().EndUniformBlock();
+		basicMatShader_1->AddSampler("baseColorTexture");
+		basicMatShader_1->AddSampler("AOTexture");
+		basicMatShader_1->AddSampler("metallicTexture");
+		basicMatShader_1->AddSampler("roughnessTexture");
+		basicMatShader_1->LoadOnGpu();
+
+		// Basic Material...
+		Ptr<MaterialShader> basicMatShader_2(new MaterialShader());
+		basicMatShader_2->SetDomain(ERenderShaderDomain::Mesh);
+		basicMatShader_2->SetType(ERenderShaderType::Translucent);
+		basicMatShader_2->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
+		basicMatShader_2->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
+		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "alpha");
+		basicMatShader_2->GetBlockInput().EndUniformBlock();
+		basicMatShader_2->AddSampler("baseColorTexture");
+		basicMatShader_2->AddSampler("AOTexture");
+		basicMatShader_2->AddSampler("metallicTexture");
+		basicMatShader_2->AddSampler("roughnessTexture");
+		basicMatShader_2->LoadOnGpu();
 
 
 		//
 		int res = 7;
 		glm::vec2 size(1000.0f);
-		Ptr<Mesh> sphereMesh(MeshFactory::CreateSphere());
 
 		{
-			glm::vec3 pos = glm::vec3(size.x * 0.5, 220.0f, size.y * 0.5);
+			ResourceManager* RscManager = Engine::GetModule<ResourceManager>();
 
-			auto meshEntity = newScene->CreateEntity("Middle_Sphere");
-			auto& tr = meshEntity.GetOrAddComponent<Transform>();
-			tr.SetLocalPosition(pos);
-			tr.SetLocalScale(glm::vec3(150.0f));
+			std::string modelPath_1 = "assets/models/Lantern/lantern_obj_1.obj";
+			RscManager->LoadResource<Mesh>(modelPath_1);
+			Ptr<Mesh> lanternModel_1 = RscManager->GetResource<Mesh>(modelPath_1);
+
+			std::string modelPath_2 = "assets/models/Lantern/lantern_obj_2.obj";
+			RscManager->LoadResource<Mesh>(modelPath_2);
+			Ptr<Mesh> lanternModel_2 = RscManager->GetResource<Mesh>(modelPath_2);
+
+			std::string tex0 = "assets/models/Lantern/lantern_Base_Color.jpg";
+			std::string tex1 = "assets/models/Lantern/lantern_Mixed_AO.jpg";
+			std::string tex2 = "assets/models/Lantern/lantern_Metallic.jpg";
+			std::string tex3 = "assets/models/Lantern/lantern_Roughness.jpg";
+			RscManager->LoadResource<Texture2D>(tex0);
+			RscManager->LoadResource<Texture2D>(tex1);
+			RscManager->LoadResource<Texture2D>(tex2);
+			RscManager->LoadResource<Texture2D>(tex3);
+
+			RscManager->GetResource<Texture2D>(tex0)->renderRscTexture = new RenderRscTexture();
+			RscManager->GetResource<Texture2D>(tex0)->LoadOnGpu();
+
+			RscManager->GetResource<Texture2D>(tex1)->renderRscTexture = new RenderRscTexture();
+			RscManager->GetResource<Texture2D>(tex1)->LoadOnGpu();
+
+			RscManager->GetResource<Texture2D>(tex2)->renderRscTexture = new RenderRscTexture();
+			RscManager->GetResource<Texture2D>(tex2)->LoadOnGpu();
+
+			RscManager->GetResource<Texture2D>(tex3)->renderRscTexture = new RenderRscTexture();
+			RscManager->GetResource<Texture2D>(tex3)->LoadOnGpu();
+
+			Ptr<Material> mat_0(new Material(basicMatShader_1));
+			mat_0->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
+			mat_0->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
+			mat_0->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
+			mat_0->SetTexture("roughnessTexture", RscManager->GetResource<Texture2D>(tex3).get());
+			mat_0->SetColor("color", glm::vec4(1.0f, 0.1, 0.1, 1.0));
+			mat_0->SetColor("emission", glm::vec4(0.0f));
+			mat_0->SetScalar("roughness", 0.5f);
+			mat_0->SetScalar("metallic", 1.0f);
+			mat_0->SetScalar("specular", 1.0f);
+			mat_0->LoadOnGpu();
 
 
-			TESTING_MAT = Ptr<Material>(new Material(basicMatShader));
-			TESTING_MAT->SetColor("color", glm::vec4(0.1));
-			TESTING_MAT->SetColor("emission", glm::vec4(0.0));
-			TESTING_MAT->SetScalar("roughness", 0.05f);
-			TESTING_MAT->SetScalar("metallic", 1.0f);
-			TESTING_MAT->SetScalar("specular", 1.0f);
-			TESTING_MAT->LoadOnGpu();
-
-			auto& model = meshEntity.GetOrAddComponent<Model>();
-			model.AddMesh(sphereMesh);
-			model.SetMaterial(0, TESTING_MAT);
-		}
-		
-
-
-		glm::vec4 randomColors[8] = {
-			glm::vec4(0.1f, 0.1f, 0.1f, 1.0),
-			glm::vec4(1.0f, 1.0f, 1.0f, 1.0),
-			glm::vec4(1.0f, 0.0f, 0.0f, 1.0),
-			glm::vec4(0.0f, 1.0f, 0.0f, 1.0),
-			glm::vec4(0.0f, 0.0f, 1.0f, 1.0),
-			glm::vec4(0.0f, 1.0f, 1.0f, 1.0),
-			glm::vec4(1.0f, 0.0f, 1.0f, 1.0),
-			glm::vec4(1.0f, 1.0f, 0.0f, 1.0),
-		};
+			Ptr<Material> mat_2(new Material(basicMatShader_2));
+			mat_2->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
+			mat_2->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
+			mat_2->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
+			mat_2->SetTexture("roughnessTexture", RscManager->GetResource<Texture2D>(tex3).get());
+			mat_2->SetColor("color", glm::vec4(1.0f));
+			mat_2->SetColor("emission", glm::vec4(0.0f));
+			mat_2->SetScalar("roughness", 1.0f);
+			mat_2->SetScalar("metallic", 1.0f);
+			mat_2->SetScalar("specular", 22.0f);
+			mat_2->SetScalar("alpha", 0.75f);
+			mat_2->LoadOnGpu();
 
 
-
-
-		for (int32_t x = 0; x < res; ++x)
-		{
-
-			for (int32_t y = 0; y < res; ++y)
 			{
-				if (!(x == 0 || x == res - 1 || y == 0 || y == res - 1))
-					continue;
-
-				float fx = (float)x / (float)(res - 1);
-				float fy = (float)y / (float)(res - 1);
-
-				//
-				glm::vec3 pos = glm::vec3(size.x * fx, 200.0f, size.y * fy);
-
-				auto meshEntity = newScene->CreateEntity("Model_" + std::to_string(x+y*res));
+				auto meshEntity = newScene->CreateEntity("Lantern");
 				auto& tr = meshEntity.GetOrAddComponent<Transform>();
-				tr.SetLocalPosition(pos);
-				tr.SetLocalScale(glm::vec3(80.0f));
-
-
-				Ptr<Material> basicMat(new Material(basicMatShader));
-				basicMat->SetColor("color", glm::vec4(0.4f));
-				basicMat->SetColor("emission", glm::vec4(0.0f));
-				basicMat->SetScalar("roughness", fx);
-				basicMat->SetScalar("metallic", fy);
-				basicMat->SetScalar("specular", 1.0f);
-				basicMat->LoadOnGpu();
+				tr.SetLocalPosition(glm::vec3(0.0f, -4.0f, 0.0f));
+				tr.SetLocalScale(glm::vec3(0.1f));
 
 				auto& model = meshEntity.GetOrAddComponent<Model>();
-				model.AddMesh(sphereMesh);
-				model.SetMaterial(0, basicMat);
+				model.AddMesh(lanternModel_1);
+				model.AddMesh(lanternModel_2);
+				model.SetMaterial(0, mat_0);
+				model.SetMaterial(1, mat_2);
 			}
+
+
+
 		}
 
 
-
-		for (int32_t i = 0; i < 16; ++i)
 		{
-			float f = (float)i / (float)(16 - 1);
-			f *= 6.15132f;
+			Ptr<Mesh> plane = Ptr<Mesh>( MeshFactory::CreateQuad() );
+			
+			auto meshEntity = newScene->CreateEntity("Plane");
+			auto& tr = meshEntity.GetOrAddComponent<Transform>();
+			tr.SetLocalPosition(glm::vec3(0.0f, -4.3f, 0.0f));
+			tr.SetLocalScale(glm::vec3(3000.0f));
+			tr.SetLocalOrientation(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f));
+			
+			auto& model = meshEntity.GetOrAddComponent<Model>();
+			model.AddMesh(plane);
+		}
 
-			auto& lightEntity = newScene->CreateEntity("light");
-			auto& lightComp = lightEntity.GetOrAddComponent<Light>();
-			lightComp.type = (int32_t)LightType::PointLight;
-			lightComp.intensity = 40000.0f;
-			lightComp.radius = 450.0f;
-			lightComp.position = glm::vec3(cos(f), 0.4, sin(f)) * 500.0f + glm::vec3(500.0f, 150.0f, 500.0f);
 
-			lightComp.direction = glm::normalize(glm::vec3(500.0f, 100.0f, 500.0f) - lightComp.position);
+		{
+			glm::vec4 lightPositions[4] = {
+				 glm::vec4( 4.0f, 9.0f, 4.0f, 1.0f),
+				 glm::vec4(-4.0f, 9.0f, 4.0f, 1.0f),
+				 glm::vec4(-4.0f, 9.0f,-4.0f, 1.0f),
+				 glm::vec4( 4.0f, 9.0f,-4.0f, 1.0f),
+			};
 
-			lightComp.color = glm::vec4(randomColors[i % 8]);
-			lightComp.innerAngle = 20.0f;
-			lightComp.outerAngle = 25.0f;
+			for (int32_t i = 0; i < 4; ++i)
+			{
+				auto& lightEntity = newScene->CreateEntity("Lights");
 
-			auto& lightTransfrom = lightEntity.GetOrAddComponent<Transform>();
-			lightTransfrom.SetLocalPosition(lightComp.position);
+				auto& lightComp = lightEntity.GetOrAddComponent<Light>();
+				lightComp.type = (int32_t)LightType::PointLight;
+				lightComp.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				lightComp.intensity = 370.0f;
+				lightComp.radius = 17.0f;
+				lightComp.clipDistance = 20.0f;
+
+				auto& tr = lightEntity.GetOrAddComponent<Transform>();
+				tr.SetLocalPosition(lightPositions[i]);
+			}
+
+
+			for (int32_t i = 0; i < 4; ++i)
+			{
+				auto& lightEntity = newScene->CreateEntity("Lights");
+
+				auto& lightComp = lightEntity.GetOrAddComponent<Light>();
+				lightComp.type = (int32_t)LightType::PointLight;
+				lightComp.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+				lightComp.intensity = 70.0f;
+				lightComp.radius = 17.0f;
+				lightComp.clipDistance = 5000.0f;
+
+				auto& tr = lightEntity.GetOrAddComponent<Transform>();
+				tr.SetLocalPosition(lightPositions[i] + glm::vec4(700.0f));
+			}
 
 		}
+		
 
 		// Switch the scene....
 		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);

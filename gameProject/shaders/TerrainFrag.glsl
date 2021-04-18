@@ -23,8 +23,11 @@ uniform sampler2D inHeightMap;
 // Output G-Buffer...
 layout(location=0) out vec4 outAlbedo;
 layout(location=1) out vec3 outNormal;
-layout(location=2) out vec3 outBRDF;
+layout(location=2) out vec4 outBRDF;
+layout(location=3) out vec3 outEmission;
 #endif
+
+
 
 
 
@@ -53,12 +56,12 @@ void main()
 
 #if RENDER_PASS_DEFERRED
 	// Output G-Buffer...
-	outAlbedo.rgb = matOut.color + matOut.emission;
-	outAlbedo.a = length(matOut.emission) * 0.1;
+	outAlbedo.rgb = matOut.color;
+	outEmission.rgb = matOut.emission;
 	outNormal.rgb = normal;
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
-	outBRDF.b = matOut.specular;
+	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
 #endif
 
 }

@@ -43,6 +43,9 @@ namespace Raven
 		// The outer angle of a spot light.
 		float outerAngle;
 
+		// Distance from the view used to clip the light.
+		float clipDistance;
+
 		// serialize the light
 		template<class Archive>
 		void serialize(Archive& archive)

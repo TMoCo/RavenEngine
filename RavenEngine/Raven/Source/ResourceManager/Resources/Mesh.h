@@ -22,7 +22,13 @@ namespace Raven
 	// This type of resource will rarely if not ever be on its own in the resource register.
 	// It is almost definitely part of a Model resource.
 	public:
-		Mesh() : IResource(EResourceType::RT_Mesh, true) {}
+		// Construct.
+		Mesh() 
+			: IResource(EResourceType::RT_Mesh, true) 
+			, isTranslucentShadowCast(false)
+		{
+		}
+
 		// TODO: free data on destruction
 		virtual ~Mesh()
 		{
@@ -48,10 +54,14 @@ namespace Raven
 
 		std::vector<uint32_t> indices;
 
-		MathUtils::BoundingBox bbox; // defaults to 0 values
+		// The Bounding box the mesh.
+		MathUtils::BoundingBox bounds;
 
 		RenderRscMesh* renderRscMesh = nullptr; // interface with renderer (default constructor)
 
 		bool active = true;
+
+		// Should this mesh cast shadow even if it is translucent.
+		bool isTranslucentShadowCast;
 	};
 }

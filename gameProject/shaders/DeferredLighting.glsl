@@ -59,20 +59,14 @@ void main()
 	// Compute Lighting on the surface
 	vec3 lighting = ComputeLighting(surface);
 	
-	// Add Emission
-	lighting += surface.albedo * (gAlbedo.a * 10.0);
-	
 	// Final Output Color.
 	outFinalColor.rgb = lighting;
 	
+	// Temp Sky...
 	if (gDepth == 1.0)
 	{
-		outFinalColor.rgb = textureLod(inSkyEnvironment, -surface.v, 1.0).rgb;
-	}
-	
-	// TEMP Gamma Correction........
-	outFinalColor.rgb = pow(outFinalColor.rgb, vec3(1.0 / 2.2));
-	
+		outFinalColor.rgb = textureLod(inSkyEnvironment, -surface.v, NUM_ENV_MAP_LOD - 1.0).rgb;
+	}	
 
 }
 

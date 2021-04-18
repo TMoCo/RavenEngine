@@ -65,7 +65,8 @@ namespace Raven
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]));
 
-                mesh->bbox.AddVertex(*mesh->positions.rbegin());
+                // Update Bounds.
+                mesh->bounds.Add( mesh->positions.back() );
 
                 // check that normals and texcoords exist, add accordingly
                 if (index.normal_index == -1)
@@ -94,8 +95,8 @@ namespace Raven
 
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
-            // once all vertices have been processed, update the bbox's centre
-            mesh->bbox.UpdateCentre();
+
+
             resourceManager->AddResource(path, mesh); // file path is resource id
             //meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
         }

@@ -106,10 +106,10 @@ namespace Raven
 		// if true the engine currently rendering.
 		bool isRendering;
 
-		// ???
+		// The Main Render data of the scene. 
 		Ptr<RenderScene> rscene;
 
-		// ??? 
+		// The Main Render Target of the scene. 
 		Ptr<RenderTarget> rtScene;
 
 		// Render Debug, used for debug drawing.

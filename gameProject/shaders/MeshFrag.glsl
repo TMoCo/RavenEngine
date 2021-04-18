@@ -31,7 +31,8 @@ layout(location=0) out vec4 outFinalColor;
 // Output G-Buffer...
 layout(location=0) out vec4 outAlbedo;
 layout(location=1) out vec3 outNormal;
-layout(location=2) out vec3 outBRDF;
+layout(location=2) out vec4 outBRDF;
+layout(location=3) out vec3 outEmission;
 #endif
 
 
@@ -48,7 +49,6 @@ void main()
 	// Normalize Input Normal
 	vec3 normal = normalize(inFrag.normal);
 
-	
 	
 	// Material Input...
 	MaterialData matIn;
@@ -75,8 +75,24 @@ void main()
 
 	
 #if RENDER_PASS_FORWARD
+	// Surface Data.
+	LightSurfaceData surface;
+	surface.n = normal;
+	surface.p = inFrag.position;
+	surface.albedo = matOut.color;
+	surface.specular = clamp(matOut.specular, 0.0, 1.0);
+	surface.roughness = max(matOut.roughness, 0.01);
+	surface.metallic = matOut.metallic;
+	
+	// View Direction Vector.
+	surface.v = normalize(inCommon.viewPos - surface.p);
+	surface.NDotV = max(dot(surface.n, surface.v), 0.0001);
+	
+	// Base Reflective Index, 0.04 similar to UE4
+	surface.f0 = mix(vec3(0.04), surface.albedo, surface.metallic); 
+
 	// Forward-Lighting...
-	outFinalColor.rgb = vec3(0.0);
+	outFinalColor.rgb = ComputeLighting(surface);
 	
 #if RENDER_SHADER_TYPE_TRANSLUCENT
 	outFinalColor.a = matOut.alpha;
@@ -88,12 +104,12 @@ void main()
 
 #if RENDER_PASS_DEFERRED
 	// Output G-Buffer...
-	outAlbedo.rgb = matOut.color + matOut.emission;
-	outAlbedo.a = length(matOut.emission) * 0.1;
+	outAlbedo.rgb = matOut.color;
+	outEmission.rgb = matOut.emission;
 	outNormal.rgb = normal;
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
-	outBRDF.b = matOut.specular;
+	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
 #endif
 
 	

@@ -28,7 +28,9 @@ RenderSphere::RenderSphere()
 
 RenderSphere::~RenderSphere()
 {
-
+	delete vxArray;
+	delete vxBuffer;
+	delete idxBuffer;
 }
 
 

@@ -6,7 +6,7 @@
 
 
 
-using namespace Raven;
+namespace Raven {
 
 
 
@@ -14,6 +14,7 @@ using namespace Raven;
 
 RenderPrimitive::RenderPrimitive()
 	: material(nullptr)
+	, indexInScene(-1)
 {
 
 }
@@ -41,3 +42,10 @@ void RenderPrimitive::SetMaterial(RenderRscMaterial* mat)
 {
 	material = mat;
 }
+
+
+
+
+
+} // End of namespace Raven.
+

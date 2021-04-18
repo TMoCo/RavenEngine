@@ -24,6 +24,7 @@ RenderRscMaterial::RenderRscMaterial(RenderRscShader* shader)
 	, materialBuffer(nullptr)
 	, blockIndex(-1)
 	, ubo(nullptr)
+	, renderBatchIndex((uint32_t)-1)
 {
 
 }

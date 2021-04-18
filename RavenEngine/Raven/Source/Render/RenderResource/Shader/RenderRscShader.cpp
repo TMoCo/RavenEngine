@@ -10,7 +10,10 @@
 #define IMPORT_COMMON_TAG 0
 #define IMPORT_TRANSFORM_VERTEX_TAG 1 
 #define IMPORT_MATERIAL_FUNCTION_BASE_TAG 2 
-#define IMPORT_LIGHTING_TAG 3 
+#define IMPORT_COMMON_LIGHTING_TAG 4 
+#define IMPORT_LIGHTING_TAG 5 
+
+
 
 
 
@@ -25,6 +28,9 @@ namespace Raven {
 
 
 RenderRscShader::RenderRscShader()
+	: domain(ERenderShaderDomain::Custom)
+	, type(ERenderShaderType::Opaque)
+	, renderBatchIndex((uint32_t)-1)
 {
 
 }
@@ -178,25 +184,43 @@ void RenderRscShader::SetupShaderForType()
 	switch (type)
 	{
 	case ERenderShaderType::Opaque:
+	{
 		shader->AddPreprocessor("#define RENDER_PASS_DEFERRED 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_OPAQUE 1");
+	}
 		break;
 
 	case ERenderShaderType::Masked:
+	{
 		shader->AddPreprocessor("#define RENDER_PASS_DEFERRED 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_MASKED 1");
+	}
 		break;
 
 	case ERenderShaderType::Translucent:
+	{
 		shader->AddPreprocessor("#define RENDER_PASS_FORWARD 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_TRANSLUCENT 1");
+
+		// Lighting Shader.
+		shader->AddExSourceFile(IMPORT_COMMON_LIGHTING_TAG, EGLShaderStageBit::FragmentBit,
+			"shaders/CommonLight.glsl");
+
+		shader->AddExSourceFile(IMPORT_LIGHTING_TAG, EGLShaderStageBit::FragmentBit,
+			"shaders/Lighting.glsl");
+
 		shader->AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_FORWARD_MAX_LIGHTS));
 		input.AddBlockInput(RenderShaderInput::LightingBlock_FORWARD);
+		input.AddSamplerInput("inSkyEnvironment");
+		input.AddSamplerInput("inEnvBRDF");
+	}
 		break;
 
 	case ERenderShaderType::PostProcessing:
+	{
 		RAVEN_ASSERT(0, "Shader PostProcessing type not supported yet.");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_POSTPROCESSING 1");
+	}
 		break;
 	}
 }

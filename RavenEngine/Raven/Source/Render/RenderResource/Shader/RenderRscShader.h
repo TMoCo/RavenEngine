@@ -161,6 +161,12 @@ namespace Raven
 
 		// Return the OpenGL shader.
 		inline GLShader* GetShader() { return shader.get(); }
+		
+		// Return the shader domain.
+		inline ERenderShaderDomain GetDomain() { return domain; }
+
+		// Return the shader type.
+		inline ERenderShaderType GetType() { return type; }
 
 		// Return this shader input.
 		inline RenderShaderInput& GetInput() { return input; }
@@ -192,6 +198,9 @@ namespace Raven
 		// The input defined by the shader.
 		RenderShaderInput input;
 
+	public:
+		// Render Batch Use Only, index set by the render batch to performs fast mapping during batching.
+		mutable uint32_t renderBatchIndex;
 	};
 
 }

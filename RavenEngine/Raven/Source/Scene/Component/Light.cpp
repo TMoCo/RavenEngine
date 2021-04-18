@@ -45,7 +45,9 @@ namespace Raven
 		, radius(radius)
 		, type(int32_t(type))
 		, outerAngle(angle)
+		, clipDistance(750.0f)
 	{
+
 	}
 	
 	void Light::OnImGui()
@@ -57,8 +59,8 @@ namespace Raven
 		//if (type != 0)
 		//	ImGuiHelper::Property("Position", position);
 
-		//if (type != 2)
-		//	ImGuiHelper::Property("Direction", direction);
+		if (type != 2)
+			ImGuiHelper::Property("Direction", direction);
 
 		if (type != 0)
 			ImGuiHelper::Property("Radius", radius, 0.0f, 100.0f);

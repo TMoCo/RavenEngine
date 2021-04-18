@@ -94,6 +94,10 @@ namespace Raven
 
 		// The unfirom buffer this material update.
 		UniformBuffer* ubo;
+
+	public:
+		// Render Batch Use Only, index set by the render batch to performs fast mapping during batching.
+		mutable uint32_t renderBatchIndex;
 	};
 
 }

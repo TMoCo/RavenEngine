@@ -142,6 +142,8 @@ vec3 ComputeBRDFLighting(in LightSurfaceData surface, float NDotH, float NDotV, 
 	
 	// Specular & Diffuse Terms
 	vec3 Ks = (Dggx * Gggx * Fr) / (4.0 * NDotL * NDotV);
+	Ks *= surface.specular;
+	
 	vec3 Kd = surface.albedo * ONE_OVER_PI;
 	
 	// Incoming Light == Outgoing Light
@@ -165,6 +167,7 @@ vec3 ComputeIBL(in LightSurfaceData surface)
 	vec3 prefiltered = textureLod(inSkyEnvironment, r, surface.roughness * (NUM_ENV_MAP_LOD - 1.0)).rgb;
 	vec2 brdf = texture(inEnvBRDF, vec2(surface.roughness, surface.NDotV) ).xy;
 	vec3 Ks = prefiltered * ( Fr * brdf.x + brdf.y );
+	Ks *= surface.specular;
 	
 	
 	// Trying to compute diffuse from environemnt pre-filtered specular roughness 1.0.
@@ -283,6 +286,7 @@ vec3 ComputeLighting(in LightSurfaceData surface)
 	
 	// Environment IBL
 	finalLighting += ComputeIBL(surface);
+	
 
 	// TODO: This should only be done for forward pass, deferred pass we need to implement light proxies
 	// Many Lights.
@@ -290,6 +294,7 @@ vec3 ComputeLighting(in LightSurfaceData surface)
 	{
 		finalLighting += ComputeLight(surface, lightIndex);
 	}
+
 
 	return finalLighting;
 }

@@ -115,10 +115,10 @@ namespace Raven
 		{
 			const float* cameraViewPtr = glm::value_ptr(glm::inverse(transform->GetWorldMatrix()));
 
-			ImGuizmo::DrawGrid(
-				cameraViewPtr,
-				glm::value_ptr(camera->GetProjectionMatrix()),
-				glm::value_ptr(glm::mat4(1)), 100.f);
+			//ImGuizmo::DrawGrid(
+			//	cameraViewPtr,
+			//	glm::value_ptr(camera->GetProjectionMatrix()),
+			//	glm::value_ptr(glm::mat4(1)), 100.f);
 
 			//2D Grid..here
 

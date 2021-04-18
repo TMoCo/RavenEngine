@@ -4,6 +4,7 @@
 
 
 #include "Utilities/Core.h"
+#include "Math/Frustum.h"
 #include "RenderBatch.h"
 
 #include "glm/matrix.hpp"
@@ -14,35 +15,28 @@
 
 namespace Raven
 {
-	class RenderPrimitive;
+	class Scene;
 	class RenderLight;
 	class UniformBuffer;
-	class Scene;
+	class RenderShadowCascade;
 
 
-
-
-
-	// Render Scene Batches.
-	enum class ERSceneBatch : uint32_t
-	{
-		Opaque = 0,
-		Debug = 1,
-		Translucent = 2,
-	};
 
 
 	// The Environment Properties of the scene.
 	struct RenderSceneEnvironment
 	{
-		//
+		// The Sun Direction.
 		glm::vec3 sunDir;
 
-		//
+		// The Sun Color.
 		glm::vec3 sunColor;
 
-		//
+		// The Sun Power.
 		float sunPower;
+
+		// The Sun Shadow.
+		Ptr<RenderShadowCascade> sunShadow;
 
 		// Reset All Environment Properties.
 		void Reset();
@@ -62,7 +56,7 @@ namespace Raven
 		// Destruct. 
 		~RenderScene();
 
-		//
+		// Setup the scene, called once for initializing.
 		void Setup();
 
 		// Build Render scene data form a scene.
@@ -74,17 +68,20 @@ namespace Raven
 		// Set scene projection.
 		void SetProjection(const glm::mat4& mtx, float n, float f);
 
-		// Draw a specific batch.
-		void Draw(ERSceneBatch type);
+		// Draw the deferred batch.
+		void DrawDeferred();
+
+		// Draw all debug primitives that are set to this scene.
+		void DrawDebug();
+
+		// Draw the translucent batch.
+		void DrawTranslucent(UniformBuffer* lightUB);
 
 		// Add primitives to the debug batch to be draw by this scene.
-		void AddDebugPrimitives(const std::vector<RenderPrimitive*>& primitives);
+		void SetDebugPrimitives(const std::vector<RenderPrimitive*>* primitives);
 		
 		// Clear all render data of the previous frame.
 		void Clear();
-
-		// Return true if the batch is empty.
-		inline bool IsEmpty(ERSceneBatch batch) { return batches[(uint32_t)batch].IsEmpty(); }
 
 		// Return the view projection matrix.
 		inline const glm::mat4& GetViewProjection() const { return viewProjMatrix; }
@@ -108,7 +105,13 @@ namespace Raven
 		inline const float& GetFar() const { return far; }
 
 		// Return the light in the scene.
-		inline const std::vector<RenderLight*>& GetLights() { return lights; }
+		inline const std::vector<RenderLight*>& GetLights() { return rlights; }
+		
+		// Return true if the scene want to draw the 2D grid.
+		inline bool IsGrid() { return isGrid; }
+
+		// Return true if the scene want to draw the sky.
+		inline bool IsSky() { return isSky; }
 
 	private:
 		// Collect view & projection from the scene.
@@ -117,11 +120,14 @@ namespace Raven
 		// Collect lights from the scene.
 		void CollectSceneLights(Scene* scene);
 
-		//
+		// Collect the terrain from the scene.
+		void CollectTerrain(Scene* scene);
+
+		// Traverse the scene and collect primitives that needs to be rendered.
 		void TraverseScene(Scene* scene);
 
-		// Return batch of a batchtype.
-		inline RenderBatch& GetBatch(ERSceneBatch batchType) { return batches[(uint32_t)batchType]; }
+		// Gather all lights that intesect with the bounding sphere.
+		void GatherLights(const glm::vec3& center, float radius, std::vector<RenderLight*>& outLights);
 
 		// Create New Primitive to render.
 		template<class PrimitiveType>
@@ -129,7 +135,8 @@ namespace Raven
 		{
 			// TODO: Memeory management for dynamic primitives.
 			PrimitiveType* prim = new PrimitiveType();
-			dynamicPrimitive.push_back(prim);
+			prim->indexInScene = rprimitives.size();
+			rprimitives.push_back(prim);
 
 			return prim;
 		}
@@ -140,15 +147,21 @@ namespace Raven
 		{
 			// TODO: Memeory management for lights.
 			LightType* light = new LightType();
-			lights.push_back(light);
+			light->indexInScene = rlights.size();
+			rlights.push_back(light);
 
 			return light;
 		}
 
+		// Update Light Unifrom Buffer for forward lighting.
+		void UpdateLights_FORWARD(UniformBuffer* lightUB, RenderPrimitive* prim);
 
 	private:
-		// The main render batches of the scene.
-		RenderBatch batches[3];
+		// Batch for rendering deferred primitives.
+		RenderBatch<ERenderBatchType::Deferred> deferredBatch;
+
+		// Batch for rendering translucent primitives.
+		RenderBatch<ERenderBatchType::Translucent> translucentBatch;
 
 		// The View Matrix.
 		glm::mat4 view;
@@ -174,17 +187,29 @@ namespace Raven
 		// Far Clipping Plane.
 		float far;
 
+		// The current frustum of the view & projection. Computed in RenderScene::CollectSceneView().
+		MathUtils::Frustum frustum;
+
 		// Scene Enviornment Data.
 		RenderSceneEnvironment environment;
 
 		// Dynamic Primitives Container.
-		std::vector<RenderPrimitive*> dynamicPrimitive;
+		std::vector<RenderPrimitive*> rprimitives;
 
 		// Transform Uniform Buffer.
-		Ptr<UniformBuffer> transformUB;
+		Ptr<UniformBuffer> transformUniform;
 
 		// Lights in the scene.
-		std::vector<RenderLight*> lights;
+		std::vector<RenderLight*> rlights;
+
+		// Debug primitive added to the scene to be drawn.
+		const std::vector<RenderPrimitive*>* debugPrimitives;
+
+		// Draw 2D Grid.
+		bool isGrid;
+
+		// Draw Sky.
+		bool isSky;
 	};
 
 

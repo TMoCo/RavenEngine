@@ -97,7 +97,6 @@ void RenderModule::Initialize()
 	rdebug->Setup();
 
 
-
 	// ...
 	Ptr<RenderScreen> rscreen = Ptr<RenderScreen>(RenderScreen::Create());
 	Ptr<RenderSphere> rsphere = Ptr<RenderSphere>(RenderSphere::Create());
@@ -121,10 +120,11 @@ void RenderModule::Initialize()
 	// Render Scene.
 	rscene = std::make_shared<RenderScene>();
 	rscene->Setup();
+	rscene->SetDebugPrimitives( &rdebug->GetRenderPrimitive() );
 
 
 
-	// ~Testing----------------------------------------------------------------------------
+	// ~ITERATION_0----------------------------------------------------------------------------
 	// load the generated height map into resource manager
 	std::string evnTexPath = "assets/textures/T_Default_Environment_Map.jpg";
 	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>(evnTexPath);
@@ -150,7 +150,7 @@ void RenderModule::Initialize()
 	rpipeline->testBRDF = brdfLUTTex->GetTexture().get();
 	
 	delete envMap;
-	// ~Testing----------------------------------------------------------------------------
+	// ~ITERATION_0----------------------------------------------------------------------------
 
 
 }
@@ -199,15 +199,17 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 	// ~TESTING-------------------------------------------------------
 	float near = 1.0f, far = 32000.0f;
 	float camRot = Engine::Get().GetEngineTime();
-	camRot *= 0.1f;
+	camRot *= 0.5f;
 
-#if 1
+#if 0
 	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 1000.0f, 
 		glm::vec3(500.0f, 0.0f, 500.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 	
 #else
-	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::vec3 offset = glm::vec3(0.0f, -4.0f, 0.0f);
+	float dist = 17.0f;
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.9f, sin(camRot)) * dist + offset, offset, glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 #endif
 
@@ -219,7 +221,6 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 	// Build Render Data form the scene...
 	rscene->Build(scene);
-	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );
 }
 
 

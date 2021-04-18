@@ -50,13 +50,27 @@ namespace Raven
 	void Model::AddMesh(Ptr<Mesh> mesh)
 	{
 		meshes.emplace_back(mesh);
+		UpdateBounds();
 	}
 
 	void Model::AddMeshes(const std::vector< Ptr<Mesh> > & inputMeshes)
 	{
 		// for multiple meshes
 		meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
+		UpdateBounds();
 	}
+
+
+	void Model::UpdateBounds()
+	{
+		localBounds.Reset();
+
+		for (auto mesh : meshes)
+		{
+			localBounds.Add(mesh->bounds);
+		}
+	}
+
 
 	void Model::SetMaterial(uint32_t index, Ptr<Material> mat)
 	{

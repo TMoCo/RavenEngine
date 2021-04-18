@@ -34,9 +34,16 @@
 #include "Scene/Entity/EntityManager.h"
 #include <entt/entt.hpp>
 
+#include "Logger/Console.h"
+
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
+
+
+
+
+
 
 
 
@@ -79,6 +86,9 @@ void RenderSceneEnvironment::Reset()
 RenderScene::RenderScene()
 	: near(0.0f)
 	, far(0.0f)
+	, frustum(glm::mat4(1.0f))
+	, isGrid(true)
+	, isSky(false)
 {
 	environment.Reset();
 }
@@ -93,47 +103,27 @@ RenderScene::~RenderScene()
 void RenderScene::Setup()
 {
 	// Transfrom Vertex Uniform 
-	transformUB = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransfromBlock, false) );
+	transformUniform = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransfromBlock, false) );
 
 }
 
 
 void RenderScene::Build(Scene* scene)
 {
-	// View & Projection...
+	// View & Projection.
 	CollectSceneView(scene);
 
-	// Lights...
+	// Lights.
 	CollectSceneLights(scene);
 
-	// Terrain...
-	auto TerrainEttView = scene->GetRegistry().view<TerrainComponent>();
-
-	if (!TerrainEttView.empty())
-	{
-		auto entity = TerrainEttView.front();
-		const auto& theTerrain = TerrainEttView.get<TerrainComponent>(entity);
-		auto terrainRsc = theTerrain.GetTerrainResource();
-
-		if (!terrainRsc->IsOnGPU())
-		{
-			terrainRsc->renderRscTerrain = new RenderRscTerrain();
-			terrainRsc->LoadOnGPU();
-		}
-
-		RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
-		renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
-		renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
-
-		// Default Terrain Material.
-		const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
-		renderTerrain->SetMaterial( defaultMaterials.terrain->GetRenderRsc() );
-
-		GetBatch(ERSceneBatch::Opaque).Add(renderTerrain);
-	}
+	// Terrain.
+	CollectTerrain(scene);
 
 	// Traverse the scene to collected render primitives.
 	TraverseScene(scene);
+
+	// ...
+	translucentBatch.Sort();
 }
 
 
@@ -151,15 +141,9 @@ void RenderScene::SetProjection(const glm::mat4& mtx, float n, float f)
 }
 
 
-void RenderScene::AddDebugPrimitives(const std::vector<RenderPrimitive*>& primitives)
+void RenderScene::SetDebugPrimitives(const std::vector<RenderPrimitive*>* primitives)
 {
-	RenderBatch& batch = GetBatch(ERSceneBatch::Debug);
-
-	for (auto prim : primitives)
-	{
-		batch.Add(prim);
-	}
-
+	debugPrimitives = primitives;
 }
 
 
@@ -176,10 +160,24 @@ void RenderScene::TraverseScene(Scene* scene)
 
 
 	// Iterate over all Models in the scene.
-	// TODO: Culling should be here, for both the view, lights, and shadow frustums.
 	for (auto entity : group)
 	{
 		const auto& [model, trans] = group.get<Model, Transform>(entity);
+
+		// Compute World Bounds.
+		MathUtils::BoundingBox bounds = model.GetLocalBounds().Transform(trans.GetWorldMatrix());
+
+		float radius;
+		glm::vec3 center;
+		bounds.GetSphere(center, radius);
+
+		// Test if its in scene view frustum?
+		if (!frustum.IsInFrustum(center, radius))
+		{
+			continue;
+		}
+
+		// Meshes...
 		const auto& meshes = model.GetMeshes();
 
 		// Create a RenderPrimitive for each model, and add it to the correct batch.
@@ -199,6 +197,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			rmesh->SetMesh(mesh->renderRscMesh);
 
 			// Mesh Materail...
+			RenderRscShader* meshShader = nullptr;
 			Material* meshMaterail = model.GetMaterial(i);
 
 			if (meshMaterail)
@@ -210,16 +209,37 @@ void RenderScene::TraverseScene(Scene* scene)
 				}
 
 				rmesh->SetMaterial( meshMaterail->GetRenderRsc() );
+				meshShader = meshMaterail->GetRenderRsc()->GetShaderRsc();
 			}
 			else
 			{
 				rmesh->SetMaterial( defaultMaterials.model->GetRenderRsc() );
+				meshShader = defaultMaterials.model->GetRenderRsc()->GetShaderRsc();
 			}
 
-			// Add to opaque...
-			GetBatch(ERSceneBatch::Opaque).Add(rmesh);
+
+			// Translucent?
+			if (meshShader->GetType() == ERenderShaderType::Translucent)
+			{
+				//
+				std::vector<RenderLight*> litPrim;
+				GatherLights(center, radius, litPrim);
+
+				for (const auto& lit : litPrim)
+					rmesh->AddLight(lit->indexInScene);
+
+				//
+				glm::vec3 v = (viewPos - trans.GetWorldPosition());
+				float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
+				translucentBatch.Add(rmesh, d2);
+			}
+			else
+			{
+				deferredBatch.Add(rmesh);
+			}
 		}
 	}
+
 }
 
 
@@ -246,6 +266,8 @@ void RenderScene::CollectSceneView(Scene* scene)
 	viewProjMatrix = projection * view;
 	viewProjMatrixInverse = glm::inverse(viewProjMatrix);
 
+	// Set the new Frustum
+	frustum = MathUtils::Frustum(viewProjMatrix);
 }
 
 
@@ -279,65 +301,210 @@ void RenderScene::CollectSceneLights(Scene* scene)
 			}
 		}
 
+		// ...
+		float lightRadius = glm::max(light.radius, 1.0f);
 
+
+		//  Clipping...
+		if (light.type != (int32_t)LightType::DirectionalLight)
+		{
+			// Clip based on distance from the view.
+			glm::vec3 v = (viewPos - trans.GetWorldPosition());
+			float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+			if (d2 > (light.clipDistance * light.clipDistance))
+			{
+				continue;
+			}
+
+			// Clip based on view frustum
+			if (!frustum.IsInFrustum(trans.GetWorldPosition(), lightRadius))
+			{
+				continue;
+			}
+		}
+
+		// Add new light...
 		RenderLight* newLight = NewLight<RenderLight>();
 		newLight->type = light.type + 1;
 		newLight->colorAndPower = glm::vec4(light.color.x, light.color.y, light.color.z, light.intensity);
 		newLight->postion = trans.GetWorldPosition();
 		newLight->dir = light.direction;
-		newLight->radius = light.radius;
+		newLight->radius = lightRadius;
 		newLight->innerAngle = glm::cos(glm::radians(light.innerAngle));
 		newLight->outerAngle = glm::cos(glm::radians(light.outerAngle));
+
 	}
 
+}
+
+
+void RenderScene::CollectTerrain(Scene* scene)
+{
+	auto TerrainEttView = scene->GetRegistry().view<TerrainComponent>();
+
+	// No Terrain Found?
+	if (TerrainEttView.empty())
+		return;
+
+	auto entity = TerrainEttView.front();
+	const auto& theTerrain = TerrainEttView.get<TerrainComponent>(entity);
+	auto terrainRsc = theTerrain.GetTerrainResource();
+	
+	if (!terrainRsc->IsOnGPU())
+	{
+		terrainRsc->renderRscTerrain = new RenderRscTerrain();
+		terrainRsc->LoadOnGPU();
+	}
+	
+	RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
+	renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
+	renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
+	
+	// Default Terrain Material.
+	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+	renderTerrain->SetMaterial(defaultMaterials.terrain->GetRenderRsc());
+
+	// Add the terrain to the deferred batch.
+	deferredBatch.Add(renderTerrain);
 }
 
 
 void RenderScene::Clear()
 {
 	// Clear Render Batches...
-	for (auto& batch : batches)
-	{
-		batch.Clear();
-	}
+	deferredBatch.Reset();
+	translucentBatch.Reset();
+
 
 	// Delete Dynamic Render Primitives created while building render scene...
-	for (auto& prim : dynamicPrimitive)
+	for (auto& prim : rprimitives)
 		delete prim;
 
 	// Delete Render Lights created while building render scene...
-	for (auto& light : lights)
+	for (auto& light : rlights)
 		delete light;
 
 	//...
-	dynamicPrimitive.clear();
-	lights.clear();
+	rprimitives.clear();
+	rlights.clear();
 	environment.Reset();
 	near = 0.0f;
 	far = 0.0f;
+	debugPrimitives = nullptr;
 }
 
 
-void RenderScene::Draw(ERSceneBatch type)
+void RenderScene::DrawDeferred()
 {
-	const RenderBatch& batch = GetBatch(type);
+	// Bind Transform Uniform Buffer.
+	transformUniform->BindBase();
 
-	// Bind Transform UB
-	transformUB->BindBase();
+	// All The Batch Primitives.
+	const auto& primitives = deferredBatch.GetPrimitives();
 
-
-	for (auto& prim : batch.elements)
+	// First: iterate on shaders...
+	for (uint32_t is = 0; is < deferredBatch.GetNumShaders(); ++is)
 	{
-		// Transfromation...
-		trData.modelMatrix = prim->GetWorldMatrix();
-		trData.normalMatrix = prim->GetWorldMatrix();
-		transformUB->UpdateData( sizeof(TransformVertexData), 0, &trData ); // Model & Normal Matrix.
+		const auto& shaderBatch = deferredBatch.GetShaderBatch(is);
 
-		// Shader & Materail...
-		RenderRscMaterial* material = prim->GetMaterial();
-		GLShader* shader = material->GetShaderRsc()->GetShader();
+		// The Shader
+		GLShader* shader = shaderBatch.shader->GetShader();
 		shader->Use();
 
+		// Second: iterate on materails...
+		for (uint32_t im = 0; im < shaderBatch.materials.size(); ++im)
+		{
+			const auto& materialBatch = deferredBatch.GetMaterialBatch( shaderBatch.materials[im] );
+
+			// The Material
+			RenderRscMaterial* material = materialBatch.material;
+			material->MakeTexturesActive();
+
+			if (material->HasMaterialData())
+			{
+				material->GetUniformBuffer()->BindBase();
+				material->UpdateUniformBuffer();
+			}
+
+
+			// Finally: Draw Primitives...
+			for (uint32_t ip = 0; ip < materialBatch.primitives.size(); ++ip)
+			{
+				RenderPrimitive* prim = primitives[ materialBatch.primitives[ip] ];
+
+				// Transform.
+				trData.modelMatrix = prim->GetWorldMatrix();
+				trData.normalMatrix = prim->GetWorldMatrix();
+				transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
+
+				// Draw...
+				prim->Draw(shader);
+			}
+		}
+	}
+
+	
+	// End Drawing...
+	glBindVertexArray(0);
+
+}
+
+
+
+void RenderScene::DrawDebug()
+{
+	// Is Empty?
+	if (!debugPrimitives || debugPrimitives->empty())
+		return;
+
+	const auto& prims = *debugPrimitives;
+
+	// Bind Transform Uniform Buffer.
+	transformUniform->BindBase();
+
+	
+	// All debug primitives have the same shader & materail.
+	RenderRscMaterial* materail = prims[0]->GetMaterial();
+	GLShader* shader = materail->GetShaderRsc()->GetShader();
+
+
+	// Draw Debug Primitives...
+	for (uint32_t ip = 0; ip < prims.size(); ++ip)
+	{
+		RenderPrimitive* prim = prims[ip];
+
+		// Transform.
+		trData.modelMatrix = prim->GetWorldMatrix();
+		trData.normalMatrix = prim->GetWorldMatrix();
+		transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
+
+		// Draw...
+		prim->Draw(shader);
+	}
+
+	glBindVertexArray(0);
+}
+
+
+void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
+{
+	// Bind Transform Uniform Buffer.
+	transformUniform->BindBase();
+
+	// All The Batch Primitives.
+	const auto& primitives = translucentBatch.GetPrimitives();
+
+	// Iterate over all translucent primitives.
+	for (const auto& prim : primitives)
+	{
+		// The Lights.
+		UpdateLights_FORWARD(lightUB, prim.primitive);
+
+
+		// The Material
+		RenderRscMaterial* material = prim.primitive->GetMaterial();
+		material->MakeTexturesActive();
 
 		if (material->HasMaterialData())
 		{
@@ -345,17 +512,85 @@ void RenderScene::Draw(ERSceneBatch type)
 			material->UpdateUniformBuffer();
 		}
 
+		// The Shader.
+		GLShader *shader = material->GetShaderRsc()->GetShader();
+		shader->Use();
 
-		material->MakeTexturesActive(); // Material Textures...
-
+		// Transform.
+		trData.modelMatrix = prim.primitive->GetWorldMatrix();
+		trData.normalMatrix = prim.primitive->GetWorldMatrix();
+		transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
 
 		// Draw...
-		prim->Draw(shader);
+		prim.primitive->Draw(shader);
 	}
 
-	//
-	glBindVertexArray(0);
 }
+
+
+void RenderScene::UpdateLights_FORWARD(UniformBuffer* lightUB, RenderPrimitive* prim)
+{
+	static std::vector<glm::vec4> lightPos(RENDER_PASS_FORWARD_MAX_LIGHTS);
+	static std::vector<glm::vec4> lightDir(RENDER_PASS_FORWARD_MAX_LIGHTS);
+	static std::vector<glm::vec4> lightPower(RENDER_PASS_FORWARD_MAX_LIGHTS);
+	static std::vector<glm::vec4> lightData(RENDER_PASS_FORWARD_MAX_LIGHTS);
+
+	const auto& lit = prim->GetLights();
+
+	for (int32_t i = 0; i < RENDER_PASS_FORWARD_MAX_LIGHTS; ++i)
+	{
+		if (i >= lit.size())
+		{
+			lightData[i].r = 0.0f; // No Light.
+			continue;
+		}
+
+		const auto& light = rlights[ lit[i] ];
+		lightPos[i] = glm::vec4(light->postion, 0.0f);
+		lightDir[i] = glm::vec4(light->dir, 0.0f);
+		lightData[i].r = light->GetType();
+		lightData[i].g = light->innerAngle;
+		lightData[i].b = light->outerAngle;
+		lightData[i].a = light->radius;
+		lightPower[i] = light->colorAndPower;
+	}
+
+
+
+	lightUB->SetDataValues(0, lightDir);
+	lightUB->SetDataValues(1, lightPos);
+	lightUB->SetDataValues(2, lightPower);
+	lightUB->SetDataValues(3, lightData);
+	lightUB->Update();
+}
+
+
+void RenderScene::GatherLights(const glm::vec3& center, float radius, std::vector<RenderLight*>& outLights)
+{
+	float r2 = radius * radius;
+
+	for (uint32_t il = 0; il < rlights.size(); ++il)
+	{
+		// Invalid or Directional?
+		if (rlights[il]->type <= 1)
+			continue;
+
+		glm::vec3 v = (center - rlights[il]->postion);
+		float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+		float lr2 = rlights[il]->radius;
+		lr2 = lr2 * lr2;
+
+
+		// No intersection?
+		if ((d2 - lr2) > r2)
+			continue;
+
+		outLights.push_back(rlights[il]);
+	}
+
+}
+
 
 
 

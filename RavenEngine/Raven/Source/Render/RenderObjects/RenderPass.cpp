@@ -210,6 +210,10 @@ void RenderPass::ResizeTargets(const glm::ivec2& newSize)
 		if (!target.texture)
 			continue;
 
+		// Same Size?
+		if (target.texture->GetWidth()== newSize.x && target.texture->GetHeight() == newSize.y)
+			continue;
+
 		target.texture->Bind();
 		target.texture->UpdateTexData(target.level, size.x, size.y, target.layer, nullptr);
 	}
@@ -218,9 +222,14 @@ void RenderPass::ResizeTargets(const glm::ivec2& newSize)
 	// Has Depth? resize...
 	if (depthTexture.texture != nullptr)
 	{
-		depthTexture.texture->Bind();
-		depthTexture.texture->UpdateTexData(depthTexture.level, size.x, size.y, depthTexture.layer, nullptr);
+		// different Size?
+		if (depthTexture.texture->GetWidth() != newSize.x || depthTexture.texture->GetHeight() != newSize.y)
+		{
+			depthTexture.texture->Bind();
+			depthTexture.texture->UpdateTexData(depthTexture.level, size.x, size.y, depthTexture.layer, nullptr);
+		}
 	}
+
 	
 	// Resize Render Buffers...
 	for (int32_t i = 0; i < 2; ++i)

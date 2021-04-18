@@ -187,6 +187,41 @@ vec2 ComputeEquiCoord(vec3 normal)
 }
 
 
+// Convert Linear to sRGB color space.
+vec3 LinearTosRGB(vec3 val)
+{
+	return pow(val, vec3(0.4545456));
+}
+
+
+// Convert sRGB to Linear color space.
+vec3 sRGBToLinear(vec3 val)
+{
+	return pow(val, vec3(2.2));
+}
+
+
+// Convert Linear Scalar to sRGB color space.
+float LinearTosRGB(float val)
+{
+	return pow(val, 0.4545456);
+}
+
+
+// Convert sRGB Scalar to Linear color space.
+float sRGBToLinear(float val)
+{
+	return pow(val, 2.2);
+}
+
+
+// Convert sample sRGB texture and convert it to Linear color space.
+vec4 sRGBToLinearSample(sampler2D tex, vec2 coord)
+{
+	vec4 color = texture(tex, coord);
+	color.rgb = pow(color.rgb, vec3(2.2));
+	return color;
+}
 
 
 

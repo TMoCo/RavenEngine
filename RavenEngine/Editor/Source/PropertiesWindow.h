@@ -14,15 +14,18 @@
 namespace Raven 
 {
 	
+	class AnimationController;
 	class PropertiesWindow : public EditorWindow
 	{
 	public:
 		PropertiesWindow();
 		virtual void OnImGui() override;
 		virtual void OnSceneCreated(Scene* scene) override;
+		inline void SetController(AnimationController* con) { controller = con; }
 	private:
 		bool init = false;
-		//MM::ImGuiEntityEditor<entt::entity> enttEditor;
 		MM::EntityEditor<entt::entity> enttEditor;
+		AnimationController* controller = nullptr;
+
 	};
 };

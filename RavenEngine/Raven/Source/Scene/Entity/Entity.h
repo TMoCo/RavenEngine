@@ -33,19 +33,25 @@ namespace Raven
 			if (HasComponent<T>())
 				LOGW("Attempting to add extisting component ");
 #endif
-			return scene->GetRegistry().emplace<T>(entityHandle, std::forward<Args>(args)...);
+			T & t = scene->GetRegistry().emplace<T>(entityHandle, std::forward<Args>(args)...);
+			t.entity = entityHandle;
+			return t;
 		}
 
 		template<typename T, typename... Args>
 		T& GetOrAddComponent(Args&&... args)
 		{
-			return scene->GetRegistry().get_or_emplace<T>(entityHandle, std::forward<Args>(args)...);
+			T & t = scene->GetRegistry().get_or_emplace<T>(entityHandle, std::forward<Args>(args)...);
+			t.entity = entityHandle;
+			return t;
 		}
 
 		template<typename T, typename... Args>
 		void AddOrReplaceComponent(Args&&... args)
 		{
-			scene->GetRegistry().emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
+			T & t = scene->GetRegistry().emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
+			t.entity = entityHandle;
+			
 		}
 
 		template<typename T>
@@ -75,6 +81,8 @@ namespace Raven
 		bool IsActive();
 		void SetActive(bool isActive);
 		void SetParent(const Entity& entity);
+		Entity FindByPath(const std::string& path);
+		Entity GetChildInChildren(const std::string& name);
 		Entity GetParent();
 		std::vector<Entity> GetChildren();
 		bool IsParent(const Entity& potentialParent) const;

@@ -2,14 +2,1374 @@
     "value0": {
         "SceneName": "default"
     },
-    "value1": 4,
+    "value1": 72,
     "value2": 0,
     "value3": 1,
     "value4": 2,
     "value5": 3,
-    "value6": 3,
-    "value7": 0,
-    "value8": {
+    "value6": 4,
+    "value7": 5,
+    "value8": 6,
+    "value9": 7,
+    "value10": 8,
+    "value11": 9,
+    "value12": 10,
+    "value13": 11,
+    "value14": 12,
+    "value15": 13,
+    "value16": 14,
+    "value17": 15,
+    "value18": 16,
+    "value19": 17,
+    "value20": 18,
+    "value21": 19,
+    "value22": 20,
+    "value23": 21,
+    "value24": 22,
+    "value25": 23,
+    "value26": 24,
+    "value27": 25,
+    "value28": 26,
+    "value29": 27,
+    "value30": 28,
+    "value31": 29,
+    "value32": 30,
+    "value33": 31,
+    "value34": 32,
+    "value35": 33,
+    "value36": 34,
+    "value37": 35,
+    "value38": 36,
+    "value39": 37,
+    "value40": 38,
+    "value41": 39,
+    "value42": 40,
+    "value43": 41,
+    "value44": 42,
+    "value45": 43,
+    "value46": 44,
+    "value47": 45,
+    "value48": 46,
+    "value49": 47,
+    "value50": 48,
+    "value51": 49,
+    "value52": 50,
+    "value53": 51,
+    "value54": 52,
+    "value55": 53,
+    "value56": 54,
+    "value57": 55,
+    "value58": 56,
+    "value59": 57,
+    "value60": 58,
+    "value61": 59,
+    "value62": 60,
+    "value63": 61,
+    "value64": 62,
+    "value65": 63,
+    "value66": 64,
+    "value67": 65,
+    "value68": 66,
+    "value69": 67,
+    "value70": 68,
+    "value71": 69,
+    "value72": 70,
+    "value73": 71,
+    "value74": 72,
+    "value75": 0,
+    "value76": {
+        "Position": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 0.20000000298023225,
+            "value1": 0.20000000298023225,
+            "value2": 0.20000000298023225
+        },
+        "Id": 1048575
+    },
+    "value77": 1,
+    "value78": {
+        "Position": {
+            "value0": 0.0,
+            "value1": 99.67206573486328,
+            "value2": 0.24705205857753755
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 1
+    },
+    "value79": 2,
+    "value80": {
+        "Position": {
+            "value0": 5.648319643114519e-7,
+            "value1": 9.92345905303955,
+            "value2": -1.2273348569869996
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 2
+    },
+    "value81": 3,
+    "value82": {
+        "Position": {
+            "value0": -0.00013886521628592163,
+            "value1": 11.645440101623536,
+            "value2": -1.422341227531433
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 3
+    },
+    "value83": 4,
+    "value84": {
+        "Position": {
+            "value0": 0.00009144072100752965,
+            "value1": 13.360203742980957,
+            "value2": -1.6264597177505494
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 4
+    },
+    "value85": 5,
+    "value86": {
+        "Position": {
+            "value0": 0.00002520208181522321,
+            "value1": 15.032490730285645,
+            "value2": 0.792904794216156
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 5
+    },
+    "value87": 6,
+    "value88": {
+        "Position": {
+            "value0": 0.0000023707482341706056,
+            "value1": 10.321830749511719,
+            "value2": 3.1424288749694826
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 6
+    },
+    "value89": 7,
+    "value90": {
+        "Position": {
+            "value0": 0.00015417259419336915,
+            "value1": 18.474672317504884,
+            "value2": 6.636399269104004
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 7
+    },
+    "value91": 8,
+    "value92": {
+        "Position": {
+            "value0": 2.9479150772094728,
+            "value1": 7.681745529174805,
+            "value2": 9.120731353759766
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 8
+    },
+    "value93": 9,
+    "value94": {
+        "Position": {
+            "value0": -2.9444808959960939,
+            "value1": 7.681745529174805,
+            "value2": 9.120495796203614
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 9
+    },
+    "value95": 10,
+    "value96": {
+        "Position": {
+            "value0": 6.1058244705200199,
+            "value1": 9.110424041748047,
+            "value2": 0.7055508494377136
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 10
+    },
+    "value97": 11,
+    "value98": {
+        "Position": {
+            "value0": 12.655036926269532,
+            "value1": -0.2659344971179962,
+            "value2": -2.600921869277954
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 11
+    },
+    "value99": 12,
+    "value100": {
+        "Position": {
+            "value0": 27.40468406677246,
+            "value1": 0.00003912667671102099,
+            "value2": 0.0000065881099544640169
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 12
+    },
+    "value101": 13,
+    "value102": {
+        "Position": {
+            "value0": 27.614463806152345,
+            "value1": 0.00002895180841733236,
+            "value2": 0.000019646586224553176
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 13
+    },
+    "value103": 14,
+    "value104": {
+        "Position": {
+            "value0": 12.77552318572998,
+            "value1": 0.000013342024431040045,
+            "value2": 0.000020418458007043229
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 14
+    },
+    "value105": 15,
+    "value106": {
+        "Position": {
+            "value0": 3.613971471786499,
+            "value1": 0.0000026601378522173038,
+            "value2": 0.0000024623632270959208
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 15
+    },
+    "value107": 16,
+    "value108": {
+        "Position": {
+            "value0": 3.4597601890563967,
+            "value1": 5.432470970845316e-7,
+            "value2": -0.00002641967876115814
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 16
+    },
+    "value109": 17,
+    "value110": {
+        "Position": {
+            "value0": 3.680192470550537,
+            "value1": -8.559337061342376e-8,
+            "value2": 0.0000327692468999885
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 17
+    },
+    "value111": 18,
+    "value112": {
+        "Position": {
+            "value0": 3.7888095378875734,
+            "value1": -2.166996717453003,
+            "value2": 3.0030879974365236
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 18
+    },
+    "value113": 19,
+    "value114": {
+        "Position": {
+            "value0": 3.675442934036255,
+            "value1": -2.1220078468322756,
+            "value2": 2.1220123767852785
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 19
+    },
+    "value115": 20,
+    "value116": {
+        "Position": {
+            "value0": 3.3943586349487306,
+            "value1": -1.9597440958023072,
+            "value2": 1.9597928524017335
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 20
+    },
+    "value117": 21,
+    "value118": {
+        "Position": {
+            "value0": 2.6794040203094484,
+            "value1": -1.5469446182250977,
+            "value2": 1.5469200611114503
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 21
+    },
+    "value119": 22,
+    "value120": {
+        "Position": {
+            "value0": 12.26661491394043,
+            "value1": -0.2316688448190689,
+            "value2": 2.8220579624176027
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 22
+    },
+    "value121": 23,
+    "value122": {
+        "Position": {
+            "value0": 3.891967296600342,
+            "value1": 0.0000016868665397851146,
+            "value2": 0.00003872154775308445
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 23
+    },
+    "value123": 24,
+    "value124": {
+        "Position": {
+            "value0": 3.4151611328125,
+            "value1": 5.749108140662429e-7,
+            "value2": -0.000008770532986090985
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 24
+    },
+    "value125": 25,
+    "value126": {
+        "Position": {
+            "value0": 3.0779855251312258,
+            "value1": 7.926917078293627e-8,
+            "value2": -0.000008560385140299332
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 25
+    },
+    "value127": 26,
+    "value128": {
+        "Position": {
+            "value0": 12.147005081176758,
+            "value1": 0.009894982911646366,
+            "value2": -2.2166292667388918
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 26
+    },
+    "value129": 27,
+    "value130": {
+        "Position": {
+            "value0": 3.6011905670166017,
+            "value1": 0.000001512936705694301,
+            "value2": 0.000035112192563246938
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 27
+    },
+    "value131": 28,
+    "value132": {
+        "Position": {
+            "value0": 3.307317018508911,
+            "value1": 0.000004531744252744829,
+            "value2": -0.000020893265173071997
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 28
+    },
+    "value133": 29,
+    "value134": {
+        "Position": {
+            "value0": 3.6601152420043947,
+            "value1": 0.000002906111149059143,
+            "value2": 4.54771331703796e-8
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 29
+    },
+    "value135": 30,
+    "value136": {
+        "Position": {
+            "value0": 10.908194541931153,
+            "value1": -0.22636495530605317,
+            "value2": -4.725817680358887
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 30
+    },
+    "value137": 31,
+    "value138": {
+        "Position": {
+            "value0": 4.13665246963501,
+            "value1": 0.000002299953393958276,
+            "value2": 0.000026898434953182006
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 31
+    },
+    "value139": 32,
+    "value140": {
+        "Position": {
+            "value0": 2.5948359966278078,
+            "value1": 5.939040192970424e-8,
+            "value2": -0.00003600901982281357
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 32
+    },
+    "value141": 33,
+    "value142": {
+        "Position": {
+            "value0": 2.9238691329956056,
+            "value1": 0.000001440737719349272,
+            "value2": 0.00001873212750069797
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 33
+    },
+    "value143": 34,
+    "value144": {
+        "Position": {
+            "value0": -6.105696201324463,
+            "value1": 9.110508918762207,
+            "value2": 0.7055634260177612
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 34
+    },
+    "value145": 35,
+    "value146": {
+        "Position": {
+            "value0": -12.655040740966797,
+            "value1": -0.26602062582969668,
+            "value2": -2.600895881652832
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 35
+    },
+    "value147": 36,
+    "value148": {
+        "Position": {
+            "value0": -27.40468406677246,
+            "value1": 0.000032884112442843619,
+            "value2": 0.000005275639523460995
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 36
+    },
+    "value149": 37,
+    "value150": {
+        "Position": {
+            "value0": -27.614463806152345,
+            "value1": 0.00002266145747853443,
+            "value2": 0.00001832406996982172
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 37
+    },
+    "value151": 38,
+    "value152": {
+        "Position": {
+            "value0": -12.77552318572998,
+            "value1": 0.00000894577351573389,
+            "value2": 0.00001801163853087928
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 38
+    },
+    "value153": 39,
+    "value154": {
+        "Position": {
+            "value0": -3.613971471786499,
+            "value1": 0.000002756501771727926,
+            "value2": 0.000003080337592109572
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 39
+    },
+    "value155": 40,
+    "value156": {
+        "Position": {
+            "value0": -3.4597601890563967,
+            "value1": -1.972182417375734e-7,
+            "value2": -0.000026457890271558428
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 40
+    },
+    "value157": 41,
+    "value158": {
+        "Position": {
+            "value0": -3.680192470550537,
+            "value1": -6.576054829565692e-7,
+            "value2": 0.000032509808079339567
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 41
+    },
+    "value159": 42,
+    "value160": {
+        "Position": {
+            "value0": -3.788809299468994,
+            "value1": -2.1669981479644777,
+            "value2": 3.003087282180786
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 42
+    },
+    "value161": 43,
+    "value162": {
+        "Position": {
+            "value0": -3.675442695617676,
+            "value1": -2.1220085620880129,
+            "value2": 2.122012138366699
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 43
+    },
+    "value163": 44,
+    "value164": {
+        "Position": {
+            "value0": -3.394357919692993,
+            "value1": -1.9597457647323609,
+            "value2": 1.9597926139831544
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 44
+    },
+    "value165": 45,
+    "value166": {
+        "Position": {
+            "value0": -2.67940354347229,
+            "value1": -1.546945571899414,
+            "value2": 1.546919822692871
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 45
+    },
+    "value167": 46,
+    "value168": {
+        "Position": {
+            "value0": -12.266615867614746,
+            "value1": -0.2316731959581375,
+            "value2": 2.8220555782318117
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 46
+    },
+    "value169": 47,
+    "value170": {
+        "Position": {
+            "value0": -3.891967296600342,
+            "value1": -7.205551355582429e-8,
+            "value2": 0.00003751302574528381
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 47
+    },
+    "value171": 48,
+    "value172": {
+        "Position": {
+            "value0": -3.4151611328125,
+            "value1": 2.529913842863607e-7,
+            "value2": -0.000008605841685493943
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 48
+    },
+    "value173": 49,
+    "value174": {
+        "Position": {
+            "value0": -3.0779855251312258,
+            "value1": -9.372841986987623e-7,
+            "value2": -0.000008780579264566768
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 49
+    },
+    "value175": 50,
+    "value176": {
+        "Position": {
+            "value0": -12.147004127502442,
+            "value1": 0.009890901856124401,
+            "value2": -2.2166314125061037
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 50
+    },
+    "value177": 51,
+    "value178": {
+        "Position": {
+            "value0": -3.6011905670166017,
+            "value1": 2.3856512143538568e-7,
+            "value2": 0.00003486698187771253
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 51
+    },
+    "value179": 52,
+    "value180": {
+        "Position": {
+            "value0": -3.307317018508911,
+            "value1": 0.000003760175104616792,
+            "value2": -0.000021114596165716649
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 52
+    },
+    "value181": 53,
+    "value182": {
+        "Position": {
+            "value0": -3.6601152420043947,
+            "value1": 0.000002046845111181028,
+            "value2": 6.718011036355165e-7
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 53
+    },
+    "value183": 54,
+    "value184": {
+        "Position": {
+            "value0": -10.908193588256836,
+            "value1": -0.2263685017824173,
+            "value2": -4.725820064544678
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 54
+    },
+    "value185": 55,
+    "value186": {
+        "Position": {
+            "value0": -4.13665246963501,
+            "value1": 4.31063114092467e-7,
+            "value2": 0.000025609582735341975
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 55
+    },
+    "value187": 56,
+    "value188": {
+        "Position": {
+            "value0": -2.5948359966278078,
+            "value1": -9.571485861670226e-7,
+            "value2": -0.00003666115662781522
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 56
+    },
+    "value189": 57,
+    "value190": {
+        "Position": {
+            "value0": -2.9238691329956056,
+            "value1": 6.41227018149948e-7,
+            "value2": 0.000018695744074648247
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 57
+    },
+    "value191": 58,
+    "value192": {
+        "Position": {
+            "value0": -9.1244535446167,
+            "value1": -6.656398296356201,
+            "value2": -0.05537792667746544
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 58
+    },
+    "value193": 59,
+    "value194": {
+        "Position": {
+            "value0": -0.2446804940700531,
+            "value1": -40.595436096191409,
+            "value2": -0.5145279765129089
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 59
+    },
+    "value195": 60,
+    "value196": {
+        "Position": {
+            "value0": 0.24466943740844727,
+            "value1": -42.04787063598633,
+            "value2": -2.0602309703826906
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 60
+    },
+    "value197": 61,
+    "value198": {
+        "Position": {
+            "value0": -0.3733598589897156,
+            "value1": -10.492194175720215,
+            "value2": 12.640663146972657
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 61
+    },
+    "value199": 62,
+    "value200": {
+        "Position": {
+            "value0": 1.134739591179823e-7,
+            "value1": 4.5877411025685435e-7,
+            "value2": 9.992521286010743
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 62
+    },
+    "value201": 63,
+    "value202": {
+        "Position": {
+            "value0": 9.124452590942383,
+            "value1": -6.656399250030518,
+            "value2": -0.05537792667746544
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 63
+    },
+    "value203": 64,
+    "value204": {
+        "Position": {
+            "value0": 0.24468018114566804,
+            "value1": -40.59540557861328,
+            "value2": -0.5170410871505737
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 64
+    },
+    "value205": 65,
+    "value206": {
+        "Position": {
+            "value0": -0.2446696013212204,
+            "value1": -42.04800033569336,
+            "value2": -2.0576412677764894
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 65
+    },
+    "value207": 66,
+    "value208": {
+        "Position": {
+            "value0": 0.3733598291873932,
+            "value1": -10.492193222045899,
+            "value2": 12.640664100646973
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 66
+    },
+    "value209": 67,
+    "value210": {
+        "Position": {
+            "value0": -2.0536640477075708e-7,
+            "value1": 9.634096613808652e-7,
+            "value2": 9.992521286010743
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 67
+    },
+    "value211": 68,
+    "value212": {
         "Position": {
             "value0": 0.0,
             "value1": 0.0,
@@ -24,10 +1384,11 @@
             "value0": 1.0,
             "value1": 1.0,
             "value2": 1.0
-        }
+        },
+        "Id": 68
     },
-    "value9": 1,
-    "value10": {
+    "value213": 69,
+    "value214": {
         "Position": {
             "value0": 0.0,
             "value1": 0.0,
@@ -42,14 +1403,15 @@
             "value0": 1.0,
             "value1": 1.0,
             "value2": 1.0
-        }
+        },
+        "Id": 69
     },
-    "value11": 2,
-    "value12": {
+    "value215": 70,
+    "value216": {
         "Position": {
             "value0": 0.0,
-            "value1": 0.550000011920929,
-            "value2": 14.25
+            "value1": 0.0,
+            "value2": 0.0
         },
         "Rotation": {
             "value0": 0.0,
@@ -60,39 +1422,972 @@
             "value0": 1.0,
             "value1": 1.0,
             "value2": 1.0
-        }
+        },
+        "Id": 70
     },
-    "value13": 4,
-    "value14": 0,
-    "value15": {
-        "Name": "Model"
+    "value217": 71,
+    "value218": {
+        "Position": {
+            "value0": 0.3381940722465515,
+            "value1": 18.289409637451173,
+            "value2": 78.35598754882813
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": -0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 71
     },
-    "value16": 1,
-    "value17": {
-        "Name": "Light"
+    "value219": 72,
+    "value220": 0,
+    "value221": {
+        "Name": "ybot",
+        "Id": 1048575
     },
-    "value18": 2,
-    "value19": {
-        "Name": "Camera"
+    "value222": 1,
+    "value223": {
+        "Name": "mixamorig:Hips",
+        "Id": 1048575
     },
-    "value20": 3,
-    "value21": {
-        "Name": "Empty Entity"
+    "value224": 2,
+    "value225": {
+        "Name": "mixamorig:Spine",
+        "Id": 1048575
     },
-    "value22": 0,
-    "value23": 0,
-    "value24": 1,
-    "value25": 2,
-    "value26": {
+    "value226": 3,
+    "value227": {
+        "Name": "mixamorig:Spine1",
+        "Id": 1048575
+    },
+    "value228": 4,
+    "value229": {
+        "Name": "mixamorig:Spine2",
+        "Id": 1048575
+    },
+    "value230": 5,
+    "value231": {
+        "Name": "mixamorig:Neck",
+        "Id": 1048575
+    },
+    "value232": 6,
+    "value233": {
+        "Name": "mixamorig:Head",
+        "Id": 1048575
+    },
+    "value234": 7,
+    "value235": {
+        "Name": "mixamorig:HeadTop_End",
+        "Id": 1048575
+    },
+    "value236": 8,
+    "value237": {
+        "Name": "mixamorig:LeftEye",
+        "Id": 1048575
+    },
+    "value238": 9,
+    "value239": {
+        "Name": "mixamorig:RightEye",
+        "Id": 1048575
+    },
+    "value240": 10,
+    "value241": {
+        "Name": "mixamorig:LeftShoulder",
+        "Id": 1048575
+    },
+    "value242": 11,
+    "value243": {
+        "Name": "mixamorig:LeftArm",
+        "Id": 1048575
+    },
+    "value244": 12,
+    "value245": {
+        "Name": "mixamorig:LeftForeArm",
+        "Id": 1048575
+    },
+    "value246": 13,
+    "value247": {
+        "Name": "mixamorig:LeftHand",
+        "Id": 1048575
+    },
+    "value248": 14,
+    "value249": {
+        "Name": "mixamorig:LeftHandMiddle1",
+        "Id": 1048575
+    },
+    "value250": 15,
+    "value251": {
+        "Name": "mixamorig:LeftHandMiddle2",
+        "Id": 1048575
+    },
+    "value252": 16,
+    "value253": {
+        "Name": "mixamorig:LeftHandMiddle3",
+        "Id": 1048575
+    },
+    "value254": 17,
+    "value255": {
+        "Name": "mixamorig:LeftHandMiddle4",
+        "Id": 1048575
+    },
+    "value256": 18,
+    "value257": {
+        "Name": "mixamorig:LeftHandThumb1",
+        "Id": 1048575
+    },
+    "value258": 19,
+    "value259": {
+        "Name": "mixamorig:LeftHandThumb2",
+        "Id": 1048575
+    },
+    "value260": 20,
+    "value261": {
+        "Name": "mixamorig:LeftHandThumb3",
+        "Id": 1048575
+    },
+    "value262": 21,
+    "value263": {
+        "Name": "mixamorig:LeftHandThumb4",
+        "Id": 1048575
+    },
+    "value264": 22,
+    "value265": {
+        "Name": "mixamorig:LeftHandIndex1",
+        "Id": 1048575
+    },
+    "value266": 23,
+    "value267": {
+        "Name": "mixamorig:LeftHandIndex2",
+        "Id": 1048575
+    },
+    "value268": 24,
+    "value269": {
+        "Name": "mixamorig:LeftHandIndex3",
+        "Id": 1048575
+    },
+    "value270": 25,
+    "value271": {
+        "Name": "mixamorig:LeftHandIndex4",
+        "Id": 1048575
+    },
+    "value272": 26,
+    "value273": {
+        "Name": "mixamorig:LeftHandRing1",
+        "Id": 1048575
+    },
+    "value274": 27,
+    "value275": {
+        "Name": "mixamorig:LeftHandRing2",
+        "Id": 1048575
+    },
+    "value276": 28,
+    "value277": {
+        "Name": "mixamorig:LeftHandRing3",
+        "Id": 1048575
+    },
+    "value278": 29,
+    "value279": {
+        "Name": "mixamorig:LeftHandRing4",
+        "Id": 1048575
+    },
+    "value280": 30,
+    "value281": {
+        "Name": "mixamorig:LeftHandPinky1",
+        "Id": 1048575
+    },
+    "value282": 31,
+    "value283": {
+        "Name": "mixamorig:LeftHandPinky2",
+        "Id": 1048575
+    },
+    "value284": 32,
+    "value285": {
+        "Name": "mixamorig:LeftHandPinky3",
+        "Id": 1048575
+    },
+    "value286": 33,
+    "value287": {
+        "Name": "mixamorig:LeftHandPinky4",
+        "Id": 1048575
+    },
+    "value288": 34,
+    "value289": {
+        "Name": "mixamorig:RightShoulder",
+        "Id": 1048575
+    },
+    "value290": 35,
+    "value291": {
+        "Name": "mixamorig:RightArm",
+        "Id": 1048575
+    },
+    "value292": 36,
+    "value293": {
+        "Name": "mixamorig:RightForeArm",
+        "Id": 1048575
+    },
+    "value294": 37,
+    "value295": {
+        "Name": "mixamorig:RightHand",
+        "Id": 1048575
+    },
+    "value296": 38,
+    "value297": {
+        "Name": "mixamorig:RightHandMiddle1",
+        "Id": 1048575
+    },
+    "value298": 39,
+    "value299": {
+        "Name": "mixamorig:RightHandMiddle2",
+        "Id": 1048575
+    },
+    "value300": 40,
+    "value301": {
+        "Name": "mixamorig:RightHandMiddle3",
+        "Id": 1048575
+    },
+    "value302": 41,
+    "value303": {
+        "Name": "mixamorig:RightHandMiddle4",
+        "Id": 1048575
+    },
+    "value304": 42,
+    "value305": {
+        "Name": "mixamorig:RightHandThumb1",
+        "Id": 1048575
+    },
+    "value306": 43,
+    "value307": {
+        "Name": "mixamorig:RightHandThumb2",
+        "Id": 1048575
+    },
+    "value308": 44,
+    "value309": {
+        "Name": "mixamorig:RightHandThumb3",
+        "Id": 1048575
+    },
+    "value310": 45,
+    "value311": {
+        "Name": "mixamorig:RightHandThumb4",
+        "Id": 1048575
+    },
+    "value312": 46,
+    "value313": {
+        "Name": "mixamorig:RightHandIndex1",
+        "Id": 1048575
+    },
+    "value314": 47,
+    "value315": {
+        "Name": "mixamorig:RightHandIndex2",
+        "Id": 1048575
+    },
+    "value316": 48,
+    "value317": {
+        "Name": "mixamorig:RightHandIndex3",
+        "Id": 1048575
+    },
+    "value318": 49,
+    "value319": {
+        "Name": "mixamorig:RightHandIndex4",
+        "Id": 1048575
+    },
+    "value320": 50,
+    "value321": {
+        "Name": "mixamorig:RightHandRing1",
+        "Id": 1048575
+    },
+    "value322": 51,
+    "value323": {
+        "Name": "mixamorig:RightHandRing2",
+        "Id": 1048575
+    },
+    "value324": 52,
+    "value325": {
+        "Name": "mixamorig:RightHandRing3",
+        "Id": 1048575
+    },
+    "value326": 53,
+    "value327": {
+        "Name": "mixamorig:RightHandRing4",
+        "Id": 1048575
+    },
+    "value328": 54,
+    "value329": {
+        "Name": "mixamorig:RightHandPinky1",
+        "Id": 1048575
+    },
+    "value330": 55,
+    "value331": {
+        "Name": "mixamorig:RightHandPinky2",
+        "Id": 1048575
+    },
+    "value332": 56,
+    "value333": {
+        "Name": "mixamorig:RightHandPinky3",
+        "Id": 1048575
+    },
+    "value334": 57,
+    "value335": {
+        "Name": "mixamorig:RightHandPinky4",
+        "Id": 1048575
+    },
+    "value336": 58,
+    "value337": {
+        "Name": "mixamorig:RightUpLeg",
+        "Id": 1048575
+    },
+    "value338": 59,
+    "value339": {
+        "Name": "mixamorig:RightLeg",
+        "Id": 1048575
+    },
+    "value340": 60,
+    "value341": {
+        "Name": "mixamorig:RightFoot",
+        "Id": 1048575
+    },
+    "value342": 61,
+    "value343": {
+        "Name": "mixamorig:RightToeBase",
+        "Id": 1048575
+    },
+    "value344": 62,
+    "value345": {
+        "Name": "mixamorig:RightToe_End",
+        "Id": 1048575
+    },
+    "value346": 63,
+    "value347": {
+        "Name": "mixamorig:LeftUpLeg",
+        "Id": 1048575
+    },
+    "value348": 64,
+    "value349": {
+        "Name": "mixamorig:LeftLeg",
+        "Id": 1048575
+    },
+    "value350": 65,
+    "value351": {
+        "Name": "mixamorig:LeftFoot",
+        "Id": 1048575
+    },
+    "value352": 66,
+    "value353": {
+        "Name": "mixamorig:LeftToeBase",
+        "Id": 1048575
+    },
+    "value354": 67,
+    "value355": {
+        "Name": "mixamorig:LeftToe_End",
+        "Id": 1048575
+    },
+    "value356": 68,
+    "value357": {
+        "Name": "Alpha_Surface",
+        "Id": 1048575
+    },
+    "value358": 69,
+    "value359": {
+        "Name": "Alpha_Joints",
+        "Id": 1048575
+    },
+    "value360": 70,
+    "value361": {
+        "Name": "Light",
+        "Id": 1048575
+    },
+    "value362": 71,
+    "value363": {
+        "Name": "Camera",
+        "Id": 1048575
+    },
+    "value364": 0,
+    "value365": 71,
+    "value366": 7,
+    "value367": {
+        "First": 1048575,
+        "Next": 8,
+        "Previous": 1048575,
+        "Parent": 6,
+        "Id": 1048575
+    },
+    "value368": 6,
+    "value369": {
+        "First": 7,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 5,
+        "Id": 1048575
+    },
+    "value370": 8,
+    "value371": {
+        "First": 1048575,
+        "Next": 9,
+        "Previous": 7,
+        "Parent": 6,
+        "Id": 1048575
+    },
+    "value372": 9,
+    "value373": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 8,
+        "Parent": 6,
+        "Id": 1048575
+    },
+    "value374": 5,
+    "value375": {
+        "First": 6,
+        "Next": 10,
+        "Previous": 1048575,
+        "Parent": 4,
+        "Id": 1048575
+    },
+    "value376": 4,
+    "value377": {
+        "First": 5,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 3,
+        "Id": 1048575
+    },
+    "value378": 17,
+    "value379": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 16,
+        "Id": 1048575
+    },
+    "value380": 16,
+    "value381": {
+        "First": 17,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 15,
+        "Id": 1048575
+    },
+    "value382": 15,
+    "value383": {
+        "First": 16,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 14,
+        "Id": 1048575
+    },
+    "value384": 14,
+    "value385": {
+        "First": 15,
+        "Next": 18,
+        "Previous": 1048575,
+        "Parent": 13,
+        "Id": 1048575
+    },
+    "value386": 13,
+    "value387": {
+        "First": 14,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 12,
+        "Id": 1048575
+    },
+    "value388": 21,
+    "value389": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 20,
+        "Id": 1048575
+    },
+    "value390": 20,
+    "value391": {
+        "First": 21,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 19,
+        "Id": 1048575
+    },
+    "value392": 19,
+    "value393": {
+        "First": 20,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 18,
+        "Id": 1048575
+    },
+    "value394": 18,
+    "value395": {
+        "First": 19,
+        "Next": 22,
+        "Previous": 14,
+        "Parent": 13,
+        "Id": 1048575
+    },
+    "value396": 25,
+    "value397": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 24,
+        "Id": 1048575
+    },
+    "value398": 24,
+    "value399": {
+        "First": 25,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 23,
+        "Id": 1048575
+    },
+    "value400": 23,
+    "value401": {
+        "First": 24,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 22,
+        "Id": 1048575
+    },
+    "value402": 22,
+    "value403": {
+        "First": 23,
+        "Next": 26,
+        "Previous": 18,
+        "Parent": 13,
+        "Id": 1048575
+    },
+    "value404": 29,
+    "value405": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 28,
+        "Id": 1048575
+    },
+    "value406": 28,
+    "value407": {
+        "First": 29,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 27,
+        "Id": 1048575
+    },
+    "value408": 27,
+    "value409": {
+        "First": 28,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 26,
+        "Id": 1048575
+    },
+    "value410": 26,
+    "value411": {
+        "First": 27,
+        "Next": 30,
+        "Previous": 22,
+        "Parent": 13,
+        "Id": 1048575
+    },
+    "value412": 33,
+    "value413": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 32,
+        "Id": 1048575
+    },
+    "value414": 32,
+    "value415": {
+        "First": 33,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 31,
+        "Id": 1048575
+    },
+    "value416": 31,
+    "value417": {
+        "First": 32,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 30,
+        "Id": 1048575
+    },
+    "value418": 30,
+    "value419": {
+        "First": 31,
+        "Next": 1048575,
+        "Previous": 26,
+        "Parent": 13,
+        "Id": 1048575
+    },
+    "value420": 12,
+    "value421": {
+        "First": 13,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 11,
+        "Id": 1048575
+    },
+    "value422": 11,
+    "value423": {
+        "First": 12,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 10,
+        "Id": 1048575
+    },
+    "value424": 10,
+    "value425": {
+        "First": 11,
+        "Next": 34,
+        "Previous": 5,
+        "Parent": 4,
+        "Id": 1048575
+    },
+    "value426": 41,
+    "value427": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 40,
+        "Id": 1048575
+    },
+    "value428": 40,
+    "value429": {
+        "First": 41,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 39,
+        "Id": 1048575
+    },
+    "value430": 39,
+    "value431": {
+        "First": 40,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 38,
+        "Id": 1048575
+    },
+    "value432": 38,
+    "value433": {
+        "First": 39,
+        "Next": 42,
+        "Previous": 1048575,
+        "Parent": 37,
+        "Id": 1048575
+    },
+    "value434": 37,
+    "value435": {
+        "First": 38,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 36,
+        "Id": 1048575
+    },
+    "value436": 45,
+    "value437": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 44,
+        "Id": 1048575
+    },
+    "value438": 44,
+    "value439": {
+        "First": 45,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 43,
+        "Id": 1048575
+    },
+    "value440": 43,
+    "value441": {
+        "First": 44,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 42,
+        "Id": 1048575
+    },
+    "value442": 42,
+    "value443": {
+        "First": 43,
+        "Next": 46,
+        "Previous": 38,
+        "Parent": 37,
+        "Id": 1048575
+    },
+    "value444": 49,
+    "value445": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 48,
+        "Id": 1048575
+    },
+    "value446": 48,
+    "value447": {
+        "First": 49,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 47,
+        "Id": 1048575
+    },
+    "value448": 47,
+    "value449": {
+        "First": 48,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 46,
+        "Id": 1048575
+    },
+    "value450": 46,
+    "value451": {
+        "First": 47,
+        "Next": 50,
+        "Previous": 42,
+        "Parent": 37,
+        "Id": 1048575
+    },
+    "value452": 53,
+    "value453": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 52,
+        "Id": 1048575
+    },
+    "value454": 52,
+    "value455": {
+        "First": 53,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 51,
+        "Id": 1048575
+    },
+    "value456": 51,
+    "value457": {
+        "First": 52,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 50,
+        "Id": 1048575
+    },
+    "value458": 50,
+    "value459": {
+        "First": 51,
+        "Next": 54,
+        "Previous": 46,
+        "Parent": 37,
+        "Id": 1048575
+    },
+    "value460": 57,
+    "value461": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 56,
+        "Id": 1048575
+    },
+    "value462": 56,
+    "value463": {
+        "First": 57,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 55,
+        "Id": 1048575
+    },
+    "value464": 55,
+    "value465": {
+        "First": 56,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 54,
+        "Id": 1048575
+    },
+    "value466": 54,
+    "value467": {
+        "First": 55,
+        "Next": 1048575,
+        "Previous": 50,
+        "Parent": 37,
+        "Id": 1048575
+    },
+    "value468": 36,
+    "value469": {
+        "First": 37,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 35,
+        "Id": 1048575
+    },
+    "value470": 35,
+    "value471": {
+        "First": 36,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 34,
+        "Id": 1048575
+    },
+    "value472": 34,
+    "value473": {
+        "First": 35,
+        "Next": 1048575,
+        "Previous": 10,
+        "Parent": 4,
+        "Id": 1048575
+    },
+    "value474": 3,
+    "value475": {
+        "First": 4,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 2,
+        "Id": 1048575
+    },
+    "value476": 2,
+    "value477": {
+        "First": 3,
+        "Next": 58,
+        "Previous": 1048575,
+        "Parent": 1,
+        "Id": 1048575
+    },
+    "value478": 1,
+    "value479": {
+        "First": 2,
+        "Next": 68,
+        "Previous": 1048575,
+        "Parent": 0,
+        "Id": 1048575
+    },
+    "value480": 62,
+    "value481": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 61,
+        "Id": 1048575
+    },
+    "value482": 61,
+    "value483": {
+        "First": 62,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 60,
+        "Id": 1048575
+    },
+    "value484": 60,
+    "value485": {
+        "First": 61,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 59,
+        "Id": 1048575
+    },
+    "value486": 59,
+    "value487": {
+        "First": 60,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 58,
+        "Id": 1048575
+    },
+    "value488": 58,
+    "value489": {
+        "First": 59,
+        "Next": 63,
+        "Previous": 2,
+        "Parent": 1,
+        "Id": 1048575
+    },
+    "value490": 67,
+    "value491": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 66,
+        "Id": 1048575
+    },
+    "value492": 66,
+    "value493": {
+        "First": 67,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 65,
+        "Id": 1048575
+    },
+    "value494": 65,
+    "value495": {
+        "First": 66,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 64,
+        "Id": 1048575
+    },
+    "value496": 64,
+    "value497": {
+        "First": 65,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 63,
+        "Id": 1048575
+    },
+    "value498": 63,
+    "value499": {
+        "First": 64,
+        "Next": 1048575,
+        "Previous": 58,
+        "Parent": 1,
+        "Id": 1048575
+    },
+    "value500": 0,
+    "value501": {
+        "First": 1,
+        "Next": 1048575,
+        "Previous": 1048575,
+        "Parent": 1048575,
+        "Id": 1048575
+    },
+    "value502": 68,
+    "value503": {
+        "First": 1048575,
+        "Next": 69,
+        "Previous": 1,
+        "Parent": 0,
+        "Id": 1048575
+    },
+    "value504": 69,
+    "value505": {
+        "First": 1048575,
+        "Next": 71,
+        "Previous": 68,
+        "Parent": 0,
+        "Id": 1048575
+    },
+    "value506": 71,
+    "value507": {
+        "First": 1048575,
+        "Next": 1048575,
+        "Previous": 69,
+        "Parent": 0,
+        "Id": 1048575
+    },
+    "value508": 1,
+    "value509": 71,
+    "value510": {
         "Scale": 1.0,
         "Aspect": 1.3333333730697632,
         "FOV": 45.0,
         "Near": 0.009999999776482582,
-        "Far": 100.0
+        "Far": 100.0,
+        "Id": 71
     },
-    "value27": 1,
-    "value28": 1,
-    "value29": {
+    "value511": 1,
+    "value512": 70,
+    "value513": {
         "value0": {
             "value0": 0.0,
             "value1": 0.0,
@@ -107,28 +2402,3276 @@
         "value2": 0,
         "value3": 0.0,
         "value4": {
-            "value0": 0.28600001335144045,
+            "value0": -1.0,
             "value1": -1.0,
             "value2": -1.0
         },
         "value5": 1.0,
-        "value6": 1.0
+        "value6": 1.0,
+        "value7": 70
     },
-    "value30": 1,
-    "value31": 2,
-    "value32": {
-        "ControllerType": 1
+    "value514": 0,
+    "value515": 1,
+    "value516": 0,
+    "value517": {
+        "PrimitiveType": 8,
+        "FilePath": ".\\assets\\ybot.fbx",
+        "Id": 0
     },
-    "value33": 1,
-    "value34": 0,
-    "value35": {
-        "PrimitiveType": 2,
-        "FilePath": ""
-    },
-    "value36": 1,
-    "value37": 0,
-    "value38": {
-        "FilePath": "./scripts/Test.lua",
+    "value518": 1,
+    "value519": 0,
+    "value520": {
+        "FilePath": "./scripts/TestAnimation.lua",
         "Parent": 0
+    },
+    "value521": 0,
+    "value522": 2,
+    "value523": 68,
+    "value524": {
+        "MeshIndex": 0,
+        "Id": 68,
+        "Skeleton": {
+            "bones": [
+                {
+                    "value0": "mixamorig:Hips",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -0.0,
+                            "value1": -99.67206573486328,
+                            "value2": -0.24705205857753755,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": -1,
+                    "value3": 0
+                },
+                {
+                    "value0": "mixamorig:Spine",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -5.648319643114519e-7,
+                            "value1": -109.59552764892578,
+                            "value2": 0.9802827835083008,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 1
+                },
+                {
+                    "value0": "mixamorig:Spine1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.00013830038369633257,
+                            "value1": -121.240966796875,
+                            "value2": 2.4026241302490236,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 1,
+                    "value3": 2
+                },
+                {
+                    "value0": "mixamorig:Spine2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.00004685966268880293,
+                            "value1": -134.60116577148438,
+                            "value2": 4.029083728790283,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 2,
+                    "value3": 3
+                },
+                {
+                    "value0": "mixamorig:Neck",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.000021657579054590316,
+                            "value1": -149.6336669921875,
+                            "value2": 3.2361788749694826,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 4
+                },
+                {
+                    "value0": "mixamorig:Head",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.000019286830138298684,
+                            "value1": -159.9554901123047,
+                            "value2": 0.0937499925494194,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 4,
+                    "value3": 5
+                },
+                {
+                    "value0": "mixamorig:LeftShoulder",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -6.105777740478516,
+                            "value1": -143.7115936279297,
+                            "value2": 3.323532819747925,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 6
+                },
+                {
+                    "value0": "mixamorig:LeftArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -18.760814666748048,
+                            "value1": -143.44566345214845,
+                            "value2": 5.924454689025879,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 6,
+                    "value3": 7
+                },
+                {
+                    "value0": "mixamorig:LeftForeArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -46.165496826171878,
+                            "value1": -143.44569396972657,
+                            "value2": 5.924448013305664,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 7,
+                    "value3": 8
+                },
+                {
+                    "value0": "mixamorig:LeftHand",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -73.77996063232422,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924428462982178,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 8,
+                    "value3": 9
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -86.55548858642578,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924407958984375,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 10
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -90.1694564819336,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924405574798584,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 10,
+                    "value3": 11
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -93.62921905517578,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924432277679443,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 11,
+                    "value3": 12
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -77.56877136230469,
+                            "value1": -141.2787322998047,
+                            "value2": 2.9213404655456545,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 13
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -81.24421691894531,
+                            "value1": -139.15672302246095,
+                            "value2": 0.7993280291557312,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 13,
+                    "value3": 14
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -84.6385726928711,
+                            "value1": -137.1969757080078,
+                            "value2": -1.160464882850647,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 14,
+                    "value3": 15
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -86.04657745361328,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023707389831545,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 16
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -89.93854522705078,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023318767547609,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 16,
+                    "value3": 17
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -93.35370635986328,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023406982421877,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 17,
+                    "value3": 18
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -85.92697143554688,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141057968139649,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 19
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -89.52816009521485,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141022682189942,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 19,
+                    "value3": 20
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -92.8354721069336,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141043663024903,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 20,
+                    "value3": 21
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -84.68815612792969,
+                            "value1": -143.2193603515625,
+                            "value2": 10.650246620178223,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 22
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -88.82481384277344,
+                            "value1": -143.2193603515625,
+                            "value2": 10.650219917297364,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 22,
+                    "value3": 23
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -91.41964721679688,
+                            "value1": -143.2193603515625,
+                            "value2": 10.65025520324707,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 23,
+                    "value3": 24
+                },
+                {
+                    "value0": "mixamorig:RightShoulder",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 6.105742931365967,
+                            "value1": -143.71168518066407,
+                            "value2": 3.3235201835632326,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 25
+                },
+                {
+                    "value0": "mixamorig:RightArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 18.76078224182129,
+                            "value1": -143.44566345214845,
+                            "value2": 5.9244160652160648,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 25,
+                    "value3": 26
+                },
+                {
+                    "value0": "mixamorig:RightForeArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 46.16546630859375,
+                            "value1": -143.44569396972657,
+                            "value2": 5.924410820007324,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 26,
+                    "value3": 27
+                },
+                {
+                    "value0": "mixamorig:RightHand",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 73.7799301147461,
+                            "value1": -143.44570922851563,
+                            "value2": 5.9243927001953129,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 27,
+                    "value3": 28
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 86.55545806884766,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924374580383301,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 29
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 90.16942596435547,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924371719360352,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 29,
+                    "value3": 30
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 93.62918853759766,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924397945404053,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 30,
+                    "value3": 31
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 77.56874084472656,
+                            "value1": -141.27871704101563,
+                            "value2": 2.9213054180145265,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 32
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 81.24418640136719,
+                            "value1": -139.15670776367188,
+                            "value2": 0.7992931008338928,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 32,
+                    "value3": 33
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 84.63854217529297,
+                            "value1": -137.19696044921876,
+                            "value2": -1.1604995727539063,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 33,
+                    "value3": 34
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 86.04654693603516,
+                            "value1": -143.2140350341797,
+                            "value2": 3.102336883544922,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 35
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 89.93851470947266,
+                            "value1": -143.2140350341797,
+                            "value2": 3.102299451828003,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 35,
+                    "value3": 36
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 93.35367584228516,
+                            "value1": -143.2140350341797,
+                            "value2": 3.1023080348968508,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 36,
+                    "value3": 37
+                },
+                {
+                    "value0": "mixamorig:RightHandRing1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 85.92693328857422,
+                            "value1": -143.4556121826172,
+                            "value2": 8.141023635864258,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 38
+                },
+                {
+                    "value0": "mixamorig:RightHandRing2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 89.52812957763672,
+                            "value1": -143.4556121826172,
+                            "value2": 8.140989303588868,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 38,
+                    "value3": 39
+                },
+                {
+                    "value0": "mixamorig:RightHandRing3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 92.83544158935547,
+                            "value1": -143.4556121826172,
+                            "value2": 8.141010284423829,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 39,
+                    "value3": 40
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 84.68812561035156,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650212287902832,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 41
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 88.82477569580078,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650186538696289,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 41,
+                    "value3": 42
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 91.41961669921875,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650223731994629,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 42,
+                    "value3": 43
+                },
+                {
+                    "value0": "mixamorig:RightUpLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.1244535446167,
+                            "value1": -93.01567077636719,
+                            "value2": -0.1916741281747818,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 44
+                },
+                {
+                    "value0": "mixamorig:RightLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.369133949279786,
+                            "value1": -52.42023468017578,
+                            "value2": 0.32285386323928835,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 44,
+                    "value3": 45
+                },
+                {
+                    "value0": "mixamorig:RightFoot",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.124464988708496,
+                            "value1": -10.372363090515137,
+                            "value2": 2.383084774017334,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 45,
+                    "value3": 46
+                },
+                {
+                    "value0": "mixamorig:RightToeBase",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": -0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.497824668884278,
+                            "value1": 0.11983145773410797,
+                            "value2": -10.25757884979248,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 46,
+                    "value3": 47
+                },
+                {
+                    "value0": "mixamorig:LeftUpLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.124452590942383,
+                            "value1": -93.01567077636719,
+                            "value2": -0.1916741281747818,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 48
+                },
+                {
+                    "value0": "mixamorig:LeftLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.369132995605469,
+                            "value1": -52.420265197753909,
+                            "value2": 0.32536694407463076,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 48,
+                    "value3": 49
+                },
+                {
+                    "value0": "mixamorig:LeftFoot",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.12446403503418,
+                            "value1": -10.37226676940918,
+                            "value2": 2.3830082416534426,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 49,
+                    "value3": 50
+                },
+                {
+                    "value0": "mixamorig:LeftToeBase",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.497823715209961,
+                            "value1": 0.11992628127336502,
+                            "value2": -10.25765609741211,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 50,
+                    "value3": 51
+                }
+            ]
+        }
+    },
+    "value525": 69,
+    "value526": {
+        "MeshIndex": 1,
+        "Id": 69,
+        "Skeleton": {
+            "bones": [
+                {
+                    "value0": "mixamorig:Hips",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -0.0,
+                            "value1": -99.67206573486328,
+                            "value2": -0.24705205857753755,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": -1,
+                    "value3": 0
+                },
+                {
+                    "value0": "mixamorig:Spine",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -5.648319643114519e-7,
+                            "value1": -109.59552764892578,
+                            "value2": 0.9802827835083008,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 1
+                },
+                {
+                    "value0": "mixamorig:Spine1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.00013830038369633257,
+                            "value1": -121.240966796875,
+                            "value2": 2.4026241302490236,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 1,
+                    "value3": 2
+                },
+                {
+                    "value0": "mixamorig:Spine2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.00004685966268880293,
+                            "value1": -134.60116577148438,
+                            "value2": 4.029083728790283,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 2,
+                    "value3": 3
+                },
+                {
+                    "value0": "mixamorig:Neck",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.000021657579054590316,
+                            "value1": -149.6336669921875,
+                            "value2": 3.2361788749694826,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 4
+                },
+                {
+                    "value0": "mixamorig:Head",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 0.000019286830138298684,
+                            "value1": -159.9554901123047,
+                            "value2": 0.0937499925494194,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 4,
+                    "value3": 5
+                },
+                {
+                    "value0": "mixamorig:LeftShoulder",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -6.105777740478516,
+                            "value1": -143.7115936279297,
+                            "value2": 3.323532819747925,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 6
+                },
+                {
+                    "value0": "mixamorig:LeftArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -18.760814666748048,
+                            "value1": -143.44566345214845,
+                            "value2": 5.924454689025879,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 6,
+                    "value3": 7
+                },
+                {
+                    "value0": "mixamorig:LeftForeArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -46.165496826171878,
+                            "value1": -143.44569396972657,
+                            "value2": 5.924448013305664,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 7,
+                    "value3": 8
+                },
+                {
+                    "value0": "mixamorig:LeftHand",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -73.77996063232422,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924428462982178,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 8,
+                    "value3": 9
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -86.55548858642578,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924407958984375,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 10
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -90.1694564819336,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924405574798584,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 10,
+                    "value3": 11
+                },
+                {
+                    "value0": "mixamorig:LeftHandMiddle3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -93.62921905517578,
+                            "value1": -143.44573974609376,
+                            "value2": 5.924432277679443,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 11,
+                    "value3": 12
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -77.56877136230469,
+                            "value1": -141.2787322998047,
+                            "value2": 2.9213404655456545,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 13
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -81.24421691894531,
+                            "value1": -139.15672302246095,
+                            "value2": 0.7993280291557312,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 13,
+                    "value3": 14
+                },
+                {
+                    "value0": "mixamorig:LeftHandThumb3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -84.6385726928711,
+                            "value1": -137.1969757080078,
+                            "value2": -1.160464882850647,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 14,
+                    "value3": 15
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -86.04657745361328,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023707389831545,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 16
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -89.93854522705078,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023318767547609,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 16,
+                    "value3": 17
+                },
+                {
+                    "value0": "mixamorig:LeftHandIndex3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -93.35370635986328,
+                            "value1": -143.2140655517578,
+                            "value2": 3.1023406982421877,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 17,
+                    "value3": 18
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -85.92697143554688,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141057968139649,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 19
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -89.52816009521485,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141022682189942,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 19,
+                    "value3": 20
+                },
+                {
+                    "value0": "mixamorig:LeftHandRing3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -92.8354721069336,
+                            "value1": -143.45562744140626,
+                            "value2": 8.141043663024903,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 20,
+                    "value3": 21
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -84.68815612792969,
+                            "value1": -143.2193603515625,
+                            "value2": 10.650246620178223,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 9,
+                    "value3": 22
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -88.82481384277344,
+                            "value1": -143.2193603515625,
+                            "value2": 10.650219917297364,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 22,
+                    "value3": 23
+                },
+                {
+                    "value0": "mixamorig:LeftHandPinky3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -91.41964721679688,
+                            "value1": -143.2193603515625,
+                            "value2": 10.65025520324707,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 23,
+                    "value3": 24
+                },
+                {
+                    "value0": "mixamorig:RightShoulder",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 6.105742931365967,
+                            "value1": -143.71168518066407,
+                            "value2": 3.3235201835632326,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 3,
+                    "value3": 25
+                },
+                {
+                    "value0": "mixamorig:RightArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 18.76078224182129,
+                            "value1": -143.44566345214845,
+                            "value2": 5.9244160652160648,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 25,
+                    "value3": 26
+                },
+                {
+                    "value0": "mixamorig:RightForeArm",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 46.16546630859375,
+                            "value1": -143.44569396972657,
+                            "value2": 5.924410820007324,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 26,
+                    "value3": 27
+                },
+                {
+                    "value0": "mixamorig:RightHand",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 73.7799301147461,
+                            "value1": -143.44570922851563,
+                            "value2": 5.9243927001953129,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 27,
+                    "value3": 28
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 86.55545806884766,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924374580383301,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 29
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 90.16942596435547,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924371719360352,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 29,
+                    "value3": 30
+                },
+                {
+                    "value0": "mixamorig:RightHandMiddle3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 93.62918853759766,
+                            "value1": -143.4457244873047,
+                            "value2": 5.924397945404053,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 30,
+                    "value3": 31
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 77.56874084472656,
+                            "value1": -141.27871704101563,
+                            "value2": 2.9213054180145265,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 32
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 81.24418640136719,
+                            "value1": -139.15670776367188,
+                            "value2": 0.7992931008338928,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 32,
+                    "value3": 33
+                },
+                {
+                    "value0": "mixamorig:RightHandThumb3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 84.63854217529297,
+                            "value1": -137.19696044921876,
+                            "value2": -1.1604995727539063,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 33,
+                    "value3": 34
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 86.04654693603516,
+                            "value1": -143.2140350341797,
+                            "value2": 3.102336883544922,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 35
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 89.93851470947266,
+                            "value1": -143.2140350341797,
+                            "value2": 3.102299451828003,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 35,
+                    "value3": 36
+                },
+                {
+                    "value0": "mixamorig:RightHandIndex3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 93.35367584228516,
+                            "value1": -143.2140350341797,
+                            "value2": 3.1023080348968508,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 36,
+                    "value3": 37
+                },
+                {
+                    "value0": "mixamorig:RightHandRing1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 85.92693328857422,
+                            "value1": -143.4556121826172,
+                            "value2": 8.141023635864258,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 38
+                },
+                {
+                    "value0": "mixamorig:RightHandRing2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 89.52812957763672,
+                            "value1": -143.4556121826172,
+                            "value2": 8.140989303588868,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 38,
+                    "value3": 39
+                },
+                {
+                    "value0": "mixamorig:RightHandRing3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 92.83544158935547,
+                            "value1": -143.4556121826172,
+                            "value2": 8.141010284423829,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 39,
+                    "value3": 40
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky1",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 84.68812561035156,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650212287902832,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 28,
+                    "value3": 41
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky2",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 88.82477569580078,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650186538696289,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 41,
+                    "value3": 42
+                },
+                {
+                    "value0": "mixamorig:RightHandPinky3",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 91.41961669921875,
+                            "value1": -143.21934509277345,
+                            "value2": 10.650223731994629,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 42,
+                    "value3": 43
+                },
+                {
+                    "value0": "mixamorig:RightUpLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.1244535446167,
+                            "value1": -93.01567077636719,
+                            "value2": -0.1916741281747818,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 44
+                },
+                {
+                    "value0": "mixamorig:RightLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.369133949279786,
+                            "value1": -52.42023468017578,
+                            "value2": 0.32285386323928835,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 44,
+                    "value3": 45
+                },
+                {
+                    "value0": "mixamorig:RightFoot",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.124464988708496,
+                            "value1": -10.372363090515137,
+                            "value2": 2.383084774017334,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 45,
+                    "value3": 46
+                },
+                {
+                    "value0": "mixamorig:RightToeBase",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": -0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": -0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": 9.497824668884278,
+                            "value1": 0.11983145773410797,
+                            "value2": -10.25757884979248,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 46,
+                    "value3": 47
+                },
+                {
+                    "value0": "mixamorig:LeftUpLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.124452590942383,
+                            "value1": -93.01567077636719,
+                            "value2": -0.1916741281747818,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 0,
+                    "value3": 48
+                },
+                {
+                    "value0": "mixamorig:LeftLeg",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.369132995605469,
+                            "value1": -52.420265197753909,
+                            "value2": 0.32536694407463076,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 48,
+                    "value3": 49
+                },
+                {
+                    "value0": "mixamorig:LeftFoot",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.12446403503418,
+                            "value1": -10.37226676940918,
+                            "value2": 2.3830082416534426,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 49,
+                    "value3": 50
+                },
+                {
+                    "value0": "mixamorig:LeftToeBase",
+                    "value1": {
+                        "value0": {
+                            "value0": 1.0,
+                            "value1": -0.0,
+                            "value2": 0.0,
+                            "value3": -0.0
+                        },
+                        "value1": {
+                            "value0": 0.0,
+                            "value1": 1.0,
+                            "value2": -0.0,
+                            "value3": 0.0
+                        },
+                        "value2": {
+                            "value0": 0.0,
+                            "value1": -0.0,
+                            "value2": 1.0,
+                            "value3": -0.0
+                        },
+                        "value3": {
+                            "value0": -9.497823715209961,
+                            "value1": 0.11992628127336502,
+                            "value2": -10.25765609741211,
+                            "value3": 1.0
+                        }
+                    },
+                    "value2": 50,
+                    "value3": 51
+                }
+            ]
+        }
+    },
+    "value527": 1,
+    "value528": 0,
+    "value529": {
+        "controllerFile": ".\\assets\\NewAnimController.controller",
+        "rootMotion": false
     }
 }

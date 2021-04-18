@@ -4,6 +4,7 @@
 #include "HierarchyWindow.h"
 #include "PropertiesWindow.h"
 #include "AssetsWindow.h"
+#include "FbxWindow.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -21,6 +22,7 @@
 
 #include "Core/Camera.h"
 #include "Window/Window.h"
+#include "NodeWindow.h"
 #include "ImGui/ImGuiHelpers.h"
 #include <ImGuizmo.h>
 #include <imgui_internal.h>
@@ -30,15 +32,18 @@
 
 namespace Raven 
 {
+#define addWindow(T) editorWindows.emplace(typeid(T).hash_code(),std::make_shared<T>())
 
 	void Editor::Initialize()
 	{
 		Engine::Initialize();
 
-		editorWindows.emplace(typeid(SceneWindow).hash_code(),std::make_shared<SceneWindow>());
-		editorWindows.emplace(typeid(HierarchyWindow).hash_code(),std::make_shared<HierarchyWindow>());
-		editorWindows.emplace(typeid(PropertiesWindow).hash_code(),std::make_shared<PropertiesWindow>());
-		editorWindows.emplace(typeid(AssetsWindow).hash_code(),std::make_shared<AssetsWindow>());
+		addWindow(SceneWindow);
+		addWindow(HierarchyWindow);
+		addWindow(PropertiesWindow);
+		addWindow(AssetsWindow);
+		addWindow(FbxWindow);
+		addWindow(NodeWindow);
 
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
@@ -52,7 +57,7 @@ namespace Raven
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
 
 		camera = std::make_unique<Camera>(
-			45,0.1,100,winSize.x / winSize.y);
+			45,0.1,1000000,winSize.x / winSize.y);
 
 		SetEditorState(EditorState::Preview);
 	}
@@ -120,6 +125,86 @@ namespace Raven
 			}
 			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));
 		}
+
+	}
+
+	void Editor::DrawPlayButtons()
+	{
+
+		auto x = (ImGui::GetWindowContentRegionMax().x / 2.0f) - (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x));
+		//ImGui::SameLine();
+		
+		ImGui::Dummy({ x,0 });
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.7f, 0.0f));
+
+		if (Engine::Get().GetEditorState() == EditorState::Next)
+			Engine::Get().SetEditorState(EditorState::Paused);
+
+		bool selected;
+		{
+			selected = Engine::Get().GetEditorState() == EditorState::Play;
+			if (selected)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+			if (ImGui::Button(ICON_MDI_PLAY))
+			{
+				Engine::Get().SetEditorState(selected ? EditorState::Preview : EditorState::Play);
+
+				selectedNode = entt::null;
+				if (selected)
+					LoadCachedScene();
+				else
+				{
+					CacheScene();
+					Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->OnInit();
+				}
+			}
+
+
+			ImGuiHelper::Tooltip("Play");
+
+
+			if (selected)
+				ImGui::PopStyleColor();
+		}
+
+		//ImGui::SameLine();
+
+		{
+			selected = Engine::Get().GetEditorState() == EditorState::Paused;
+			if (selected)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+			if (ImGui::Button(ICON_MDI_PAUSE))
+				Engine::Get().SetEditorState(selected ? EditorState::Play : EditorState::Paused);
+
+			ImGuiHelper::Tooltip("Pause");
+
+
+			if (selected)
+				ImGui::PopStyleColor();
+		}
+
+		//ImGui::SameLine();
+
+		{
+			selected = Engine::Get().GetEditorState() == EditorState::Next;
+			if (selected)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
+
+			if (ImGui::Button(ICON_MDI_STEP_FORWARD))
+				Engine::Get().SetEditorState(EditorState::Next);
+
+
+			ImGuiHelper::Tooltip("Next");
+
+			if (selected)
+				ImGui::PopStyleColor();
+		}
+
+		//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 240.0f);
+		ImGui::PopStyleColor();
 
 	}
 
@@ -251,9 +336,14 @@ namespace Raven
 		}
 		else if (StringUtils::IsModelFile(filePath))
 		{
-			auto modelEntity = GetModule<SceneManager>()->GetCurrentScene()->CreateEntity("Model");
+			if (StringUtils::GetExtension(filePath) == "fbx") 
+			{
+				GetWindow<FbxWindow>()->OpenFile(filePath);
+			}
+
+			auto modelEntity = GetModule<SceneManager>()->GetCurrentScene()->CreateEntity(StringUtils::GetFileNameWithoutExtension(filePath));
 			auto & model = modelEntity.AddComponent<Model>(filePath);
-			model.SetPrimitiveType(PrimitiveType::File);
+			model.LoadFile();
 			selectedNode = modelEntity.GetHandle();
 		}
 		else if (StringUtils::IsAudioFile(filePath))
@@ -269,6 +359,10 @@ namespace Raven
 		else if (StringUtils::IsTextureFile(filePath))
 		{
 			LOGW("OpenFile file : {0} did not implement", filePath);
+		}
+		else if (StringUtils::IsControllerFile(filePath)) 
+		{
+			GetWindow<NodeWindow>()->OpenFile(filePath);
 		}
 	}
 
@@ -309,8 +403,10 @@ namespace Raven
 
 	void Editor::DrawMenu()
 	{
+		//ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0,10});
 		if (ImGui::BeginMainMenuBar())
 		{
+
 			if (ImGui::BeginMenu("File"))
 			{
 				if (ImGui::MenuItem("Exit"))
@@ -323,80 +419,13 @@ namespace Raven
 				ImGui::EndMenu();
 			}
 
-			ImGui::SameLine((ImGui::GetWindowContentRegionMax().x / 2.0f) - (1.5f * (ImGui::GetFontSize() + ImGui::GetStyle().ItemSpacing.x)));
 
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.7f, 0.0f));
-
-			if (Engine::Get().GetEditorState() == EditorState::Next)
-				Engine::Get().SetEditorState(EditorState::Paused);
-
-			bool selected;
-			{
-				selected = Engine::Get().GetEditorState() == EditorState::Play;
-				if (selected)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
-
-				if (ImGui::Button(ICON_MDI_PLAY))
-				{
-					Engine::Get().SetEditorState(selected ? EditorState::Preview : EditorState::Play);
-
-					selectedNode = entt::null;
-					if (selected)
-						LoadCachedScene();
-					else
-					{
-						CacheScene();
-						Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->OnInit();
-					}
-				}
-
-
-				ImGuiHelper::Tooltip("Play");
-
-
-				if (selected)
-					ImGui::PopStyleColor();
-			}
-
-			ImGui::SameLine();
-
-			{
-				selected = Engine::Get().GetEditorState() == EditorState::Paused;
-				if (selected)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
-
-				if (ImGui::Button(ICON_MDI_PAUSE))
-					Engine::Get().SetEditorState(selected ? EditorState::Play : EditorState::Paused);
-
-				ImGuiHelper::Tooltip("Pause");
-
-
-				if (selected)
-					ImGui::PopStyleColor();
-			}
-
-			ImGui::SameLine();
-
-			{
-				selected = Engine::Get().GetEditorState() == EditorState::Next;
-				if (selected)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
-
-				if (ImGui::Button(ICON_MDI_STEP_FORWARD))
-					Engine::Get().SetEditorState(EditorState::Next);
-
-
-				ImGuiHelper::Tooltip("Next");
-
-				if (selected)
-					ImGui::PopStyleColor();
-			}
-
-			ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 240.0f);
-			ImGui::PopStyleColor();
-
+			DrawPlayButtons();
 			ImGui::EndMainMenuBar();
+		
 		}
+		//ImGui::PopStyleVar();
+	
 	}
 
 	void Editor::BeginDockSpace()
@@ -466,6 +495,7 @@ namespace Raven
 			ImGuiID DockMiddle = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.8f, nullptr, &dock_main_id);
 
 			ImGui::DockBuilderDockWindow("Scene", DockMiddle);
+			ImGui::DockBuilderDockWindow("Animator", DockMiddle);
 
 			ImGui::DockBuilderDockWindow("Properties", DockRight);
 
@@ -505,6 +535,12 @@ namespace Raven
 	void Editor::CacheScene()
 	{
 		//Serialize the scene
+	
+		for (auto & win : editorWindows)
+		{
+			win.second->SaveWorkspace();
+		}
+
 		GetModule<SceneManager>()->GetCurrentScene()->Save("./scenes/");
 	}
 };

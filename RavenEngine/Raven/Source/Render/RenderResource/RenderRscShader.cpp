@@ -86,6 +86,26 @@ void RenderRscShader::Load(ERenderShaderType type, std::string name)
 		AddInput(ShaderInput::Sampler, "inSpecularTexture", 1);
 
 	}
+	break;
+
+	case Raven::ERenderShaderType::SkinnedMesh:
+		
+		shader->SetSourceFile(EGLShaderStage::Vertex, "shaders/SkeletonVert.glsl");
+		shader->SetSourceFile(EGLShaderStage::Fragment, "shaders/PhongFrag.glsl");
+		shader->Build();
+
+		// Setup Input...
+		shader->Use();
+
+		// Global...
+		AddInput(ShaderInput::UniformBlock, "TransformBoneBlock", 3);
+		AddInput(ShaderInput::UniformBlock, "LightingBlock", ShaderInput::LGHTING_BINDING);
+
+		// 
+		AddInput(ShaderInput::UniformBlock, "MaterailBlock", 2);
+		AddInput(ShaderInput::Sampler, "inDiffuseTexture", 0);
+		AddInput(ShaderInput::Sampler, "inSpecularTexture", 1);
+
 		break;
 
 	case Raven::ERenderShaderType::MaterialMasked:
@@ -107,8 +127,6 @@ void RenderRscShader::AddInput(ShaderInput::EInputType type, const std::string& 
 	{
 		shader->SetUniform(name, (int32_t)binding);
 	}
-
-
 	//
 	ShaderInput indesc{};
 	indesc.type = type;

@@ -33,6 +33,10 @@ namespace Raven
 		localScale = { 1.0f, 1.0f, 1.0f };
 		localMatrix = glm::mat4(1.f);
 		worldMatrix = glm::mat4(1.f);
+
+		initLocalPosition = localPosition;
+		initLocalScale = localScale;
+		initLocalOrientation = localOrientation;
 	}
 
 	Transform::Transform(const glm::mat4& matrix)
@@ -44,6 +48,11 @@ namespace Raven
 		localOrientation = glm::eulerAngles(rotation);
 		localMatrix = matrix;
 		worldMatrix = matrix;
+
+		initLocalPosition = localPosition;
+		initLocalScale = localScale;
+		initLocalOrientation = localOrientation;
+
 	}
 
 	Transform::Transform(const glm::vec3& position)
@@ -54,6 +63,10 @@ namespace Raven
 		localMatrix = glm::mat4(1.f);
 		worldMatrix = glm::mat4(1.f);
 		SetLocalPosition(position);
+
+		initLocalPosition = localPosition;
+		initLocalScale = localScale;
+		initLocalOrientation = localOrientation;
 	}
 
 	Transform::~Transform() = default;
@@ -118,6 +131,19 @@ namespace Raven
 		glm::vec4 perspective;
 		glm::decompose(mat, localScale, localOrientation, localPosition, skew, perspective);
 		return localScale;
+	}
+
+	void Transform::SetOffsetTransform(const glm::mat4& localMat)
+	{
+		offsetMatrix = localMat;
+	}
+
+	void Transform::ResetTransform()
+	{
+		dirty = true;
+		localPosition = initLocalPosition;
+		localScale = initLocalScale;
+		localOrientation = initLocalOrientation;
 	}
 
 };

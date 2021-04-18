@@ -58,7 +58,8 @@ namespace MM {
 	template <class Component, class EntityType>
 	void ComponentAddAction(entt::basic_registry<EntityType>& registry, EntityType entity)
 	{
-		registry.template emplace<Component>(entity);
+		auto & ent = registry.template emplace<Component>(entity);
+		ent.entity = entity;
 	}
 
 	template <class Component, class EntityType>
@@ -73,10 +74,13 @@ namespace MM {
 		using Registry = entt::basic_registry<EntityType>;
 		using ComponentTypeID = entt::id_type;
 
+		std::function<void(Registry& registry, EntityType& e)> createCallback;
+
 		struct ComponentInfo {
 			using Callback = std::function<void(Registry&, EntityType)>;
 			std::string name;
 			Callback widget, create, destroy;
+			bool showInEditor;
 		};
 
 		bool show_window = true;
@@ -109,13 +113,16 @@ namespace MM {
 				widget,
 				ComponentAddAction<Component, EntityType>,
 				ComponentRemoveAction<Component, EntityType>,
+				true
 				});
 		}
 
 		template <class Component>
-		ComponentInfo& registerComponent(const std::string& name)
+		ComponentInfo& registerComponent(const std::string& name,bool showInEditor)
 		{
-			return registerComponent<Component>(name, ComponentEditorWidget<Component, EntityType>);
+			auto & info = registerComponent<Component>(name, ComponentEditorWidget<Component, EntityType>);
+			info.showInEditor = showInEditor;
+			return info;
 		}
 
 		void renderEditor(Registry& registry, EntityType& e)
@@ -188,11 +195,17 @@ namespace MM {
 						ImGui::Separator();
 
 						for (auto& [component_type_id, ci] : has_not) {
-							ImGui::PushID(component_type_id);
-							if (ImGui::Selectable(ci.name.c_str())) {
-								ci.create(registry, e);
+							if (ci.showInEditor) 
+							{
+								ImGui::PushID(component_type_id);
+								if (ImGui::Selectable(ci.name.c_str())) {
+									ci.create(registry, e);
+									if (createCallback) {
+										createCallback(registry, e);
+									}
+								}
+								ImGui::PopID();
 							}
-							ImGui::PopID();
 						}
 						ImGui::EndPopup();
 					}
@@ -283,6 +296,10 @@ namespace MM {
 			}
 		}
 
+
+		void addCreateCallback(const std::function<void(Registry& registry, EntityType& e)> & call) {
+			createCallback = call;
+		}
 	};
 
 }

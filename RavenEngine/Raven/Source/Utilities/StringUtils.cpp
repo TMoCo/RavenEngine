@@ -46,7 +46,12 @@ namespace Raven
 			return filePath;
 		}
 
-		void Replace(std::string& src, const std::string& origin, const std::string& des) 
+		std::string GetFileNameWithoutExtension(const std::string& filePath)
+		{
+			return RemoveExtension(GetFileName(filePath));
+		}
+
+		void Replace(std::string& src, const std::string& origin, const std::string& des)
 		{
 			std::string::size_type pos = 0;
 			std::string::size_type srcLen = origin.size();
@@ -69,6 +74,26 @@ namespace Raven
 			}
 			currentPath[sizeof(currentPath) - 1] = '\0'; // terminate the string
 			return std::string(currentPath);
+		}
+
+		std::vector<std::string> Split(std::string input, const std::string& delimiter)
+		{
+			std::vector<std::string> ret;
+			size_t pos = 0;
+			std::string token;
+			while ((pos = input.find(delimiter)) != std::string::npos)
+			{
+				token = input.substr(0, pos);
+				ret.emplace_back(token);
+				input.erase(0, pos + delimiter.length());
+			}
+			ret.emplace_back(input);
+			return ret;
+		}
+
+		bool StartWith(const std::string& str, const std::string& with)
+		{
+			return str.find(with);
 		}
 
 		bool IsHiddenFile(const std::string& path)
@@ -114,6 +139,13 @@ namespace Raven
 			Trim(extension);
 			return extension == "raven";
 			
+		}
+
+		bool IsControllerFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			Trim(extension);
+			return extension == "controller";
 		}
 
 		bool IsModelFile(const std::string& filePath)

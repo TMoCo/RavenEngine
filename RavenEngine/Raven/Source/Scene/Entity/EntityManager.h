@@ -31,6 +31,9 @@ namespace Raven
 			return EntityView<Component>(scene);
 		}
 
+
+		Entity GetEntityByName(const std::string& name);
+
 		template<typename R, typename T>
 		void AddDependency();
 

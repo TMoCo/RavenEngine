@@ -2,10 +2,11 @@
 
 local Test = {};
 
+Inventory = require("Inventory")
+
+
 function Test:OnInit()
 
-	self.gameEntity = nil
-	
 	self.x = 10
 	self.y = 20
 
@@ -14,7 +15,6 @@ function Test:OnInit()
 	
 	self.gameEntity = Entity()
 
-	
 end
 
 

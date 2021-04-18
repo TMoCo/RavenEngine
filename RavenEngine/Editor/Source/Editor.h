@@ -20,9 +20,11 @@ namespace Raven
 		void Initialize() override;
 		void OnImGui() override;
 		void OnUpdate(float dt) override;
+		void DrawPlayButtons();
 
 		void SetSelected(const entt::entity& selectedNode);
 		void SetCopiedEntity(const entt::entity& selectedNode,bool cut = false);
+
 		inline auto& GetSelected() const { return selectedNode; }
 		inline auto& GetPrevSelected() const { return prevSelectedNode; }
 		inline auto& GetCopiedEntity() const  { return copiedNode; }
@@ -79,6 +81,7 @@ namespace Raven
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;
 		EditorCameraController editorCameraController;
+
 
 	};
 

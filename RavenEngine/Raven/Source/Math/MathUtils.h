@@ -4,6 +4,7 @@
 #pragma once
 #include <string>
 #include <glm/glm.hpp>
+#include <algorithm>
 
 namespace Raven
 {
@@ -19,6 +20,15 @@ namespace Raven
 			Outside,
 			Intesects
 		};
+
+		inline float Lerp(float from, float to, float t, bool clamp01 = true)
+		{
+			if (clamp01)
+			{
+				t = std::min<float>(std::max<float>(t, 0), 1);
+			}
+			return from + (to - from) * t;
+		}
 
 
 		// vec4 comparators

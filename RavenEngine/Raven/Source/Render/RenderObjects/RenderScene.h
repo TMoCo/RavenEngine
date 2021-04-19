@@ -196,8 +196,9 @@ namespace Raven
 		// Dynamic Primitives Container.
 		std::vector<RenderPrimitive*> rprimitives;
 
-		// Transform Uniform Buffer.
+		// Transform Uniform Buffers.
 		Ptr<UniformBuffer> transformUniform;
+		Ptr<UniformBuffer> transformBoneUniform;
 
 		// Lights in the scene.
 		std::vector<RenderLight*> rlights;

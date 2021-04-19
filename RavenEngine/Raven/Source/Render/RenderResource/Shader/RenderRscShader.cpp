@@ -144,7 +144,7 @@ void RenderRscShader::SetupShaderForDomain()
 
 		// Add Input...
 		input.AddBlockInput(RenderShaderInput::CommonBlock);
-		input.AddBlockInput(RenderShaderInput::TransfromBlock);
+		input.AddBlockInput(RenderShaderInput::TransformBlock);
 	}
 		break;
 
@@ -166,13 +166,33 @@ void RenderRscShader::SetupShaderForDomain()
 
 		// Add Input...
 		input.AddBlockInput(RenderShaderInput::CommonBlock);
-		input.AddBlockInput(RenderShaderInput::TransfromBlock);
+		input.AddBlockInput(RenderShaderInput::TransformBlock);
 	}
 		break;
 
 
-	case ERenderShaderDomain::Skeletal:
-		RAVEN_ASSERT(0, "Shader Skeletal Domain not supported yet.");
+	case ERenderShaderDomain::Skinned:
+	{
+		shader->AddExSourceFile(IMPORT_TRANSFORM_VERTEX_TAG,
+			EGLShaderStageBit::VertexBit,
+			"shaders/VertexTransform.glsl");
+
+		shader->AddExSourceFile(IMPORT_MATERIAL_FUNCTION_BASE_TAG,
+			EGLShaderStageBit::VertexBit | EGLShaderStageBit::FragmentBit,
+			"shaders/Materials/MaterialFunctions.glsl");
+
+		// Max Bones..
+		shader->AddPreprocessor("#define RENDER_BONE_TRANSFORM ");
+		shader->AddPreprocessor("#define RENDER_SKINNED_MAX_BONES " + std::to_string(RENDER_SKINNED_MAX_BONES));
+
+		// Main Source...
+		shader->SetSourceFile(EGLShaderStage::Vertex, "shaders/SkeletonVert.glsl");
+		shader->SetSourceFile(EGLShaderStage::Fragment, "shaders/MeshFrag.glsl");
+
+		// Add Input...
+		input.AddBlockInput(RenderShaderInput::CommonBlock);
+		input.AddBlockInput(RenderShaderInput::TransformBoneBlock);
+	}
 		break;
 	}
 

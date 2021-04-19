@@ -29,6 +29,7 @@
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/Loaders/ImageLoader.h"
 #include "ResourceManager/Loaders/MeshLoader.h"
+#include "ResourceManager/Loaders/LayoutLoader.h"
 
 namespace Raven
 {
@@ -69,7 +70,7 @@ namespace Raven
 		template<class TResource>
 		bool LoadResource(const std::string& path);
 
-		void AddResource(const std::string& id, IResource* resource);
+		std::shared_ptr<IResource> AddResource(const std::string& id, IResource* resource);
 
 		void RemoveResource(const std::string& id);
 
@@ -81,7 +82,9 @@ namespace Raven
 
 		inline void SetLoading(bool loading) { loadingResource = loading; }
 
-
+		// get a loader of type T
+		template <class TLoader>
+		TLoader* GetLoader();
 	private:
 		// add and remove loader of a certain type
 		template <class TLoader>
@@ -91,9 +94,7 @@ namespace Raven
 
 		void PrintResources();
 
-		// get a loader of type T
-		template <class TLoader>
-		TLoader* GetLoader();
+		
 				
 		// one to many 
 		std::unordered_multimap<std::string, std::shared_ptr<IResource>> resources;
@@ -118,6 +119,8 @@ namespace Raven
 			return GetLoader<ImageLoader>()->LoadAsset(path); // adds a resource to the register
 		case EResourceType::RT_Mesh:
 			return GetLoader<MeshLoader>()->LoadAsset(path);
+		case EResourceType::RT_GuiLayout:
+			return GetLoader<LayoutLoader>()->LoadAsset(path);
 		default:
 			return false;
 		}

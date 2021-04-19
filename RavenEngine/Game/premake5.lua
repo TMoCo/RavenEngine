@@ -28,6 +28,7 @@ project "Game"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.NodeEditor}"
 	}
 
 	includedirs
@@ -43,6 +44,7 @@ project "Game"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.NodeEditor}"
 	}
 
 	links
@@ -84,7 +86,7 @@ project "Game"
 		links
 		{
 			"glfw",
-			"OpenGL32","lua"
+			"OpenGL32","lua","openfbx","node-editor"
 			
 		}
 

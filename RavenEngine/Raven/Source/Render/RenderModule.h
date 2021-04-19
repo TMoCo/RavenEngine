@@ -35,7 +35,10 @@ namespace Raven
 	struct RenderDefaultMaterials
 	{
 		// The Default Material for meshes.
-		Ptr<Material> model;
+		Ptr<Material> mesh;
+
+		// The Default Material for skinned meshes.
+		Ptr<Material> skinned;
 
 		// The Default Material for terrain.
 		Ptr<Material> terrain;

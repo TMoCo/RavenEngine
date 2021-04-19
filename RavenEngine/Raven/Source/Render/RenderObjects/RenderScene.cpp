@@ -9,6 +9,7 @@
 #include "Primitives/RenderDebugPrimitive.h"
 #include "Primitives/RenderPrimitive.h"
 #include "Primitives/RenderMesh.h"
+#include "Primitives/RenderSkinnedMesh.h"
 #include "Primitives/RenderTerrain.h"
 #include "RenderLight.h"
 
@@ -29,6 +30,7 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/MeshRenderer.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/TerrainComponent.h"
 #include "Scene/Entity/EntityManager.h"
@@ -58,6 +60,15 @@ struct TransformVertexData
 	glm::mat4 normalMatrix;
 } trData;
 
+
+
+// Data reflect TransformVertex Uniform Block for skinned mesh
+struct TransformBoneVertexData
+{
+	glm::mat4 modelMatrix;
+	glm::mat4 normalMatrix;
+	glm::mat4 bones[RENDER_SKINNED_MAX_BONES];
+} trBoneData;
 
 
 
@@ -103,7 +114,11 @@ RenderScene::~RenderScene()
 void RenderScene::Setup()
 {
 	// Transfrom Vertex Uniform 
-	transformUniform = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransfromBlock, false) );
+	transformUniform = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransformBlock, false) );
+	transformBoneUniform = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::TransformBoneBlock, false));
+
+	RAVEN_ASSERT(transformUniform->GetDescription().size == sizeof(TransformVertexData), "Invalid Size.");
+	RAVEN_ASSERT(transformBoneUniform->GetDescription().size == sizeof(TransformBoneVertexData), "Invalid Size.");
 
 }
 
@@ -177,24 +192,55 @@ void RenderScene::TraverseScene(Scene* scene)
 			continue;
 		}
 
+		// distance to view.
+		glm::vec3 v = (viewPos - trans.GetWorldPosition());
+		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+
 		// Meshes...
 		const auto& meshes = model.GetMeshes();
+		std::vector<ModelMeshRendererData> meshRenderers;
+		model.GetMeshRenderers(meshRenderers, scene);
 
 		// Create a RenderPrimitive for each model, and add it to the correct batch.
 		for (uint32_t i = 0; i < meshes.size(); ++i)
 		{
 			const auto& mesh = meshes[i];
+			RenderPrimitive* rprim = nullptr;
 
 			// Update Mesh on GPU if not loaded yet.
 			if (!mesh->IsOnGPU())
-			{
-				mesh->renderRscMesh = new RenderRscMesh();
 				mesh->LoadOnGpu();
+
+
+			if (meshRenderers[i].skinned)
+			{
+				auto skinned = meshRenderers[i].skinned;
+				RenderRscSkinnedMesh* skinnedRsc = static_cast<RenderRscSkinnedMesh*>(mesh->renderRscMesh);
+				skinnedRsc->bones.resize(skinned->skeleton.GetBoneSize());
+
+				RenderSkinnedMesh* rmesh = NewPrimitive<RenderSkinnedMesh>();
+				rmesh->SetWorldMatrix(trans.GetWorldMatrix());
+				rmesh->SetMesh(skinnedRsc);
+				rprim = rmesh;
+
+				// TODO: Need to be optimized! & is it per RenderPrimitive?
+				for (auto i = 0; i < skinned->skeleton.GetBoneSize(); i++)
+				{
+					auto& bone = skinned->skeleton.GetBone(i);
+					skinnedRsc->bones[i] = bone.localTransform->GetWorldMatrix() * bone.offsetMatrix;
+				}
+
+			}
+			else
+			{
+				RenderMesh* rmesh = NewPrimitive<RenderMesh>();
+				rmesh->SetWorldMatrix(trans.GetWorldMatrix());
+				rmesh->SetMesh(mesh->renderRscMesh);
+				rprim = rmesh;
 			}
 
-			RenderMesh* rmesh = NewPrimitive<RenderMesh>();
-			rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-			rmesh->SetMesh(mesh->renderRscMesh);
+
 
 			// Mesh Materail...
 			RenderRscShader* meshShader = nullptr;
@@ -208,13 +254,15 @@ void RenderScene::TraverseScene(Scene* scene)
 					meshMaterail->Update();
 				}
 
-				rmesh->SetMaterial( meshMaterail->GetRenderRsc() );
+				rprim->SetMaterial( meshMaterail->GetRenderRsc() );
 				meshShader = meshMaterail->GetRenderRsc()->GetShaderRsc();
 			}
 			else
 			{
-				rmesh->SetMaterial( defaultMaterials.model->GetRenderRsc() );
-				meshShader = defaultMaterials.model->GetRenderRsc()->GetShaderRsc();
+				meshMaterail = rprim->isSkinned ? defaultMaterials.skinned.get() : defaultMaterials.mesh.get();
+
+				rprim->SetMaterial(meshMaterail->GetRenderRsc());
+				meshShader = meshMaterail->GetRenderRsc()->GetShaderRsc();
 			}
 
 
@@ -226,16 +274,14 @@ void RenderScene::TraverseScene(Scene* scene)
 				GatherLights(center, radius, litPrim);
 
 				for (const auto& lit : litPrim)
-					rmesh->AddLight(lit->indexInScene);
+					rprim->AddLight(lit->indexInScene);
 
 				//
-				glm::vec3 v = (viewPos - trans.GetWorldPosition());
-				float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
-				translucentBatch.Add(rmesh, d2);
+				translucentBatch.Add(rprim, viewDist2);
 			}
 			else
 			{
-				deferredBatch.Add(rmesh);
+				deferredBatch.Add(rprim);
 			}
 		}
 	}
@@ -399,6 +445,8 @@ void RenderScene::DrawDeferred()
 {
 	// Bind Transform Uniform Buffer.
 	transformUniform->BindBase();
+	transformBoneUniform->BindBase();
+
 
 	// All The Batch Primitives.
 	const auto& primitives = deferredBatch.GetPrimitives();
@@ -434,9 +482,24 @@ void RenderScene::DrawDeferred()
 				RenderPrimitive* prim = primitives[ materialBatch.primitives[ip] ];
 
 				// Transform.
-				trData.modelMatrix = prim->GetWorldMatrix();
-				trData.normalMatrix = prim->GetWorldMatrix();
-				transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
+				if (prim->isSkinned)
+				{
+					auto skinned = static_cast<RenderRscSkinnedMesh*>(prim->GetRsc());
+
+					// Model & Normal & Bones.
+					trBoneData.modelMatrix = prim->GetWorldMatrix();
+					trBoneData.normalMatrix = prim->GetWorldMatrix();
+					memcpy(&trBoneData.bones, skinned->bones.data(), sizeof(glm::mat4) * skinned->bones.size());
+					transformBoneUniform->UpdateData(sizeof(TransformBoneVertexData), 0, (void*)(&trBoneData));
+				}
+				else
+				{
+					// Model & Normal.
+					trData.modelMatrix = prim->GetWorldMatrix();
+					trData.normalMatrix = prim->GetWorldMatrix();
+					transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData);
+				}
+
 
 				// Draw...
 				prim->Draw(shader);
@@ -491,6 +554,7 @@ void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
 {
 	// Bind Transform Uniform Buffer.
 	transformUniform->BindBase();
+	transformBoneUniform->BindBase();
 
 	// All The Batch Primitives.
 	const auto& primitives = translucentBatch.GetPrimitives();
@@ -517,9 +581,23 @@ void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
 		shader->Use();
 
 		// Transform.
-		trData.modelMatrix = prim.primitive->GetWorldMatrix();
-		trData.normalMatrix = prim.primitive->GetWorldMatrix();
-		transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
+		if (prim.primitive->isSkinned)
+		{
+			auto skinned = static_cast<RenderRscSkinnedMesh*>(prim.primitive->GetRsc());
+
+			// Model & Normal & Bones.
+			trBoneData.modelMatrix = prim.primitive->GetWorldMatrix();
+			trBoneData.normalMatrix = prim.primitive->GetWorldMatrix();
+			memcpy(&trBoneData.bones, skinned->bones.data(), sizeof(glm::mat4) * skinned->bones.size());
+			transformBoneUniform->UpdateData(sizeof(TransformBoneVertexData), 0, (void*)(&trBoneData));
+		}
+		else
+		{
+			// Model & Normal.
+			trData.modelMatrix = prim.primitive->GetWorldMatrix();
+			trData.normalMatrix = prim.primitive->GetWorldMatrix();
+			transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData);
+		}
 
 		// Draw...
 		prim.primitive->Draw(shader);

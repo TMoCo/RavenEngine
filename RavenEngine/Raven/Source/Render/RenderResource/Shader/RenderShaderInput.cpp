@@ -12,8 +12,9 @@
 
 #define COMMON_BLOCK_BINDING 1
 #define TRANSFROM_BLOCK_BINDING 2
-#define LIGHTING_BLOCK_BINDING 3
-#define MATERIAL_BLOCK_BINDING 4
+#define TRANSFROM_BONE_BLOCK_BINDING 3
+#define LIGHTING_BLOCK_BINDING 4
+#define MATERIAL_BLOCK_BINDING 5
 
 
 
@@ -28,7 +29,8 @@ namespace Raven {
 
 
 RSInputBlockDescription RenderShaderInput::CommonBlock = RSInputBlockDescription::MakeCommonBlock();
-RSInputBlockDescription RenderShaderInput::TransfromBlock = RSInputBlockDescription::MakeTransfromBlock();
+RSInputBlockDescription RenderShaderInput::TransformBlock = RSInputBlockDescription::MakeTransformBlock();
+RSInputBlockDescription RenderShaderInput::TransformBoneBlock = RSInputBlockDescription::MakeTransformBoneBlock();
 RSInputBlockDescription RenderShaderInput::LightingBlock_DEFERRED = RSInputBlockDescription::MakeLightingBlock_DEFERRED();
 RSInputBlockDescription RenderShaderInput::LightingBlock_FORWARD = RSInputBlockDescription::MakeLightingBlock_FORWARD();
 
@@ -55,16 +57,23 @@ void RSInputBlockDescription::EndUniformBlock()
 	// Compute Block Size
 	size = inputs.back().second;
 	int32_t prevCount = inputs.back().first.count;
+	EShaderInputType prevType = inputs.back().first.inputType;
 
 	// Is Array?
 	if (prevCount > 1)
 	{
+		int32_t baseSize;
+		if (prevType == EShaderInputType::Mat3 || prevType == EShaderInputType::Mat4)
+			baseSize = RenderShaderInput::GetSize(EShaderInputType::Mat4);
+		else
+			baseSize = RenderShaderInput::GetSize(EShaderInputType::Vec4);
+
 		// Each element in the array is aligned with vec4.
-		size += prevCount * RenderShaderInput::GetSize(EShaderInputType::Vec4);
+		size += prevCount * baseSize;
 	}
 	else
 	{
-		size += RenderShaderInput::GetSize(inputs.back().first.inputType);
+		size += RenderShaderInput::GetSize(prevType);
 	}
 
 	size = RenderShaderInput::AlignOffset(size, 16); // always align the final size with 16.
@@ -93,17 +102,24 @@ void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const st
 			// Compute Current Offset...
 			int32_t size = inputs.back().second;
 			int32_t prevCount = inputs.back().first.count;
+			EShaderInputType prevType = inputs.back().first.inputType;
 
 			// Is Array?
 			if (prevCount > 1)
 			{
+				int32_t baseSize;
+				if (prevType == EShaderInputType::Mat3 || prevType == EShaderInputType::Mat4)
+					baseSize = RenderShaderInput::GetSize(EShaderInputType::Mat4);
+				else
+					baseSize = RenderShaderInput::GetSize(EShaderInputType::Vec4);
+
 				// Each element in the array is aligned with vec4.
 				size += prevCount * RenderShaderInput::GetSize(EShaderInputType::Vec4);
 				offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(EShaderInputType::Vec4));
 			}
 			else
 			{
-				size += RenderShaderInput::GetSize(inputs.back().first.inputType);
+				size += RenderShaderInput::GetSize(prevType);
 				offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(inputType));
 			}
 		}
@@ -152,13 +168,27 @@ RSInputBlockDescription RSInputBlockDescription::MakeCommonBlock()
 }
 
 
-RSInputBlockDescription RSInputBlockDescription::MakeTransfromBlock()
+RSInputBlockDescription RSInputBlockDescription::MakeTransformBlock()
 {
 	RSInputBlockDescription inputblock;
 	inputblock.binding = TRANSFROM_BLOCK_BINDING;
 	inputblock.BeginUniformBlock("TransformBlock");
 	inputblock.AddInput(EShaderInputType::Mat4, "inModelMatrix");
 	inputblock.AddInput(EShaderInputType::Mat4, "inNormalMatrix");
+	inputblock.EndUniformBlock();
+
+	return inputblock;
+}
+
+
+RSInputBlockDescription RSInputBlockDescription::MakeTransformBoneBlock()
+{
+	RSInputBlockDescription inputblock;
+	inputblock.binding = TRANSFROM_BONE_BLOCK_BINDING;
+	inputblock.BeginUniformBlock("TransformBoneBlock");
+	inputblock.AddInput(EShaderInputType::Mat4, "inModelMatrix");
+	inputblock.AddInput(EShaderInputType::Mat4, "inNormalMatrix");
+	inputblock.AddInputArray(EShaderInputType::Mat4, "bones", RENDER_SKINNED_MAX_BONES);
 	inputblock.EndUniformBlock();
 
 	return inputblock;

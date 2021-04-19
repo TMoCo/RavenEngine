@@ -5,7 +5,15 @@
 #pragma once
 
 #include "Scene/Component/Model.h"
+#include "Scene/Component/MeshRenderer.h"
 #include "ResourceManager/ResourceManager.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
+#include "Scene/Entity/EntityManager.h"
+#include "ResourceManager/FbxLoader.h"
+#include "Utilities/StringUtils.h"
+#include "Animation/SkeletonCache.h"
+#include "MeshRenderer.h"
 
 #include "Engine.h"
 
@@ -15,7 +23,7 @@ namespace Raven
 	Model::Model(const std::string & fileName)
 		: primitiveType(PrimitiveType::File), filePath(fileName)
 	{
-		LoadFile();
+		
 	}
 
 	Model::~Model()
@@ -36,7 +44,7 @@ namespace Raven
 	// return shared pointer to a mesh resource
 	std::shared_ptr<Mesh> Model::GetMesh(size_t index)
 	{
-		if (index > meshes.size())
+		if (index >= meshes.size())
 		{
 			return nullptr;
 		}
@@ -94,10 +102,129 @@ namespace Raven
 		return const_cast<Model*>(this)->GetMaterial(index);
 	}
 
-	void Model::LoadFile()
+	void Model::LoadFile(bool fromLoad)
 	{
 		auto res = Engine::Get().GetModule<ResourceManager>();
-		res->LoadResource<Mesh>(filePath);
-		res->GetResource(filePath, meshes);
+		auto loader = res->GetLoader<MeshLoader>();
+
+		std::string extension = StringUtils::GetExtension(filePath);
+		// file extension calls appropriate loading function
+		if (extension == "obj")
+		{
+			loader->LoadOBJ(filePath);
+			res->LoadResource<Mesh>(filePath);
+			res->GetResource(filePath, meshes);
+			BindMeshComponent();
+		}
+		else if (extension == "fbx")
+		{
+			loader->LoadFBX(filePath, fromLoad ? nullptr : this);
+			if(meshes.empty())
+				res->GetResource(filePath, meshes);
+			BindMeshComponentForFBX();
+		}
 	}
+
+	void Model::BindMeshComponentForFBX()
+	{
+		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
+		Entity ent(entity, currentScene);
+		if (ent.GetChildren().empty())
+		{
+			FbxLoader loader;
+			loader.LoadHierarchy(filePath, this);
+
+			for (auto i = 0; i < meshes.size(); i++)
+			{
+				auto entity = ent.GetChildInChildren(meshes[i]->name);
+				if (!entity.Valid())
+					entity = currentScene->CreateEntity(meshes[i]->name);
+
+				if (!meshes[i]->blendIndices.empty() ||
+					!meshes[i]->blendWeights.empty())
+				{
+					auto& render = entity.GetOrAddComponent<SkinnedMeshRenderer>();
+					render.mesh = meshes[i];
+					render.meshIndex = i;
+					//skeleton should be copy for every skinned mesh.
+					render.skeleton = *SkeletonCache::Get().Get(filePath); //copy a skeleton
+					render.skeleton.ResetTransfromTarget(ent);
+				}
+				else
+				{
+					auto& render = entity.GetOrAddComponent<MeshRenderer>();
+					render.mesh = meshes[i];
+					render.meshIndex = i;
+				}
+				entity.SetParent(ent);
+			}
+		}
+	}
+
+	void Model::BindMeshComponent()
+	{
+		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
+		auto& enManager = currentScene->GetEntityManager();
+
+		Entity ent(entity, currentScene);
+
+		if (ent.GetChildren().empty())
+		{
+			if (meshes.size() == 1)
+			{
+				auto& render = ent.GetOrAddComponent<MeshRenderer>();
+				render.mesh = meshes[0];
+				render.meshIndex = 0;
+			}
+			else
+			{
+				for (auto i = 0; i < meshes.size(); i++)
+				{
+					auto entity = ent.GetChildInChildren(meshes[i]->name);
+					if (!entity.Valid())
+						entity = currentScene->CreateEntity(meshes[i]->name);
+
+					auto& render = entity.AddComponent<MeshRenderer>();
+					render.mesh = meshes[i];
+					render.meshIndex = i;
+					entity.SetParent(ent);
+				}
+			}
+		}
+		
+	}
+
+
+	void Model::GetMeshRenderersImp(std::vector<ModelMeshRendererData>& outMesRenderers, Entity& ent)
+	{
+		// Try to get mesh renderer.
+		auto* rmesh = ent.TryGetComponent<MeshRenderer>();
+		if (rmesh)
+			outMesRenderers[rmesh->meshIndex].mesh = rmesh;
+
+		// Try to get mesh skinned mesh renderer.
+		auto* rskinned = ent.TryGetComponent<SkinnedMeshRenderer>();
+		if (rskinned)
+			outMesRenderers[rskinned->meshIndex].skinned = rskinned;
+
+		// Iterate on childrens...
+		auto children = ent.GetChildren();
+
+		for (auto childEntt : children)
+		{
+			GetMeshRenderersImp(outMesRenderers, childEntt);
+		}
+	}
+
+
+
+	void Model::GetMeshRenderers(std::vector<ModelMeshRendererData>& outMesRenderers, Scene* scene)
+	{
+		Entity ent(entity, scene);
+		outMesRenderers.resize(meshes.size());
+		GetMeshRenderersImp(outMesRenderers, ent);
+	}
+
+
+
 }

@@ -2,6 +2,7 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 #include "Entity.h"
+#include "Utilities/StringUtils.h"
 
 namespace Raven
 {
@@ -38,6 +39,58 @@ namespace Raven
 		{
 			scene->GetRegistry().emplace<Hierarchy>(entityHandle, entity.entityHandle);
 		}
+	}
+
+	Entity Entity::FindByPath(const std::string& path)
+	{
+		if (path == "") {
+			return {};
+		}
+		Entity ent = {};
+		auto layers = StringUtils::Split(path,"/");
+		auto children = GetChildren();
+
+		for (int32_t i = 0; i < layers.size(); ++i)
+		{
+			bool findChild = false;
+
+			if (layers[i] == "..")
+			{
+				ent = GetParent();
+			}
+			else
+			{
+				for (auto entt : children)
+				{
+					auto & nameComp = entt.GetComponent<NameComponent>();
+					if (layers[i] == nameComp.name) 
+					{
+						ent = entt;
+						children = ent.GetChildren();
+						break;
+					}
+				}
+			}
+		}
+		return ent;
+	}
+
+	Entity Entity::GetChildInChildren(const std::string& name)
+	{
+		auto children = GetChildren();
+		for (auto entt : children)
+		{
+			auto& nameComp = entt.GetComponent<NameComponent>();
+			if (name == nameComp.name)
+			{
+				return entt;
+			}
+			auto ret =  entt.GetChildInChildren(name);
+			if (ret.Valid()) {
+				return ret;
+			}
+		}
+		return {};
 	}
 
 	Entity Entity::GetParent()
@@ -96,7 +149,7 @@ namespace Raven
 
 	bool Entity::Valid()
 	{
-		return scene->GetRegistry().valid(entityHandle) && scene;
+		return scene && scene->GetRegistry().valid(entityHandle);
 	}
 
 };

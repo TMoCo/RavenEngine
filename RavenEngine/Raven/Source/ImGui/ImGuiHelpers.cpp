@@ -33,7 +33,6 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
-
 		return updated;
 	}
 
@@ -50,6 +49,7 @@ namespace ImGuiHelper
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
+
 
 		return updated;
 	}
@@ -156,6 +156,40 @@ namespace ImGuiHelper
 			if (ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max))
 				updated = true;
 		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		return updated;
+	}
+
+	bool Property(const std::string& name, std::string& value, bool disable )
+	{
+		bool updated = false;
+		ImGui::TextUnformatted(name.c_str());
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+
+		std::string id = "##" + name;
+		static char obj[256] = {};
+		memcpy(obj, value.c_str(), value.length() + 1);
+
+		ImGuiInputTextFlags flags = ImGuiInputTextFlags_None;
+		if (disable) 
+		{
+			flags = ImGuiInputTextFlags_ReadOnly;
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(200, 200, 200)));
+		}
+
+		if (ImGui::InputText(id.c_str(), obj, 256)) 
+		{
+			updated = true;
+			value = obj;
+		}
+
+		if (disable)
+			ImGui::PopStyleColor();
+
 
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();

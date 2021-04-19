@@ -45,9 +45,9 @@
 #include "glm/gtx/transform.hpp"
 
 
-// ~Testing----------------------------------------------------------------------------
+// ~ITERATION_0----------------------------------------------------------------------------
 #include "ResourceManager/ResourceManager.h"
-// ~Testing----------------------------------------------------------------------------
+// ~ITERATION_0----------------------------------------------------------------------------
 
 
 
@@ -304,9 +304,26 @@ void RenderModule::CreateDefaultMaterials()
 		mat->SetTexture("inCheckerTexture", checkerTexture.get());
 		mat->LoadOnGpu();
 		
-		defaultMaterials.model = mat;
+		defaultMaterials.mesh = mat;
 	}
 
+
+	// Default Skinned Mesh Material...
+	{
+		Ptr<MaterialShader> matShader(new MaterialShader());
+		matShader->SetName("Default_Skinned");
+		matShader->SetDomain(ERenderShaderDomain::Skinned);
+		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
+		matShader->AddSampler("inCheckerTexture");
+		matShader->LoadOnGpu();
+
+		Ptr<Material> mat(new Material(matShader));
+		mat->SetTexture("inCheckerTexture", checkerTexture.get());
+		mat->LoadOnGpu();
+
+		defaultMaterials.skinned = mat;
+	}
 
 
 	// Default Terrain Material...

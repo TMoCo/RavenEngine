@@ -28,7 +28,6 @@ namespace Raven
 		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 		ImGuiStyle& style = ImGui::GetStyle();
 
-
 		//auto scale = Engine::Get().GetModule<Window>()->GetWindowScale();
 
 		//style.ScaleAllSizes(std::max(scale.first, scale.second));

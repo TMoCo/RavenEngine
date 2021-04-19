@@ -37,8 +37,8 @@ namespace Raven
 		// The Shaders for rendering a terrain.
 		Terrain,
 
-		// The Shaders for skeletal mesh.
-		Skeletal,
+		// The Shaders for rendering a skinned mesh.
+		Skinned,
 
 		// The Shaders for custom post-processing.
 		PostProcessing,

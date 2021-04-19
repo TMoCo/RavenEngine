@@ -38,8 +38,32 @@ namespace Raven
 			auto pos = filePath.find_last_of('/');
 			if (pos != std::string::npos)
 				return filePath.substr(pos + 1);
+
+			pos = filePath.find_last_of('\\');
+			if (pos != std::string::npos)
+				return filePath.substr(pos + 1);
+
 			return filePath;
 		}
+
+		std::string GetFileNameWithoutExtension(const std::string& filePath)
+		{
+			return RemoveExtension(GetFileName(filePath));
+		}
+
+		void Replace(std::string& src, const std::string& origin, const std::string& des)
+		{
+			std::string::size_type pos = 0;
+			std::string::size_type srcLen = origin.size();
+			std::string::size_type desLen = des.size();
+			pos = src.find(origin, pos);
+			while ((pos != std::string::npos))
+			{
+				src.replace(pos, srcLen, des);
+				pos = src.find(origin, (pos + desLen));
+			}
+		}
+
 
 		std::string GetCurrentWorkingDirectory()
 		{
@@ -50,6 +74,26 @@ namespace Raven
 			}
 			currentPath[sizeof(currentPath) - 1] = '\0'; // terminate the string
 			return std::string(currentPath);
+		}
+
+		std::vector<std::string> Split(std::string input, const std::string& delimiter)
+		{
+			std::vector<std::string> ret;
+			size_t pos = 0;
+			std::string token;
+			while ((pos = input.find(delimiter)) != std::string::npos)
+			{
+				token = input.substr(0, pos);
+				ret.emplace_back(token);
+				input.erase(0, pos + delimiter.length());
+			}
+			ret.emplace_back(input);
+			return ret;
+		}
+
+		bool StartWith(const std::string& str, const std::string& with)
+		{
+			return str.find(with);
 		}
 
 		bool IsHiddenFile(const std::string& path)
@@ -67,7 +111,7 @@ namespace Raven
 		bool IsTextFile(const std::string& filePath)
 		{
 			std::string extension = GetExtension(filePath);
-
+			Trim(extension);
 			if (extension == "txt" || extension == "glsl" || extension == "shader" || extension == "vert"
 				|| extension == "frag" || extension == "lua" || extension == "Lua")
 				return true;
@@ -75,30 +119,56 @@ namespace Raven
 			return false;
 		}
 
+		bool IsLuaFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			Trim(extension);
+			return extension == "lua" || extension == "Lua";
+		}
+
 		bool IsAudioFile(const std::string& filePath)
 		{
 			std::string extension = GetExtension(filePath);
+			Trim(extension);
 			return extension == "ogg" || extension == "wav" || extension == "mp3";
 		}
 
 		bool IsSceneFile(const std::string& filePath)
 		{
 			std::string extension = GetExtension(filePath);
-
+			Trim(extension);
 			return extension == "raven";
 			
+		}
+
+		bool IsControllerFile(const std::string& filePath)
+		{
+			std::string extension = GetExtension(filePath);
+			Trim(extension);
+			return extension == "controller";
 		}
 
 		bool IsModelFile(const std::string& filePath)
 		{
 			std::string extension = GetExtension(filePath);
+			Trim(extension);
 			return extension == "obj" || extension == "gltf" || extension == "glb" || extension == "fbx" || extension == "FBX";
 		}
 
 		bool IsTextureFile(const std::string& filePath)
 		{
 			std::string extension = GetExtension(filePath);
+			Trim(extension);
 			return extension == "png" || extension == "tga" || extension == "jpg";
+		}
+
+		void Trim(std::string& str)
+		{
+			if (!str.empty())
+			{
+				str.erase(0, str.find_first_not_of(" "));
+				str.erase(str.find_last_not_of(" ") + 1);
+			}
 		}
 
 		char* IntToString(int num, char* buffer, EBase base)

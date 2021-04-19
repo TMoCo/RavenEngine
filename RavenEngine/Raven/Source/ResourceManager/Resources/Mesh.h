@@ -11,9 +11,15 @@
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
+#include "Animation/Bone.h"
 //
 // A class for a 3D mesh and its data
 //
+
+namespace ofbx
+{
+	struct Mesh;
+};
 
 namespace Raven
 {
@@ -25,7 +31,6 @@ namespace Raven
 		// Construct.
 		Mesh() 
 			: IResource(EResourceType::RT_Mesh, true) 
-			, isTranslucentShadowCast(false)
 		{
 		}
 
@@ -41,8 +46,33 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscMesh->Load(positions, normals, texCoords, indices); // call interface method
+				RAVEN_ASSERT(renderRscMesh == nullptr, "");
+
+				if (blendWeights.empty())
+					renderRscMesh = new RenderRscMesh();
+				else
+					renderRscMesh = new RenderRscSkinnedMesh();
+
+				renderRscMesh->Load(
+					positions, normals, texCoords, indices, blendWeights,blendIndices
+				); // call interface method
 				onGPU = true;
+			}
+		}
+
+
+		inline void NormalizeBlendWeights()
+		{
+			RAVEN_ASSERT(positions.size() == blendWeights.size(), "size is not correct");
+			for (int32_t i = 0; i < positions.size(); i++)
+			{
+				float sum = 0;
+				for (int32_t j = 0; j < 4; j++)
+				{
+					sum += blendWeights[i][j];
+				}
+				const float invSum = sum > MathUtils::EPS ? 1.0f / sum : 0.0f;
+				blendWeights[i] *= invSum;
 			}
 		}
 
@@ -58,10 +88,15 @@ namespace Raven
 		MathUtils::BoundingBox bounds;
 
 		RenderRscMesh* renderRscMesh = nullptr; // interface with renderer (default constructor)
-
+		std::string name;
 		bool active = true;
 
-		// Should this mesh cast shadow even if it is translucent.
-		bool isTranslucentShadowCast;
+		/// Skinned mesh blend indices (max 4 per bone)
+		std::vector<glm::ivec4> blendIndices;
+
+		/// Skinned mesh index buffer (max 4 per bone)
+		std::vector<glm::vec4> blendWeights;
+
 	};
+
 }

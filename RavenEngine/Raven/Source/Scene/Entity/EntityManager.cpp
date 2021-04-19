@@ -26,4 +26,17 @@ namespace Raven
 		registry.clear();
 	}
 
+	Entity EntityManager::GetEntityByName(const std::string& name)
+	{
+		auto views = registry.view<NameComponent>();
+		for (auto & view : views) 
+		{
+			auto & comp = registry.get<NameComponent>(view);
+			if (comp.name == name) {
+				return { view,scene };
+			}
+		}
+		return { entt::null,nullptr };
+	}
+
 };

@@ -71,6 +71,7 @@ namespace Raven
 			currentScene = allScenes.back().get();
 		}
 
+		sceneIdx = queuedSceneIndex;
 		currentScene = allScenes[queuedSceneIndex].get();
 
 		if (!currentScene->dynamic)

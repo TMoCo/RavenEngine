@@ -516,9 +516,11 @@ public:
     */
     /** @{ */
     LuaRef operator()() const
-    {
+	{
+	
         impl().push();
         ;
+   
         LuaException::pcall(m_L, 0, 1);
         return LuaRef::fromStack(m_L);
     }

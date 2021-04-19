@@ -15,6 +15,7 @@
 
 #define RENDER_PASS_DEFERRED_MAX_LIGHTS 32
 #define RENDER_PASS_FORWARD_MAX_LIGHTS 4
+#define RENDER_SKINNED_MAX_BONES 82
 
 
 
@@ -110,7 +111,8 @@ namespace Raven
 	public:
 		// Utility functions for making specific/global uniform blocks to a shader input.
 		static RSInputBlockDescription MakeCommonBlock();
-		static RSInputBlockDescription MakeTransfromBlock();
+		static RSInputBlockDescription MakeTransformBlock();
+		static RSInputBlockDescription MakeTransformBoneBlock();
 		static RSInputBlockDescription MakeLightingBlock_DEFERRED();
 		static RSInputBlockDescription MakeLightingBlock_FORWARD();
 	};
@@ -179,7 +181,8 @@ namespace Raven
 	public:
 		// Global Uniform Buffer Description...
 		static RSInputBlockDescription CommonBlock;
-		static RSInputBlockDescription TransfromBlock;
+		static RSInputBlockDescription TransformBlock;
+		static RSInputBlockDescription TransformBoneBlock;
 		static RSInputBlockDescription LightingBlock_DEFERRED;
 		static RSInputBlockDescription LightingBlock_FORWARD;
 

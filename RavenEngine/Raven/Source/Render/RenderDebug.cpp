@@ -66,7 +66,7 @@ void RenderDebug::Setup()
 
 		debugShader = RenderRscShader::CreateCustom(shaderDomainData, shaderData);
 		debugShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
-		debugShader->GetInput().AddBlockInput(RenderShaderInput::TransfromBlock);
+		debugShader->GetInput().AddBlockInput(RenderShaderInput::TransformBlock);
 		debugShader->GetInput().AddInput(EShaderInputType::Vec4, "color");
 		debugShader->BindBlockInputs();
 

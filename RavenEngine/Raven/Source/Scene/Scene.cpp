@@ -11,6 +11,9 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/MeshRenderer.h"
+
+#include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"
 
 #include "Render/RenderModule.h"
@@ -20,6 +23,8 @@
 #include "Core/Camera.h"
 #include "Devices/Input.h"
 
+#include "Animation/Animator.h"
+
 #include <fstream>
 #include "Engine.h"
 #include "Utilities/Serialization.h"
@@ -28,17 +33,19 @@
 #include "cereal/archives/binary.hpp"
 
 
+
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
 		:name(initName)
 	{
-		LOGV("{0}", __FUNCTION__);
+		LOGV("{0} {1}", __FUNCTION__,initName);
 		entityManager = std::make_shared<EntityManager>(this);
 
 		entityManager->AddDependency<Camera, Transform>();
 		entityManager->AddDependency<Model, Transform>();
 		entityManager->AddDependency<Light, Transform>();
+		entityManager->AddDependency<MeshRenderer, Transform>();
 
 		sceneGraph = std::make_shared<SceneGraph>();
 		sceneGraph->Init(entityManager->GetRegistry());
@@ -55,7 +62,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -125,26 +132,28 @@ namespace Raven {
 			path += std::string(".raven");
 
 			std::ifstream in(path);
-			if (!in.good())
+			if (in.good())
+			{
+
+				std::string data;
+				in.seekg(0, std::ios::end);
+				auto len = in.tellg();
+				in.seekg(0, std::ios::beg);
+				data.resize(len);
+				in.read(data.data(), len);
+				in.close();
+
+				std::istringstream istr;
+				istr.str(data);
+				cereal::JSONInputArchive input(istr);
+				input(*this);
+				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
+			}
+			else 
 			{
 				LOGE("No saved scene file found {0}", path);
 				in.close();
-				return;
 			}
-			std::string data;
-			in.seekg(0, std::ios::end);
-			auto len = in.tellg();
-			in.seekg(0, std::ios::beg);
-			data.resize(len);
-			in.read(data.data(), len);
-			in.close();
-
-			std::istringstream istr;
-			istr.str(data);
-			cereal::JSONInputArchive input(istr);
-			input(*this);
-
-			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 		}
 
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
@@ -183,7 +192,7 @@ namespace Raven {
 		auto camsEttView = entityManager->GetEntitiesWithType<Camera>();
 		if ((!camsEttView.Empty() && Engine::Get().GetEditorState() == EditorState::Play) || forceShow)
 		{
-			Camera& sceneCam = camsEttView[0].GetComponent<Camera>();
+			Camera& sceneCam = camsEttView.Front().GetComponent<Camera>();
 			return &sceneCam;
 		}
 
@@ -215,6 +224,13 @@ namespace Raven {
 		{
 			initCallback(this);
 		}
+		auto view = GetRegistry().view<LuaComponent>();
+		for (auto v : view)
+		{
+			auto& lua = GetRegistry().get<LuaComponent>(v);
+			lua.OnInit();
+		}
+
 	}
 
 	void Scene::OnClean()

@@ -75,6 +75,10 @@ namespace Raven
 
 		// Used by RenderScene, the index of this primitive in the render scene.
 		int32_t indexInScene;
+
+	protected:
+		// True if this is a skinned primitive.
+		bool isSkinned;
 	};
 
 

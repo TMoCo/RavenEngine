@@ -4,23 +4,52 @@
 
 #pragma once
 #include "Utilities/Core.h"
+#include "Component.h"
+#include "Animation/Bone.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/MeshFactory.h"
+#include "ResourceManager/Resources/Fbx.h"
+
+
 #include <string>
 #include <vector>
 #include <memory>
 
+
+
+
+
 namespace Raven
 {
+	class Entity;
 	class Mesh;
 	class Material;
+	class MeshRenderer;
+	class SkinnedMeshRenderer;
+	class Scene;
+
+
+	// Data of MeshRenderer as viewed by the model
+	struct ModelMeshRendererData
+	{
+		MeshRenderer* mesh;
+		SkinnedMeshRenderer* skinned;
+
+		ModelMeshRendererData()
+			: mesh(nullptr)
+			, skinned(nullptr)
+		{
+
+		}
+	};
+
 
 
 	// Model:
-	//	- 3D models and their related data such as meshes, and later materials
+	//	- 3D models and their related data such as meshes, and materials
 	//	- Represent a mesh in the scene with material.
 	//
-	class Model
+	class Model : public Component
 	{
 		// Friend loader for setting file name
 		friend class ModelLoader; 
@@ -74,7 +103,11 @@ namespace Raven
 		{
 			if (meshes.size() > 0)
 			{
-				archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
+				archive(
+					cereal::make_nvp("PrimitiveType", primitiveType), 
+					cereal::make_nvp("FilePath", filePath),
+					cereal::make_nvp("Id", entity)
+					);
 			}
 		}
 
@@ -82,7 +115,10 @@ namespace Raven
 		void load(Archive& archive)
 		{
 
-			archive(cereal::make_nvp("PrimitiveType", primitiveType), cereal::make_nvp("FilePath", filePath));
+			archive(
+				cereal::make_nvp("PrimitiveType", primitiveType), 
+				cereal::make_nvp("FilePath", filePath),
+				cereal::make_nvp("Id", entity));
 
 			meshes.clear();
 
@@ -93,15 +129,27 @@ namespace Raven
 			}
 			else
 			{
-				LoadFile();
+				LoadFile(true);
 			}
+
+			UpdateBounds();
 		}
 
+		//if fromLoad is true, indicating engine should not generate the bones and the entities from fbx
+//
+		void LoadFile(bool fromLoad = false);
+
+		// Return mesh renderers for at their mesh indices.
+		void GetMeshRenderers(std::vector<ModelMeshRendererData>& outMesRenderers, Scene* scene);
+
+	private:
+		// Recursive Implemenation fo GetMeshRenderer
+		void GetMeshRenderersImp(std::vector<ModelMeshRendererData>& outMesRenderers, Entity& ent);
 
 	private:
 
-		void LoadFile();
-
+		void BindMeshComponent();
+		void BindMeshComponentForFBX();
 		inline void SetFileName(const std::string& path) { filePath = path; }
 
 	private:

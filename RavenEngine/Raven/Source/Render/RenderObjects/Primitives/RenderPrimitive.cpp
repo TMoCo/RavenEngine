@@ -15,6 +15,7 @@ namespace Raven {
 RenderPrimitive::RenderPrimitive()
 	: material(nullptr)
 	, indexInScene(-1)
+	, isSkinned(false)
 {
 
 }

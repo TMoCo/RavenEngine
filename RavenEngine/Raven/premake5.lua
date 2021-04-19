@@ -42,6 +42,7 @@ project "RavenEngine"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.NodeEditor}"
 	}
 
 	sysincludedirs
@@ -58,6 +59,7 @@ project "RavenEngine"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.NodeEditor}"
 	}
 
 	links
@@ -114,12 +116,12 @@ project "RavenEngine"
 
 		links
 		{
-			"glfw","glew32","lua"
+			"glfw","glew32","lua","openfbx","node-editor"
 		}
 
 		buildoptions
 		{
-			"/MP", "/bigobj"
+			"/MP", "/bigobj","/openmp"
 		}
 
 		filter 'files:External/**.cpp'

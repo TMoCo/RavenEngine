@@ -40,7 +40,8 @@
 
 
 #include "Devices/Input.h"
-
+#include "Scripts/LuaSystem.h"
+#include "Animation/AnimationSystem.h"
 #include "Scripts/LuaVirtualMachine.h"
 
 
@@ -210,6 +211,8 @@ namespace Raven
 //############	Register your system here ######################
 
 		auto guiSystem = GetSystemManager()->AddSystem<GUISystem>();
+		GetSystemManager()->AddSystem<LuaSystem>();
+		GetSystemManager()->AddSystem<AnimationSystem>()->OnInit();
 		guiSystem->OnInit();
 	
 //############	Register your system here ######################
@@ -220,13 +223,13 @@ namespace Raven
 	{
 		// Destroy - Here order matter.
 		DestroyModule<TerrainGeneration>();
-		DestroyModule<LuaVirtualMachine>();
 		DestroyModule<RenderModule>();
 		DestroyModule<SceneManager>();
 		DestroyModule<GUIModule>();
 		DestroyModule<ImGuiEngine>();
 		DestroyModule<ResourceManager>();
 		DestroyModule<Window>();
+		DestroyModule<LuaVirtualMachine>();
 	}
 
 	std::future<bool> Engine::Post(const std::function<bool()>& callback)

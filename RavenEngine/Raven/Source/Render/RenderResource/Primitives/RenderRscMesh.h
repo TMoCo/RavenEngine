@@ -8,6 +8,8 @@
 
 #include "glm/vec3.hpp"
 #include "glm/vec2.hpp"
+#include "glm/vec4.hpp"
+#include "glm/mat4x4.hpp"
 #include <vector>
 
 
@@ -19,8 +21,6 @@ namespace Raven
 	class GLVertexArray;
 	class GLBuffer;
 
-
-
 	//
 	//
 	class RenderRscMesh : public RenderRscPrimitive
@@ -30,11 +30,14 @@ namespace Raven
 		RenderRscMesh();
 
 		// Destruct.
-		~RenderRscMesh();
+		virtual ~RenderRscMesh();
 
 		// Load Mesh Data
-		void Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
-			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices);
+		virtual void Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
+			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
+			const std::vector<glm::vec4>& weight,
+			const std::vector<glm::ivec4>& blendIndices
+		);
 
 		// Return the vertex array that defines this mesh Vertex Input.
 		inline GLVertexArray* GetArray() { return vxarray; }
@@ -43,7 +46,7 @@ namespace Raven
 		inline int32_t GetNumIndices() const { return numIndices; }
 
 
-	private:
+	protected:
 		/** The OpenGL Vertex Array of the mesh, defines mesh vertex input. */
 		GLVertexArray* vxarray;
 
@@ -61,6 +64,30 @@ namespace Raven
 
 		// Number of indices in the index buffer.
 		int32_t numIndices;
+	};
+
+
+	//
+	//
+	class RenderRscSkinnedMesh : public RenderRscMesh
+	{
+	public:
+		RenderRscSkinnedMesh();
+		virtual ~RenderRscSkinnedMesh();
+
+		void Load(
+			const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
+			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
+			const std::vector<glm::vec4>& weight,
+			const std::vector<glm::ivec4>& blendIndices
+		) override;
+
+		
+		std::vector<glm::mat4> bones;
+
+	private:
+		GLBuffer* weightBuffer;
+		GLBuffer* indicesBuffer;
 	};
 
 }

@@ -5,14 +5,35 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 #include "Utilities/StringUtils.h"
 
 #include "ResourceManager/Loaders/MeshLoader.h"
 #include "ResourceManager/Resources/Mesh.h"
+#include <OpenFBX/ofbx.h>
+
+#include "Scene/Component/Transform.h"
+#include "Scene/Entity/Entity.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Entity/EntityManager.h"
+
+#include "ResourceManager/FileSystem.h"
+#include "Scene/Component/Model.h"
+
+#include "ResourceManager/FbxLoader.h"
+
+#include "Engine.h"
+
+#include <unordered_map>
 
 namespace Raven
 {
+
+
+
 	bool MeshLoader::LoadAsset(const std::string& path)
 	{
         std::string extension = StringUtils::GetExtension(path);
@@ -21,6 +42,10 @@ namespace Raven
         {
             return LoadOBJ(path);
         }
+		if (extension == "fbx")
+		{
+			return LoadFBX(path);
+		}
         else
         {
             return false;
@@ -56,6 +81,7 @@ namespace Raven
         {
             // one shape = one mesh
             Mesh* mesh = new Mesh();
+            mesh->name = shape.name;
             // resize the mesh data
             for (const auto& index : shape.mesh.indices)
             {
@@ -103,4 +129,22 @@ namespace Raven
         // TODO: process Material data
         return true;
     }
-}
+
+	bool MeshLoader::LoadFBX(const std::string& path)
+	{
+		return false;
+	}
+
+	bool MeshLoader::LoadFBX(const std::string& path, Model * model)
+	{
+		if (resourceManager->HasResource(path))
+		{
+			// already loaded
+			return true;
+		}
+        FbxLoader loader;
+        loader.Load(path, model);
+		return true;
+	}
+
+};

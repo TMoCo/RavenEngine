@@ -40,6 +40,8 @@ namespace Raven
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		auto flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 		ImGui::SetNextWindowBgAlpha(0.0f);
+
+		auto currentScene = editor.GetModule<SceneManager>()->GetCurrentScene();
 		ImGui::Begin(title.c_str(), &active, flags);
 		Camera* camera = nullptr;
 		Transform* transform = nullptr;
@@ -142,10 +144,11 @@ namespace Raven
 
 		if (ImGui::BeginDragDropTarget())
 		{
-			auto data = ImGui::AcceptDragDropPayload("AssetFile", ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+			auto data = ImGui::AcceptDragDropPayload("AssetFile");
 			if (data)
 			{
 				std::string file = (char*)data->Data;
+				PRINT_FUNC();
 				LOGV("Receive file from assets window : {0}",file);
 				editor.OpenFile(file);
 			}

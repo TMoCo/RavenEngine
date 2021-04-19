@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "imgui/imgui.h"
 
 namespace glm
 {
@@ -26,3 +27,8 @@ namespace glm
 	template<class Archive> void serialize(Archive& archive, glm::quat& q) { archive(q.x, q.y, q.z, q.w); }
 	template<class Archive> void serialize(Archive& archive, glm::dquat& q) { archive(q.x, q.y, q.z, q.w); }
 }
+
+// ImGui vector serialization
+template<class Archive> void serialize(Archive& archive, ImVec2& v) { archive(v.x, v.y); }
+template<class Archive> void serialize(Archive& archive, ImVec4& v) { archive(v.x, v.y, v.z, v.w); }
+

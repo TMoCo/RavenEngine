@@ -20,10 +20,13 @@ namespace Raven
 		void Initialize() override;
 		void OnImGui() override;
 		void OnUpdate(float dt) override;
+		void DrawPlayButtons();
 
 		void SetSelected(const entt::entity& selectedNode);
 		void SetCopiedEntity(const entt::entity& selectedNode,bool cut = false);
+
 		inline auto& GetSelected() const { return selectedNode; }
+		inline auto& GetPrevSelected() const { return prevSelectedNode; }
 		inline auto& GetCopiedEntity() const  { return copiedNode; }
 		inline auto IsCutCopyEntity() const { return cutCopyEntity; }
 		inline auto& GetComponentIconMap() const { return iconMap; }
@@ -48,6 +51,12 @@ namespace Raven
 
 		const char* GetIconFontIcon(const std::string& filePath);
 
+
+		template<class T>
+		inline auto GetWindow() { return
+			std::static_pointer_cast<T>(editorWindows[typeid(T).hash_code()]);
+		}
+
 	private:
 		void DrawMenu();
 		void BeginDockSpace();
@@ -56,8 +65,10 @@ namespace Raven
 		void LoadCachedScene();
 		void CacheScene();
 
-		std::vector<std::unique_ptr<EditorWindow>> editorWindows;
+		std::unordered_map<size_t, std::shared_ptr<EditorWindow>> editorWindows;
+
 		entt::entity selectedNode = entt::null;
+		entt::entity prevSelectedNode = entt::null;
 		entt::entity copiedNode = entt::null;
 		bool cutCopyEntity = false;
 		std::unordered_map<size_t, const char*> iconMap;
@@ -70,6 +81,7 @@ namespace Raven
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;
 		EditorCameraController editorCameraController;
+
 
 	};
 

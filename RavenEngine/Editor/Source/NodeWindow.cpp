@@ -644,6 +644,7 @@ namespace Raven
 			else if (controller)
 			{
 				controller->FocusTransition(nullptr);
+				editor.GetWindow<PropertiesWindow>()->SetController(nullptr);
 			}
 			else
 			{

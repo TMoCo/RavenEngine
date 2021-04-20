@@ -10,7 +10,7 @@ namespace Raven
 		return cache;
 	}
 
-	std::shared_ptr<Animation> AnimationCache::Get(const std::string& name)
+	Animation* AnimationCache::Get(const std::string& name)
 	{
 		auto iter = animations.find(name);
 		if (iter == animations.end())
@@ -23,9 +23,9 @@ namespace Raven
 			}
 			return animations.emplace(std::piecewise_construct, 
 				std::forward_as_tuple(name),
-				std::forward_as_tuple(anim)).first->second;
+				std::forward_as_tuple(anim)).first->second.get();
 		}
-		return iter->second;
+		return iter->second.get();
 	}
 
 };

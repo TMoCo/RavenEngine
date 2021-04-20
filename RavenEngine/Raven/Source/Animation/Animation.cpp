@@ -35,7 +35,12 @@ namespace Raven
         return clips[index]->length;
     }
 
-    int32_t Animation::GetPlayingClip() const
+	float Animation::GetCurrentClipLength() const
+	{
+		return clips[GetPlayingClip()]->length;
+	}
+
+	int32_t Animation::GetPlayingClip() const
     {
 		if (states.empty() || stopped)
 		{

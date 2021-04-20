@@ -15,7 +15,7 @@ namespace Raven
 	{
 	public:
 		static AnimationCache& Get();
-		std::shared_ptr<Animation> Get(const std::string& name);
+		Animation* Get(const std::string& name);
 	private:
 		AnimationCache()= default;
 		std::unordered_map<std::string, std::shared_ptr<Animation>> animations;

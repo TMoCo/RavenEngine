@@ -91,6 +91,7 @@ namespace Raven
 		void AddClip(const std::shared_ptr<AnimationClip>& clips);
 		const std::string& GetClipName(int32_t index) const;
 		float GetClipLength(int32_t index) const;
+		float GetCurrentClipLength() const;
 		int32_t GetPlayingClip() const;
 		float GetPlayingTime() const;
 		void SetPlayingTime(float time);

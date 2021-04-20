@@ -2,8 +2,8 @@
 ------------------------------------------------------------------------------
 --              This file is part of the Raven Engine                       --
 --            this file is used to declare a class in lua                   -- 
-------------------------------------------------------------------------------                                      --
-------------------------------------------------------------------------------
+------------------------------------------------------------------------------ 
+
 
 
 function typeof(var)  
@@ -83,7 +83,9 @@ function class(classname,super)
             callSuper(obj.super)
         end
    
-        setmetatable(obj,{__index = newClass})
+        setmetatable(obj,{
+			__index = newClass
+		})
       --currentObj.super = nil
        
       return obj

@@ -27,7 +27,7 @@ namespace Raven
 		PRINT_FUNC();
 		L = luaL_newstate();
 		luaL_openlibs(L);//load all default lua functions
-		AddPath("./scripts/");
+		AddPath(".");
 		InputExport::Export(L);
 		LogExport::Export(L);
 		MathExport::Export(L);

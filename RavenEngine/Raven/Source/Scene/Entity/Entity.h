@@ -67,6 +67,21 @@ namespace Raven
 		}
 
 		template<typename T>
+		T* TryGetComponentFromParent()
+		{
+			auto t =  scene->GetRegistry().try_get<T>(entityHandle);
+			if (t == nullptr) 
+			{
+				auto parent = GetParent();
+				while (parent.Valid() && t == nullptr) {
+					t = parent.TryGetComponent<T>();
+					parent = parent.GetParent();
+				}
+			}
+			return t;
+		}
+
+		template<typename T>
 		bool HasComponent()
 		{
 			return scene->GetRegistry().has<T>(entityHandle);

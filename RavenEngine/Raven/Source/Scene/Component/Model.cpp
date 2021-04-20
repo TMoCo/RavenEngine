@@ -128,7 +128,7 @@ namespace Raven
 	void Model::BindMeshComponentForFBX()
 	{
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
-		Entity ent(entity, currentScene);
+		Entity ent = GetEntity();
 		if (ent.GetChildren().empty())
 		{
 			FbxLoader loader;
@@ -137,8 +137,10 @@ namespace Raven
 			for (auto i = 0; i < meshes.size(); i++)
 			{
 				auto entity = ent.GetChildInChildren(meshes[i]->name);
-				if (!entity.Valid())
+				if (!entity.Valid()) {
 					entity = currentScene->CreateEntity(meshes[i]->name);
+					entity.SetParent(ent);
+				}
 
 				if (!meshes[i]->blendIndices.empty() ||
 					!meshes[i]->blendWeights.empty())
@@ -156,7 +158,6 @@ namespace Raven
 					render.mesh = meshes[i];
 					render.meshIndex = i;
 				}
-				entity.SetParent(ent);
 			}
 		}
 	}
@@ -181,17 +182,16 @@ namespace Raven
 				for (auto i = 0; i < meshes.size(); i++)
 				{
 					auto entity = ent.GetChildInChildren(meshes[i]->name);
-					if (!entity.Valid())
+					if (!entity.Valid()) {
 						entity = currentScene->CreateEntity(meshes[i]->name);
-
+						entity.SetParent(ent);
+					}
 					auto& render = entity.AddComponent<MeshRenderer>();
 					render.mesh = meshes[i];
 					render.meshIndex = i;
-					entity.SetParent(ent);
 				}
 			}
 		}
-		
 	}
 
 

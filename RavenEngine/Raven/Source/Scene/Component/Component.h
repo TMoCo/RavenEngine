@@ -8,13 +8,13 @@
 namespace Raven 
 {
 	//TODO serialize function is not implementation
-
+	class Entity;
 	class Component 
 	{
 	public:
 		virtual ~Component() = default;
 		entt::entity entity = entt::null;
-
+		Entity GetEntity();
 	};
 
 	class NameComponent : public Component

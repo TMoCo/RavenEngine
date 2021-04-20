@@ -270,7 +270,7 @@ namespace Raven {
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto skin = fbxMesh->getGeometry()->getSkin();
 
-		Entity rootEntity = model == nullptr ? Entity{} : Entity{ model->entity, currentScene };
+		Entity rootEntity = model == nullptr ? Entity{} : model->GetEntity();
 			
 
 		for (int32_t clusterIndex = 0; clusterIndex < skin->getClusterCount(); clusterIndex++)
@@ -283,12 +283,10 @@ namespace Raven {
 			auto boneIndex = skeleton->IndexOf(link->name);//create a bone if missing
 			if (boneIndex == -1)
 			{
-				
 				auto & bone = skeleton->AddBone(skeleton->IndexOf(link->getParent()->name));
-
 				bone.name = link->name;
 				bone.offsetMatrix = glm::inverse(GetOffsetMatrix(fbxMesh, link));
-				if (rootEntity) 
+				if (rootEntity.Valid()) 
 				{
 					auto entity = rootEntity.FindByPath(GetBonePath(link));
 					bone.localTransform = entity.TryGetComponent<Transform>();

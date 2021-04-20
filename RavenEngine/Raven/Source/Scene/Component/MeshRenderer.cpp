@@ -17,21 +17,9 @@ namespace Raven
 	{
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& enManager = currentScene->GetEntityManager();
-		if (auto render = enManager->GetRegistry().try_get<Model>(entity))
+		if (auto model = GetEntity().TryGetComponentFromParent<Model>()) 
 		{
-			mesh = render->GetMesh(meshIndex);
-		}
-		else
-		{
-			Entity ent(entity, currentScene);
-			auto parent = ent.GetParent();
-			if (parent.Valid()) {
-
-				if (auto render = parent.TryGetComponent<Model>())
-				{
-					mesh = render->GetMesh(meshIndex);
-				}
-			}
+			mesh = model->GetMesh(meshIndex);
 		}
 	}
 
@@ -63,27 +51,13 @@ namespace Raven
 	{
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& enManager = currentScene->GetEntityManager();
-		Entity ent(entity, currentScene);
-		if (auto render = ent.TryGetComponent<Model>())
-		{
-			mesh = render->GetMesh(meshIndex);
-			if (skeleton.GetRoot()->localTransform == nullptr) 
+	
+		auto model = GetEntity().TryGetComponentFromParent<Model>();
+		if (model) {
+			mesh = model->GetMesh(meshIndex);
+			if (skeleton.GetRoot()->localTransform == nullptr)
 			{
-				skeleton.ResetTransfromTarget(ent);
-			}
-		}
-		else
-		{
-			auto parent = ent.GetParent();
-			if (parent.Valid()) {
-				if (auto render = parent.TryGetComponent<Model>())
-				{
-					mesh = render->GetMesh(meshIndex);
-					if (skeleton.GetRoot()->localTransform == nullptr)
-					{
-						skeleton.ResetTransfromTarget(parent);
-					}
-				}
+				skeleton.ResetTransfromTarget(model->GetEntity());
 			}
 		}
 	}

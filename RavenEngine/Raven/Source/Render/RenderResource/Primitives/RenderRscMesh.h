@@ -82,9 +82,6 @@ namespace Raven
 			const std::vector<glm::ivec4>& blendIndices
 		) override;
 
-		
-		std::vector<glm::mat4> bones;
-
 	private:
 		GLBuffer* weightBuffer;
 		GLBuffer* indicesBuffer;

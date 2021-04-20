@@ -87,4 +87,19 @@ namespace Raven
 			}
 		}
 	}
+
+
+	void SkinnedMeshRenderer::UpdateBones()
+	{
+		if (bones.size() != skeleton.GetBoneSize())
+			bones.resize( skeleton.GetBoneSize() );
+
+		for (auto i = 0; i < skeleton.GetBoneSize(); i++)
+		{
+			auto& bone = skeleton.GetBone(i);
+			bones[i] = bone.localTransform->GetWorldMatrix() * bone.offsetMatrix;
+		}
+	}
+
+
 };

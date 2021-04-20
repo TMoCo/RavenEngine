@@ -216,20 +216,14 @@ void RenderScene::TraverseScene(Scene* scene)
 			if (meshRenderers[i].skinned)
 			{
 				auto skinned = meshRenderers[i].skinned;
-				RenderRscSkinnedMesh* skinnedRsc = static_cast<RenderRscSkinnedMesh*>(mesh->renderRscMesh);
-				skinnedRsc->bones.resize(skinned->skeleton.GetBoneSize());
+				skinned->UpdateBones();
+				RAVEN_ASSERT(skinned->bones.size() <= RENDER_SKINNED_MAX_BONES, "");
 
 				RenderSkinnedMesh* rmesh = NewPrimitive<RenderSkinnedMesh>();
 				rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-				rmesh->SetMesh(skinnedRsc);
+				rmesh->SetMesh(static_cast<RenderRscSkinnedMesh*>(mesh->renderRscMesh));
+				rmesh->SetBones(&skinned->bones);
 				rprim = rmesh;
-
-				// TODO: Need to be optimized! & is it per RenderPrimitive?
-				for (auto i = 0; i < skinned->skeleton.GetBoneSize(); i++)
-				{
-					auto& bone = skinned->skeleton.GetBone(i);
-					skinnedRsc->bones[i] = bone.localTransform->GetWorldMatrix() * bone.offsetMatrix;
-				}
 
 			}
 			else
@@ -484,12 +478,12 @@ void RenderScene::DrawDeferred()
 				// Transform.
 				if (prim->isSkinned)
 				{
-					auto skinned = static_cast<RenderRscSkinnedMesh*>(prim->GetRsc());
+					auto skinned = static_cast<RenderSkinnedMesh*>(prim);
 
 					// Model & Normal & Bones.
 					trBoneData.modelMatrix = prim->GetWorldMatrix();
 					trBoneData.normalMatrix = prim->GetWorldMatrix();
-					memcpy(&trBoneData.bones, skinned->bones.data(), sizeof(glm::mat4) * skinned->bones.size());
+					memcpy(&trBoneData.bones, skinned->GetBones()->data(), sizeof(glm::mat4) * skinned->GetBones()->size());
 					transformBoneUniform->UpdateData(sizeof(TransformBoneVertexData), 0, (void*)(&trBoneData));
 				}
 				else
@@ -583,12 +577,12 @@ void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
 		// Transform.
 		if (prim.primitive->isSkinned)
 		{
-			auto skinned = static_cast<RenderRscSkinnedMesh*>(prim.primitive->GetRsc());
+			auto skinned = static_cast<RenderSkinnedMesh*>(prim.primitive);
 
 			// Model & Normal & Bones.
 			trBoneData.modelMatrix = prim.primitive->GetWorldMatrix();
 			trBoneData.normalMatrix = prim.primitive->GetWorldMatrix();
-			memcpy(&trBoneData.bones, skinned->bones.data(), sizeof(glm::mat4) * skinned->bones.size());
+			memcpy(&trBoneData.bones, skinned->GetBones()->data(), sizeof(glm::mat4) * skinned->GetBones()->size());
 			transformBoneUniform->UpdateData(sizeof(TransformBoneVertexData), 0, (void*)(&trBoneData));
 		}
 		else

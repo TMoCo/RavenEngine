@@ -39,7 +39,7 @@ void main()
 	
 	// Surface Data from G-Buffer used for lighting the surface.
 	LightSurfaceData surface;
-	surface.n = texture(inNormal, inFrag.rtCoord).xyz;
+	surface.n = normalize(texture(inNormal, inFrag.rtCoord).xyz);
 	surface.albedo = gAlbedo.rgb;
 	surface.specular = gBRDF.b;
 	surface.roughness = max(gBRDF.r, 0.01);

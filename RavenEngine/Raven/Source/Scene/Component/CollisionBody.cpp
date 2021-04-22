@@ -16,7 +16,7 @@ namespace Raven
 	{
 		// convert our transform component to the transform used in react and put the collision body in the 
 		// physics world
-		body = physWorld->createCollisionBody(ToRp3d::ToRp3dTransform(transform));
+		body = physWorld->createCollisionBody(Rp3dConvert::ToRp3dTransform(transform));
 	}
 
 	CollisionBody::~CollisionBody()
@@ -56,7 +56,7 @@ namespace Raven
 	void CollisionBody::SetTransform(const Transform& t)
 	{
 		// set the underlying rp3d body's transform to specified
-		body->setTransform(ToRp3d::ToRp3dTransform(t));
+		body->setTransform(Rp3dConvert::ToRp3dTransform(t));
 	}
 
 	void CollisionBody::RemoveBodyFromWorld()

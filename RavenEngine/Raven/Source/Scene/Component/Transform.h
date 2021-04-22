@@ -33,6 +33,7 @@ namespace Raven
 		Transform(const glm::vec3 & position);
 		~Transform();
 
+		void SetTransform(Transform& other);
 		void SetWorldMatrix(const glm::mat4& mat);
 		void SetLocalTransform(const glm::mat4& localMat);
 		void SetLocalPosition(const glm::vec3& localPos);
@@ -53,6 +54,8 @@ namespace Raven
 
 		inline auto HasUpdated() const { return hasUpdated; }
 		inline void SetHasUpdated(bool set) { hasUpdated = set; }
+
+		inline auto IsDirty() const { return dirty; }
 
 		void UpdateLocalMatrix();
 		void ApplyTransform();

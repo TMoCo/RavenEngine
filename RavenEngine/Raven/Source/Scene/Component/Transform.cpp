@@ -58,6 +58,16 @@ namespace Raven
 
 	Transform::~Transform() = default;
 
+	void Transform::SetTransform(Transform& other)
+	{
+		localMatrix = other.GetLocalMatrix();
+		worldMatrix = other.GetWorldMatrix();
+		localPosition = other.GetLocalPosition();
+		localOrientation = other.GetLocalOrientation();
+		hasUpdated = other.HasUpdated();
+		dirty = other.IsDirty();
+	}
+
 	void Transform::SetWorldMatrix(const glm::mat4 & mat)
 	{
 		if (dirty)

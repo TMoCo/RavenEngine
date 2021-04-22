@@ -8,6 +8,8 @@
 
 #include "IModule.h"
 
+#include "Scene/Scene.h"
+
 #include "Utilities/Core.h"
 
 namespace Raven
@@ -18,7 +20,7 @@ namespace Raven
 	class PhysicsModule : public IModule
 	{
 	public:
-		PhysicsModule() = default;
+		PhysicsModule();
 		virtual ~PhysicsModule() override {};
 
 		// inherited from IModule, must be overridden
@@ -30,6 +32,15 @@ namespace Raven
 		// update the physics world
 		void Step(float deltaTime);
 
+		float GetLerpFactor();
+
+		rp3d::PhysicsCommon* GetPhysicsCommon();
+		rp3d::PhysicsWorld* GetCurrentWorld();
+
+		// call these methods when loading in a new scene to initialise the physics world
+		void CreateWorld();
+		void DestroyWorld();
+
 	private:
 		// singleton class for physics library's memory allocation etc
 		rp3d::PhysicsCommon physicsCommon;
@@ -38,5 +49,7 @@ namespace Raven
 
 		// where we accumulate time between frames
 		float accumulator;
+
+		float lerpFactor;
 	};
 }

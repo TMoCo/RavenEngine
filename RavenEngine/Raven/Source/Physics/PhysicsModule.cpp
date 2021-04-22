@@ -6,74 +6,27 @@
 #include "Physics/Collider.h"
 
 #include "Scene/Component/CollisionBody.h"
+#include "Scene/Component/RigidBody.h"
 
 namespace Raven
 {
+	PhysicsModule::PhysicsModule() :
+		accumulator(0.0f),
+		lerpFactor(0.0f),
+		world(nullptr)
+	{
+
+	}
+
 	void PhysicsModule::Initialize()
 	{
 		// instantiate the physics world
 		world = physicsCommon.createPhysicsWorld();
-
-		// create a collision body at the origin
-		CollisionBody* bodyA = new CollisionBody(world, Transform::Identity());
-
-		// declare a box collider 
-		BoxCollider* colliderA = new BoxCollider();
-		// set the body the collider should belong to
-		colliderA->SetBody(bodyA->body);
-		// set our extents
-		colliderA->SetExtents(rp3d::Vector3(10.0f, 20.0f, 5.0f));
-		// create the collider shape with physics common
-		colliderA->CreateCollider(ColliderShapeFactory::CreateBoxShape(&physicsCommon, colliderA));
-
-		// assign the collider to the body
-		bodyA->AddCollider(colliderA);
-		{
-			std::ofstream os("firstSave.json");
-			cereal::JSONOutputArchive oArchive(os);
-			oArchive(*bodyA);
-		}
-
-		// remove the body 
-		delete bodyA;
-
-		// create a collision body above the origin
-		Transform t;
-		t.SetLocalPosition(glm::vec3(0.0f, 2.0f, 0.0f));
-		CollisionBody* bodyB = new CollisionBody(world, t);
-
-		{
-			std::ifstream is("firstSave.json");
-			cereal::JSONInputArchive iArchive(is);
-			iArchive(*bodyB);
-			// we have loaded collider data, but they neeed to be initialised in the rp3d library memory
-			for (auto& c : bodyB->colliders)
-			{
-				c->SetBody(bodyB->body);
-				c->CreateCollider(ColliderShapeFactory::CreateCollisionShape(&physicsCommon, c.get()));
-			}
-		}
-		
-		// declare a box collider 
-		CapsuleCollider* colliderC = new CapsuleCollider();
-		// set the body the collider should belong to
-		colliderC->SetBody(bodyB->body);
-		// create the collider shape with physics common
-		colliderC->CreateCollider(ColliderShapeFactory::CreateCapsuleShape(&physicsCommon, colliderC));
-
-		// assign the collider to the body
-		bodyB->AddCollider(colliderC);
-
-		{
-			std::ofstream os("secondSave.json");
-			cereal::JSONOutputArchive oArchive(os);
-			oArchive(*bodyB);
-		}
 	}
 
 	void PhysicsModule::Destroy()
 	{
-		
+		// physics common is destroyed here, takes care of destroying everything in physics engine
 	}
 
 	void PhysicsModule::Step(float deltaTime)
@@ -84,13 +37,44 @@ namespace Raven
 		// While there is enough accumulated time to take one or several physics steps 
 		while (accumulator >= timeStep) {
 
-			// Update the Dynamics world with a constant time step 
+			// Update the Dynamics world with a constant time step, updates the transforms in the bodies
 			world->update(timeStep);
 
 			// Decrease the accumulated time 
 			accumulator -= timeStep;
 		}
 
-		// slerp between world states using the remaining accumulated time
+		// time left in accumulator is smaller than delta time, so we normalise to get a value between 0 and 1 for lerping
+		lerpFactor = accumulator / timeStep;
+	}
+
+	float PhysicsModule::GetLerpFactor()
+	{
+		return lerpFactor;
+	}
+
+	rp3d::PhysicsCommon* PhysicsModule::GetPhysicsCommon()
+	{
+		return &physicsCommon;
+	}
+
+	rp3d::PhysicsWorld* PhysicsModule::GetCurrentWorld()
+	{
+		return world;
+	}
+
+	// call these methods when loading in a new scene to initialise the physics world
+	void PhysicsModule::CreateWorld()
+	{
+		// valid world pointer means we do not have to create one
+		if (world)
+			return;
+		world = physicsCommon.createPhysicsWorld();
+	}
+
+	void PhysicsModule::DestroyWorld() // call when destroying a scene
+	{
+		physicsCommon.destroyPhysicsWorld(world);
+		world = nullptr; // invalidate pointer
 	}
 }

@@ -21,10 +21,14 @@
 
 namespace Raven
 {
-	namespace ToRp3d
+	namespace Rp3dConvert
 	{
+		// from engine to physics
 		rp3d::Transform ToRp3dTransform(const Transform& t);
 		rp3d::Vector3 ToRp3dVector3(const glm::vec3& v);
 		rp3d::Quaternion ToRp3dQuaternion(const glm::quat& q);
+
+		// from physics to engine
+		Transform ToTransform(const rp3d::Transform& other);
 	}
 }

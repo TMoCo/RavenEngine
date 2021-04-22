@@ -63,11 +63,11 @@ namespace Raven
 		friend CollisionBody;
 		friend RigidBody;
 	public:
-		Collider(ColliderPrimitive::Type shapeType);
+		Collider(rp3d::CollisionBody* body, ColliderPrimitive::Type shapeType, rp3d::Transform& t = rp3d::Transform::identity());
 		~Collider();
 
 		// creates the collider and adds it to the body 
-		virtual void CreateCollider(rp3d::CollisionShape* shape) = 0;
+		virtual void InitShape(rp3d::PhysicsCommon* physicsCommon) = 0;
 
 		// set the body the collider belongs to (should only be called by the body's AddCollider prior to calling CreateCollider)
 		void SetBody(rp3d::CollisionBody* parentBody);
@@ -75,9 +75,9 @@ namespace Raven
 		// use a transform to place the collider relative to the body it should be attached to
 		void SetTransform(const Transform& transform);
 
-		rp3d::CollisionShape* GetShape();
-
 		ColliderPrimitive::Type GetColliderType() const;
+
+		rp3d::CollisionShape* Collider::GetShape();
 
 		rp3d::Transform GetRelativeTransform();
 
@@ -93,20 +93,19 @@ namespace Raven
 
 		// pointer to the body the collider belongs to
 		rp3d::CollisionBody* body;
-
-		// pointer to the collider shape
-		rp3d::CollisionShape* shape;
 	};
 
 	class BoxCollider : public Collider
 	{
 	public:
 		BoxCollider();
+		BoxCollider(rp3d::CollisionBody* body, Transform& t = Transform::Identity());
 		~BoxCollider() = default;
 
-		void CreateCollider(rp3d::CollisionShape* shape) override;
+		void InitShape(rp3d::PhysicsCommon* physicsCommon) override;
 
 		void SetExtents(const rp3d::Vector3& vec);
+		void SetExtents(const float& x, const float& y, const float& z);
 		rp3d::Vector3 GetExtents() const;
 
 		template<class Archive>
@@ -118,6 +117,9 @@ namespace Raven
 	private:
 		// inherits the same variables as the base class
 		rp3d::Vector3 extents; // box extent
+
+		// pointer to the collider shape
+		rp3d::BoxShape* shape;
 	};
 
 	template<class Archive>
@@ -138,9 +140,10 @@ namespace Raven
 	{
 	public:
 		SphereCollider();
+		SphereCollider(rp3d::CollisionBody* body);
 		~SphereCollider() = default;
 
-		void CreateCollider(rp3d::CollisionShape* shape) override;
+		void InitShape(rp3d::PhysicsCommon* physicsCommon) override;
 
 		void SetRadius(const float& r);
 		float GetRadius() const;
@@ -153,6 +156,9 @@ namespace Raven
 
 	private:
 		float radius; // sphere radius
+		
+		// pointer to the collider shape
+		rp3d::SphereShape* shape;
 	};
 
 	template<class Archive>
@@ -172,9 +178,10 @@ namespace Raven
 	{
 	public:
 		CapsuleCollider();
+		CapsuleCollider(rp3d::CollisionBody* body);
 		~CapsuleCollider() = default;
 
-		void CreateCollider(rp3d::CollisionShape* shape) override;
+		void InitShape(rp3d::PhysicsCommon* physicsCommon) override;
 
 		void SetRadius(const float& r);
 		void SetHeight(const float& h);
@@ -191,6 +198,9 @@ namespace Raven
 	private:
 		float radius; // capsule radius
 		float height; // capsule height
+		
+		// pointer to the collider shape
+		rp3d::CapsuleShape* shape;
 	};
 
 	template<class Archive>

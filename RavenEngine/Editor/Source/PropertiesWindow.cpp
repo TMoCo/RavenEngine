@@ -417,6 +417,8 @@ namespace Raven
 		TRIVIAL_COMPONENT(Model);
 		TRIVIAL_COMPONENT(CameraControllerComponent);
 		TRIVIAL_COMPONENT(LuaComponent);
+		//TRIVIAL_COMPONENT()
+
 		init = true;
 	}
 

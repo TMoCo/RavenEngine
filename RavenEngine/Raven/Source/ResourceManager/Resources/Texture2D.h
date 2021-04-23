@@ -24,7 +24,10 @@ namespace Raven
 	public:
 		Texture2D(size_t initWidth = 0, size_t initHeight = 0, EGLFormat format = EGLFormat::None, byte* initData = nullptr) 
 			: IResource(EResourceType::RT_Image, true), 
-			width(initHeight), height(initHeight), format(format), data(initData) {}
+			width(initWidth), height(initHeight), format(format), data(initData) 
+		{
+			renderRscTexture = NULL;
+		}
 
 		inline virtual ~Texture2D()
 		{

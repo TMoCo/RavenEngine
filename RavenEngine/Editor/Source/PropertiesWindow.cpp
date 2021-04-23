@@ -12,6 +12,7 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/CameraControllerComponent.h"
+#include "Scene/Component/MeshRenderer.h"
 #include "Scripts/LuaComponent.h"
 
 #include "Core/Camera.h"
@@ -22,13 +23,15 @@
 
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/Mesh.h"
-#include "Engine.h"
 #include "Utilities/StringUtils.h"
-
-#include <filesystem>
+#include "Animation/Animator.h"
+#include "Animation/AnimationController.h"
+#include "Engine.h"
 #include "HierarchyWindow.h"
 
 
+#include <filesystem>
+#include <functional>
 
 namespace MM 
 {
@@ -108,10 +111,8 @@ namespace MM
 		
 		if (ImGui::BeginCombo("", lua.GetFileName().c_str(), 0))
 		{
-
 			for (const auto& entry : std::filesystem::directory_iterator("./scripts/"))
 			{
-				
 				if (!StringUtils::IsLuaFile(entry.path().string()))
 				{
 					continue;
@@ -134,7 +135,6 @@ namespace MM
 			ImGui::EndCombo();
 		}
 		ImGui::NextColumn();
-		//ImGui::PushItemWidth(-1);
 		if (ImGui::Button(lua.IsLoaded() ? "Reload" : "Load"))
 		{
 			lua.Reload();
@@ -142,9 +142,7 @@ namespace MM
 		ImGui::PopItemWidth();
 		ImGui::Columns(1);
 		ImGui::PopStyleVar();
-
 		lua.OnImGui();
-
 		
 	}
 
@@ -295,13 +293,38 @@ namespace MM
 
 			ImGui::PopItemWidth();
 			ImGui::NextColumn();
-
+			ImGui::Columns(1);
+			int32_t i = 0;
 			for (auto & mesh : model.GetMeshes())
 			{
-				ImGui::TextUnformatted(std::to_string((int64_t)mesh.get()).c_str());
+				ImGui::Separator();
+				
+				ImGui::TextUnformatted((mesh->name + " : " + std::to_string(i++)).c_str());
 			}
 
 		}
+		ImGui::Separator();
+		ImGui::PopStyleVar();
+
+	}
+
+	template<>
+	void ComponentEditorWidget<SkinnedMeshRenderer>(entt::registry& reg, entt::registry::entity_type e) 
+	{
+		auto& model = reg.get<SkinnedMeshRenderer>(e);
+		model.OnImGui();
+	}
+
+	template<>
+	void ComponentEditorWidget<Animator>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& model = reg.get<Animator>(e);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+		model.OnImGui();
 
 		ImGui::Columns(1);
 		ImGui::Separator();
@@ -332,6 +355,13 @@ namespace Raven
 
 		if (ImGui::Begin(title.c_str(), &active))
 		{
+			if (controller != nullptr)
+			{
+				controller->OnImGui();
+				ImGui::End();
+				return;
+			}
+
 			if (selected == entt::null)
 			{
 				ImGui::End();
@@ -380,14 +410,11 @@ namespace Raven
 					{
 						auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
 						auto name = StringUtils::GetFileName(file);
-						registry.emplace<LuaComponent>(selected, selected, file, scene);
+						registry.emplace<LuaComponent>(selected, file, scene).entity = selected;
 					}
 				}
 				ImGui::EndDragDropTarget();
 			}
-
-		
-
 		}
 		ImGui::End();
 	}
@@ -399,7 +426,7 @@ namespace Raven
 		auto& editor = static_cast<Editor&>(Engine::Get());
 		auto& iconMap = editor.GetComponentIconMap();
 
-#define TRIVIAL_COMPONENT(ComponentType) \
+#define TRIVIAL_COMPONENT(ComponentType,show) \
 	{ \
 		std::string name; \
 		if(iconMap.find(typeid(ComponentType).hash_code()) != iconMap.end()) \
@@ -408,18 +435,25 @@ namespace Raven
             name += iconMap[typeid(Editor).hash_code()]; \
 		name += "\t"; \
 		name += ###ComponentType; \
-		enttEditor.registerComponent<ComponentType>(name.c_str()); \
+		enttEditor.registerComponent<ComponentType>(name,show); \
 	}
 
-		TRIVIAL_COMPONENT(Transform);
-		TRIVIAL_COMPONENT(Light);
-		TRIVIAL_COMPONENT(Camera);
-		TRIVIAL_COMPONENT(Model);
-		TRIVIAL_COMPONENT(CameraControllerComponent);
-		TRIVIAL_COMPONENT(LuaComponent);
-		//TRIVIAL_COMPONENT()
+		TRIVIAL_COMPONENT(Transform,true);
+		TRIVIAL_COMPONENT(Light, true);
+		TRIVIAL_COMPONENT(Camera, true);
+		TRIVIAL_COMPONENT(CameraControllerComponent, true);
+		TRIVIAL_COMPONENT(MeshRenderer, false);
+		TRIVIAL_COMPONENT(SkinnedMeshRenderer, false);
+		TRIVIAL_COMPONENT(LuaComponent, true);
+		TRIVIAL_COMPONENT(Animator, true);
 
-		init = true;
+		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
+			auto lua = r.try_get<LuaComponent>(entity);
+			if (lua) 
+			{
+				lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
+			}
+		});
 	}
 
 };

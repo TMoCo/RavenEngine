@@ -13,6 +13,8 @@
 
 namespace Raven 
 {
+	class Model;
+
 	class MeshLoader : public ILoader
 	{
 	public:
@@ -23,7 +25,10 @@ namespace Raven
 		bool LoadAsset(const std::string& path) override;
 
 		bool LoadOBJ(const std::string& path);
+		bool LoadFBX(const std::string& path);
+		bool LoadFBX(const std::string& path, Model * model);
 
 		virtual bool LoadOnGPU() override { return true; }
+	private:
 	};
 }

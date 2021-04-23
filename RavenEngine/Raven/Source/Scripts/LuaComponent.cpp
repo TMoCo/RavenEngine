@@ -17,16 +17,22 @@
 #include <fstream>
 #include <filesystem>
 
+#include "Logger/Console.h"
+
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Component.h"
+#include "Animation/Animator.h"
 
 namespace Raven 
 {
-	LuaComponent::LuaComponent(entt::entity entity, const std::string& file, Scene* initScene)
-		:scene(initScene),file(file), entity(entity)
+	LuaComponent::LuaComponent( const std::string& file, Scene* initScene)
+		:scene(initScene),file(file)
 	{
 		table = nullptr;
 
 		Init();
 	}
+
 
 	void LuaComponent::SaveNewFile(const std::string& clazzName)
 	{
@@ -69,7 +75,6 @@ return #name
 
 	void LuaComponent::Init()
 	{
-		
 		className = StringUtils::RemoveExtension(StringUtils::GetFileName(file));
 		auto vm = Engine::GetModule<LuaVirtualMachine>();
 		LoadScript();
@@ -98,7 +103,7 @@ return #name
 			{
 				LOGE("{0}",e.what());
 			}
-			metaFile.Load(this, file + ".mata", scene);
+			metaFile.Load(this, file + ".meta", scene);
 		}
 	}
 
@@ -129,9 +134,12 @@ return #name
 		try
 		{
 			table = std::make_shared<luabridge::LuaRef>(luabridge::LuaRef::fromStack(vm->GetState()));
+			
+			table = std::make_shared<luabridge::LuaRef>((*table)["new"]());
+			
 			onInitFunc = std::make_shared<luabridge::LuaRef>((*table)["OnInit"]);
 			onUpdateFunc = std::make_shared<luabridge::LuaRef>((*table)["OnUpdate"]);
-			(*table)["parent"] = Entity(entity, scene);
+			(*table)["entity"] = GetEntity();
 		}
 		catch (const std::exception& e)
 		{
@@ -140,11 +148,8 @@ return #name
 		OnInit();
 	}
 
-
 	void LuaComponent::OnImGui()
 	{
-
-	
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
@@ -154,6 +159,11 @@ return #name
 			for (auto&& pair : luabridge::pairs(*table))
 			{
 				auto name = pair.first.tostring();
+
+				if (name == "__cname" || name == "__index") {
+					continue;
+				}
+
 				if (pair.second.isNumber()) 
 				{
 					float number = pair.second;
@@ -170,6 +180,11 @@ return #name
 						(*table)[pair.first.tostring()] = str;
 					}
 				}
+				else if (pair.second.isFunction())
+				{
+					ImGui::Columns(1);
+					ImGui::TextUnformatted(name.c_str());
+				}
 				else if (pair.second.isBool())
 				{
 					bool value = pair.second;
@@ -180,12 +195,29 @@ return #name
 				}
 				else if (pair.second.isTable()) 
 				{
-					ImGui::TextUnformatted("isTable");
-					/*bool value = pair.second;
-					if (ImGuiHelper::Property(pair.first.tostring(), value))
+					ImGui::TextUnformatted(name.c_str());
+					ImGui::NextColumn();
+					ImGui::PushItemWidth(-1);
+
+					std::string id =  name + " not support now";
+
+					try
 					{
-						(*table)[pair.first.tostring()] = value;
-					}*/
+						std::string cname = pair.second["__cname"];
+						memcpy(modelName, cname.c_str(), cname.size() + 1);
+					}
+					catch (...)
+					{
+						
+					}
+					
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(ImColor(200, 200, 200)));
+					ImGui::InputText(id.c_str(), modelName, 255, ImGuiInputTextFlags_ReadOnly);
+					ImGui::PopStyleColor();
+
+					ImGui::PopItemWidth();
+					ImGui::NextColumn();
+
 				}
 				else if (pair.second.isUserdata())
 				{
@@ -213,10 +245,10 @@ return #name
 						{
 						}
 					}
-					else if ((pair.second.isInstance<Entity>() && name != "parent"))
+					else if ((pair.second.isInstance<Entity>() && name != "entity"))
 					{
 						Entity* v = pair.second;
-						if (v->GetHandle() != entt::null)
+						if (v != nullptr && v->GetHandle() != entt::null)
 						{
 							auto icon = 
 								v->HasComponent<Camera>() ?
@@ -263,11 +295,7 @@ return #name
 							}
 						}
 					}
-					
 				}
-
-
-			
 			}
 		}
 
@@ -282,4 +310,4 @@ return #name
 		return table != nullptr && !table->isNil();
 	}
 
-	};
+};

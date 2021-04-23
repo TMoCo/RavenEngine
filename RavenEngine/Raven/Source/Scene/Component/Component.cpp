@@ -1,10 +1,16 @@
 #include "Component.h"
+#include "Scene/Entity/Entity.h"
+#include "Engine.h"
+#include "Scene/SceneManager.h"
 
 namespace Raven
 {
 	Hierarchy::Hierarchy(entt::entity p)
 		:parent(p)
 	{
+		first = entt::null;
+		next = entt::null;
+		prev = entt::null;
 	}
 	Hierarchy::Hierarchy()
 	{
@@ -148,9 +154,9 @@ namespace Raven
 		}
 	}
 
-	void Hierarchy::Reparent(entt::entity entity, entt::entity parent, entt::registry& registry, Hierarchy& hierarchy)
+	void Hierarchy::Reparent(entt::entity ent, entt::entity parent, entt::registry& registry, Hierarchy& hierarchy)
 	{
-		Hierarchy::OnDestroy(registry, entity);
+		Hierarchy::OnDestroy(registry, ent);
 
 		hierarchy.parent = entt::null;
 		hierarchy.next = entt::null;
@@ -159,8 +165,13 @@ namespace Raven
 		if (parent != entt::null)
 		{
 			hierarchy.parent = parent;
-			Hierarchy::OnConstruct(registry, entity);
+			Hierarchy::OnConstruct(registry, ent);
 		}
+	}
+
+	Raven::Entity Component::GetEntity()
+	{
+		return {entity,Engine::Get().GetModule<SceneManager>()->GetCurrentScene()};
 	}
 
 }

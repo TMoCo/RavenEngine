@@ -32,6 +32,8 @@ namespace Raven
 		void RenderBottom();
 		void GetDirectories(const std::string& path);
 
+		void PopupWindow();
+
 		inline auto GetParsedAssetID(const std::string& extension)
 		{
 			for (int i = 0; i < assetTypes.size(); i++)

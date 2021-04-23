@@ -9,11 +9,17 @@
 #include "Math/BoundingBox.h"
 
 #include "ResourceManager/Resources/IResource.h"
-#include "Render/RenderResource/RenderRscMesh.h"
+#include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
+#include "Animation/Bone.h"
 //
 // A class for a 3D mesh and its data
 //
+
+namespace ofbx
+{
+	struct Mesh;
+};
 
 namespace Raven
 {
@@ -22,7 +28,12 @@ namespace Raven
 	// This type of resource will rarely if not ever be on its own in the resource register.
 	// It is almost definitely part of a Model resource.
 	public:
-		Mesh() : IResource(EResourceType::RT_Mesh, true) {}
+		// Construct.
+		Mesh() 
+			: IResource(EResourceType::RT_Mesh, true) 
+		{
+		}
+
 		// TODO: free data on destruction
 		virtual ~Mesh()
 		{
@@ -35,8 +46,33 @@ namespace Raven
 		{
 			if (!onGPU)
 			{
-				renderRscMesh->Load(positions, normals, texCoords, indices); // call interface method
+				RAVEN_ASSERT(renderRscMesh == nullptr, "");
+
+				if (blendWeights.empty())
+					renderRscMesh = new RenderRscMesh();
+				else
+					renderRscMesh = new RenderRscSkinnedMesh();
+
+				renderRscMesh->Load(
+					positions, normals, texCoords, indices, blendWeights,blendIndices
+				); // call interface method
 				onGPU = true;
+			}
+		}
+
+
+		inline void NormalizeBlendWeights()
+		{
+			RAVEN_ASSERT(positions.size() == blendWeights.size(), "size is not correct");
+			for (int32_t i = 0; i < positions.size(); i++)
+			{
+				float sum = 0;
+				for (int32_t j = 0; j < 4; j++)
+				{
+					sum += blendWeights[i][j];
+				}
+				const float invSum = sum > MathUtils::EPS ? 1.0f / sum : 0.0f;
+				blendWeights[i] *= invSum;
 			}
 		}
 
@@ -48,10 +84,19 @@ namespace Raven
 
 		std::vector<uint32_t> indices;
 
-		MathUtils::BoundingBox bbox; // defaults to 0 values
+		// The Bounding box the mesh.
+		MathUtils::BoundingBox bounds;
 
 		RenderRscMesh* renderRscMesh = nullptr; // interface with renderer (default constructor)
-
+		std::string name;
 		bool active = true;
+
+		/// Skinned mesh blend indices (max 4 per bone)
+		std::vector<glm::ivec4> blendIndices;
+
+		/// Skinned mesh index buffer (max 4 per bone)
+		std::vector<glm::vec4> blendWeights;
+
 	};
+
 }

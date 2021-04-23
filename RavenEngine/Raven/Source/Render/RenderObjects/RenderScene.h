@@ -3,6 +3,8 @@
 
 
 
+#include "Utilities/Core.h"
+#include "Math/Frustum.h"
 #include "RenderBatch.h"
 
 #include "glm/matrix.hpp"
@@ -13,24 +15,32 @@
 
 namespace Raven
 {
-	class RenderPrimitive;
-	class RenderTerrain;
 	class Scene;
-
-	class GLBuffer;
-
-
-
+	class RenderLight;
+	class UniformBuffer;
+	class RenderShadowCascade;
 
 
-	// Render Scene Batches.
-	enum class ERSceneBatch : uint32_t
+
+
+	// The Environment Properties of the scene.
+	struct RenderSceneEnvironment
 	{
-		Opaque = 0,
-		Debug = 1,
-		Translucent = 2,
-	};
+		// The Sun Direction.
+		glm::vec3 sunDir;
 
+		// The Sun Color.
+		glm::vec3 sunColor;
+
+		// The Sun Power.
+		float sunPower;
+
+		// The Sun Shadow.
+		Ptr<RenderShadowCascade> sunShadow;
+
+		// Reset All Environment Properties.
+		void Reset();
+	};
 
 
 
@@ -46,7 +56,7 @@ namespace Raven
 		// Destruct. 
 		~RenderScene();
 
-		//
+		// Setup the scene, called once for initializing.
 		void Setup();
 
 		// Build Render scene data form a scene.
@@ -56,26 +66,68 @@ namespace Raven
 		void SetView(const glm::mat4& mtx);
 
 		// Set scene projection.
-		void SetProjection(const glm::mat4& mtx);
+		void SetProjection(const glm::mat4& mtx, float n, float f);
 
-		// Draw a specific batch.
-		void Draw(ERSceneBatch type);
+		// Draw the deferred batch.
+		void DrawDeferred();
+
+		// Draw all debug primitives that are set to this scene.
+		void DrawDebug();
+
+		// Draw the translucent batch.
+		void DrawTranslucent(UniformBuffer* lightUB);
 
 		// Add primitives to the debug batch to be draw by this scene.
-		void AddDebugPrimitives(const std::vector<RenderPrimitive*>& primitives);
+		void SetDebugPrimitives(const std::vector<RenderPrimitive*>* primitives);
 		
 		// Clear all render data of the previous frame.
 		void Clear();
 
-		// Return true if the batch is empty.
-		inline bool IsEmpty(ERSceneBatch batch) { return batches[(uint32_t)batch].IsEmpty(); }
+		// Return the view projection matrix.
+		inline const glm::mat4& GetViewProjection() const { return viewProjMatrix; }
+
+		// Return the inverse of the view projection matrix.
+		inline const glm::mat4& GetViewProjectionInverse() const { return viewProjMatrixInverse; }
+
+		// Return the view direction.
+		inline const glm::vec3& GetViewDir() const { return viewDir; }
+
+		// Return the view position.
+		inline const glm::vec3& GetViewPos() const { return viewPos; }
+
+		// Return the scene enviornment.
+		inline const RenderSceneEnvironment& GetEnvironment() const { return environment; }
+
+		// Return near clipping plane.
+		inline const float& GetNear() const { return near; }
+
+		// Return far clipping plane.
+		inline const float& GetFar() const { return far; }
+
+		// Return the light in the scene.
+		inline const std::vector<RenderLight*>& GetLights() { return rlights; }
+		
+		// Return true if the scene want to draw the 2D grid.
+		inline bool IsGrid() { return isGrid; }
+
+		// Return true if the scene want to draw the sky.
+		inline bool IsSky() { return isSky; }
 
 	private:
-		//
+		// Collect view & projection from the scene.
+		void CollectSceneView(Scene* scene);
+
+		// Collect lights from the scene.
+		void CollectSceneLights(Scene* scene);
+
+		// Collect the terrain from the scene.
+		void CollectTerrain(Scene* scene);
+
+		// Traverse the scene and collect primitives that needs to be rendered.
 		void TraverseScene(Scene* scene);
 
-		// Return batch of a batchtype.
-		inline RenderBatch& GetBatch(ERSceneBatch batchType) { return batches[(uint32_t)batchType]; }
+		// Gather all lights that intesect with the bounding sphere.
+		void GatherLights(const glm::vec3& center, float radius, std::vector<RenderLight*>& outLights);
 
 		// Create New Primitive to render.
 		template<class PrimitiveType>
@@ -83,38 +135,82 @@ namespace Raven
 		{
 			// TODO: Memeory management for dynamic primitives.
 			PrimitiveType* prim = new PrimitiveType();
-			dynamicPrimitive.push_back(prim);
+			prim->indexInScene = rprimitives.size();
+			rprimitives.push_back(prim);
 
 			return prim;
 		}
 
+		// Create New Primitive to render.
+		template<class LightType>
+		inline LightType* NewLight()
+		{
+			// TODO: Memeory management for lights.
+			LightType* light = new LightType();
+			light->indexInScene = rlights.size();
+			rlights.push_back(light);
+
+			return light;
+		}
+
+		// Update Light Unifrom Buffer for forward lighting.
+		void UpdateLights_FORWARD(UniformBuffer* lightUB, RenderPrimitive* prim);
 
 	private:
-		// Render Scene Batches.
-		RenderBatch batches[3];
+		// Batch for rendering deferred primitives.
+		RenderBatch<ERenderBatchType::Deferred> deferredBatch;
 
-		// Main View
+		// Batch for rendering translucent primitives.
+		RenderBatch<ERenderBatchType::Translucent> translucentBatch;
+
+		// The View Matrix.
 		glm::mat4 view;
 
 		// Main Project.
 		glm::mat4 projection;
-		
+
+		// View & Projection Matrix
+		glm::mat4 viewProjMatrix;
+
+		// View & Projection Matrix Inverse
+		glm::mat4 viewProjMatrixInverse;
+
+		// The View Direction.
+		glm::vec3 viewDir;
+
+		// The View Position.
+		glm::vec3 viewPos;
+
+		// Near Clipping Plane.
+		float near;
+
+		// Far Clipping Plane.
+		float far;
+
+		// The current frustum of the view & projection. Computed in RenderScene::CollectSceneView().
+		MathUtils::Frustum frustum;
+
+		// Scene Enviornment Data.
+		RenderSceneEnvironment environment;
+
 		// Dynamic Primitives Container.
-		std::vector<RenderPrimitive*> dynamicPrimitive;
+		std::vector<RenderPrimitive*> rprimitives;
 
-		// ~MinimalSolution --- ---- --- ---- --- ---- ---
-		GLBuffer* trUBO;
-		GLBuffer* lightingUBO;
-		GLBuffer* materialUBO;
-		// ~MinimalSolution --- ---- --- ---- --- ---- ---
+		// Transform Uniform Buffers.
+		Ptr<UniformBuffer> transformUniform;
+		Ptr<UniformBuffer> transformBoneUniform;
 
-		// If primitives does not have materials, we use this one.
-		class RenderRscShader* defaultShader;
-		class RenderRscMaterial* defaultMaterail;
+		// Lights in the scene.
+		std::vector<RenderLight*> rlights;
 
-		/** The Terrain in the Scene. */
-		RenderRscShader* terrainShader;
-		RenderRscMaterial* terrainMaterail;
+		// Debug primitive added to the scene to be drawn.
+		const std::vector<RenderPrimitive*>* debugPrimitives;
+
+		// Draw 2D Grid.
+		bool isGrid;
+
+		// Draw Sky.
+		bool isSky;
 	};
 
 

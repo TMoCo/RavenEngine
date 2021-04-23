@@ -5,12 +5,13 @@
 #pragma once
 #include <string>
 #include <memory>
+#include "Component.h"
 
 namespace Raven
 {
 	class CameraController;
 
-	class CameraControllerComponent
+	class CameraControllerComponent : public Component
 	{
 	public:
 		enum class ControllerType : int32_t
@@ -37,13 +38,13 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("ControllerType", type));
+			archive(cereal::make_nvp("ControllerType", type), cereal::make_nvp("Id", entity));
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::make_nvp("ControllerType",type));
+			archive(cereal::make_nvp("ControllerType",type), cereal::make_nvp("Id", entity));
 			SetControllerType(type);
 		}
 

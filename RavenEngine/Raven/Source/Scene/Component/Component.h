@@ -8,30 +8,47 @@
 namespace Raven 
 {
 	//TODO serialize function is not implementation
-	struct NameComponent
+	class Entity;
+	class Component 
 	{
+	public:
+		virtual ~Component() = default;
+		entt::entity entity = entt::null;
+		Entity GetEntity();
+	};
+
+	class NameComponent : public Component
+	{
+	public:
+		NameComponent() = default;
+
+		NameComponent(const std::string & name) :name(name) {}
+
 		template<typename Archive>
 		void serialize(Archive& archive)
 		{
-			archive(cereal::make_nvp("Name", name));
+			archive(cereal::make_nvp("Name", name), cereal::make_nvp("Id", entity));
 		}
 		std::string name;
 	};
 
 
-	struct ActiveComponent
+	class ActiveComponent : public Component
 	{
+	public:
+		ActiveComponent() = default;
+		ActiveComponent(bool active) :active(active) {}
 		template<typename Archive>
 		void serialize(Archive& archive)
 		{
-			archive(cereal::make_nvp("Active", active));
+			archive(cereal::make_nvp("Active", active), cereal::make_nvp("Id", entity));
 		}
 		bool active = true;
 	};
 
 	
 	//Component - 
-	class Hierarchy
+	class Hierarchy : public Component
 	{
 	public:
 		Hierarchy(entt::entity p);
@@ -67,7 +84,7 @@ namespace Raven
 		template<typename Archive>
 		void serialize(Archive& archive)
 		{
-			archive(cereal::make_nvp("First", first), cereal::make_nvp("Next", next), cereal::make_nvp("Previous", prev), cereal::make_nvp("Parent", parent));
+			archive(cereal::make_nvp("First", first), cereal::make_nvp("Next", next), cereal::make_nvp("Previous", prev), cereal::make_nvp("Parent", parent), cereal::make_nvp("Id", entity));
 		}
 	};
 

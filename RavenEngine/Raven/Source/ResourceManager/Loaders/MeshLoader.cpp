@@ -5,14 +5,35 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 #include "Utilities/StringUtils.h"
 
 #include "ResourceManager/Loaders/MeshLoader.h"
 #include "ResourceManager/Resources/Mesh.h"
+#include <OpenFBX/ofbx.h>
+
+#include "Scene/Component/Transform.h"
+#include "Scene/Entity/Entity.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Entity/EntityManager.h"
+
+#include "ResourceManager/FileSystem.h"
+#include "Scene/Component/Model.h"
+
+#include "ResourceManager/FbxLoader.h"
+
+#include "Engine.h"
+
+#include <unordered_map>
 
 namespace Raven
 {
+
+
+
 	bool MeshLoader::LoadAsset(const std::string& path)
 	{
         std::string extension = StringUtils::GetExtension(path);
@@ -21,6 +42,10 @@ namespace Raven
         {
             return LoadOBJ(path);
         }
+		if (extension == "fbx")
+		{
+			return LoadFBX(path);
+		}
         else
         {
             return false;
@@ -56,6 +81,7 @@ namespace Raven
         {
             // one shape = one mesh
             Mesh* mesh = new Mesh();
+            mesh->name = shape.name;
             // resize the mesh data
             for (const auto& index : shape.mesh.indices)
             {
@@ -65,7 +91,8 @@ namespace Raven
                     attrib.vertices[3 * index.vertex_index + 1],
                     attrib.vertices[3 * index.vertex_index + 2]));
 
-                mesh->bbox.AddVertex(*mesh->positions.rbegin());
+                // Update Bounds.
+                mesh->bounds.Add( mesh->positions.back() );
 
                 // check that normals and texcoords exist, add accordingly
                 if (index.normal_index == -1)
@@ -94,12 +121,30 @@ namespace Raven
 
                 mesh->indices.push_back(static_cast<uint32_t>(mesh->indices.size()));
             }
-            // once all vertices have been processed, update the bbox's centre
-            mesh->bbox.UpdateCentre();
+
+
             resourceManager->AddResource(path, mesh); // file path is resource id
             //meshId = path + std::string(StringUtils::IntToString(meshNum++, buffer, StringUtils::Decimal));
         }
         // TODO: process Material data
         return true;
     }
-}
+
+	bool MeshLoader::LoadFBX(const std::string& path)
+	{
+		return false;
+	}
+
+	bool MeshLoader::LoadFBX(const std::string& path, Model * model)
+	{
+		if (resourceManager->HasResource(path))
+		{
+			// already loaded
+			return true;
+		}
+        FbxLoader loader;
+        loader.Load(path, model);
+		return true;
+	}
+
+};

@@ -21,10 +21,34 @@ namespace Raven
 	class GLContext;
 	class RenderScene;
 	class RenderDebug;
-	class Scene;
 	class RenderTarget;
-	class Camera;
-	class Transform;
+	class Scene;
+	class RenderPipeline;
+	class RenderTexFilter;
+	class RenderRscMaterial;
+	class Material;
+
+
+
+
+	// The Renderer Default Materials.
+	struct RenderDefaultMaterials
+	{
+		// The Default Material for meshes.
+		Ptr<Material> mesh;
+
+		// The Default Material for skinned meshes.
+		Ptr<Material> skinned;
+
+		// The Default Material for terrain.
+		Ptr<Material> terrain;
+	};
+
+
+
+
+
+
 	// RenderModule:
 	//		- The Engine Render Manager.
 	//
@@ -52,6 +76,9 @@ namespace Raven
 		// if true will resize the render target with engine window.
 		inline void SetRTToWindow(bool value) { isRTToWindow = value; }
 
+		//  Return default materails.
+		inline const RenderDefaultMaterials& GetDefaultMaterials() { return defaultMaterials; }
+
 	public:
 		// Update render.
 		void Update(float dt);
@@ -64,6 +91,9 @@ namespace Raven
 
 		// End and clean up the render.
 		void EndRender();
+
+		// Create/Setup default materials.
+		void CreateDefaultMaterials();
 
 	private:
 		// Module Initialize.
@@ -79,19 +109,26 @@ namespace Raven
 		// if true the engine currently rendering.
 		bool isRendering;
 
-		// 
-		std::shared_ptr<RenderScene> rscene;
+		// The Main Render data of the scene. 
+		Ptr<RenderScene> rscene;
+
+		// The Main Render Target of the scene. 
+		Ptr<RenderTarget> rtScene;
 
 		// Render Debug, used for debug drawing.
-		std::unique_ptr<RenderDebug> rdebug;
+		Ptr<RenderDebug> rdebug;
 
-		// The Render Target we draw our scene on.
-		std::shared_ptr<RenderTarget> rtScene;
+		// The Engine Render Pipeline.
+		Ptr<RenderPipeline> rpipeline;
+
+		// The Engine Render Texture Filter, used to filter textures.
+		Ptr<RenderTexFilter> rfilter;
 
 		// if true will render to window with the exact size as the window.
 		bool isRTToWindow;
 
-
+		// The default materials.
+		RenderDefaultMaterials defaultMaterials;
 	};
 
 }

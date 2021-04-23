@@ -10,9 +10,8 @@
 #include <imgui_internal.h>
 #include "Logger/Console.h"
 
-
-
 #include <algorithm>
+#include "Animation/AnimationController.h"
 #include "Utilities/StringUtils.h"
 #include "Editor.h"
 
@@ -124,6 +123,11 @@ namespace Raven
 				{
 					ImGui::BeginChild("##Scrolling");
 
+					if (ImGui::IsMouseClicked(1)) {
+						ImGui::OpenPopup("AssetsWindow::PopupWindow");
+					}
+					PopupWindow();
+
 					int shownIndex = 0;
 
 					float xAvail = ImGui::GetContentRegionAvail().x;
@@ -158,6 +162,9 @@ namespace Raven
 					ImGui::EndChild();
 				}
 				ImGui::EndChild();
+
+			
+
 			}
 
 			if (ImGui::BeginDragDropTarget())
@@ -411,6 +418,23 @@ namespace Raven
 		}
 	}
 
+	void AssetsWindow::PopupWindow()
+	{
+		if (ImGui::BeginPopupContextWindow("AssetsWindow::PopupWindow"))
+		{
+			if (ImGui::Selectable("Add Animation Controller"))
+			{
+				LOGV("{0}/", currentDirPath);
+				AnimationController controller(currentDirPath +"/NewAnimController.controller");
+				controller.Save();
+
+				baseProjectDir = GetFsContents(baseDirPath);
+				currentDir = baseProjectDir;
+			}
+			ImGui::EndPopup();
+		}
+	}
+
 	std::string AssetsWindow::ParseFilename(const std::string& str, const char delim, std::vector<std::string>& out)
 	{
 		size_t start;
@@ -446,11 +470,6 @@ namespace Raven
 
 		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{
-			/*if (StringUtils::IsHiddenFile(entry.path().string()))
-			{
-				break;
-			}
-*/
 
 			bool isDir = std::filesystem::is_directory(entry);
 			auto test = std::vector<std::string>();

@@ -1,9 +1,9 @@
 #include "RenderDebug.h"
-#include "RenderResource/RenderRscDebugMesh.h"
-#include "RenderResource/RenderRscShader.h"
-#include "RenderResource/RenderRscMaterial.h"
-#include "RenderObjects/RenderDebugPrimitive.h"
+#include "RenderResource/Primitives/RenderRscDebugMesh.h"
+#include "RenderObjects/Primitives/RenderDebugPrimitive.h"
 
+#include "RenderResource/Shader/RenderRscShader.h"
+#include "RenderResource/Shader/RenderRscMaterial.h"
 
 #include "glm/vec3.hpp"
 #include "glm/gtx/transform.hpp"
@@ -51,12 +51,28 @@ RenderDebug::~RenderDebug()
 
 void RenderDebug::Setup()
 {
-	//
-	debugShader = new RenderRscShader();
-	debugShader->Load(ERenderShaderType::Debug, "DrawDebugShader");
+	// Debug Shader
+	{
+		// Shader Domain Data (Custom Domain)
+		RenderRscShaderDomainCreateData shaderDomainData;
+		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/DrawDebugVert.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/DrawDebugFrag.glsl");
+		shaderDomainData.AddImport(EGLShaderStageBit::VertexBit, "shaders/VertexTransform.glsl");
 
-	//
-	debugMaterial = new RenderRscMaterial(debugShader);
+		// Shader Type Data
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::Opaque;
+		shaderData.name = "DrawDebug_Shader";
+
+		debugShader = RenderRscShader::CreateCustom(shaderDomainData, shaderData);
+		debugShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
+		debugShader->GetInput().AddBlockInput(RenderShaderInput::TransformBlock);
+		debugShader->GetInput().AddInput(EShaderInputType::Vec4, "color");
+		debugShader->BindBlockInputs();
+
+		debugMaterial = new RenderRscMaterial(debugShader);
+	}
+
 
 	//
 	RenderRscDebugMesh* rscMesh = new RenderRscDebugMesh();

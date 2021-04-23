@@ -24,7 +24,8 @@ namespace Raven
 		void Destroy() override;
 		inline auto GetState() { return L; }
 	private:
-
+		void AddSystemPath(const std::string& path);
+		void AddPath(const std::string& path);
 
 		lua_State * L = nullptr;
 	};

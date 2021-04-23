@@ -21,7 +21,7 @@ namespace Raven
 		{
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Quad";
 			mesh->positions.resize(4);
 			mesh->texCoords.resize(4);
 
@@ -50,22 +50,29 @@ namespace Raven
 		Mesh* CreateQuad()
 		{
 			Mesh* mesh = new Mesh();
+			mesh->name = "Quad";
 			mesh->positions.resize(4);
 			mesh->texCoords.resize(4);
+			mesh->normals.resize(4);
 
 			mesh->positions[0] = glm::vec3(-1.0f, -1.0f, 0.0f);
 			mesh->texCoords[0] = glm::vec2(0.0f, 0.0f);
+			mesh->normals[0] = glm::vec3(0.0f, 0.0f, 1.0f);
 
 			mesh->positions[1] = glm::vec3(1.0f, -1.0f, 0.0f);
 			mesh->texCoords[1] = glm::vec2(1.0f, 0.0f);
+			mesh->normals[1] = glm::vec3(0.0f, 0.0f, 1.0f);
 
 			mesh->positions[2] = glm::vec3(1.0f, 1.0f, 0.0f);
 			mesh->texCoords[2] = glm::vec2(1.0f, 1.0f);
+			mesh->normals[2] = glm::vec3(0.0f, 0.0f, 1.0f);
 
 			mesh->positions[3] = glm::vec3(-1.0f, 1.0f, 0.0f);
 			mesh->texCoords[3] = glm::vec2(0.0f, 1.0f);
+			mesh->normals[3] = glm::vec3(0.0f, 0.0f, 1.0f);
 
 			mesh->indices = { 0, 1, 2, 2, 3, 0, };
+			mesh->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 
 			return mesh;
 		}
@@ -80,6 +87,7 @@ namespace Raven
 			//  |/      |/
 			//  v2------v3
 			Mesh* mesh = new Mesh();
+			mesh -> name= "Cube";
 			mesh->texCoords.resize(24);
 			mesh->normals.resize(24);
 			mesh->positions.resize(24);
@@ -180,6 +188,9 @@ namespace Raven
 				20,21,22,
 				20,22,23
 			};
+
+			mesh->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
 			return mesh;
 		}
 
@@ -264,6 +275,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
+			mesh->name = "Pyramid";
 
 			mesh->indices = {
 				0,1,2,
@@ -280,6 +292,7 @@ namespace Raven
 				mesh->positions.emplace_back(data[i].position);
 				mesh->texCoords.emplace_back(data[i].texCoord);
 				mesh->normals.emplace_back(data[i].normal);
+				mesh->bounds.Add(data[i].position);
 			}
 
 			return mesh;
@@ -297,7 +310,7 @@ namespace Raven
 			float radius = 1.0f;
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Sphere";
 			for (int i = 0; i <= stackCount; ++i)
 			{
 				float stackAngle = M_PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
@@ -320,6 +333,7 @@ namespace Raven
 					mesh->positions.emplace_back(glm::vec3(x, y, z));
 					mesh->texCoords.emplace_back(glm::vec2(s, t));
 					mesh->normals.emplace_back(glm::normalize(glm::vec3(x, y, z)));
+					mesh->bounds.Add(glm::vec3(x, y, z));
 				}
 			}
 
@@ -357,7 +371,7 @@ namespace Raven
 		{
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Plane";
 			glm::vec3 vec = normal * 90.0f;
 			glm::quat rotation =
 				glm::quat(vec.z, glm::vec3(1.0f, 0.0f, 0.0f)) *
@@ -390,6 +404,7 @@ namespace Raven
 				mesh->positions.emplace_back(v.position);
 				mesh->texCoords.emplace_back(v.texCoord);
 				mesh->normals.emplace_back(v.normal);
+				mesh->bounds.Add(v.position);
 			}
 
 			mesh->indices =
@@ -410,7 +425,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Capsule";
 
 			point = 0;
 
@@ -482,6 +497,7 @@ namespace Raven
 					mesh->positions.emplace_back(p);
 					mesh->normals.emplace_back(glm::vec3(x, 0.0f, z));
 					mesh->texCoords.emplace_back(glm::vec2(u, onethird * v));
+					mesh->bounds.Add(p);
 
 
 
@@ -557,7 +573,7 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-
+			mesh->name = "Cylinder";
 			thisrow = 0;
 			prevrow = 0;
 			for (j = 0; j <= (rings + 1); j++)
@@ -583,6 +599,7 @@ namespace Raven
 					mesh->positions.emplace_back(p);
 					mesh->normals.emplace_back(glm::vec3(x, 0.0f, z));
 					mesh->texCoords.emplace_back(glm::vec2(u, v * 0.5f));
+					mesh->bounds.Add(p);
 
 					point++;
 

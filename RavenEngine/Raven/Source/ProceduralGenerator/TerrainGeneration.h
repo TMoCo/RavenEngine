@@ -18,6 +18,8 @@ namespace Raven {
 	class TerrainGeneration : public IModule
 	{
 	public:
+		uint8_t* squareGradient;
+
 		// constructor
 		TerrainGeneration();
 
@@ -33,8 +35,11 @@ namespace Raven {
 		// destroy module
 		virtual void Destroy() override;
 
-		// create noise
-		void Noise(int width, int height, FileFormat type);
+		// create a square gradient for island
+		void GenerateSquareGradient(int width, int height);
+
+		// create terrain noise
+		void GenerateNoise(int width, int height, FileFormat type);
 
 		// write out image in the specified format
 		void WriteImage(FileFormat type, int width, int height, const uint8_t* data);

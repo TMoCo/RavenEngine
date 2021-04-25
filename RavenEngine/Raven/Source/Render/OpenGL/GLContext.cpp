@@ -32,9 +32,9 @@ RenderSurface GLContext::GetSurface()
 {
 	RenderSurface surface;
 
-	// OpenGL 3.3 core profile.
-	surface.majorVersion = 3;
-	surface.minorVersion = 3;
+	// OpenGL 4.5 core profile.
+	surface.majorVersion = 4;
+	surface.minorVersion = 5;
 	surface.coreProfile = true;
 
 	// RGBA - 32Bit

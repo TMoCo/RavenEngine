@@ -4,10 +4,13 @@
 #include <LuaBridge/LuaBridge.h>
 #include <string>
 #include <functional>
+
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Animation/Animator.h"
+
+#include "LuaComponent.h"
 
 #include "Scene/Entity/Entity.h"
 #include "Scene/Entity/EntityManager.h"
@@ -36,6 +39,8 @@ namespace Raven
 				.endClass()
 				.endNamespace()
 
+
+
 				.beginClass <Entity>("Entity")
 				.addConstructor <void (*) (entt::entity, Scene*)>()
 				.addConstructor <void (*) ()>()
@@ -47,11 +52,14 @@ namespace Raven
 				.addFunction("GetChildren", &Entity::GetChildren)
 				.addFunction("SetActive", &Entity::SetActive)
 				.addFunction("IsActive", &Entity::IsActive)
+				.addFunction("GetChildInChildren", &Entity::GetChildInChildren)
+
 				.EXPORT_COMPONENTS(NameComponent)
 				.EXPORT_COMPONENTS(ActiveComponent)
 				.EXPORT_COMPONENTS(Transform)
 				.EXPORT_COMPONENTS(Light)
 				.EXPORT_COMPONENTS(Animator)
+				.EXPORT_COMPONENTS(LuaComponent)
 
 				.endClass()
 
@@ -59,9 +67,10 @@ namespace Raven
 				.addFunction("Create", static_cast<Entity(EntityManager::*)()> (&EntityManager::Create))
 				.addFunction("GetRegistry", &EntityManager::GetRegistry)
 				.endClass()
-				
+
 				.beginClass<NameComponent>("NameComponent")
-				.addProperty("name",&NameComponent::name)
+				.addProperty("name", &NameComponent::name)
+				.addFunction("GetEntity", &NameComponent::GetEntity)
 				.endClass()
 
 				.beginClass<Light>("Light")
@@ -69,19 +78,29 @@ namespace Raven
 				.addProperty("position", &Light::position)
 				.addProperty("direction", &Light::direction)
 				.addProperty("intensity", &Light::intensity)
-				.addProperty("angle", &Light::angle)
+				.addProperty("angle", &Light::innerAngle)
+				.addProperty("angle", &Light::outerAngle)
+				.addProperty("angle", &Light::clipDistance)
+				.addFunction("GetEntity", &Light::GetEntity)
 				.endClass()
 
 				.beginClass<ActiveComponent>("ActiveComponent")
 				.addProperty("active", &ActiveComponent::active)
+				.addFunction("GetEntity", &ActiveComponent::GetEntity)
 				.endClass()
-				
+
+				.beginClass<LuaComponent>("LuaComponent")
+				.endClass()
+
 				.beginClass<Animator>("Animator")
 				.addFunction("SetValue", &Animator::SetValue<float>)
 				.addFunction("SetValue", &Animator::SetValue<int32_t>)
 				.addFunction("SetValue", &Animator::SetValue<std::string>)
 				.addFunction("SetValue", &Animator::SetValue<bool>)
-				;
+				.addFunction("GetEntity", &Animator::GetEntity)
+				.endClass();
+				
+
 		}
 	};
 };

@@ -5,8 +5,7 @@
 #pragma once
 
 #include "Scene/Component/Model.h"
-#include "ResourceManager/Resources/Mesh.h"
-#include "Engine.h"
+#include "Scene/Component/MeshRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
@@ -15,6 +14,8 @@
 #include "Utilities/StringUtils.h"
 #include "Animation/SkeletonCache.h"
 #include "MeshRenderer.h"
+
+#include "Engine.h"
 
 
 namespace Raven
@@ -54,22 +55,51 @@ namespace Raven
 		}
 	}
 
-	std::shared_ptr<Mesh> Model::AddMesh(Mesh* mesh)
-	{
-		auto ret = std::shared_ptr<Mesh>(mesh);
-		meshes.emplace_back(ret);
-		return ret;
-	}
-
-	void Model::AddMesh(const std::shared_ptr<Mesh>& mesh)
+	void Model::AddMesh(Ptr<Mesh> mesh)
 	{
 		meshes.emplace_back(mesh);
+		UpdateBounds();
 	}
 
-	void Model::AddMeshes(const std::vector<std::shared_ptr<Mesh>> & inputMeshes)
+	void Model::AddMeshes(const std::vector< Ptr<Mesh> > & inputMeshes)
 	{
 		// for multiple meshes
 		meshes.insert(meshes.end(), inputMeshes.begin(), inputMeshes.end());
+		UpdateBounds();
+	}
+
+
+	void Model::UpdateBounds()
+	{
+		localBounds.Reset();
+
+		for (auto mesh : meshes)
+		{
+			localBounds.Add(mesh->bounds);
+		}
+	}
+
+
+	void Model::SetMaterial(uint32_t index, Ptr<Material> mat)
+	{
+		if (materials.size() < index + 1)
+			materials.resize(index + 1);
+
+		materials[index] = mat;
+	}
+
+	Material* Model::GetMaterial(uint32_t index)
+	{
+		// Invalid Index?
+		if (index >= materials.size() || index < 0)
+			return nullptr;
+
+		return materials[index].get();
+	}
+
+	const Material* Model::GetMaterial(uint32_t index) const
+	{
+		return const_cast<Model*>(this)->GetMaterial(index);
 	}
 
 	void Model::LoadFile(bool fromLoad)
@@ -98,7 +128,7 @@ namespace Raven
 	void Model::BindMeshComponentForFBX()
 	{
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
-		Entity ent(entity, currentScene);
+		Entity ent = GetEntity();
 		if (ent.GetChildren().empty())
 		{
 			FbxLoader loader;
@@ -107,8 +137,10 @@ namespace Raven
 			for (auto i = 0; i < meshes.size(); i++)
 			{
 				auto entity = ent.GetChildInChildren(meshes[i]->name);
-				if (!entity.Valid())
+				if (!entity.Valid()) {
 					entity = currentScene->CreateEntity(meshes[i]->name);
+					entity.SetParent(ent);
+				}
 
 				if (!meshes[i]->blendIndices.empty() ||
 					!meshes[i]->blendWeights.empty())
@@ -126,7 +158,6 @@ namespace Raven
 					render.mesh = meshes[i];
 					render.meshIndex = i;
 				}
-				entity.SetParent(ent);
 			}
 		}
 	}
@@ -151,16 +182,49 @@ namespace Raven
 				for (auto i = 0; i < meshes.size(); i++)
 				{
 					auto entity = ent.GetChildInChildren(meshes[i]->name);
-					if (!entity.Valid())
+					if (!entity.Valid()) {
 						entity = currentScene->CreateEntity(meshes[i]->name);
-
+						entity.SetParent(ent);
+					}
 					auto& render = entity.AddComponent<MeshRenderer>();
 					render.mesh = meshes[i];
 					render.meshIndex = i;
-					entity.SetParent(ent);
 				}
 			}
 		}
-		
 	}
+
+
+	void Model::GetMeshRenderersImp(std::vector<ModelMeshRendererData>& outMesRenderers, Entity& ent)
+	{
+		// Try to get mesh renderer.
+		auto* rmesh = ent.TryGetComponent<MeshRenderer>();
+		if (rmesh)
+			outMesRenderers[rmesh->meshIndex].mesh = rmesh;
+
+		// Try to get mesh skinned mesh renderer.
+		auto* rskinned = ent.TryGetComponent<SkinnedMeshRenderer>();
+		if (rskinned)
+			outMesRenderers[rskinned->meshIndex].skinned = rskinned;
+
+		// Iterate on childrens...
+		auto children = ent.GetChildren();
+
+		for (auto childEntt : children)
+		{
+			GetMeshRenderersImp(outMesRenderers, childEntt);
+		}
+	}
+
+
+
+	void Model::GetMeshRenderers(std::vector<ModelMeshRendererData>& outMesRenderers, Scene* scene)
+	{
+		Entity ent(entity, scene);
+		outMesRenderers.resize(meshes.size());
+		GetMeshRenderersImp(outMesRenderers, ent);
+	}
+
+
+
 }

@@ -62,7 +62,6 @@ namespace Raven
 		void SetScene(Scene* scene) { this->scene = scene; }
 
 	private:
-	
 
 		void SaveNewFile(const std::string & fileName);
 		void Init();
@@ -76,4 +75,5 @@ namespace Raven
 
 		MetaFile metaFile;
 	};
+
 };

@@ -5,79 +5,166 @@
 #include "Math/BoundingBox.h"
 #include "Math/MathUtils.h"
 
-namespace Raven 
+
+#include "glm/common.hpp"
+
+
+
+
+
+namespace Raven {
+
+namespace MathUtils {
+
+
+
+BoundingBox::BoundingBox()
+	: isValid(false)
 {
-	namespace MathUtils
+
+}
+
+
+BoundingBox::BoundingBox(const glm::vec3& inMin, const glm::vec3& inMax)
+	: isValid(true)
+	, min(inMin)
+	, max(inMax)
+{
+
+}
+
+
+BoundingBox::BoundingBox(const glm::vec3& center, float scaleX, float scaleY, float scaleZ)
+{
+	glm::vec3 scale(scaleX * 0.5f, scaleY * 0.5f, scaleZ * 0.5f);
+
+	Add(center + scale);
+	Add(center - scale);
+}
+
+
+void BoundingBox::Add(const glm::vec3& vert)
+{
+	if (isValid)
 	{
-		// add a vertex and update bounding box min and max if nescessary
-		void BoundingBox::AddVertex(const glm::vec3& vert)
-		{
-			if (min.x > vert.x + EPS)
-				min.x = vert.x;
-			if (max.x < vert.x - EPS)
-				max.x = vert.x;
-			if (min.y > vert.y + EPS)
-				min.y = vert.y;
-			if (max.y < vert.y - EPS)
-				max.y = vert.y;
-			if (min.z > vert.z + EPS)
-				min.z = vert.z;
-			if (max.z < vert.z - EPS)
-				max.z = vert.z;
-		}
+		min = glm::min(min, vert);
+		max = glm::max(max, vert);
+	}
+	else
+	{
+		min = max = vert;
+		isValid = true;
+	}
 
-		EIntersection BoundingBox::DoesPointIntersect(const glm::vec3 point) const
-		{
-			// point is outside if either of its xyz is bigger or smaller than the corresponding max or min respectively
-			if (point.x > min.x || point.x < max.x ||
-				point.y > min.y || point.y < max.y ||
-				point.z > min.z || point.z < max.z)
-			{
-				return EIntersection::Outside;
-			}
-			else
-			{
-				return EIntersection::Inside;
-			}
-		}
-
-		EIntersection BoundingBox::DoesBoxIntersect(const BoundingBox& other) const
-		{
-			// other box is outside if either of its max or min is smaller or bigger
-			// than this box's corresponding min or max respectively
-			if (other.max.x < min.x || max.x > other.min.x ||
-				other.max.y < min.y || max.y > other.min.y ||
-				other.max.z < min.z || max.z > other.min.z)
-			{
-				return EIntersection::Outside;
-			}
-			else 
-			// other box is intersecting if either of its max or min is or smaller 
-			// than this box's corresponding max or min respectively
-			if (other.max.x > max.x || min.x < other.min.x ||
-				other.max.y > max.y || min.y < other.min.y ||
-				other.max.z > max.z || min.z < other.min.z)
-			{
-				return EIntersection::Intesects;
-			}
-			// remaining case must be Inside
-			else
-			{
-				return EIntersection::Inside;
-			}
-		}
+}
 
 
-		glm::vec3 BoundingBox::RayIntersection(const glm::vec3 dir) const
-		{
-			// get intersection point with box, how to process no intersection?
-			return glm::vec3(0.0f);
-		}
+void BoundingBox::Add(const BoundingBox& other)
+{
+	Add(other.min);
+	Add(other.max);
+}
 
-		void BoundingBox::UpdateCentre()
-		{
-			// update the centre depending on min and max values
-			centre = glm::vec3((min.x + max.x) / 2.0f, (min.y + max.y) / 2.0f, (min.z + max.z) / 2.0f);
-		}
-	};
-};
+
+EIntersection BoundingBox::DoesPointIntersect(const glm::vec3 point) const
+{
+	// point is outside if either of its xyz is bigger or smaller than the corresponding max or min respectively
+	if (point.x > min.x || point.x < max.x ||
+		point.y > min.y || point.y < max.y ||
+		point.z > min.z || point.z < max.z)
+	{
+		return EIntersection::Outside;
+	}
+	else
+	{
+		return EIntersection::Inside;
+	}
+}
+
+
+EIntersection BoundingBox::DoesBoxIntersect(const BoundingBox& other) const
+{
+	// other box is outside if either of its max or min is smaller or bigger
+	// than this box's corresponding min or max respectively
+	if (other.max.x < min.x || max.x > other.min.x ||
+		other.max.y < min.y || max.y > other.min.y ||
+		other.max.z < min.z || max.z > other.min.z)
+	{
+		return EIntersection::Outside;
+	}
+	else 
+	// other box is intersecting if either of its max or min is or smaller 
+	// than this box's corresponding max or min respectively
+	if (other.max.x > max.x || min.x < other.min.x ||
+		other.max.y > max.y || min.y < other.min.y ||
+		other.max.z > max.z || min.z < other.min.z)
+	{
+		return EIntersection::Intesects;
+	}
+	// remaining case must be Inside
+	else
+	{
+		return EIntersection::Inside;
+	}
+}
+
+
+bool BoundingBox::RayIntersection(const glm::vec3& org, const glm::vec3& dir, float& outAlpha) const
+{
+	// 
+	glm::vec3 div;
+	div.x = 1.0f / dir.x;
+	div.y = 1.0f / dir.y;
+	div.z = 1.0f / dir.z;
+
+	//
+	glm::vec3 mx = (min - org) * div;
+	glm::vec3 mn = (max - org) * div;
+
+	//
+	glm::vec3 minab = glm::min(mx, mn);
+	glm::vec3 maxab = glm::max(mx, mn);
+
+	float alphaMin = glm::max(minab.x, glm::max(minab.y, minab.z));
+	float alphaMax = glm::min(maxab.x, glm::min(maxab.y, maxab.z));
+
+	// Intersection is Behind?
+	if (alphaMax < 0)
+	{
+		outAlpha = alphaMax;
+		return true;
+	}
+
+	// No Intersection?
+	if (alphaMin > alphaMax)
+	{
+		return false;
+	}
+
+	outAlpha = alphaMin;
+	return true;
+}
+
+
+
+BoundingBox BoundingBox::Transform(const glm::mat4& mtx) const
+{
+	glm::vec3 newMin = mtx * glm::vec4(min, 1.0f);
+	glm::vec3 mewMax = mtx * glm::vec4(max, 1.0f);
+
+	BoundingBox trBox;
+	trBox.isValid = isValid;
+	trBox.min = glm::min(newMin, mewMax);
+	trBox.max = glm::max(newMin, mewMax);
+
+	return trBox;
+}
+
+
+
+
+
+} // End of namespace MathUtils.
+
+
+} // End of namespace Raven.

@@ -78,9 +78,30 @@ namespace Raven
 	{
 		Vertex = 0x8B31,
 		Geometry = 0x8DD9,
-		Fragment = 0x8B30
+		Fragment = 0x8B30,
+		TessEvaluation = 0x8E87,
+		TessControl = 0x8E88
 	};
 
+
+	// Shader Types Bit flags.
+	enum class EGLShaderStageBit : GLENUM
+	{
+		None = 0x0,
+		VertexBit = 0x00000001,
+		FragmentBit = 0x00000002,
+		GeometryBit = 0x00000004,
+		TessControlBit = 0x00000008,
+		TessEvaluationBit = 0x00000010,
+
+		All = VertexBit 
+		| FragmentBit | GeometryBit 
+		| TessControlBit | TessEvaluationBit
+	};
+
+	// Operators for EGLShaderStageBit
+	inline EGLShaderStageBit operator&(EGLShaderStageBit a, EGLShaderStageBit b) { return static_cast<EGLShaderStageBit>((GLENUM)a & (GLENUM)b); }
+	inline EGLShaderStageBit operator|(EGLShaderStageBit a, EGLShaderStageBit b) { return static_cast<EGLShaderStageBit>((GLENUM)a | (GLENUM)b); }
 
 
 	// OpenGL Texture Types
@@ -102,6 +123,7 @@ namespace Raven
 		RGBA = 0x1908,
 
 		R16F = 0x822D,
+		RG16F = 0x822F,
 		RGB16F = 0x881B,
 		RGBA16F = 0x881A,
 
@@ -118,7 +140,7 @@ namespace Raven
 	{
 		Nearest = 0x2600,
 		Linear = 0x2601,
-		TriLinear = 0x2703,
+		TriLinear = 0x2703
 	};
 
 

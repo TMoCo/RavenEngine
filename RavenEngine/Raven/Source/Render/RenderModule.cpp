@@ -3,18 +3,26 @@
 
 #include "Engine.h"
 #include "Window/Window.h"
+
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/MaterialShader.h"
+#include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Resources/Texture2D.h"
+
+
 #include "RenderDebug.h"
-#include "OpenGL/GLContext.h"
 #include "RenderTarget.h"
-
+#include "RenderPipeline.h"
+#include "RenderTexFilter.h"
+#include "Render/RenderResource/Shader/RenderRscShader.h"
+#include "Render/RenderResource/Shader/UniformBuffer.h"
 #include "RenderObjects/RenderScene.h"
-#include "Render/RenderObjects/RenderTerrain.h"
-#include "Render/RenderResource/RenderRscTerrain.h"
-#include "Render/RenderResource/RenderRscMaterial.h"
-#include "Render/RenderResource/RenderRscShader.h"
-#include "Render/RenderObjects/RenderTerrain.h"
+#include "RenderObjects/RenderPass.h"
+#include "RenderObjects/RenderScreen.h"
+#include "RenderObjects/RenderSphere.h"
 
 
+#include "OpenGL/GLContext.h"
 #include "OpenGL/GLShader.h"
 #include "OpenGL/GLFrameBuffer.h"
 #include "OpenGL/GLVertexArray.h"
@@ -22,37 +30,34 @@
 #include "OpenGL/GLTexture.h"
 
 
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-
-#include "glm/gtx/transform.hpp"
-
 
 #include "Scene/Scene.h"
+#include "Scene/SceneGraph.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/SceneGraph.h"
-#include <entt/entt.hpp>
 
 
-#include <chrono>
+
+#include "entt/entt.hpp"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "glm/gtx/transform.hpp"
 
 
-#include "Core/Camera.h"
+// ~ITERATION_0----------------------------------------------------------------------------
+#include "ResourceManager/ResourceManager.h"
+// ~ITERATION_0----------------------------------------------------------------------------
+
+
+
+
+
+
 
 namespace Raven {
 
 
-
-
-
-
-// ~TESTING-------------------------------------------------------
-
-static float camRot = 0.0f;
-
-// ~TESTING-------------------------------------------------------
 
 
 
@@ -64,6 +69,7 @@ RenderModule::RenderModule()
 	, isRTToWindow(true)
 {
 	rdebug.reset(new RenderDebug());
+
 }
 
 
@@ -91,6 +97,19 @@ void RenderModule::Initialize()
 	rdebug->Setup();
 
 
+	// ...
+	Ptr<RenderScreen> rscreen = Ptr<RenderScreen>(RenderScreen::Create());
+	Ptr<RenderSphere> rsphere = Ptr<RenderSphere>(RenderSphere::Create());
+
+	rpipeline = Ptr<RenderPipeline>(new RenderPipeline(rscreen, rsphere));
+	rpipeline->Initialize();
+
+	rfilter = Ptr<RenderTexFilter>(new RenderTexFilter(rscreen, rsphere) );
+	rfilter->Initialize();
+
+	CreateDefaultMaterials();
+
+
 	// Main Scene Render Target.
 	rtScene = std::make_shared<RenderTarget>(EGLTexture::Texture2D, EGLFormat::RGBA);
 	rtScene->Resize(glm::ivec2(1920, 1080));
@@ -101,49 +120,60 @@ void RenderModule::Initialize()
 	// Render Scene.
 	rscene = std::make_shared<RenderScene>();
 	rscene->Setup();
+	rscene->SetDebugPrimitives( &rdebug->GetRenderPrimitive() );
+
+
+
+	// ~ITERATION_0----------------------------------------------------------------------------
+	// load the generated height map into resource manager
+	std::string evnTexPath = "assets/textures/T_Default_Environment_Map.jpg";
+	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>(evnTexPath);
+	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(evnTexPath).get();
+	envTexture->renderRscTexture = new RenderRscTexture();
+	envTexture->LoadOnGpu();
+	envTexture->renderRscTexture->GetTexture()->Bind();
+	envTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Mirror);
+	envTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::Linear);
+	envTexture->renderRscTexture->GetTexture()->UpdateTexParams();
+	envTexture->renderRscTexture->GetTexture()->Unbind();
+
+	RenderRscTexture* envMap = new RenderRscTexture();
+	rfilter->GenCubeMap(envTexture->renderRscTexture, envMap, true);
+
+	RenderRscTexture* specularEnvMap = new RenderRscTexture();
+	rfilter->FilterSpecularIBL(envMap, specularEnvMap);
+
+	RenderRscTexture* brdfLUTTex = new RenderRscTexture();
+	rfilter->GenBRDFLUT(brdfLUTTex);
+
+	rpipeline->testEnv = specularEnvMap->GetTexture().get();
+	rpipeline->testBRDF = brdfLUTTex->GetTexture().get();
+	
+	delete envMap;
+	// ~ITERATION_0----------------------------------------------------------------------------
+
+
 }
 
 
 void RenderModule::Destroy()
 {
-	//
+	// Destroy Debug Render.
 	rdebug->Destroy();
+	
+	// Destroy Main Render Target.
 	rtScene.reset();
 
+	// Destroy pipeline
+	rpipeline->Destroy();
+
+	// Destroy render filter.
+	rfilter->Destroy();
 }
 
 
 void RenderModule::Update(float dt)
 {
-	// ~TESTING-------------------------------------------------------
-	// Debug Drawing...
-	static float debugtime = 0.0f;
-	debugtime += dt;
-	camRot += dt * 0.5f;
-
-	if (debugtime > 0.1f)
-	{
-		static glm::vec3 pos;
-		pos.x = (rand() / (float)RAND_MAX);
-		pos.y = (rand() / (float)RAND_MAX);
-		pos.z = (rand() / (float)RAND_MAX);
-
-		pos = pos * 2.0f - 1.0f;
-		pos = pos * 2.5f;
-
-		// Random Yellow Boxes
-		GetDebug()->DrawBox(glm::vec3(pos), glm::vec3(rand() / RAND_MAX + 0.5f),
-			glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), 1.0f);
-
-		debugtime = 0.0f;
-	}
-
-	// Green Box
-	GetDebug()->DrawBox(glm::vec3(0.0f), glm::vec3(5.0f),
-		glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), 0.0f);
-
-	// ~TESTING-------------------------------------------------------
-
 	rdebug->Update(dt);
 
 }
@@ -167,20 +197,29 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 
 
 	// ~TESTING-------------------------------------------------------
-	//glm::mat4 view = glm::mat4(1.f);
+	float near = 1.0f, far = 32000.0f;
+	float camRot = Engine::Get().GetEngineTime();
+	camRot *= 0.5f;
+
+#if 0
 	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.7f, sin(camRot)) * 1000.0f, 
 		glm::vec3(500.0f, 0.0f, 500.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 	
+#else
+	glm::vec3 offset = glm::vec3(0.0f, -4.0f, 0.0f);
+	float dist = 17.0f;
+	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.9f, sin(camRot)) * dist + offset, offset, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
+#endif
+
 	rscene->SetView(view);
-	rscene->SetProjection(proj);
+	rscene->SetProjection(proj, near, far);
 
 	// ~TESTING-------------------------------------------------------
 
-	 
 
 	// Build Render Data form the scene...
-	rscene->AddDebugPrimitives( rdebug->GetRenderPrimitive() );
 	rscene->Build(scene);
 }
 
@@ -189,30 +228,17 @@ void RenderModule::Render()
 {
 	RAVEN_ASSERT(isRendering, "Render - Trying to render before BeginRender().");
 
-	// Global OpenGL States...
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
+	// Engine Time.
+	float time = Engine::Get().GetEngineTime();
 
-	// Bind FBO For drawing...
-	rtScene->GetFBO()->Bind(EGLFrameBuffer::Framebuffer);
-	
-	// Viewport.
-	glViewport(0 ,0, rtScene->GetSize().x, rtScene->GetSize().y);
-	glScissor(0, 0, rtScene->GetSize().x, rtScene->GetSize().y);
+	// Begin The Pipeline for rendering a scene.
+	rpipeline->Begin(rtScene.get(), rscene.get(), time);
 
-	// Clear...
-	glm::vec4 clearColor = rtScene->GetClearColor();
-	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Rendering...
+	rpipeline->Render();
 
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	rscene->Draw(ERSceneBatch::Opaque);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	rscene->Draw(ERSceneBatch::Debug);
+	// End The Pipeline Render.
+	rpipeline->End();
 
 
 	if (isRTToWindow)
@@ -226,9 +252,9 @@ void RenderModule::Render()
 		);
 	}
 
+	// Unbind FBO...
 	rtScene->GetFBO()->Unbind(EGLFrameBuffer::Framebuffer);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
@@ -246,6 +272,77 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 {
 	return GLContext::GetSurface();
 }
+
+
+void RenderModule::CreateDefaultMaterials()
+{
+	// Checker Texture...
+	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>("assets/textures/T_Checker.png");
+	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Checker.png");
+	checkerTexture->renderRscTexture = new RenderRscTexture();
+	checkerTexture->LoadOnGpu();
+
+	// TODO: Better texture system.
+	checkerTexture->renderRscTexture->GetTexture()->Bind();
+	checkerTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Repeat);
+	checkerTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::TriLinear);
+	checkerTexture->renderRscTexture->GetTexture()->UpdateTexParams();
+	checkerTexture->renderRscTexture->GetTexture()->GenerateMipmaps();
+	checkerTexture->renderRscTexture->GetTexture()->Unbind();
+
+	// Default Mesh Material...
+	{
+		Ptr<MaterialShader> matShader( new MaterialShader() );
+		matShader->SetName("Default_Mesh");
+		matShader->SetDomain(ERenderShaderDomain::Mesh);
+		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
+		matShader->AddSampler("inCheckerTexture");
+		matShader->LoadOnGpu();
+
+		Ptr<Material> mat(new Material(matShader));
+		mat->SetTexture("inCheckerTexture", checkerTexture.get());
+		mat->LoadOnGpu();
+		
+		defaultMaterials.mesh = mat;
+	}
+
+
+	// Default Skinned Mesh Material...
+	{
+		Ptr<MaterialShader> matShader(new MaterialShader());
+		matShader->SetName("Default_Skinned");
+		matShader->SetDomain(ERenderShaderDomain::Skinned);
+		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
+		matShader->AddSampler("inCheckerTexture");
+		matShader->LoadOnGpu();
+
+		Ptr<Material> mat(new Material(matShader));
+		mat->SetTexture("inCheckerTexture", checkerTexture.get());
+		mat->LoadOnGpu();
+
+		defaultMaterials.skinned = mat;
+	}
+
+
+	// Default Terrain Material...
+	{
+		Ptr<MaterialShader> matShader(new MaterialShader());
+		matShader->SetName("Default_Terrain");
+		matShader->SetDomain(ERenderShaderDomain::Terrain);
+		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetMaterialFunction("shaders/Materials/TerrainMaterial.glsl");
+		matShader->AddSampler("inCheckerTexture");
+		matShader->LoadOnGpu();
+
+		Ptr<Material> mat(new Material(matShader));
+		mat->LoadOnGpu();
+
+		defaultMaterials.terrain = mat;
+	}
+}
+
 
 
 

@@ -30,8 +30,8 @@ GLRenderBuffer* GLRenderBuffer::Create(EGLFormat format, int width, int height)
 {
 	GLRenderBuffer* rd = new GLRenderBuffer();
 	rd->format = format;
-	rd->width = width;
-	rd->height = height;
+	rd->size.x = width;
+	rd->size.y = height;
 
 	glGenRenderbuffers(1, &rd->id);
 	glBindRenderbuffer(GL_RENDERBUFFER, rd->id);
@@ -54,8 +54,10 @@ void GLRenderBuffer::Unbind()
 }
 
 
-void GLRenderBuffer::UpdateStorage(EGLFormat format, int width, int height)
+void GLRenderBuffer::UpdateStorage(int width, int height)
 {
+	size.x = width;
+	size.y = height;
 	glRenderbufferStorage(GL_RENDERBUFFER, (GLENUM)format, width, height);
 }
 

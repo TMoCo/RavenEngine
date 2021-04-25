@@ -22,8 +22,8 @@ namespace Raven
 		, scale(scale)
 		, projectionDirty(true)
 		, fov(0)
-		, near(-10.0)
-		, far(10.0f)
+		, near(1.0)
+		, far(3200000.0f)
 		, orthographic(true)
 	{
 

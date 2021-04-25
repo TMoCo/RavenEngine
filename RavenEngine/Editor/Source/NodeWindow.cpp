@@ -364,14 +364,13 @@ namespace Raven
 			if (editor.GetEditorState() == EditorState::Play && 
 				controller != nullptr && 
 				controller->GetCurrentAnimationName() == node.nodeName) {
-				if (auto curr = controller->GetCurrAnimation()) 
+
+				auto& cur = controller->GetCurrAnimation();
+				if (auto clip = cur.GetPlayingClip(); clip >= 0)
 				{
-					if (auto clip = curr->GetPlayingClip(); clip >= 0)
-					{
-						float time = curr->GetPlayingTime();
-						float timeLength = curr->GetClipLength(clip);
-						ImGui::ProgressBar(time / timeLength, { 100, 10 });
-					}
+					float time = cur.GetPlayingTime();
+					float timeLength = cur.GetClipLength(clip);
+					ImGui::ProgressBar(time / timeLength, { 100, 10 });
 				}
 			}
 
@@ -645,6 +644,7 @@ namespace Raven
 			else if (controller)
 			{
 				controller->FocusTransition(nullptr);
+				editor.GetWindow<PropertiesWindow>()->SetController(nullptr);
 			}
 			else
 			{

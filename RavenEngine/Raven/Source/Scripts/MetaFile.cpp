@@ -20,6 +20,10 @@ namespace Raven
 			for (auto&& pair : luabridge::pairs(*comp->table))
 			{
 				auto name = pair.first.tostring();
+				if (name == "__cname" || name == "__index") {
+					continue;
+				}
+
 				if (pair.second.isNumber())
 				{
 					float value = pair.second;
@@ -58,7 +62,7 @@ namespace Raven
 						archive(cereal::make_nvp(name, *v));
 
 					}
-					else if ((pair.second.isInstance<Entity>() && name != "parent"))
+					else if ((pair.second.isInstance<Entity>() && name != "entity"))
 					{
 						Entity * v = pair.second;
 						archive(cereal::make_nvp(name, v->GetHandle()));
@@ -125,7 +129,7 @@ namespace Raven
 							archive(cereal::make_nvp(name, *v));
 
 						}
-						else if ((pair.second.isInstance<Entity>() && name != "parent"))
+						else if ((pair.second.isInstance<Entity>() && name != "entity"))
 						{
 							Entity* v = pair.second;
 							entt::entity e;

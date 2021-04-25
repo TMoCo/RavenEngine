@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 
 
 
@@ -9,22 +9,28 @@ in VertexOutput
 	vec3 position;
 	vec3 normal;
 	vec2 texCoord;
-	
-} fgIn;
+} inFrag;
 
 
 
 // Uniforms...
 uniform sampler2D inHeightMap;
-uniform vec4 color;
-
-
-// Output...
-out vec4 fragColor;
 
 
 
-// -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
+
+#if RENDER_PASS_DEFERRED
+// Output G-Buffer...
+layout(location=0) out vec4 outAlbedo;
+layout(location=1) out vec3 outNormal;
+layout(location=2) out vec4 outBRDF;
+layout(location=3) out vec3 outEmission;
+#endif
+
+
+
+
+
 // -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- -- --- -- 
 
 
@@ -32,8 +38,31 @@ out vec4 fragColor;
 
 void main()
 {
-	fragColor = vec4(fgIn.normal * 0.5 + 0.5, 1.0);
-	fragColor = texture(inHeightMap, fgIn.texCoord);
-	//fragColor = vec4(fgIn.texCoord, 0.0, 1.0);
+	// Normalize Input Normal
+	vec3 normal = normalize(inFrag.normal);
+
+	// Material Input...
+	MaterialData matIn;
+	matIn.position = inFrag.position;
+	matIn.normal = normal;
+	matIn.texCoord = inFrag.texCoord;
+	
+	// Material Compute Output.
+	MaterialOutput matOut;
+	
+	// Compute Material Function...
+	ComputeMaterial(matIn, matOut);
+	
+
+#if RENDER_PASS_DEFERRED
+	// Output G-Buffer...
+	outAlbedo.rgb = matOut.color;
+	outEmission.rgb = matOut.emission;
+	outNormal.rgb = normal;
+	outBRDF.r = matOut.roughness;
+	outBRDF.g = matOut.metallic;
+	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
+#endif
+
 }
 

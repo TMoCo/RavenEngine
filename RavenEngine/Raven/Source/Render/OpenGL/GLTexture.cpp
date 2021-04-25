@@ -1,6 +1,8 @@
 #include "GLTexture.h"
+#include "Utilities/Core.h"
 
 #include "GL/glew.h"
+
 
 
 
@@ -16,6 +18,8 @@ GLTexture::GLTexture()
 	, format(EGLFormat::None)
 	, filter(EGLFilter::Nearest)
 	, wrap(EGLWrap::ClampToEdge)
+	, baseMipLevel(0)
+	, maxMipLevel(1000)
 {
 
 }
@@ -88,32 +92,11 @@ GLTexture* GLTexture::Create2D(EGLFormat format, int width, int height, const vo
 
 void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, const void* data)
 {
-	width = newWidth;
-	height = newHeight;
-
-	// Get pixel information about based on the current format
-	GLENUM pixelFormat;
-	GLENUM pixelType;
-	int alignment = 4;
-	GetPixelInfo(format, pixelFormat, pixelType, alignment);
-
-	// Pixel Data Alignment...
-	if (alignment != 4)
-		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-
-
-	// Texture Data...
-	glTexImage2D((GLENUM)type, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
-
-	
-	// Reset alignment back to default.
-	if (alignment != 4)
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
+	UpdateTexData(level, newWidth, newHeight, 0, data);
 }
 
 
-void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLayers, const void* data)
+void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int layer, const void* data)
 {
 	width = newWidth;
 	height = newHeight;
@@ -129,16 +112,16 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLay
 		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
 
 
-	// For now only cubemap...
+	// Update Texture Data...
 	if (type == EGLTexture::CubeMap)
 	{
-		for (int i = 0; i < numLayers; ++i)
-		{
-			// Texture Data...
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
-		}
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
 	}
-
+	else
+	{
+		RAVEN_ASSERT(layer == 0, "Layer should be zero for non-layered textuers.");
+		glTexImage2D((GLENUM)type, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
+	}
 
 
 	// Reset alignment back to default.
@@ -149,10 +132,14 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int numLay
 
 void GLTexture::UpdateTexParams()
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (GLINT)filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (GLINT)filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, (GLINT)wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, (GLINT)wrap);
+	EGLFilter magFilter = filter == EGLFilter::TriLinear ? EGLFilter::Linear : filter;
+
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MAG_FILTER, (GLINT)magFilter);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MIN_FILTER, (GLINT)filter);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_WRAP_S, (GLINT)wrap);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_WRAP_T, (GLINT)wrap);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_BASE_LEVEL, baseMipLevel);
+	glTexParameteri((GLENUM)type, GL_TEXTURE_MAX_LEVEL, maxMipLevel);
 }
 
 
@@ -196,6 +183,11 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 		pixelType = GL_FLOAT;
 		break;
 
+	case EGLFormat::RG16F:
+		pixelFormat = GL_RG;
+		pixelType = GL_FLOAT;
+		break;
+
 	case EGLFormat::RGB16F:
 		pixelFormat = GL_RGB;
 		pixelType = GL_FLOAT;
@@ -222,10 +214,30 @@ void GLTexture::GetPixelInfo(EGLFormat format, GLENUM& pixelFormat, GLENUM& pixe
 }
 
 
+int GLTexture::GetBPP(EGLFormat format)
+{
+	switch (format)
+	{
+	case EGLFormat::R16F: return sizeof(float) * 8;
+	case EGLFormat::RG16F: return sizeof(float) * 16;
+	case EGLFormat::RGB16F: return sizeof(float) * 24;
+	case EGLFormat::RGBA16F: return sizeof(float) * 32;
+
+	case EGLFormat::R: return sizeof(uint8_t) * 8;
+	case EGLFormat::RGB: return sizeof(uint8_t) * 24;
+	case EGLFormat::RGBA: return sizeof(uint8_t) * 32;
+	}
+
+	RAVEN_ASSERT(0, "No BPP Info.");
+	return -1;
+}
+
+
+
 void GLTexture::Active(int i)
 {
-	glBindTexture((GLENUM)type, id);
 	glActiveTexture(GL_TEXTURE0 + i);
+	glBindTexture((GLENUM)type, id);
 }
 
 
@@ -240,6 +252,12 @@ void GLTexture::SetWrap(EGLWrap value)
 	wrap = value;
 }
 
+
+void GLTexture::SetMipLevels(int base, int max)
+{
+	baseMipLevel = base;
+	maxMipLevel = max;
+}
 
 
 } // End of namespace Raven.

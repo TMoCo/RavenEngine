@@ -1,4 +1,7 @@
 #include "Component.h"
+#include "Scene/Entity/Entity.h"
+#include "Engine.h"
+#include "Scene/SceneManager.h"
 
 namespace Raven
 {
@@ -164,6 +167,11 @@ namespace Raven
 			hierarchy.parent = parent;
 			Hierarchy::OnConstruct(registry, ent);
 		}
+	}
+
+	Raven::Entity Component::GetEntity()
+	{
+		return {entity,Engine::Get().GetModule<SceneManager>()->GetCurrentScene()};
 	}
 
 }

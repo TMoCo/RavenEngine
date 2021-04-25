@@ -355,7 +355,7 @@ namespace Raven
 
 		if (ImGui::Begin(title.c_str(), &active))
 		{
-			if (controller != nullptr && selected == entt::null)
+			if (controller != nullptr)
 			{
 				controller->OnImGui();
 				ImGui::End();

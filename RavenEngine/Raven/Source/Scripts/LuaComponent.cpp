@@ -17,6 +17,11 @@
 #include <fstream>
 #include <filesystem>
 
+#include "Logger/Console.h"
+
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Component.h"
+#include "Animation/Animator.h"
 
 namespace Raven 
 {
@@ -27,6 +32,7 @@ namespace Raven
 
 		Init();
 	}
+
 
 	void LuaComponent::SaveNewFile(const std::string& clazzName)
 	{
@@ -128,9 +134,12 @@ return #name
 		try
 		{
 			table = std::make_shared<luabridge::LuaRef>(luabridge::LuaRef::fromStack(vm->GetState()));
+			
+			table = std::make_shared<luabridge::LuaRef>((*table)["new"]());
+			
 			onInitFunc = std::make_shared<luabridge::LuaRef>((*table)["OnInit"]);
 			onUpdateFunc = std::make_shared<luabridge::LuaRef>((*table)["OnUpdate"]);
-			(*table)["parent"] = Entity(entity, scene);
+			(*table)["entity"] = GetEntity();
 		}
 		catch (const std::exception& e)
 		{
@@ -138,7 +147,6 @@ return #name
 		}
 		OnInit();
 	}
-
 
 	void LuaComponent::OnImGui()
 	{
@@ -151,6 +159,11 @@ return #name
 			for (auto&& pair : luabridge::pairs(*table))
 			{
 				auto name = pair.first.tostring();
+
+				if (name == "__cname" || name == "__index") {
+					continue;
+				}
+
 				if (pair.second.isNumber()) 
 				{
 					float number = pair.second;
@@ -166,6 +179,11 @@ return #name
 					{
 						(*table)[pair.first.tostring()] = str;
 					}
+				}
+				else if (pair.second.isFunction())
+				{
+					ImGui::Columns(1);
+					ImGui::TextUnformatted(name.c_str());
 				}
 				else if (pair.second.isBool())
 				{
@@ -227,7 +245,7 @@ return #name
 						{
 						}
 					}
-					else if ((pair.second.isInstance<Entity>() && name != "parent"))
+					else if ((pair.second.isInstance<Entity>() && name != "entity"))
 					{
 						Entity* v = pair.second;
 						if (v != nullptr && v->GetHandle() != entt::null)

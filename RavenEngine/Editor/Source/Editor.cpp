@@ -57,7 +57,7 @@ namespace Raven
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
 
 		camera = std::make_unique<Camera>(
-			45,0.1,1000000,winSize.x / winSize.y);
+			45, 1.0, 3200000,winSize.x / winSize.y);
 
 		SetEditorState(EditorState::Preview);
 	}

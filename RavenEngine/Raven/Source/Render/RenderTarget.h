@@ -32,6 +32,7 @@ namespace Raven
 	{
 		// Friend...
 		friend class RenderModule;
+		friend class RenderPipeline;
 
 	public:
 		// Construct.
@@ -78,9 +79,6 @@ namespace Raven
 	private:
 		// Render Target Texture.
 		GLTexture* rtTexture;
-
-		// Render Depth.
-		GLRenderBuffer* rtDepth;
 
 		// Framebuffer Object.
 		GLFrameBuffer* fbo;

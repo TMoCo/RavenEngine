@@ -10,16 +10,6 @@ layout(location=3) in vec4 inWeight;
 layout(location=4) in vec4 inIndices;
 
 
-// Transform Unifrom Block.
-layout(std140) uniform TransformBoneBlock
-{
-	mat4 inModelMatrix;
-	mat4 inViewMatrix;
-	mat4 inProjectionMatrix;
-	mat4 bones[196];
-};
-
-
 // Vertex Shader Output.
 out VertexOutput
 {
@@ -27,7 +17,7 @@ out VertexOutput
 	vec3 normal;
 	vec2 texCoord;
 	
-} vxOut;
+} outVertex;
 
 
 
@@ -63,12 +53,17 @@ mat4 getSkinMat()
 
 void main()
 {
-
-	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * (getSkinMat() * vec4(inPosition, 1.0));
-
+	// Transform to world space.
+	vec4 worldPos = inModelMatrix * getSkinMat() * vec4(inPosition, 1.0);
+	vec4 wolrdNormal = inNormalMatrix * getSkinMat() * vec4(inNormal, 0.0);
 	
-	vxOut.position = (inModelMatrix * vec4(inPosition, 1.0)).xyz;
-	vxOut.normal 	= (inModelMatrix * vec4(inNormal,   0.0)).xyz;
-	vxOut.texCoord = inTexCoord;
+	//
+	gl_Position = inCommon.viewProjMatrix * worldPos;
+	
+	// Set Vertex-Output...
+	outVertex.position = worldPos.xyz;
+	outVertex.normal = wolrdNormal.xyz;
+	outVertex.texCoord = inTexCoord;
+	
 }
 

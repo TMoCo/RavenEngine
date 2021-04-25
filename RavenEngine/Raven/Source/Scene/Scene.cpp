@@ -16,6 +16,9 @@
 #include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"
 
+#include "Render/RenderModule.h"
+#include "Render/RenderTarget.h"
+
 #include "Utilities/StringUtils.h"
 #include "Core/Camera.h"
 #include "Devices/Input.h"
@@ -237,6 +240,13 @@ namespace Raven {
 
 	auto Scene::UpdateCameraController(float dt)
 	{
+		// Update AspectRatio of the camera to match render target.
+		if (GetTargetCamera())
+		{
+			float rtRatio = Engine::GetModule<RenderModule>()->GetSceneRT()->GetAspectRatio();
+			GetTargetCamera()->SetAspectRatio(rtRatio);
+		}
+
 		auto controller = entityManager->GetRegistry().group<CameraControllerComponent>(entt::get<Transform>);
 		for (auto entity : controller)
 		{

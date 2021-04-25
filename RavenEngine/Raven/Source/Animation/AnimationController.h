@@ -13,6 +13,7 @@
 #include <entt/entt.hpp>
 
 #include "Utilities/StringUtils.h"
+#include "Animation.h"
 
 namespace Raven
 {
@@ -190,7 +191,7 @@ namespace Raven
 		//###runtime value
 		int32_t currentNodeId = 0;
 		int32_t currentLink = 0;
-		std::shared_ptr<Animation> currentAnimation;
+		Animation currentAnimation;
 
 
 		std::unordered_map<int32_t, Transition>::iterator iterId;

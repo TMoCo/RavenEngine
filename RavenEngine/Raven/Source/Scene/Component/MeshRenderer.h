@@ -72,10 +72,15 @@ namespace Raven
 		void GetMeshFromModel();
 		inline auto& getSkeleton() const { return skeleton; }
 
+		//
+		void UpdateBones();
+
 		int32_t meshIndex;
 		std::shared_ptr<Mesh> mesh;
 		Skeleton skeleton;
-	private:
+
+		// Current Bones Transform.
+		mutable std::vector<glm::mat4> bones;
 	};
 
 };

@@ -255,12 +255,12 @@ namespace Raven
 
 	void AnimationController::OnUpdate(float dt, Scene* scene, entt::entity entity)
 	{
-		if (currentAnimation != nullptr)
+		if (currentAnimation.GetClipCount() > 0)
 		{
-			if (!currentAnimation->IsStarted()) {
-				currentAnimation->Play(0, { entity,scene });
+			if (!currentAnimation.IsStarted()) {
+				currentAnimation.Play(0, { entity,scene });
 			}
-			currentAnimation->OnUpdate(dt);
+			currentAnimation.OnUpdate(dt);
 		}
 
 
@@ -298,7 +298,7 @@ namespace Raven
 	void AnimationController::LoadAnimation()
 	{
 		if(currentNodeId != 0)
-			currentAnimation = AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
+			currentAnimation = *AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
 	}
 
 };

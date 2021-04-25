@@ -100,7 +100,8 @@ namespace Raven
 						auto entity = scene->CreateEntity(name);
 						auto & model = entity.AddComponent<Model>();
 						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(name));
-						auto mesh = model.AddMesh(MeshFactory::CreatePrimitive(model.GetPrimitiveType()));
+						Ptr<Mesh> mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(model.GetPrimitiveType()));
+						model.AddMesh(mesh);
 						auto& render = entity.AddComponent<MeshRenderer>();
 						render.mesh = mesh;
 						render.meshIndex = 0;

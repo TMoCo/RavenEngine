@@ -73,7 +73,7 @@ namespace Raven
 		// Called by the render module to update each frame. 
 		void Update(float dt);
 
-		//
+		// Render the render debug primitives that need to be draw this frame. 
 		const std::vector<RenderPrimitive*>& GetRenderPrimitive() const;
 
 	public:

@@ -3,6 +3,7 @@
 
 #include "GLShader.h"
 #include "Logger/Console.h"
+#include "Utilities/Core.h"
 
 
 #include "GL/glew.h"
@@ -56,7 +57,7 @@ GLShader* GLShader::Create(const std::string& name)
 void GLShader::SetSource(EGLShaderStage stage, const std::string& src)
 {
 	GLShaderCode code;
-	code.stage = stage;
+	code.stages = ToStageBit(stage);
 	code.src = src;
 
 	code.isFile = false;
@@ -67,7 +68,7 @@ void GLShader::SetSource(EGLShaderStage stage, const std::string& src)
 void GLShader::SetSourceFile(EGLShaderStage stage, const std::string& src)
 {
 	GLShaderCode code;
-	code.stage = stage;
+	code.stages = ToStageBit(stage);
 	code.src = src;
 	code.isFile = true;
 
@@ -75,37 +76,37 @@ void GLShader::SetSourceFile(EGLShaderStage stage, const std::string& src)
 }
 
 
-void GLShader::AddExSource(const std::string& tag, EGLShaderStage stage, const std::string& src)
+void GLShader::AddExSource(uint32_t sortTag, EGLShaderStageBit stages, const std::string& src)
 {
 	GLShaderCode code;
-	code.stage = stage;
+	code.stages = stages;
 	code.src = src;
 	code.isFile = false;
 
-	exSource[tag] = code;
+	exSource[sortTag] = code;
 }
 
 
-void GLShader::AddExSourceFile(const std::string& tag, EGLShaderStage stage, const std::string& src)
+void GLShader::AddExSourceFile(uint32_t sortTag, EGLShaderStageBit stages, const std::string& src)
 {
 	GLShaderCode code;
-	code.stage = stage;
+	code.stages = stages;
 	code.src = src;
 	code.isFile = true;
 
-	exSource[tag] = code;
+	exSource[sortTag] = code;
 }
 
 
-void GLShader::RemoveExSource(EGLShaderStage stage)
+void GLShader::RemoveSource(EGLShaderStage stage)
 {
 	source.erase(stage);
 }
 
 
-void GLShader::RemoveExSource(const std::string& tag)
+void GLShader::RemoveExSource(uint32_t sortTag)
 {
-	exSource.erase(tag);
+	exSource.erase(sortTag);
 }
 
 
@@ -121,18 +122,34 @@ void GLShader::RemovePreprocessor(const std::string& def)
 }
 
 
-static std::string ToString(EGLShaderStage stage)
+std::string GLShader::ToString(EGLShaderStage stage)
 {
 	switch (stage)
 	{
-	case Raven::EGLShaderStage::Vertex: return "Vertex";
-	case Raven::EGLShaderStage::Geometry: return "Geometry";
-	case Raven::EGLShaderStage::Fragment: return "Fragment";
+	case Raven::EGLShaderStage::Vertex: return "VERTEX";
+	case Raven::EGLShaderStage::Geometry: return "GEOMETRY";
+	case Raven::EGLShaderStage::Fragment: return "FRAGMENT";
+	case Raven::EGLShaderStage::TessControl: return "TESS_CONTROL";
+	case Raven::EGLShaderStage::TessEvaluation: return "TESS_EVALUATION";
 	}
 
 	return "NONE";
 }
 
+
+EGLShaderStageBit GLShader::ToStageBit(EGLShaderStage stage)
+{
+	switch (stage)
+	{
+	case Raven::EGLShaderStage::Vertex: return EGLShaderStageBit::VertexBit;
+	case Raven::EGLShaderStage::Geometry: return EGLShaderStageBit::GeometryBit;
+	case Raven::EGLShaderStage::Fragment: return EGLShaderStageBit::FragmentBit;
+	case Raven::EGLShaderStage::TessControl: return EGLShaderStageBit::TessControlBit;
+	case Raven::EGLShaderStage::TessEvaluation: return EGLShaderStageBit::TessEvaluationBit;
+	}
+
+	return EGLShaderStageBit::None;
+}
 
 
 bool GLShader::Build()
@@ -140,36 +157,29 @@ bool GLShader::Build()
 	int prevID = id;
 
 	// OpenGL Shader for each stag
-	GLUINT glshaders[3] = { 0 };
+	GLUINT glshaders[5] = { 0 };
+	static const EGLShaderStage glshadersTypes[5] = { EGLShaderStage::Vertex, 
+	  EGLShaderStage::Fragment, EGLShaderStage::Geometry,
+	  EGLShaderStage::TessControl, EGLShaderStage::TessEvaluation
+	};
 
 
-	// Build Vertex Shader...
-	glshaders[0] = BuildStage(EGLShaderStage::Vertex);
-	if (!glshaders[0])
+	// Iterate over all stages and build the provided ones.
+	for (int32_t i = 0; i < 5; ++i)
 	{
-		return false;
-	}
+		// No source for this stage?
+		if (!source.count(glshadersTypes[i]))
+			continue;
 
+		glshaders[i] = BuildStage(glshadersTypes[i]);
 
-	// Build Fragment Shader...
-	glshaders[1] = BuildStage(EGLShaderStage::Fragment);
-
-	if (!glshaders[1]) // Build Failed?
-	{
-		glDeleteShader(glshaders[0]);
-		return false;
-	}
-
-
-	// Has Geometry?
-	if ( source.count(EGLShaderStage::Geometry) )
-	{
-		glshaders[2] = BuildStage(EGLShaderStage::Geometry);
-
-		if (!glshaders[2]) // Build Failed?
+		// Build Failed?
+		if (!glshaders[i])
 		{
-			glDeleteShader(glshaders[0]);
-			glDeleteShader(glshaders[1]);
+			// Delete created shaders objects...
+			for (int32_t pi = i - 1; pi >= 0; --pi)
+				GLSHADER_DELETE_VALID( glshaders[pi] );
+
 			return false;
 		}
 	}
@@ -177,9 +187,11 @@ bool GLShader::Build()
 
 	// Program...
 	id = glCreateProgram();
-	glAttachShader(id, glshaders[0]); // Vert
-	glAttachShader(id, glshaders[1]); // Frag
-	GLSHADER_ATTACH_VALID(id, glshaders[2]); // Geom
+
+	// Attach Valid Stages
+	for (GLUINT i = 0; i < 5; ++i)
+		GLSHADER_ATTACH_VALID(id, glshaders[i]);
+
 	glLinkProgram(id); // Link...
 
 	int result;
@@ -210,9 +222,8 @@ bool GLShader::Build()
 	}
 
 	// Cleanup...
-	glDeleteShader(glshaders[0]);
-	glDeleteShader(glshaders[1]);
-	GLSHADER_DELETE_VALID(glshaders[2]);
+	for (GLUINT i = 0; i < 5; ++i)
+		GLSHADER_DELETE_VALID( glshaders[i] );
 
 	return result == GL_TRUE;
 }
@@ -254,6 +265,7 @@ GLUINT GLShader::BuildStage(EGLShaderStage stage)
 	LOGE("GLShader({0}) - Failed To Compile {1}: \n{2}", name.c_str(), ToString(stage).c_str(), log.c_str());
 
 	glDeleteShader(shaderID);
+	RAVEN_ASSERT(0, "Failed to compile.");
 	return 0;
 }
 
@@ -276,12 +288,16 @@ bool GLShader::LoadSource(EGLShaderStage stage, std::string& loadedSrc)
 
 	// #verion
 	loadedSrc = mainSrc.substr(0, vidx + 1);
+	loadedSrc += "\n";
 
 	// #define
 	for (const auto& pre : preprocessor)
 	{
-		loadedSrc += pre;
+		loadedSrc += pre + "\n";
 	}
+
+	// Add stage preporcessor
+	loadedSrc += "#define STAGE_" + ToString(stage) + "_SHADER 1\n";
 
 	// Ex Source...
 	loadedSrc += "\n\n";
@@ -292,7 +308,7 @@ bool GLShader::LoadSource(EGLShaderStage stage, std::string& loadedSrc)
 		const auto& exsrc = ex.second;
 
 		// Different Stage?
-		if (exsrc.stage != stage)
+		if (!HasStage(exsrc.stages, stage))
 			continue;
 		
 		std::string exloadedSrc = exsrc.isFile ? ReadSrcFile(exsrc.src) : exsrc.src;
@@ -383,6 +399,8 @@ void GLShader::SetUniform(const std::string& name, const glm::mat4& value)
 void GLShader::SetUniform(const std::string& name, const glm::mat3& value)
 {
 	int loc = glGetUniformLocation(id, name.c_str());
+	RAVEN_ASSERT(loc != -1, "Invalid Unifrom Name.");
+
 	glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
@@ -390,6 +408,8 @@ void GLShader::SetUniform(const std::string& name, const glm::mat3& value)
 void GLShader::BindUniformBlock(const std::string& blockName, int binding)
 {
 	int blockIdx = glGetUniformBlockIndex(id, blockName.c_str());
+	RAVEN_ASSERT(blockIdx != -1, "Invalid Block Name.");
+
 	glUniformBlockBinding(id, blockIdx, binding);
 }
 

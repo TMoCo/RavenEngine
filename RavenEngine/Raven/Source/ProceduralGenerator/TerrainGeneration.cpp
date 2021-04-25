@@ -15,27 +15,63 @@ namespace Raven {
 
 	void TerrainGeneration::Initialize()
 	{
-		FileFormat type = PNG;
-		const int width = 128;
-		const int height = 128;
-
-		Noise(width, height, type);
 	}
 
 	void TerrainGeneration::Destroy()
 	{
 	}
 
-	void TerrainGeneration::Noise(int width, int height, FileFormat type)
+	// Create a square gradient for making an island
+	void TerrainGeneration::GenerateSquareGradient(int width, int height)
+	{
+		int halfWidth = width / 2;
+		int halfHeight = height / 2;
+
+		squareGradient = (uint8_t*)malloc(width * height * 3 * sizeof(uint8_t));
+
+		for (int row = 0; row < height; row++)
+		{
+			for (int col = 0; col < width; col++)
+			{
+				int x = col;
+				int y = row;
+
+				float value;
+
+				x = x > halfWidth ? width - x : x;
+				y = y > halfHeight ? height - y : y;
+
+				int smaller = x < y ? x : y;
+				value = smaller / (float)halfWidth;
+
+				// invert so the edges have the highest value
+				value = 1 - value;
+				// use a higher power (value^3) to increase the area of the black centre
+				//value *= value * value;
+				//value *= value;
+
+				value = value * 255;
+
+				squareGradient[(row * width + col) * 3] = value;
+				squareGradient[((row * width + col) * 3) + 1] = value;
+				squareGradient[((row * width + col) * 3) + 2] = value;
+			}
+		}
+
+		//WriteImage(FileFormat::PNG, width, height, squareGradient);
+	}
+
+	void TerrainGeneration::GenerateNoise(int width, int height, FileFormat type)
 	{	
 		const int octaves = 4;
 		// seeds
-		float a = 0.5;
-		float b = 1.0;
-		bool periodic = false;
+		float a = 7.5;	// higher value increases bumpiness; originally 0.5
+		float b = 1.5;	// higher value increases smoothness; originally 1.0
+		// a needs to be much higher than b for a bumpy terrain
+
+		bool periodic = false;	// for seamless noise
 
 		// buffer to store noise data
-		//GLubyte* data = new GLubyte[width * height * octaves];
 		float* data;
 		data = (float*)malloc(width * height * octaves * sizeof(float));
 
@@ -71,7 +107,6 @@ namespace Raven {
 					sum += val;
 					float result = (sum + 1.0f) / 2.0f;
 					// store in texture buffer
-					//data[((row * width + col) * octaves) + oct] = (GLubyte)(result * 255.0f);
 					data[((row * width + col) * octaves) + oct] = result * 255.0f;
 
 					freq *= 2.0f; // double the frequency
@@ -82,7 +117,7 @@ namespace Raven {
 
 		// add heights from all octaves
 		float sumHeight = 0;
-
+		// compute the average height and store as RGB data
 		for (int row = 0; row < height; row++)
 		{
 			for (int col = 0; col < width; col++)
@@ -98,7 +133,6 @@ namespace Raven {
 						heightFields[(row * width + col) * 3] = sumHeight;
 						heightFields[((row * width + col) * 3) + 1] = sumHeight;
 						heightFields[((row * width + col) * 3) + 2] = sumHeight;
-						//out << (int)sumHeight << ' ' << (int)sumHeight << ' ' << (int)sumHeight << '\n';
 						sumHeight = 0;
 						//out << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << ' ' << (int)data[((row * width + col) * octaves) + oct] << '\n';
 					}
@@ -106,17 +140,33 @@ namespace Raven {
 			}
 		}
 
+		float newHeight;
+		for (int row = 0; row < height; row++)
+		{
+			for (int col = 0; col < width; col++)
+			{
+				// subtract square gradient from original height
+				newHeight = heightFields[(row * width + col) * 3] - squareGradient[(row * width + col) * 3];
+
+				// set negative heights to 0
+				newHeight = newHeight < 0 ? 0 : newHeight;
+
+				// invert heights (render has 0 as the tallest)
+				newHeight = 255 - newHeight;
+
+				heightFields[(row * width + col) * 3] = newHeight;
+				heightFields[((row * width + col) * 3) + 1] = newHeight;
+				heightFields[((row * width + col) * 3) + 2] = newHeight;
+			}
+		}
+
+		// write heights to image file
 		WriteImage(type, width, height, heightFields);
-		//out.close();
+		
+		// deallocate memory
+		free(squareGradient);
 		free(data);
-
-		//GLuint texID;
-		//glGenTextures(1, &texID);
-		//glBindTexture(GL_TEXTURE_2D, texID);
-		//glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
-		//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		//delete [] data;
-
+		free(heightFields);
 	}
 
 	void TerrainGeneration::WriteImage(FileFormat type, int width, int height, const uint8_t* data)
@@ -124,16 +174,16 @@ namespace Raven {
 		// write heights to different image formats
 		switch (type)
 		{
-		case PNG:
+		case FileFormat::PNG:
 			stbi_write_png("heightmap.png", width, height, 3, data, width * 3);	// last parameter is stride in bytes
 			break;
-		case BMP:
+		case FileFormat::BMP:
 			stbi_write_bmp("heightmap.bmp", width, height, 3, data);
 			break;
-		case JPG:
+		case FileFormat::JPG:
 			stbi_write_jpg("heightmap.jpg", width, height, 3, data, 100);	// int quality
 			break;
-		case TGA:
+		case FileFormat::TGA:
 			stbi_write_tga("heightmap.tga", width, height, 3, data);
 			break;
 		}

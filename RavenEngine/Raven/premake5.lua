@@ -19,7 +19,9 @@ project "RavenEngine"
 	{
 		"Source/**.h",
 		"Source/**.c",
-		"Source/**.cpp"
+		"Source/**.cpp",
+		"../../gameProject/scripts/**.lua",
+		"../../gameProject/shaders/**.glsl"
 	}
 
 	removefiles

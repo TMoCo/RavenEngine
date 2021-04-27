@@ -22,7 +22,7 @@ namespace Raven
 
 	glm::vec3 Transform::GetUpDirection() const
 	{
-		return GetWorldOrientation() * UP;
+		return GetWorldOrientation() * UP;	
 	}
 
 
@@ -70,6 +70,16 @@ namespace Raven
 	}
 
 	Transform::~Transform() = default;
+
+	void Transform::SetTransform(Transform& other)
+	{
+		localMatrix = other.GetLocalMatrix();
+		worldMatrix = other.GetWorldMatrix();
+		localPosition = other.GetLocalPosition();
+		localOrientation = other.GetLocalOrientation();
+		hasUpdated = other.HasUpdated();
+		dirty = other.IsDirty();
+	}
 
 	void Transform::SetWorldMatrix(const glm::mat4 & mat)
 	{
@@ -133,6 +143,11 @@ namespace Raven
 		return localScale;
 	}
 
+	Transform Transform::Identity()
+	{
+		return Transform(glm::mat4(1.0f));
+	}
+	
 	void Transform::SetOffsetTransform(const glm::mat4& localMat)
 	{
 		offsetMatrix = localMat;
@@ -145,6 +160,5 @@ namespace Raven
 		localScale = initLocalScale;
 		localOrientation = initLocalOrientation;
 	}
-
 };
 

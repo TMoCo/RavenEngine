@@ -3,7 +3,12 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+#include "Engine.h"
+
+#include "Editor.h"
 #include "PropertiesWindow.h"
+#include "HierarchyWindow.h"
+
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity/Entity.h"
@@ -13,30 +18,30 @@
 #include "Scene/Component/Model.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/MeshRenderer.h"
+#include "Scene/Component/RigidBody.h"
+
 #include "Scripts/LuaComponent.h"
 
-#include "Core/Camera.h"
 #include "ImGui/ImGuiHelpers.h"
-#include "ResourceManager/MeshFactory.h"
-#include <glm/gtc/type_ptr.hpp>
-#include "Editor.h"
+
+#include "Core/Camera.h"
+#include "Utilities/StringUtils.h"
 
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/MeshFactory.h"
 #include "ResourceManager/Resources/Mesh.h"
-#include "Utilities/StringUtils.h"
+
 #include "Animation/Animator.h"
 #include "Animation/AnimationController.h"
-#include "Engine.h"
-#include "HierarchyWindow.h"
 
+
+#include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
 #include <functional>
 
 namespace MM 
 {
-
-	
 	using namespace Raven;
 	template<>
 	void ComponentEditorWidget<Transform>(entt::registry& reg, entt::registry::entity_type e)
@@ -227,7 +232,6 @@ namespace MM
 		ImGui::PopStyleVar();
 	}
 
-
 	template<>
 	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
 	{
@@ -329,15 +333,65 @@ namespace MM
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
+	}
 
+	template<>
+	void ComponentEditorWidget<RigidBody>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& rigidBody = reg.get<RigidBody>(e);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+		bool canSleep = rigidBody.CanSleep();
+
+		ImGui::TextUnformatted("Can sleep");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Checkbox("##Can sleep", &canSleep))
+		{
+			rigidBody.SetIsAllowedToSleep(canSleep);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		bool gravityEnabled = rigidBody.GravityEnabled();
+
+		ImGui::TextUnformatted("Enable gravity");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Checkbox("##Enable gravity", &gravityEnabled))
+		{
+			rigidBody.EnableGravity(gravityEnabled);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		float mass = rigidBody.GetMass();
+
+		ImGui::TextUnformatted("Set mass");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Set mass", &mass, 0.05f))
+		{
+			rigidBody.SetMass(mass < 0.0f ? 0.0f : mass);
+		}
+		
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
 	}
 
 };
 
 namespace Raven
-{
-
-	
+{	
 	constexpr size_t INPUT_BUFFER = 256;
 	PropertiesWindow::PropertiesWindow()
 	{
@@ -446,12 +500,26 @@ namespace Raven
 		TRIVIAL_COMPONENT(SkinnedMeshRenderer, false);
 		TRIVIAL_COMPONENT(LuaComponent, true);
 		TRIVIAL_COMPONENT(Animator, true);
+		TRIVIAL_COMPONENT(RigidBody, true);
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
 			auto lua = r.try_get<LuaComponent>(entity);
 			if (lua) 
 			{
 				lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
+			}
+			auto rb = r.try_get<RigidBody>(entity);
+			if (rb)
+			{
+				// when creating a rigid body, we need to set some data... like the object transform (if any)
+				auto t = r.try_get<Transform>(entity);
+				// if transform does exists, change the rigidbody's initial transform
+				if (t)
+				{
+					rb->SetInitTransform(*t);
+				}
+				// and initialise the body again
+				rb->InitRigidBody();
 			}
 		});
 	}

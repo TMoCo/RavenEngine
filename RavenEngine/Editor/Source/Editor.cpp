@@ -12,6 +12,7 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Model.h"
+#include "Scene/Component/RigidBody.h"
 #include "Scene/Entity/Entity.h"
 #include "Scripts/LuaComponent.h"
 
@@ -52,6 +53,7 @@ namespace Raven
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
 		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
 		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
+		iconMap[typeid(RigidBody).hash_code()] = ICON_MDI_APPLE;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();

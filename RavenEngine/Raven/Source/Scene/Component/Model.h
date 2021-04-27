@@ -101,6 +101,7 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
+			LOGV("Calling model serialize function");
 			if (meshes.size() > 0)
 			{
 				archive(
@@ -115,6 +116,7 @@ namespace Raven
 		void load(Archive& archive)
 		{
 
+			LOGV("Calling model serialize function");
 			archive(
 				cereal::make_nvp("PrimitiveType", primitiveType), 
 				cereal::make_nvp("FilePath", filePath),

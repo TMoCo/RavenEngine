@@ -40,7 +40,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.rp3d}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"
@@ -58,7 +58,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.rp3d}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"
@@ -67,11 +67,8 @@ project "RavenEngine"
 	links
 	{
 		"imgui",
-		"spdlog",
-		"rp3d"
+		"spdlog"
 	}
-
-
 
 	defines
 	{
@@ -119,7 +116,7 @@ project "RavenEngine"
 
 		links
 		{
-			"glfw","glew32","lua","openfbx","node-editor"
+			"glfw","glew32","lua", "reactphysics3d", "openfbx","node-editor"
 		}
 
 		buildoptions

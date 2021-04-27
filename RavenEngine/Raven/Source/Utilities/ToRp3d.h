@@ -4,14 +4,13 @@
 
 #pragma once
 
-#include <rp3d/include/reactphysics3d/reactphysics3d.h>
-#include <rp3d/include/reactphysics3d/mathematics/Transform.h>
-#include <rp3d/include/reactphysics3d/mathematics/Vector3.h>
-#include <rp3d/include/reactphysics3d/mathematics/Quaternion.h>
+#include <reactphysics3d/reactphysics3d.h>
+#include <reactphysics3d/mathematics/Transform.h>
+#include <reactphysics3d/mathematics/Vector3.h>
+#include <reactphysics3d/mathematics/Quaternion.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-
 
 #include "Scene/Component/Transform.h"
 

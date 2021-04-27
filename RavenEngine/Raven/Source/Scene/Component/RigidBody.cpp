@@ -14,22 +14,44 @@
 
 namespace Raven
 {
-	RigidBody::RigidBody(rp3d::PhysicsWorld* physWorld, Transform& transform, RigidBodyType initType) :
-		world(physWorld),
+	// default constructor to register as a valid entity
+	RigidBody::RigidBody() : 
+		world(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()),
+		initTransform(rp3d::Transform::identity()),
+		body(nullptr),
+		mass(1.0f),
+		type(RigidBodyType::Static)
+	{
+		InitRigidBody();
+	}
+
+	/*
+	RigidBody::RigidBody(Transform& transform, RigidBodyType initType) :
+		world(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()),
+		initTransform(Rp3dConvert::ToRp3dTransform(transform)),
 		body(nullptr),
 		mass(1.0f),
 		type(initType)
 	{
-		previousState = Rp3dConvert::ToRp3dTransform(transform);
-		body = physWorld->createRigidBody(previousState);
-		body->setType(static_cast<rp3d::BodyType>(type));
+		InitRigidBody();
 	}
+	*/
 
 	RigidBody::~RigidBody()
 	{
 		colliders.clear();
-		LOGE("Called destructor");
-		//world->destroyCollisionBody(body);
+		//if (body)
+			//world->destroyCollisionBody(body);
+	}
+
+	void RigidBody::InitRigidBody()
+	{
+		previousState = initTransform;
+		// if body already exists, delete it and replace
+		if (body)
+			world->destroyRigidBody(body);
+		body = world->createRigidBody(previousState);
+		body->setType(static_cast<rp3d::BodyType>(type));
 	}
 
 	void RigidBody::AddCollider(Collider* collider)
@@ -92,6 +114,11 @@ namespace Raven
 		return Transform(glm::make_mat4(m));
 	}
 
+	void RigidBody::SetInitTransform(const Transform& t)
+	{
+		initTransform = Rp3dConvert::ToRp3dTransform(t);
+	}
+
 	uint32_t RigidBody::GetNumColliders()
 	{
 		return colliders.size();
@@ -105,6 +132,21 @@ namespace Raven
 	void RigidBody::EnableGravity(bool b)
 	{
 		body->enableGravity(b);
+	}
+	bool RigidBody::GravityEnabled()
+	{
+		return body->isGravityEnabled();
+	}
+
+	void RigidBody::SetMass(float m)
+	{
+		mass = m;
+		body->setMass(mass);
+	}
+
+	float RigidBody::GetMass()
+	{
+		return mass;
 	}
 
 	void RigidBody::SetLinearDamping(float d)
@@ -121,6 +163,11 @@ namespace Raven
 	void RigidBody::SetIsAllowedToSleep(bool b)
 	{
 		body->setIsAllowedToSleep(b);
+	}
+
+	bool RigidBody::CanSleep()
+	{ 
+		return body->isAllowedToSleep(); 
 	}
 
 	//

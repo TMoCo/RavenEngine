@@ -12,6 +12,7 @@
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/Model.h"
 #include "Scene/Component/MeshRenderer.h"
+#include "Scene/Component/RigidBody.h"
 
 #include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"
@@ -46,6 +47,7 @@ namespace Raven {
 		entityManager->AddDependency<Model, Transform>();
 		entityManager->AddDependency<Light, Transform>();
 		entityManager->AddDependency<MeshRenderer, Transform>();
+		entityManager->AddDependency<RigidBody, Transform>();
 
 		sceneGraph = std::make_shared<SceneGraph>();
 		sceneGraph->Init(entityManager->GetRegistry());
@@ -62,7 +64,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model, LuaComponent, MeshRenderer, SkinnedMeshRenderer, Animator
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -134,7 +136,7 @@ namespace Raven {
 			std::ifstream in(path);
 			if (in.good())
 			{
-
+				LOGC("LOADING...");
 				std::string data;
 				in.seekg(0, std::ios::end);
 				auto len = in.tellg();
@@ -147,7 +149,9 @@ namespace Raven {
 				istr.str(data);
 				cereal::JSONInputArchive input(istr);
 				input(*this);
+				LOGC("LOADED!");
 				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
+				LOGC("CREATED SCENE.");
 			}
 			else 
 			{

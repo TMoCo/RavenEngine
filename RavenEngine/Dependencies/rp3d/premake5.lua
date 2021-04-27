@@ -1,18 +1,18 @@
-project "rp3d"
+project "reactphysics3d"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
     staticruntime "On"
 
+    rp3d_root_dir = os.getcwd()
+
     files {
-        "src/**.c",
-        "src/**.cpp",
-        "include/**.h"
+        rp3d_root_dir .. "/include/**.h",
+        rp3d_root_dir .. "/src/**.cpp"
     }
 
-    sysincludedirs 
-    {
-        "include"
+    sysincludedirs {
+        rp3d_root_dir .. "/include/"
     }
 
     filter "system:windows"

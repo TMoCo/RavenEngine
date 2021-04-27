@@ -259,7 +259,12 @@ namespace Raven
 
 	void Engine::OnSceneCreated(Scene* scene)
 	{
+		// delete previous physics world
+		auto physics = GetModule<PhysicsModule>();
+		physics->DestroyWorld();
 
+		// now create a new one for the new scene
+		physics->CreateWorld();
 	}
 
 	void Engine::NewGameScene()
@@ -267,6 +272,7 @@ namespace Raven
 		Scene* newScene = new Scene("Physics Test World");
 		newScene->dynamic = true;
 
+		/*
 		// delete previous physics world
 		auto physics = GetModule<PhysicsModule>();
 		physics->DestroyWorld();
@@ -315,10 +321,6 @@ namespace Raven
 		}
 
 		LOGV(physics->GetCurrentWorld()->getNbRigidBodies());
-		
-		// add scene and get its id
-		auto terrainEntity = newScene->CreateEntity("terrain");
-		terrainEntity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
 
 		{
 			auto& lightEntity = newScene->CreateEntity("THE_SUN");
@@ -330,6 +332,7 @@ namespace Raven
 			lightComp.intensity = 0.0f;
 			lightComp.direction = glm::normalize(glm::vec3(-1.0f));
 		}
+		*/
 
 
 		// Basic Material...

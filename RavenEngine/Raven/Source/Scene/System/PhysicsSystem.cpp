@@ -37,24 +37,27 @@ namespace Raven
 	// called before advancing the physics simulation
 	void PhysicsSystem::OnUpdate(float dt, Scene* scene)
 	{
-		// get all entities with collision bodies and tranforms
-		auto& registry = scene->GetRegistry();
-		auto group = scene->GetRegistry().group<RigidBody>(entt::get<Transform>);
-
-		// loop over them all and update the collision bodies with their transforms
-		/*
-		*/
-		char buf[128];
-		//sprintf(buf, "There are %i entities with rigid bodies and transforms", group.size());
-		//LOGV(buf);
-
-		for (auto entity : group)
+		if (Engine::Get().GetEditorState() == EditorState::Play)
 		{
-			const auto& [rigBod, trans] = group.get<RigidBody, Transform>(entity);
-			trans.SetTransform(Rp3dConvert::ToTransform(rp3d::Transform::interpolateTransforms(rigBod.GetPreviousState(), rigBod.GetCurrentState(), Engine::Get().GetModule<PhysicsModule>()->GetLerpFactor()))); // interpolate states to get transform used in rendering
-			rigBod.SetPreviousState(rigBod.GetCurrentState()); // set previous state to current state 
-			//sprintf(buf, "Entity has %i colliders", rigBod.GetNumColliders());
-			//LOGV(buf);
+			// get all entities with collision bodies and tranforms
+			auto& registry = scene->GetRegistry();
+			auto group = scene->GetRegistry().group<RigidBody>(entt::get<Transform>);
+
+			// loop over them all and update the collision bodies with their transforms
+			/*
+			*/
+			char buf[128];
+			sprintf(buf, "There are %i entities with rigid bodies and transforms", group.size());
+			LOGV(buf);
+
+			for (auto entity : group)
+			{
+				const auto& [rigBod, trans] = group.get<RigidBody, Transform>(entity);
+				trans.SetTransform(Rp3dConvert::ToTransform(rp3d::Transform::interpolateTransforms(rigBod.GetPreviousState(), rigBod.GetCurrentState(), Engine::Get().GetModule<PhysicsModule>()->GetLerpFactor()))); // interpolate states to get transform used in rendering
+				rigBod.SetPreviousState(rigBod.GetCurrentState()); // set previous state to current state 
+				//sprintf(buf, "Entity has %i colliders", rigBod.GetNumColliders());
+				//LOGV(buf);
+			}
 		}
 	}
 

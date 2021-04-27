@@ -28,7 +28,6 @@ namespace Raven
 
 	Model::~Model()
 	{
-		LOGE("Called model destructor");
 		meshes.clear(); // calls the deleters for mesh objects
 	}
 

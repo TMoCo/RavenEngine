@@ -4,6 +4,10 @@
 
 #include <iostream>
 
+#include <imgui/imgui.h>
+
+#include <glm/gtc/type_ptr.hpp>
+
 #include <reactphysics3d/mathematics/Vector3.h> 
 
 #include "Engine.h"
@@ -17,7 +21,7 @@ namespace Raven
 	// Collider base class
 	//
 
-	Collider::Collider(rp3d::CollisionBody* initBody, ColliderPrimitive::Type shapeType, rp3d::Transform& t) :
+	Collider::Collider(rp3d::CollisionBody* initBody, ColliderPrimitive::Type shapeType, Transform& t) :
 		type(shapeType),							   // When creating a new collider, specify the type
 		body(initBody),
 		collider(nullptr),
@@ -27,8 +31,6 @@ namespace Raven
 	// when deleting the collider, remove it from the body it's attached to
 	Collider::~Collider()
 	{
-		if (collider)
-			body->removeCollider(collider); // takes care of deleting the data for us
 	}
 
 	// call this when creating a collider 
@@ -39,7 +41,8 @@ namespace Raven
 
 	void Collider::SetTransform(const Transform& transform)
 	{
-		relativeTransform = Rp3dConvert::ToRp3dTransform(transform);
+		relativeTransform = transform;
+		collider->setLocalToBodyTransform(Rp3dConvert::ToRp3dTransform(relativeTransform));
 	}
 
 	ColliderPrimitive::Type Collider::GetColliderType() const
@@ -53,7 +56,7 @@ namespace Raven
 			return collider->getCollisionShape();
 	}
 
-	rp3d::Transform Collider::GetRelativeTransform()
+	Transform Collider::GetRelativeTransform()
 	{
 		return relativeTransform;
 	}
@@ -70,7 +73,7 @@ namespace Raven
 	}
 
 	BoxCollider::BoxCollider(rp3d::CollisionBody* body, Transform& t) :
-		Collider(body, ColliderPrimitive::Box, Rp3dConvert::ToRp3dTransform(t)),
+		Collider(body, ColliderPrimitive::Box, t),
 		extents(1.0f, 1.0f, 1.0f)
 	{
 		//InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
@@ -83,27 +86,43 @@ namespace Raven
 		if (body && collider == nullptr)
 		{
 			rp3d::CollisionShape* s = ColliderShapeFactory::CreateBoxShape(physicsCommon, this);
-			collider = body->addCollider(s, relativeTransform);
+			collider = body->addCollider(s, Rp3dConvert::ToRp3dTransform(relativeTransform));
 		}
 	}
 
-	void BoxCollider::SetExtents(const rp3d::Vector3& vec)
+	void BoxCollider::OnImGui()
+	{
+		// the UI for modifying a box collider
+		ImGui::TextUnformatted("Half extents");
+		ImGui::NextColumn();
+
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat3("##Half extents", glm::value_ptr(extents), 0.05))
+		{
+			// need to update collider's extents in collider and in engine
+			SetExtents(extents);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+	}
+
+	void BoxCollider::SetExtents(const glm::vec3& vec)
 	{
 		// update the extents
 		extents = vec;
 		// if collider was assigned a body, it exists in physics engine so also update extents there
 		if (body)
-			((rp3d::BoxShape*)collider->getCollisionShape())->setHalfExtents(vec);
+			((rp3d::BoxShape*)collider->getCollisionShape())->setHalfExtents(Rp3dConvert::ToRp3dVector3(vec));
 	}
 
 	void BoxCollider::SetExtents(const float& x, const float& y, const float& z)
 	{
-		extents = rp3d::Vector3(x,y,z);
+		extents = glm::vec3(x,y,z);
 		if (body)
-			((rp3d::BoxShape*)collider->getCollisionShape())->setHalfExtents(extents);
+			((rp3d::BoxShape*)collider->getCollisionShape())->setHalfExtents(Rp3dConvert::ToRp3dVector3(extents));
 	}
-
-	rp3d::Vector3 BoxCollider::GetExtents() const
+	glm::vec3 BoxCollider::GetExtents() const
 	{
 		return extents;
 	}
@@ -128,7 +147,24 @@ namespace Raven
 	void SphereCollider::InitShape(rp3d::PhysicsCommon* physicsCommon)
 	{
 		if (body)
-			collider = body->addCollider(ColliderShapeFactory::CreateSphereShape(physicsCommon, this), relativeTransform);
+			collider = body->addCollider(ColliderShapeFactory::CreateSphereShape(physicsCommon, this), Rp3dConvert::ToRp3dTransform(relativeTransform));
+	}
+
+	void SphereCollider::OnImGui()
+	{
+		// the UI for modifying a sphere collider
+		ImGui::TextUnformatted("Radius");
+		ImGui::NextColumn();
+
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Radius", &radius, 0.05))
+		{
+			// need to update collider's extents in collider and in engine
+			SetRadius(radius);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
 	}
 
 	void SphereCollider::SetRadius(const float& r)
@@ -159,13 +195,43 @@ namespace Raven
 		radius(1.0f),
 		height(1.0f)
 	{
-		InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
+		//InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
 	}
 
 	void CapsuleCollider::InitShape(rp3d::PhysicsCommon* physicsCommon)
 	{
 		if (body)
-			collider = body->addCollider(ColliderShapeFactory::CreateCapsuleShape(physicsCommon, this), relativeTransform);
+			collider = body->addCollider(ColliderShapeFactory::CreateCapsuleShape(physicsCommon, this), Rp3dConvert::ToRp3dTransform(relativeTransform));
+	}
+
+	void CapsuleCollider::OnImGui()
+	{
+		// the UI for modifying a capsule collider
+		ImGui::TextUnformatted("Radius");
+		ImGui::NextColumn();
+
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Radius", &radius, 0.05))
+		{
+			// need to update collider's extents in collider and in engine
+			SetRadius(radius);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		ImGui::TextUnformatted("Height");
+		ImGui::NextColumn();
+
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Height", &height, 0.05))
+		{
+			// need to update collider's extents in collider and in engine
+			SetHeight(height);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
 	}
 
 	void CapsuleCollider::SetRadius(const float& r)
@@ -218,7 +284,7 @@ namespace Raven
 
 		rp3d::CollisionShape* CreateBoxShape(rp3d::PhysicsCommon* physicsCommon, BoxCollider* collider)
 		{
-			return physicsCommon->createBoxShape(collider->GetExtents());
+			return physicsCommon->createBoxShape(Rp3dConvert::ToRp3dVector3(collider->GetExtents()));
 		}
 
 		rp3d::CollisionShape* CreateSphereShape(rp3d::PhysicsCommon* physicsCommon, SphereCollider* collider)
@@ -247,6 +313,24 @@ namespace Raven
 		}
 	}
 
+	namespace ColliderFactory
+	{
+		Collider* CreateCollider(ColliderPrimitive::Type type)
+		{
+			switch (type)
+			{
+			case Raven::ColliderPrimitive::Box:
+				return new BoxCollider();
+			case Raven::ColliderPrimitive::Sphere:
+				return new SphereCollider();
+			case Raven::ColliderPrimitive::Capsule:
+				return new CapsuleCollider();
+			default:
+				return new BoxCollider();
+			}
+		}
+	};
+
 	//
 	// Collider shape primitives
 	//
@@ -258,7 +342,7 @@ namespace Raven
 			return NAMES[(uint32_t)type];
 		};
 
-		Type GetColliderPrimitiveName(const std::string& type)
+		Type GetColliderPrimitiveType(const std::string& type)
 		{
 			if (type == "Box")
 			{
@@ -272,10 +356,12 @@ namespace Raven
 			{
 				return Type::Capsule;
 			}
+			/*
 			else if (type == "Height")
 			{
 				return Type::Height;
 			}
+			*/
 			return Type::Box;
 		}
 	}

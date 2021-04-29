@@ -74,7 +74,14 @@ namespace Raven
 
 	void PhysicsModule::DestroyWorld() // call when destroying a scene
 	{
-		physicsCommon.destroyPhysicsWorld(world);
+		if (world)
+			physicsCommon.destroyPhysicsWorld(world);
 		world = nullptr; // invalidate pointer
+	}
+
+	void PhysicsModule::RecreateWorld()
+	{
+		DestroyWorld();
+		CreateWorld();
 	}
 }

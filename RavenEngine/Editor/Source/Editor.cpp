@@ -537,7 +537,6 @@ namespace Raven
 	void Editor::CacheScene()
 	{
 		//Serialize the scene
-	
 		for (auto & win : editorWindows)
 		{
 			win.second->SaveWorkspace();

@@ -4,8 +4,6 @@
 
 #include "Engine.h"
 
-#include "Physics/PhysicsModule.h"
-
 #include "Scene/Component/RigidBody.h"
 
 #include "Utilities/ToRp3d.h"
@@ -25,33 +23,32 @@ namespace Raven
 		InitRigidBody();
 	}
 
-	/*
-	RigidBody::RigidBody(Transform& transform, RigidBodyType initType) :
-		world(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()),
-		initTransform(Rp3dConvert::ToRp3dTransform(transform)),
-		body(nullptr),
-		mass(1.0f),
-		type(initType)
-	{
-		InitRigidBody();
-	}
-	*/
-
 	RigidBody::~RigidBody()
 	{
-		colliders.clear();
-		//if (body)
-			//world->destroyCollisionBody(body);
+		//colliders.clear();
 	}
 
 	void RigidBody::InitRigidBody()
 	{
 		previousState = initTransform;
-		// if body already exists, delete it and replace
+		
+		// if body already exists, delete it and replace with a new default body
 		if (body)
 			world->destroyRigidBody(body);
+
 		body = world->createRigidBody(previousState);
 		body->setType(static_cast<rp3d::BodyType>(type));
+
+		canSleep	   = body->isAllowedToSleep();
+		gravityEnabled = body->isGravityEnabled();
+		linearDamping  = body->getLinearDamping();
+		angularDamping = body->getAngularDamping();
+	}
+
+	void RigidBody::DestroyRigidBody()
+	{
+		if (body)
+			world->destroyRigidBody(body);
 	}
 
 	void RigidBody::AddCollider(Collider* collider)
@@ -62,18 +59,24 @@ namespace Raven
 		collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
 		// update the body's vector containing colliders 
 		colliders.emplace_back(collider);
-		LOGV(colliders.size());
+		LOGV(body->getNbColliders());
 	}
 
 	void RigidBody::RemoveCollider(uint32_t index)
 	{
 		// NB THIS DOES NOT CHECK IF THE INDEX IS OUT OF BOUNDS (do this through editor?)
 		colliders.erase(colliders.begin() + index); // deletes the pointer
+		LOGV(body->getNbColliders());
 	}
 
 	std::shared_ptr<Collider> RigidBody::GetCollider(uint32_t index)
 	{
 		return colliders[index];
+	}
+
+	std::vector<std::shared_ptr<Collider>>* RigidBody::GetAllColliders()
+	{
+		return &colliders;
 	}
 
 	void RigidBody::SetIsTrigger(uint32_t index, bool b)
@@ -119,6 +122,16 @@ namespace Raven
 		initTransform = Rp3dConvert::ToRp3dTransform(t);
 	}
 
+	Transform RigidBody::GetInitTransform()
+	{
+		return Rp3dConvert::ToTransform(initTransform);
+	}
+
+	void RigidBody::InitTransform()
+	{
+		body->setTransform(initTransform);
+	}
+
 	uint32_t RigidBody::GetNumColliders()
 	{
 		return colliders.size();
@@ -143,7 +156,6 @@ namespace Raven
 		mass = m;
 		body->setMass(mass);
 	}
-
 	float RigidBody::GetMass()
 	{
 		return mass;
@@ -152,22 +164,42 @@ namespace Raven
 	void RigidBody::SetLinearDamping(float d)
 	{
 		// d >= 0 
+		linearDamping = d;
 		body->setLinearDamping(d);
 	}
+	float RigidBody::GetLinearDamping()
+	{
+		return linearDamping;
+	}
+
 	void RigidBody::SetAngularDamping(float d)
 	{
 		// d >= 0 
+		angularDamping = d;
 		body->setAngularDamping(d);
+	}
+	float RigidBody::GetAngularDamping()
+	{
+		return angularDamping;
 	}
 
 	void RigidBody::SetIsAllowedToSleep(bool b)
 	{
 		body->setIsAllowedToSleep(b);
 	}
-
 	bool RigidBody::CanSleep()
 	{ 
 		return body->isAllowedToSleep(); 
+	}
+
+	void RigidBody::SetBodyType(RigidBodyType t)
+	{
+		type = t;
+		body->setType(static_cast<rp3d::BodyType>(t));
+	}
+	RigidBodyType RigidBody::GetBodyType()
+	{
+		return type;
 	}
 
 	//

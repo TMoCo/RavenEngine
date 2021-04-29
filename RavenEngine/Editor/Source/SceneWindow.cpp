@@ -99,7 +99,7 @@ namespace Raven
 			(ImTextureID)previewTexture->GetRTTextureID(),
 			{ sceneViewSize.x, sceneViewSize.y },
 			{ 0, sizeFactor.y },
-			{ sizeFactor.x,0}
+			{ sizeFactor.x, 0}
 		);
 
 		auto windowSize = ImGui::GetWindowSize();

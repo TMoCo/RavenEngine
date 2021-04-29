@@ -136,14 +136,8 @@ namespace Raven
 
 		GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 
-		// Update physics world, generates new transforms for entities with rigid bodies
-		GetModule<PhysicsModule>()->Step(dt);
-
 		// Update Render...
 		GetModule<RenderModule>()->Update(dt);
-
-
-
 
 		// ~TESTING---------------------------------------------------------------------------------------------
 		if (TESTING_MAT)

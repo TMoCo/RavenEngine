@@ -8,6 +8,7 @@
 
 #include <cereal/types/vector.hpp>
 
+#include "Physics/PhysicsModule.h"
 #include "Physics/Collider.h"
 
 #include "Scene/Component/Transform.h"
@@ -42,6 +43,7 @@ namespace Raven
 		~RigidBody();
 
 		void InitRigidBody();
+		void DestroyRigidBody();
 
 		// add a collider to the collision body
 		void AddCollider(Collider* collider);
@@ -50,6 +52,7 @@ namespace Raven
 
 		// get the specified collider from the collision body colliders
 		std::shared_ptr<Collider> GetCollider(uint32_t index);
+		std::vector<std::shared_ptr<Collider>>* GetAllColliders();
 
 		// set the collider at specified index to be a trigger (does not collide, only reports overlap)
 		void SetIsTrigger(uint32_t index, bool b);
@@ -59,8 +62,10 @@ namespace Raven
 		rp3d::Transform GetPreviousState();
 		rp3d::Transform GetCurrentState();
 
-		void SetTransform(const Transform& t);
 		void SetInitTransform(const Transform& t);
+		Transform GetInitTransform();
+		void InitTransform(); // initialises the rigid body's transform
+		void SetTransform(const Transform& t);
 		Transform GetTransform();
 
 		uint32_t GetNumColliders();
@@ -75,7 +80,12 @@ namespace Raven
 		void SetLinearDamping(float d);
 		void SetAngularDamping(float d);
 		void SetIsAllowedToSleep(bool b);
+		void SetBodyType(RigidBodyType t);
+
+		float GetLinearDamping();
+		float GetAngularDamping();
 		bool CanSleep();
+		RigidBodyType GetBodyType();
 
 		// Applies forces to the body
 		void ApplyForce(const glm::vec3& f);
@@ -87,16 +97,36 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			LOGV("Calling rigid body serialize function");
-			archive(cereal::make_nvp("Type", static_cast<int>(type)), cereal::make_nvp("Colliders", colliders));
+			archive(cereal::make_nvp("Type", static_cast<int>(type)),
+					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Linear Damping", linearDamping),
+					cereal::make_nvp("Angular Damping", angularDamping),
+					cereal::make_nvp("Colliders", colliders));
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			LOGV("Calling rigid body serialize function");
 			// nb, this only loads shape data and creates instances of the collider objects.
-			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), cereal::make_nvp("Colliders", colliders));
+			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), 
+					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Linear Damping", linearDamping),
+					cereal::make_nvp("Angular Damping", angularDamping),
+					cereal::make_nvp("Colliders", colliders));
+			// we also need to set the body properties in the physics engine
+			this->SetBodyType(type);
+			this->SetMass(mass);
+			this->SetLinearDamping(linearDamping);
+			this->SetAngularDamping(angularDamping);
+			// the colliders need to be added to the physics engine, so loop and add them to the body
+			auto physCommon = Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon();
+			for (auto& collider : colliders)
+			{
+				// essentially the same as the AddCollider function, minus the adding to the collider vector (already there)
+				collider->SetBody(this->body);
+				collider->InitShape(physCommon);
+				this->body->addCollider(collider->GetShape(), Rp3dConvert::ToRp3dTransform(collider->GetRelativeTransform()));
+			}
 		}
 
 	private:
@@ -108,6 +138,11 @@ namespace Raven
 		rp3d::RigidBody* body;
 
 		float mass;
+		float linearDamping;
+		float angularDamping;
+
+		bool canSleep;
+		bool gravityEnabled;
 
 		RigidBodyType type;
 

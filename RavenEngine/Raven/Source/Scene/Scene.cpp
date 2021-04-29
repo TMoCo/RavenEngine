@@ -33,6 +33,8 @@
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 
 
 namespace Raven { 
@@ -64,7 +66,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model, LuaComponent, MeshRenderer, SkinnedMeshRenderer, Animator
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model, LuaComponent, MeshRenderer, SkinnedMeshRenderer, Animator, RigidBody
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -110,7 +112,16 @@ namespace Raven {
 	void Scene::Load(const std::string& filePath, bool binary)
 	{
 		PRINT_FUNC();
+
+		auto view = entityManager->GetRegistry().view<RigidBody>();
+		for (auto& v : view)
+		{
+			view.get(v).DestroyRigidBody();
+		}
+		Engine::Get().GetModule<PhysicsModule>()->RecreateWorld();
+		
 		entityManager->Clear();
+		// on load, also recreate the physics world
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
 		std::string path = filePath + name;
 
@@ -136,7 +147,6 @@ namespace Raven {
 			std::ifstream in(path);
 			if (in.good())
 			{
-				LOGC("LOADING...");
 				std::string data;
 				in.seekg(0, std::ios::end);
 				auto len = in.tellg();
@@ -149,9 +159,7 @@ namespace Raven {
 				istr.str(data);
 				cereal::JSONInputArchive input(istr);
 				input(*this);
-				LOGC("LOADED!");
 				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
-				LOGC("CREATED SCENE.");
 			}
 			else 
 			{
@@ -159,6 +167,7 @@ namespace Raven {
 				in.close();
 			}
 		}
+		LOGC(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()->getNbRigidBodies());
 
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
 
@@ -228,18 +237,28 @@ namespace Raven {
 		{
 			initCallback(this);
 		}
-		auto view = GetRegistry().view<LuaComponent>();
-		for (auto v : view)
+		auto luaView = GetRegistry().view<LuaComponent>();
+		for (auto v : luaView)
 		{
 			auto& lua = GetRegistry().get<LuaComponent>(v);
 			lua.OnInit();
+		}
+
+		auto rbView = GetRegistry().view<RigidBody, Transform>();
+		for (auto v : rbView)
+		{
+			auto& rb = GetRegistry().get<RigidBody>(v);
+			// initialise the transform in the rigid body engine to be the entity's transform
+			rb.SetInitTransform(GetRegistry().get<Transform>(v)); // rigid body needs transform to exist so this should never fail
+			rb.InitTransform();
+			LOGC(glm::to_string(rb.GetInitTransform().GetWorldMatrix()));
 		}
 
 	}
 
 	void Scene::OnClean()
 	{
-
+		LOGE("CLEANING");
 	}
 
 	auto Scene::UpdateCameraController(float dt)

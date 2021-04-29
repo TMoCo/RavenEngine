@@ -22,8 +22,10 @@ namespace Raven
 
 		rp3d::Quaternion ToRp3dQuaternion(const glm::quat& q)
 		{
+			// make sure to normalize the quaternion
+			glm::quat quat = glm::normalize(q);
 			// !rp3d has scalar after vector! 
-			return rp3d::Quaternion(q.x, q.y, q.z, q.w);
+			return rp3d::Quaternion(quat.x, quat.y, quat.z, quat.w);
 		}
 
 		Transform ToTransform(const rp3d::Transform& other)

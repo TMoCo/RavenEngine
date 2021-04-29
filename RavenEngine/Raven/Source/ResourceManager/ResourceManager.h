@@ -2,202 +2,345 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 
-/*
-* The resource manager module takes care of providing the resources consumed by the 
-* game engine, making sure that only a single copy of any data is ever created. It also
-* handles the loading and unloading of resources from disc to RAM and from RAM to GPU.
-* The resource registry, an unordered map, stores pointers to resources that are loaded from files. 
-* The resources are stored in a key / value pair where the key is the string of the resource's path.
-* The loading of files is handled by Loader classes, stored in a vector. Each loader implements 
-* a LoadAsset function that loads an asset of the type handled by the loader into the resource
-* register.
-*/
-
 #pragma once
 
-#include <string>		 // file path as a string
-#include <unordered_map> // a register for unique resources
-#include <memory>		 // pointer classes
-#include <array>		 // array container
-#include <vector>
+
+
+#include "IModule.h"
+
+#include "Resources/IResource.h"
+#include "Importers/Importer.h"
+#include "Loaders/ILoader.h"
+
 
 
 #include "Utilities/Core.h"
 
-#include "IModule.h"
-#include "ResourceManager/Resources/IResource.h"
-#include "ResourceManager/Loaders/ILoader.h"
-#include "ResourceManager/Loaders/ImageLoader.h"
-#include "ResourceManager/Loaders/MeshLoader.h"
-#include "ResourceManager/Loaders/LayoutLoader.h"
+
+#include <string>
+#include <unordered_map>
+#include <memory>	
+#include <array>
+#include <vector>
+
+
+
+
 
 namespace Raven
 {
-	class ResourceManager : public IModule
+	// Hold Data for a single Resource.
+	class ResourceData
 	{
-		friend class ILoader; // ILoader is a friend of the resource manager, it can add to the resource register on load
+	public:
+		// The type of the Resource.
+		EResourceType type;
+
+		// The Relative Resource Path.
+		std::string path;
+
+		// The header data that contains information about the Resource.
+		ResourceHeaderInfo info;
+
+		// The Resource.
+		Ptr<IResource> rsc;
+	};
+
+
+
+	// ResourcesRegistry:
+	//     - Handle reference and map all the Resources in the Resource manager.
+	class ResourcesRegistry
+	{
+	private:
+		// List of all the resroucs that exist, loaded or not.
+		std::vector<ResourceData> resources;
+
+		// Map a relative path to their Resource data.
+		std::unordered_map<std::string, uint32_t> resourcePathMap;
+
+		// Map a resource pointer to their Resource data.
+		std::unordered_map<IResource*, uint32_t> resourceMap;
 
 	public:
-		ResourceManager() = default;
-		virtual ~ResourceManager() override {};
+		// Add new loaded Resource.
+		void AddResource(const std::string& path, const ResourceHeaderInfo& info, Ptr<IResource> newResource);
+
+		// Remove loaded Resource, this will only remove the loaded Resource not its mapping.
+		void RemoveResource(const std::string& path);
+
+		// Clear all loaded Resources, this will leave the mapping.
+		void Reset();
+
+		// Find a resrouce from path.
+		const ResourceData* FindResource(const std::string& path) const;
+	};
+
+
+
+	// ResourceRef:
+	//    - Used to reference a resource for archiving operations.
+	//
+	template< class ResourceType,
+		std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > = true >
+	class ResourceRef
+	{
+		// Friend...
+		friend class ResourceManager;
+
+	private:
+		// The Resource relative path.
+		std::string path;
+
+		// The type of the Resource.
+		EResourceType type;
+
+		// The Resource.
+		Ptr<IResource> rsc;
+
+	public:
+		// Return the relative path to the Resource.
+		inline const std::string& GetPath() const { return path; }
+
+		// Return a raw pointer to the Resource.
+		inline Ptr<IResource> Get() const { return rsc; }
+
+		// Return true if the Resource is loaded and valid.
+		inline bool IsValid() const { return rsc != nullptr; }
+
+		// Find or load the Resource. 
+		bool FindOrLoad();
+	};
+
+
+
+
+
+	// Resource Manager:
+	//   - The resource manager module takes care of providing the resources consumed by the
+	//     game engine, making sure that only a single copy of any data is ever created/loaded.
+	//
+	//   - It handles the importing, loading and unloading the resources.
+	//
+	class ResourceManager : public IModule
+	{
+		// Delete copy constructor and assignment operator
+		NOCOPYABLE(ResourceManager);
+
+		// ILoader is a friend of the resource manager, it can add to the resource register on load
+		friend class ILoader; 
+
+	public:
+		// Construct.
+		ResourceManager();
+
+		// Destruct.
+		virtual ~ResourceManager();
 	
 		// inherited from IModule, must be overridden
 		virtual void Initialize() override;
 		virtual void Destroy() override;
 
+		// Return Module Type.
 		static EModuleType GetModuleType() { return EModuleType::MT_ResourceManager; }
 
-		//
-		// Obtain resources:
-		//
 
-		// resources are obtained by passing their path as keys for the unordered map
-		template<class TResource>
-		std::shared_ptr<TResource> GetResource(const std::string& path);
-		template<class TResource>
-		void GetResource(const std::string& path, std::vector<std::shared_ptr<TResource>>& outVec);
-		template<class TResource>
-		std::vector<std::shared_ptr<TResource>> GetResources(const std::string& path);
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+		//                 Obtain resources
+		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
 
-		// returns true if the resource is already in the resource register
-		bool HasResource(const std::string& id);
+		// Find a Resource and 
+		template<class ResourceType,
+			std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > = true >
+		Ptr<ResourceType> GetResource(const std::string& path);
 
-		//
-		// Change the resource register:
-		//
+		// Return true if the Resource exist in the Resource registry whether loaded or not.
+		bool HasResource(const std::string& path);
 
-		// tell manager to load a resource of a given type at a given path, need to specify resource type to select appropriate loader
+		// Return true if the Resource exist in the registry and loaded.
+		bool IsResourceLoaded(const std::string& path);
+
+
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+		//                 Save/Import resources
+		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
+
+		// Import new Resource from other file formats using our importers.
+		// @param file: the file we want to import could be an image or .obj file etc...
+		// @param optionalSaveDir: if not null will save the Resource to this directory.
+		// @return true if successfully imported.
+		bool Import(const std::string& file, std::string* optionalSaveDir = nullptr);
+
+		// Save a new resource and add it to be the Resource registry.
+		bool SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile);
+
+		// Save existing Resource.
+		bool SaveResource(Ptr<IResource> rsc);
+
+
+	private:
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+		//             Importers & Loaders 
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+
+		// Load a Resource at that path.
 		template<class TResource>
 		bool LoadResource(const std::string& path);
 
-		std::shared_ptr<IResource> AddResource(const std::string& id, IResource* resource);
-
-		void RemoveResource(const std::string& id);
-
-		// loops over the register entries and deletes the values, then removes the entries
-		void FlushResourceRegister();
-		
-		// may be needed later in threaded application?
-		inline bool IsLoadingScene() const { return loadingResource; }
-
-		inline void SetLoading(bool loading) { loadingResource = loading; }
-
-		// get a loader of type T
+		// Return the loader of type TLoader
 		template <class TLoader>
 		TLoader* GetLoader();
+
+		// Return the loader that can load this resource type.
+		ILoader* GetLoader(EResourceType rscType);
+
+		// Return the importer that can load a specific extension
+		IImporter* GetImporter(const std::string& ext);
+
+		// Load a resrouce using specific loader.
+		bool LoadResource(ILoader* loader, const std::string& path);
+
+
 	private:
-		// add and remove loader of a certain type
-		template <class TLoader>
-		void AddLoader(std::unique_ptr<TLoader> loader);
-		template <class TLoader>
-		void RemoveLoader(const TLoader* loader);
+		// Create & Register a new loader to the Resource manager.
+		template<class TLoader,
+			std::enable_if_t< std::is_base_of<ILoader, TLoader>::value, bool > = true >
+		void RegisterLoader();
 
-		void PrintResources();
+		// Create & Register a new importer to the Resource manager.
+		template<class TImporter,
+			std::enable_if_t< std::is_base_of<IImporter, TImporter>::value, bool > = true >
+		void RegisterImporter();
 
-		
-				
-		// one to many 
-		std::unordered_multimap<std::string, std::shared_ptr<IResource>> resources;
+		// List of all Resource loaders in the engine.
+		std::vector< std::unique_ptr<ILoader> > loaders;
 
-		// an array containing the resource loaders used
-		std::vector<std::unique_ptr<ILoader>> loaders;
+		// Map each loader to their type.
+		std::unordered_map<ELoaderType, ILoader*> loadersMap;
 
-		bool loadingResource = false;
+		// Map each loader to the type of resources they can load.
+		std::unordered_map<EResourceType, ILoader*> loadersRscMap;
 
-		NOCOPYABLE(ResourceManager); // delete copy constructor and = operator
+		// List of all importers in the engine.
+		std::vector< std::unique_ptr<IImporter> > importers;
+
+		// Map each importer to their supported extensions.
+		std::unordered_map<std::string, IImporter*> importersExtMap;
+
+		// The Resource registry, use for mapping all Resources that can be loaded or already laoded.
+		ResourcesRegistry registry;
 	};
 
-	// template method should be implemented in *.h files rather than .*cpp files
-	// if implemented in cpp files, the files could not complie 
+
+
+
+
+
+
+	// --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - ---   
+	//		
+	//                 Resource Manager Implementations
+	//
+	// --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+
+
+
+
 	template<class TResource>
 	bool ResourceManager::LoadResource(const std::string& path)
 	{
-		// based on resource type, select approptiate loader and call loader's LoadAsset method
-		switch (TResource::Type())
-		{
-		case EResourceType::RT_Image:
-			return GetLoader<ImageLoader>()->LoadAsset(path); // adds a resource to the register
-		case EResourceType::RT_Mesh:
-			return GetLoader<MeshLoader>()->LoadAsset(path);
-		case EResourceType::RT_GuiLayout:
-			return GetLoader<LayoutLoader>()->LoadAsset(path);
-		default:
-			return false;
-		}
+		ILoader* loader = GetLoader(TResource::Type());
+
+		return LoadResource(loader, path);
 	}
 
-	template <class TLoader>
-	void ResourceManager::AddLoader(std::unique_ptr<TLoader> loader)
-	{
-		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
-		{
-			loaders.push_back(std::move(loader));
-			LOGV("Added a loader of type " + ILoader::TypeToString(loaders.rbegin()->get()->GetType()));
-		}
-	}
-
-	template <class TLoader>
-	void ResourceManager::RemoveLoader(const TLoader* loader)
-	{
-		// loop over the loaders, finding the loader we want to remove
-		const auto iter = std::find_if(loaders.begin(), loaders.end(), [loader](const auto& ownedLoader) noexcept { return loader == ownedLoader.get(); });
-		// check the iterator isn't at the end, means we found a loader to remove
-		if (iter != loaders.end())
-		{
-			loaders.erase(iter); // deletes the unique pointer, which deletes its owned object
-		}
-	}
 
 	template <class TLoader>
 	TLoader* ResourceManager::GetLoader()
 	{
-		// loop over loaders, finding the type of loader requested
-		ELoaderType type = TLoader::Type();
-		const auto iter = std::find_if(loaders.begin(), loaders.end(), [type](const auto& ownedLoader) noexcept { return ownedLoader->GetType() == type; });
-		if (iter == loaders.end())
+		auto iter = loadersMap.find(TLoader::Type());
+
+		// Not Found?
+		if (iter == loadersMap.end())
 		{
+			RAVEN_ASSERT(0, "Load type not found, invalid loader type.");
 			return nullptr;
 		}
-		else
+
+		return static_cast<TLoader*>(iter->second);
+	}
+
+
+	template<class ResourceType,
+		std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > >
+	Ptr<ResourceType> ResourceManager::GetResource(const std::string& path)
+	{
+		const ResourceData* rscData = registry.FindResource(path);
+
+		// Doesn't Exist?
+		if (!rscData)
 		{
-			// cast to desired loader type
-			return dynamic_cast<TLoader*>(iter->get());
+			LOGW("Error in GetResource, Resource Does not exit {0}", path.c_str())
+			return nullptr;
 		}
-	}
 
-	template<class TResource>
-	std::vector<std::shared_ptr<TResource>> ResourceManager::GetResources(const std::string& path)
-	{
-		std::vector<std::shared_ptr<IResource>> res;
-		GetResource(path, res);
-		return res;
-	}
-
-	template<class TResource>
-	void ResourceManager::GetResource(const std::string& path, std::vector<std::shared_ptr<TResource>>& out)
-	{
-		auto pr = resources.equal_range(path);
-		if (pr.first != resources.end())
+		// Type Mismatch?
+		if (rscData->type != ResourceType::Type())
 		{
-			for (auto iter = pr.first; iter != pr.second; ++iter)
+			RAVEN_ASSERT(0, "Invalid Resrouce Type.");
+			return nullptr;
+		}
+
+		// Not Loaded?
+		if (!rscData->rsc)
+		{
+			if ( !LoadResource<ResourceType>(path) )
 			{
-				out.emplace_back(std::static_pointer_cast<TResource>(iter->second));
+				RAVEN_ASSERT(0, "Failed to load resource.");
+				return nullptr;
 			}
 		}
+
+		return static_pointer_cast<ResourceType>(rscData->rsc);
 	}
 
-	template<class TResource>
-	std::shared_ptr<TResource> ResourceManager::GetResource(const std::string& path)
+
+	template<class TLoader,
+		std::enable_if_t< std::is_base_of<ILoader, TLoader>::value, bool > >
+		void ResourceManager::RegisterLoader()
 	{
-		auto resourceIter = resources.find(path); // a key/value pair iterator
-		// check IResource pointer exists 
-		if (resourceIter == resources.end())
+		ILoader* newLoader = new TLoader();
+		loaders.push_back( std::unique_ptr<ILoader>(newLoader) );
+		loadersMap.insert(std::make_pair(TLoader::Type(), newLoader));
+
+		std::vector<EResourceType> rscTypes;
+		newLoader->ListResourceTypes(rscTypes);
+
+		// Map each file extenions to their importer
+		for (const auto& rt : rscTypes)
 		{
-			return nullptr;
-		}
-		else
-		{
-			return std::static_pointer_cast<TResource>(resourceIter->second);
+			loadersRscMap.insert(std::make_pair(rt, newLoader));
 		}
 	}
+
+
+	template<class TImporter,
+		std::enable_if_t< std::is_base_of<IImporter, TImporter>::value, bool > >
+		void ResourceManager::RegisterImporter()
+	{
+		IImporter* newImporter = new TImporter();
+		importers.push_back( std::unique_ptr<IImporter>(newImporter) );
+
+		std::vector<std::string> impExt;
+		newImporter->ListExtensions(impExt);
+
+		// Map each file extenions to their importer
+		for (const auto& ext : impExt)
+		{
+			importersExtMap.insert( std::make_pair(ext, newImporter) );
+		}
+
+	}
+
+
 }

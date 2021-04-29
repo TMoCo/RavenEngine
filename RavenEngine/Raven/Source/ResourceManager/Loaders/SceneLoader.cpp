@@ -4,13 +4,37 @@
 
 #include "SceneLoader.h"
 
+
+
+
 namespace Raven
 {
-	SceneLoader::SceneLoader(ResourceManager& initResourceManager) : ILoader(initResourceManager, ELoaderType::LT_Audio) {}
 
-	bool SceneLoader::LoadAsset(const std::string& path) 
-	{
-		// should take advantage of the cereal library here
-		return true;
-	}
+
+SceneLoader::SceneLoader()
+{
+
 }
+
+
+IResource* SceneLoader::LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive)
+{
+	RAVEN_ASSERT(0, "TODO RAVEN Implement MaterialLoader.");
+	return nullptr;
+}
+
+
+void SceneLoader::SaveResource(RavenOutputArchive& archive, IResource* Resource)
+{
+	RAVEN_ASSERT(0, "TODO RAVEN Implement MaterialLoader.");
+}
+
+
+void SceneLoader::ListResourceTypes(std::vector<EResourceType>& outRscTypes)
+{
+	outRscTypes.push_back(RT_Scene);
+}
+
+
+} // End of namespace Raven.
+

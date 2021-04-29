@@ -15,13 +15,14 @@ namespace Raven {
 
 
 MaterialShader::MaterialShader()
-	: IResource(EResourceType::RT_Material, true)
+	: IResource()
 	, renderRsc(nullptr)
 	, domain(ERenderShaderDomain::Mesh)
 	, type(ERenderShaderType::Opaque)
 	, isComputeMaterialVertex(false)
 {
-
+	type = MaterialShader::GetType();
+	hasRenderResources = true;
 }
 
 
@@ -32,10 +33,10 @@ MaterialShader::~MaterialShader()
 
 
 
-void MaterialShader::LoadOnGpu()
+void MaterialShader::LoadRenderResource()
 {
-	RAVEN_ASSERT(!onGPU, "Shader already loaded.");
-	onGPU = true;
+	RAVEN_ASSERT(!isOnGPU, "Shader already loaded.");
+	isOnGPU = true;
 
 
 	// What Stages this materail function support.

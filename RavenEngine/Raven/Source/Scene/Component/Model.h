@@ -55,25 +55,18 @@ namespace Raven
 		friend class ModelLoader; 
 
 	public:
-		Model() {}
-		Model(const std::string & fileName);
+		// Construct.
+		Model();
 
+		// Destruct.
 		~Model();
 
-		void LoadOnGpu();
+		// Retun the list mesh in the model.
+		inline auto& GetMesh() { return mesh; };
+		inline const auto& GetMesh() const { return mesh; };
 
-		// Return a pointer to
-		Ptr<Mesh> GetMesh(size_t index);
-
-		// Retun the list meshes in the model.
-		inline auto& GetMeshes() { return meshes; };
-		inline const auto& GetMeshes() const { return meshes; };
-
-		// Add new mesh to the list of meshes in the model.
-		void AddMesh(Ptr<Mesh> mesh);
-
-		// Add new meshes to the list of meshes in the model.
-		void AddMeshes(const std::vector< Ptr<Mesh> >& inputMeshes);
+		// Set a new mesh to the list of meshes in the model.
+		inline void SetMesh(Ptr<Mesh> newMesh) { mesh = newMesh; }
 
 		// Set material at index, the material is going to be used by a mesh on the same index.
 		void SetMaterial(uint32_t index, Ptr<Material> mat);
@@ -86,58 +79,21 @@ namespace Raven
 		auto& GetMaterials() { return materials; }
 		const auto& GetMaterials() const { return materials; }
 
-		// Recompute/Update the bounding box the model.
-		void UpdateBounds();
-
 		// Return the current local bounds of the model.
-		inline const auto& GetLocalBounds() { return localBounds; }
-
-		inline auto GetPrimitiveType() const { return primitiveType; }
-		inline auto SetPrimitiveType(PrimitiveType::Id type) { primitiveType = type; }
-
-		inline auto GetFileName() const { return filePath; }
+		inline const auto& GetLocalBounds() const { return mesh->GetBounds(); }
 
 		// serialization load and save
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			if (meshes.size() > 0)
-			{
-				archive(
-					cereal::make_nvp("PrimitiveType", primitiveType), 
-					cereal::make_nvp("FilePath", filePath),
-					cereal::make_nvp("Id", entity)
-					);
-			}
+			RAVEN_ASSERT(0, "Not Implemented");
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-
-			archive(
-				cereal::make_nvp("PrimitiveType", primitiveType), 
-				cereal::make_nvp("FilePath", filePath),
-				cereal::make_nvp("Id", entity));
-
-			meshes.clear();
-
-			if (primitiveType != PrimitiveType::File)
-			{
-				Ptr<Mesh> newMesh(MeshFactory::CreatePrimitive(primitiveType));
-				AddMesh(newMesh);
-			}
-			else
-			{
-				LoadFile(true);
-			}
-
-			UpdateBounds();
+			RAVEN_ASSERT(0, "Not Implemented");
 		}
-
-		//if fromLoad is true, indicating engine should not generate the bones and the entities from fbx
-//
-		void LoadFile(bool fromLoad = false);
 
 		// Return mesh renderers for at their mesh indices.
 		void GetMeshRenderers(std::vector<ModelMeshRendererData>& outMesRenderers, Scene* scene);
@@ -147,23 +103,15 @@ namespace Raven
 		void GetMeshRenderersImp(std::vector<ModelMeshRendererData>& outMesRenderers, Entity& ent);
 
 	private:
-
 		void BindMeshComponent();
 		void BindMeshComponentForFBX();
-		inline void SetFileName(const std::string& path) { filePath = path; }
 
 	private:
-		std::string filePath;
+		// The Model Mesh, each mapped to a materail on the same index.
+		Ptr<Mesh> mesh;
 
-		// The Model Meshes, each mapped to a materail on the same index.
-		std::vector< Ptr<Mesh> > meshes;
-
-		// The Model Materials, used by meshes mapped to the same index.
+		// The Model Materials, used by mesh mapped to the same index.
 		std::vector< Ptr<Material> > materials;
-
-		PrimitiveType::Id primitiveType;
-
-		// The local bounding box of the model that contain all its meshes.
-		MathUtils::BoundingBox localBounds;
 	};
+
 };

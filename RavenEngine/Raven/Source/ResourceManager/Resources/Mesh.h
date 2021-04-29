@@ -11,92 +11,134 @@
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
-#include "Animation/Bone.h"
-//
-// A class for a 3D mesh and its data
-//
 
-namespace ofbx
-{
-	struct Mesh;
-};
+
+
+
 
 namespace Raven
 {
+	// MeshSection:
+	//    - contain the data of a single section in a mesh.
+	class MeshSection
+	{
+	public:
+		MeshSection()
+		{
+
+		}
+
+
+		// Load Render Resrouces.
+		inline void LoadRenderResource()
+		{
+			RAVEN_ASSERT(!renderRscMesh, "Resrouce already on GPU. use UpdateRenderRsc to update.");
+
+			renderRscMesh = Ptr<RenderRscMesh>(new RenderRscMesh());
+			renderRscMesh->Load(
+				positions,
+				normals,
+				texCoords,
+				indices
+			);
+		}
+
+		// Position Buffer.
+		std::vector<glm::vec3> positions;
+
+		// Normals Buffer.
+		std::vector<glm::vec3> normals;
+
+		// Texture Coordinate Buffer.
+		std::vector<glm::vec2> texCoords;
+
+		// indices Buffer.
+		std::vector<uint32_t> indices;
+
+		// The bounding box of this mesh section.
+		MathUtils::BoundingBox bounds;
+
+		// Render Resrouce Data.
+		Ptr<RenderRscMesh> renderRscMesh;
+	};
+
+
+	// Mesh:
+	//  - a mesh that is made of multiple seprate sections.
+	//
 	class Mesh : public IResource
 	{
-	// This type of resource will rarely if not ever be on its own in the resource register.
-	// It is almost definitely part of a Model resource.
 	public:
 		// Construct.
 		Mesh() 
-			: IResource(EResourceType::RT_Mesh, true) 
+			: IResource() 
 		{
+			type = Mesh::GetType();
+			hasRenderResources = true;
 		}
 
-		// TODO: free data on destruction
-		virtual ~Mesh()
-		{
-			delete renderRscMesh;
-		}
+		// return the resource type
+		inline static EResourceType Type() noexcept { return EResourceType::RT_Mesh; }
 
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Mesh; } // return the resource type
-
-		inline void LoadOnGpu()
+		// Load Render Resrouces.
+		inline virtual void LoadRenderResource() override
 		{
-			if (!onGPU)
+			RAVEN_ASSERT(!isOnGPU, "Resrouce already on GPU. use UpdateRenderRsc to update.");
+
+			for (auto& section : sections)
 			{
-				RAVEN_ASSERT(renderRscMesh == nullptr, "");
+				// Invalid Section?
+				if (!section)
+					continue;
 
-				if (blendWeights.empty())
-					renderRscMesh = new RenderRscMesh();
-				else
-					renderRscMesh = new RenderRscSkinnedMesh();
-
-				renderRscMesh->Load(
-					positions, normals, texCoords, indices, blendWeights,blendIndices
-				); // call interface method
-				onGPU = true;
+				section->LoadRenderResource();
 			}
 		}
 
-
-		inline void NormalizeBlendWeights()
+		// Update Render Resrouces.
+		inline virtual void UpdateRenderResource() override
 		{
-			RAVEN_ASSERT(positions.size() == blendWeights.size(), "size is not correct");
-			for (int32_t i = 0; i < positions.size(); i++)
-			{
-				float sum = 0;
-				for (int32_t j = 0; j < 4; j++)
-				{
-					sum += blendWeights[i][j];
-				}
-				const float invSum = sum > MathUtils::EPS ? 1.0f / sum : 0.0f;
-				blendWeights[i] *= invSum;
-			}
+			RAVEN_ASSERT(isOnGPU, "Resrouce not on GPU. use LoadRenderRsc to load it first.");
+			// TODO: update.
 		}
 
-		inline auto IsActive() const { return active; }
+		// Set a new mesh section.
+		inline void SetMeshSection(uint32_t index, Ptr<MeshSection> section)
+		{
+			if (sections.size() < index + 1)
+				sections.resize(index + 1);
 
-		std::vector<glm::vec3> positions;
-		std::vector<glm::vec3> normals;
-		std::vector<glm::vec2> texCoords;
+			sections[index] = section;
+		}
 
-		std::vector<uint32_t> indices;
+		// Add new mesh section at the end of the sections list.
+		inline void AddMeshSection(Ptr<MeshSection> section)
+		{
+			sections.push_back(section);
+		}
 
-		// The Bounding box the mesh.
+		// Return mesh section.
+		inline Ptr<MeshSection> GetMeshSection(uint32_t index) { return sections[index]; }
+
+		// Return the number of sections in a mesh.
+		inline uint32_t GetNumSections() const { return sections.size(); }
+
+		// Return the bounds of this mesh.
+		inline MathUtils::BoundingBox GetBounds() const { return bounds; }
+
+	private:
+		// Recompute/Update the bounding box the model.
+		inline void UpdateBounds()
+		{
+
+		}
+
+	private:
+		// List of all mesh sections.
+		std::vector< Ptr<MeshSection> > sections;
+
+		// The boudning box of all mesh sections.
 		MathUtils::BoundingBox bounds;
-
-		RenderRscMesh* renderRscMesh = nullptr; // interface with renderer (default constructor)
-		std::string name;
-		bool active = true;
-
-		/// Skinned mesh blend indices (max 4 per bone)
-		std::vector<glm::ivec4> blendIndices;
-
-		/// Skinned mesh index buffer (max 4 per bone)
-		std::vector<glm::vec4> blendWeights;
-
 	};
 
 }

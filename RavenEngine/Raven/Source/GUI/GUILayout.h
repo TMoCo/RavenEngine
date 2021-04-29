@@ -89,6 +89,8 @@ namespace Raven {
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<IResource>(this));
+
 			archive(cereal::make_nvp("Layout Name", name),
 				cereal::make_nvp("Widgets", widgets));
 		}
@@ -96,6 +98,8 @@ namespace Raven {
 		template<typename Archive>
 		void load(Archive& archive)
 		{
+			archive(cereal::base_class<IResource>(thiss));
+
 			archive(cereal::make_nvp("Layout Name", name),
 				cereal::make_nvp("Widgets", widgets));
 		}

@@ -7,21 +7,33 @@
 #include "ResourceManager/Loaders/ILoader.h"
 #include "ResourceManager/ResourceManager.h"
 
-//
-// A class for loading gui layouts
-//
+
+
 
 namespace Raven
 {
+	// LayoutLoader:
+	//    -  loading gui layouts
+	//
 	class LayoutLoader : public ILoader
 	{
 	public:
-		LayoutLoader(ResourceManager& initResourceManager) : ILoader(initResourceManager, ELoaderType::LT_GuiLayout) {}
+		// Construct.
+		LayoutLoader();
 
-		inline static auto Type() { return ELoaderType::LT_GuiLayout; } // type of loader
+		// Destruct.
+		virtual ~LayoutLoader();
 
-		bool LoadAsset(const std::string& path) override;
+		// Loader Type.
+		inline static ELoaderType Type() { return ELoaderType::LT_GuiLayout; }
 
-		bool LoadOnGPU() override { return false; }
+		// Load Resource from archive.
+		virtual IResource* LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive) override;
+
+		// Save Resource into archive.
+		virtual void SaveResource(RavenOutputArchive& archive, IResource* Resource) override;
+
+		// List all resources that supported by this loader.
+		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) override;
 	};
 }

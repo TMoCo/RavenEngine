@@ -4,19 +4,37 @@
 
 #pragma once
 
+
+
 #include "ILoader.h"
 
-//
-// Loader for loading a scene, should take care of calling the appropriate loaders for resources used in it
-//
+
+
 
 namespace Raven
 {
-	class SceneLoader : ILoader
+	// SceneLoader:
+	//    - loader for scenes resource.
+	//
+	class SceneLoader : public ILoader
 	{
 	public:
-		SceneLoader(ResourceManager& initResourceManager);
+		// Construct.
+		SceneLoader();
 
-		bool LoadAsset(const std::string& path);
+		// Loader Type.
+		inline static ELoaderType Type() { return ELoaderType::LT_Scene; }
+
+		// Load Resource from archive.
+		virtual IResource* LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive) override;
+
+		// Save Resource into archive.
+		virtual void SaveResource(RavenOutputArchive& archive, IResource* Resource) override;
+
+		// List all resources that supported by this loader.
+		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) override;
 	};
 }
+
+
+

@@ -10,9 +10,10 @@
 namespace Raven {
 
 	/** Constructor */
-	GUILayout::GUILayout() : IResource(EResourceType::RT_GuiLayout, true)
+	GUILayout::GUILayout() 
+		: IResource()
 	{
-
+		type = RT_GuiLayout;
 	}
 
 	/** Add a widget to the layout */

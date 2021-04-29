@@ -4,31 +4,36 @@
 
 #pragma once
 
-#include "ResourceManager/Loaders/ILoader.h"
-#include "ResourceManager/ResourceManager.h"
 
-//
-// A class for loading models, stored in various formats (just obj for the time being)
-//
 
-namespace Raven 
+#include "ILoader.h"
+
+
+namespace Raven
 {
-	class Model;
-
+	// MeshLoader:
+	//    - loader for texture resources.
+	//
 	class MeshLoader : public ILoader
 	{
 	public:
-		MeshLoader(ResourceManager& initResourceManager) : ILoader(initResourceManager, ELoaderType::LT_Mesh) {}
+		// Construct.
+		MeshLoader();
 
-		inline static auto Type() { return ELoaderType::LT_Mesh; } // type of loader
+		// Destrcut.
+		virtual ~MeshLoader();
 
-		bool LoadAsset(const std::string& path) override;
+		// Loader Type.
+		inline static ELoaderType Type() { return ELoaderType::LT_Mesh; }
 
-		bool LoadOBJ(const std::string& path);
-		bool LoadFBX(const std::string& path);
-		bool LoadFBX(const std::string& path, Model * model);
+		// Load Resource from archive.
+		virtual IResource* LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive) override;
 
-		virtual bool LoadOnGPU() override { return true; }
-	private:
+		// Save Resource into archive.
+		virtual void SaveResource(RavenOutputArchive& archive, IResource* Resource) override;
+
+		// List all resources that supported by this loader.
+		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) override;
+
 	};
 }

@@ -27,13 +27,16 @@ namespace Raven
 	{
 	public:
 		// Construct.
-		RenderRscMaterial(RenderRscShader* shader);
+		RenderRscMaterial(RenderRscShader* inShader);
 
 		// Destruct.
 		~RenderRscMaterial();
 
 		// Return the shader resrouce.
 		inline RenderRscShader* GetShaderRsc() { return shader; }
+
+		// Reload shader resrouce and its paramters mapping.
+		void ReloadShader(RenderRscShader* inShader);
 
 		// Return true if this resouce has a materail data.
 		inline bool HasMaterialData() { return blockIndex != -1 && materialBuffer != nullptr; }

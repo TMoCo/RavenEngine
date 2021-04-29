@@ -16,6 +16,7 @@
 #include "RenderTexFilter.h"
 #include "Render/RenderResource/Shader/RenderRscShader.h"
 #include "Render/RenderResource/Shader/UniformBuffer.h"
+#include "Render/RenderResource/RenderRscTexture.h"
 #include "RenderObjects/RenderScene.h"
 #include "RenderObjects/RenderPass.h"
 #include "RenderObjects/RenderScreen.h"
@@ -131,14 +132,14 @@ void RenderModule::Initialize()
 	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(evnTexPath).get();
 	envTexture->renderRscTexture = new RenderRscTexture();
 	envTexture->LoadOnGpu();
-	envTexture->renderRscTexture->GetTexture()->Bind();
-	envTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Mirror);
-	envTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::Linear);
-	envTexture->renderRscTexture->GetTexture()->UpdateTexParams();
-	envTexture->renderRscTexture->GetTexture()->Unbind();
+	envTexture->GetRenderRsc()->GetTexture()->Bind();
+	envTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Mirror);
+	envTexture->GetRenderRsc()->GetTexture()->SetFilter(EGLFilter::Linear);
+	envTexture->GetRenderRsc()->GetTexture()->UpdateTexParams();
+	envTexture->GetRenderRsc()->GetTexture()->Unbind();
 
 	RenderRscTexture* envMap = new RenderRscTexture();
-	rfilter->GenCubeMap(envTexture->renderRscTexture, envMap, true);
+	rfilter->GenCubeMap(envTexture->GetRenderRsc(), envMap, true);
 
 	RenderRscTexture* specularEnvMap = new RenderRscTexture();
 	rfilter->FilterSpecularIBL(envMap, specularEnvMap);
@@ -283,12 +284,12 @@ void RenderModule::CreateDefaultMaterials()
 	checkerTexture->LoadOnGpu();
 
 	// TODO: Better texture system.
-	checkerTexture->renderRscTexture->GetTexture()->Bind();
-	checkerTexture->renderRscTexture->GetTexture()->SetWrap(EGLWrap::Repeat);
-	checkerTexture->renderRscTexture->GetTexture()->SetFilter(EGLFilter::TriLinear);
-	checkerTexture->renderRscTexture->GetTexture()->UpdateTexParams();
-	checkerTexture->renderRscTexture->GetTexture()->GenerateMipmaps();
-	checkerTexture->renderRscTexture->GetTexture()->Unbind();
+	checkerTexture->GetRenderRsc()->GetTexture()->Bind();
+	checkerTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Repeat);
+	checkerTexture->GetRenderRsc()->GetTexture()->SetFilter(EGLFilter::TriLinear);
+	checkerTexture->GetRenderRsc()->GetTexture()->UpdateTexParams();
+	checkerTexture->GetRenderRsc()->GetTexture()->GenerateMipmaps();
+	checkerTexture->GetRenderRsc()->GetTexture()->Unbind();
 
 	// Default Mesh Material...
 	{
@@ -298,11 +299,12 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture");
-		matShader->LoadOnGpu();
+		matShader->LoadRenderResource();
 
-		Ptr<Material> mat(new Material(matShader));
+		Ptr<Material> mat(new Material());
+		mat->SetMaterialShader(matShader);
 		mat->SetTexture("inCheckerTexture", checkerTexture.get());
-		mat->LoadOnGpu();
+		mat->LoadRenderResource();
 		
 		defaultMaterials.mesh = mat;
 	}
@@ -316,11 +318,12 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture");
-		matShader->LoadOnGpu();
+		matShader->LoadRenderResource();
 
-		Ptr<Material> mat(new Material(matShader));
+		Ptr<Material> mat(new Material());
+		mat->SetMaterialShader(matShader);
 		mat->SetTexture("inCheckerTexture", checkerTexture.get());
-		mat->LoadOnGpu();
+		mat->LoadRenderResource();
 
 		defaultMaterials.skinned = mat;
 	}
@@ -334,10 +337,11 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/TerrainMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture");
-		matShader->LoadOnGpu();
+		matShader->LoadRenderResource();
 
-		Ptr<Material> mat(new Material(matShader));
-		mat->LoadOnGpu();
+		Ptr<Material> mat(new Material());
+		mat->SetMaterialShader(matShader);
+		mat->LoadRenderResource();
 
 		defaultMaterials.terrain = mat;
 	}

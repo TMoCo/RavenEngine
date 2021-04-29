@@ -30,14 +30,11 @@ namespace Raven
 		RenderRscMesh();
 
 		// Destruct.
-		virtual ~RenderRscMesh();
+		~RenderRscMesh();
 
 		// Load Mesh Data
 		virtual void Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
-			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
-			const std::vector<glm::vec4>& weight,
-			const std::vector<glm::ivec4>& blendIndices
-		);
+			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices );
 
 		// Return the vertex array that defines this mesh Vertex Input.
 		inline GLVertexArray* GetArray() { return vxarray; }
@@ -47,7 +44,7 @@ namespace Raven
 
 
 	protected:
-		/** The OpenGL Vertex Array of the mesh, defines mesh vertex input. */
+		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
 		GLVertexArray* vxarray;
 
 		// OpeGL Buffer for Mesh Positions.
@@ -67,23 +64,55 @@ namespace Raven
 	};
 
 
+
 	//
 	//
-	class RenderRscSkinnedMesh : public RenderRscMesh
+	class RenderRscSkinnedMesh : public RenderRscPrimitive
 	{
 	public:
+		// Construct.
 		RenderRscSkinnedMesh();
-		virtual ~RenderRscSkinnedMesh();
 
+		// Destruct.
+		~RenderRscSkinnedMesh();
+
+		// Load Mesh Data
 		void Load(
 			const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
 			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
 			const std::vector<glm::vec4>& weight,
 			const std::vector<glm::ivec4>& blendIndices
-		) override;
+		);
+
+		// Return the vertex array that defines this mesh Vertex Input.
+		inline GLVertexArray* GetArray() { return vxarray; }
+
+		// Return the number of indices in the mesh.
+		inline int32_t GetNumIndices() const { return numIndices; }
 
 	private:
+		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
+		GLVertexArray* vxarray;
+
+		// OpeGL Buffer for Mesh Positions.
+		GLBuffer* positionBuffer;
+
+		// OpeGL Buffer for Mesh Normals.
+		GLBuffer* normalBuffer;
+
+		// OpeGL Buffer for Mesh Texture Coordinate.
+		GLBuffer* texCoordBuffer;
+
+		// OpeGL Buffer for Mesh Indices.
+		GLBuffer* indexBuffer;
+
+		// Number of indices in the index buffer.
+		int32_t numIndices;
+
+		//
 		GLBuffer* weightBuffer;
+
+		//
 		GLBuffer* indicesBuffer;
 	};
 

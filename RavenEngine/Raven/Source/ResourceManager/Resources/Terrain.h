@@ -22,7 +22,8 @@ namespace Raven
 	class Terrain : public IResource
 	{
 	public:
-		Terrain(Texture2D* initHeight = nullptr) : IResource(EResourceType::RT_Terrain, true),
+		Terrain(Texture2D* initHeight = nullptr) 
+			: IResource(),
 			heightMap(initHeight), // vector for textures, may want to swap container to a map
 			renderRscTerrain(nullptr)
 		{
@@ -30,6 +31,9 @@ namespace Raven
 			{
 				initHeight = nullptr;
 			}
+
+			type = EResourceType::RT_Terrain;
+			hasRenderResources = true;
 		}
 		
 		inline virtual ~Terrain()
@@ -43,20 +47,25 @@ namespace Raven
 			delete renderRscTerrain;
 		}
 
-		inline void LoadOnGPU()
+		// Load the render resource.
+		virtual void LoadRenderResource() override
 		{
-			if (!onGPU)
-			{
-				// load the height map data
-				renderRscTerrain->LoadHeightMap(heightMap->width, heightMap->height, heightMap->data);
-				renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), -50.0f, 200.0f);
-				onGPU = true;
-			}
+			RAVEN_ASSERT(!isOnGPU, "Resrouce already on GPU. use UpdateRenderRsc to update.");
+			isOnGPU = true;
+
+			// load the height map data
+			renderRscTerrain->LoadHeightMap(
+				heightMap->GetSize().x, 
+				heightMap->GetSize().y, 
+				heightMap->GetData().GetData()
+			);
+
+			renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), -50.0f, 200.0f);
 		}
 
 		static bool IsValidHeightMap(Texture2D* heightMap)
 		{
-			if (heightMap->format != EGLFormat::R)
+			if (heightMap->GetFormat() != ETextureFormat::R8)
 			{
 				return false;
 			}

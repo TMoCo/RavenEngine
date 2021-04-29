@@ -45,7 +45,7 @@ namespace Raven
 
 	public:
 		// Construct.
-		Material(Ptr<MaterialShader> inShader);
+		Material();
 
 		// Destruct.
 		virtual ~Material();
@@ -81,14 +81,17 @@ namespace Raven
 		inline const std::vector< std::pair<std::string, float> >& GetScalars() const { return scalars; }
 		inline const std::vector< std::pair<std::string, glm::vec4> >& GetColors() const { return colors; }
 
-		// Load the materail on GPU.
-		void LoadOnGpu();
-
 		// Return true if the materail is dirty and need update.
 		inline bool IsDirty() { return dirtyFlag != EMaterialDirtyFlag::None; }
 
+		// Load the materail on GPU.
+		virtual void LoadRenderResource() override;
+
 		// Update The Render Materail with the new paramters.
-		void Update();
+		virtual void UpdateRenderResource() override;
+
+		// Set the shader this material reference.
+		void SetMaterialShader(Ptr<MaterialShader> inShader);
 
 	private:
 		// Mark Dirty for update.

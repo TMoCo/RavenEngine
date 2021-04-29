@@ -4,59 +4,128 @@
 
 #pragma once
 
-#include <stdint.h> // uint8_t
 
-#include "ResourceManager/Resources/IResource.h"
-#include "Render/RenderResource/RenderRscTexture.h"
-#include "Utilities/Core.h"
 
-//
-// A class for a 2D texture resource
-//
+#include "Texture.h"
+
+
+
+
 
 namespace Raven
 {
-	// one byte = 8 bits
-	typedef uint8_t byte;
 
-	class Texture2D : public IResource
+	// The Texture2D Data.
+	class Texture2DData
+	{
+	private:
+		// Texture Buffer.
+		uint8_t* data;
+
+		// The size of the data in bytes.
+		uint32_t size;
+
+	public:
+		// Construct Null Data.
+		Texture2DData()
+			: data(nullptr)
+			, size(0)
+		{
+
+		}
+
+		// Destruct.
+		~Texture2DData()
+		{
+			free(data);
+		}
+
+		// Allocate Texture Data.
+		// @param size: the size of the data to allocate in bytes.
+		inline void Allocate(uint32_t allocateSize)
+		{
+			RAVEN_ASSERT(data == nullptr, "Invalid Operation, trying to reallocate texture data.");
+			data = (uint8_t*)malloc(allocateSize);
+			size = allocateSize;
+		}
+
+		// Set Image Data.
+		void SetData(uint32_t inOffset, uint32_t inSize, uint8_t* inData)
+		{
+			RAVEN_ASSERT(size >= (inOffset + inSize), "Invalid Operation, trying to reallocate texture data.");
+			memcpy(data + inOffset, inData, inSize);
+		}
+
+		// Return the texture data.
+		inline uint8_t* GetData() { return data; }
+		inline const uint8_t* GetData() const { return data; }
+
+		// Return the allocated size for the image data.
+		inline const uint32_t& GetSize() const { return size; }
+
+		// Reset/Free the data.
+		inline void Reset()
+		{
+			free(data);
+			data = nullptr;
+			size = 0;
+		}
+
+	};
+
+
+
+
+	// Texture2D:
+	//    - 
+	//
+	class Texture2D : public ITexture
 	{
 	public:
-		Texture2D(size_t initWidth = 0, size_t initHeight = 0, EGLFormat format = EGLFormat::None, byte* initData = nullptr) 
-			: IResource(EResourceType::RT_Image, true), 
-			width(initWidth), height(initHeight), format(format), data(initData) 
-		{
-			renderRscTexture = NULL;
-		}
+		// Construct.
+		Texture2D();
 
-		inline virtual ~Texture2D()
-		{
-			if (data)
-			{
-				// TODO: free data from memory manager when implemented
-				delete[] data; // delete array of texture data
-			}
-		}
-
-		inline void LoadOnGpu()
-		{
-			if (!onGPU)
-			{
-				renderRscTexture->Load(EGLTexture::Texture2D, format, glm::ivec2(width, height), data); // call interface method
-				onGPU = true;
-			}
-		}
+		// Destruct.
+		inline virtual ~Texture2D();
 
 		// return the resource type
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Image; } 
+		inline static EResourceType Type() noexcept { return EResourceType::RT_Texture2D; }
 
-		size_t height;	  // image dimensions
-		size_t width;
-		EGLFormat format; // image format
-		
-		byte* data; // image data should be sizeof(byte) * height * width
+		// Create/Load the texture render resrouce.
+	  virtual void LoadRenderResource() override;
 
-		RenderRscTexture* renderRscTexture; // interface with renderer
-		NOCOPYABLE(Texture2D);
+		// Update the texture render resrouce.
+		virtual void UpdateRenderResource() override;
+
+		// Set a new Image 2D data to this texture.
+	  void SetImageData(ETextureFormat imgFormat, const glm::ivec2& imgSize, uint8_t* imgData);
+
+		// Return texture data.
+		inline const Texture2DData& GetData() const { return data; }
+
+		// Serialization Load.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::base_class<ITexture>(this));
+
+			// Save data as binary.
+			archive.saveBinaryValue(data.GetData(), data.GetSize(), "Texture2DData");
+		}
+
+		// Serialization Save.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<ITexture>(this));
+
+			// Save data as binary.
+			archive.loadBinaryValue(data.GetData(), data.GetSize(), "Texture2DData");
+		}
+
+
+	private:
+		// The Texture Data.
+		Texture2DData data;
 	};
 }

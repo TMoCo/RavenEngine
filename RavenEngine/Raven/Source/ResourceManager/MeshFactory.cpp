@@ -19,25 +19,29 @@ namespace Raven
 
 		Mesh* CreateQuad(float x, float y, float width, float height)
 		{
-
 			Mesh* mesh = new Mesh();
-			mesh->name = "Quad";
-			mesh->positions.resize(4);
-			mesh->texCoords.resize(4);
+			mesh->SetName("Quad");
 
-			mesh->positions[0] = glm::vec3(x, y, 0.0f);
-			mesh->texCoords[0] = glm::vec2(0.0f, 1.0f);
+			MeshSection* meshSection = new MeshSection();
+			meshSection->positions.resize(4);
+			meshSection->texCoords.resize(4);
 
-			mesh->positions[1] = glm::vec3(x + width, y, 0.0f);
-			mesh->texCoords[1] = glm::vec2(0, 0);
+			meshSection->positions[0] = glm::vec3(x, y, 0.0f);
+			meshSection->texCoords[0] = glm::vec2(0.0f, 1.0f);
 
-			mesh->positions[2] = glm::vec3(x + width, y + height, 0.0f);
-			mesh->texCoords[2] = glm::vec2(1, 0);
+			meshSection->positions[1] = glm::vec3(x + width, y, 0.0f);
+			meshSection->texCoords[1] = glm::vec2(0, 0);
 
-			mesh->positions[3] = glm::vec3(x, y + height, 0.0f);
-			mesh->texCoords[3] = glm::vec2(1, 1);
+			meshSection->positions[2] = glm::vec3(x + width, y + height, 0.0f);
+			meshSection->texCoords[2] = glm::vec2(1, 0);
 
-			mesh->indices = { 0, 1, 2, 2, 3, 0, };
+			meshSection->positions[3] = glm::vec3(x, y + height, 0.0f);
+			meshSection->texCoords[3] = glm::vec2(1, 1);
+
+			meshSection->indices = { 0, 1, 2, 2, 3, 0, };
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}
@@ -50,29 +54,34 @@ namespace Raven
 		Mesh* CreateQuad()
 		{
 			Mesh* mesh = new Mesh();
-			mesh->name = "Quad";
-			mesh->positions.resize(4);
-			mesh->texCoords.resize(4);
-			mesh->normals.resize(4);
+			mesh->SetName("Quad");
 
-			mesh->positions[0] = glm::vec3(-1.0f, -1.0f, 0.0f);
-			mesh->texCoords[0] = glm::vec2(0.0f, 0.0f);
-			mesh->normals[0] = glm::vec3(0.0f, 0.0f, 1.0f);
+			MeshSection* meshSection = new MeshSection();
+			meshSection->positions.resize(4);
+			meshSection->texCoords.resize(4);
+			meshSection->normals.resize(4);
 
-			mesh->positions[1] = glm::vec3(1.0f, -1.0f, 0.0f);
-			mesh->texCoords[1] = glm::vec2(1.0f, 0.0f);
-			mesh->normals[1] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[0] = glm::vec3(-1.0f, -1.0f, 0.0f);
+			meshSection->texCoords[0] = glm::vec2(0.0f, 0.0f);
+			meshSection->normals[0] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[2] = glm::vec3(1.0f, 1.0f, 0.0f);
-			mesh->texCoords[2] = glm::vec2(1.0f, 1.0f);
-			mesh->normals[2] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[1] = glm::vec3(1.0f, -1.0f, 0.0f);
+			meshSection->texCoords[1] = glm::vec2(1.0f, 0.0f);
+			meshSection->normals[1] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[3] = glm::vec3(-1.0f, 1.0f, 0.0f);
-			mesh->texCoords[3] = glm::vec2(0.0f, 1.0f);
-			mesh->normals[3] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[2] = glm::vec3(1.0f, 1.0f, 0.0f);
+			meshSection->texCoords[2] = glm::vec2(1.0f, 1.0f);
+			meshSection->normals[2] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->indices = { 0, 1, 2, 2, 3, 0, };
-			mesh->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+			meshSection->positions[3] = glm::vec3(-1.0f, 1.0f, 0.0f);
+			meshSection->texCoords[3] = glm::vec2(0.0f, 1.0f);
+			meshSection->normals[3] = glm::vec3(0.0f, 0.0f, 1.0f);
+
+			meshSection->indices = { 0, 1, 2, 2, 3, 0, };
+			meshSection->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}
@@ -87,94 +96,96 @@ namespace Raven
 			//  |/      |/
 			//  v2------v3
 			Mesh* mesh = new Mesh();
-			mesh -> name= "Cube";
-			mesh->texCoords.resize(24);
-			mesh->normals.resize(24);
-			mesh->positions.resize(24);
+			mesh->SetName("Cube");
 
-			mesh->positions[0] = glm::vec3(1.0f, 1.0f, 1.0f);
-			mesh->normals[0] = glm::vec3(0.0f, 0.0f, 1.0f);
+			MeshSection* meshSection = new MeshSection();
+			meshSection->texCoords.resize(24);
+			meshSection->normals.resize(24);
+			meshSection->positions.resize(24);
 
-			mesh->positions[1] = glm::vec3(-1.0f, 1.0f, 1.0f);
-			mesh->normals[1] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[0] = glm::vec3(1.0f, 1.0f, 1.0f);
+			meshSection->normals[0] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[2] = glm::vec3(-1.0f, -1.0f, 1.0f);
-			mesh->normals[2] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[1] = glm::vec3(-1.0f, 1.0f, 1.0f);
+			meshSection->normals[1] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[3] = glm::vec3(1.0f, -1.0f, 1.0f);
-			mesh->normals[3] = glm::vec3(0.0f, 0.0f, 1.0f);
+			meshSection->positions[2] = glm::vec3(-1.0f, -1.0f, 1.0f);
+			meshSection->normals[2] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[4] = glm::vec3(1.0f, 1.0f, 1.0f);
-			mesh->normals[4] = glm::vec3(1.0f, 0.0f, 0.0f);
+			meshSection->positions[3] = glm::vec3(1.0f, -1.0f, 1.0f);
+			meshSection->normals[3] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-			mesh->positions[5] = glm::vec3(1.0f, -1.0f, 1.0f);
-			mesh->normals[5] = glm::vec3(1.0f, 0.0f, 0.0f);
+			meshSection->positions[4] = glm::vec3(1.0f, 1.0f, 1.0f);
+			meshSection->normals[4] = glm::vec3(1.0f, 0.0f, 0.0f);
 
-			mesh->positions[6] = glm::vec3(1.0f, -1.0f, -1.0f);
-			mesh->normals[6] = glm::vec3(1.0f, 0.0f, 0.0f);
+			meshSection->positions[5] = glm::vec3(1.0f, -1.0f, 1.0f);
+			meshSection->normals[5] = glm::vec3(1.0f, 0.0f, 0.0f);
 
-			mesh->positions[7] = glm::vec3(1.0f, 1.0f, -1.0f);
-			mesh->texCoords[7] = glm::vec2(0.0f, 1.0f);
-			mesh->normals[7] = glm::vec3(1.0f, 0.0f, 0.0f);
+			meshSection->positions[6] = glm::vec3(1.0f, -1.0f, -1.0f);
+			meshSection->normals[6] = glm::vec3(1.0f, 0.0f, 0.0f);
 
-			mesh->positions[8] = glm::vec3(1.0f, 1.0f, 1.0f);
-			mesh->normals[8] = glm::vec3(0.0f, 1.0f, 0.0f);
+			meshSection->positions[7] = glm::vec3(1.0f, 1.0f, -1.0f);
+			meshSection->texCoords[7] = glm::vec2(0.0f, 1.0f);
+			meshSection->normals[7] = glm::vec3(1.0f, 0.0f, 0.0f);
 
-			mesh->positions[9] = glm::vec3(1.0f, 1.0f, -1.0f);
-			mesh->normals[9] = glm::vec3(0.0f, 1.0f, 0.0f);
+			meshSection->positions[8] = glm::vec3(1.0f, 1.0f, 1.0f);
+			meshSection->normals[8] = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			mesh->positions[10] = glm::vec3(-1.0f, 1.0f, -1.0f);
-			mesh->texCoords[10] = glm::vec2(0.0f, 1.0f);
-			mesh->normals[10] = glm::vec3(0.0f, 1.0f, 0.0f);
+			meshSection->positions[9] = glm::vec3(1.0f, 1.0f, -1.0f);
+			meshSection->normals[9] = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			mesh->positions[11] = glm::vec3(-1.0f, 1.0f, 1.0f);
-			mesh->normals[11] = glm::vec3(0.0f, 1.0f, 0.0f);
+			meshSection->positions[10] = glm::vec3(-1.0f, 1.0f, -1.0f);
+			meshSection->texCoords[10] = glm::vec2(0.0f, 1.0f);
+			meshSection->normals[10] = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			mesh->positions[12] = glm::vec3(-1.0f, 1.0f, 1.0f);
-			mesh->normals[12] = glm::vec3(-1.0f, 0.0f, 0.0f);
+			meshSection->positions[11] = glm::vec3(-1.0f, 1.0f, 1.0f);
+			meshSection->normals[11] = glm::vec3(0.0f, 1.0f, 0.0f);
 
-			mesh->positions[13] = glm::vec3(-1.0f, 1.0f, -1.0f);
-			mesh->normals[13] = glm::vec3(-1.0f, 0.0f, 0.0f);
+			meshSection->positions[12] = glm::vec3(-1.0f, 1.0f, 1.0f);
+			meshSection->normals[12] = glm::vec3(-1.0f, 0.0f, 0.0f);
 
-			mesh->positions[14] = glm::vec3(-1.0f, -1.0f, -1.0f);
-			mesh->normals[14] = glm::vec3(-1.0f, 0.0f, 0.0f);
+			meshSection->positions[13] = glm::vec3(-1.0f, 1.0f, -1.0f);
+			meshSection->normals[13] = glm::vec3(-1.0f, 0.0f, 0.0f);
 
-			mesh->positions[15] = glm::vec3(-1.0f, -1.0f, 1.0f);
-			mesh->normals[15] = glm::vec3(-1.0f, 0.0f, 0.0f);
+			meshSection->positions[14] = glm::vec3(-1.0f, -1.0f, -1.0f);
+			meshSection->normals[14] = glm::vec3(-1.0f, 0.0f, 0.0f);
 
-			mesh->positions[16] = glm::vec3(-1.0f, -1.0f, -1.0f);
-			mesh->normals[16] = glm::vec3(0.0f, -1.0f, 0.0f);
+			meshSection->positions[15] = glm::vec3(-1.0f, -1.0f, 1.0f);
+			meshSection->normals[15] = glm::vec3(-1.0f, 0.0f, 0.0f);
 
-			mesh->positions[17] = glm::vec3(1.0f, -1.0f, -1.0f);
-			mesh->normals[17] = glm::vec3(0.0f, -1.0f, 0.0f);
+			meshSection->positions[16] = glm::vec3(-1.0f, -1.0f, -1.0f);
+			meshSection->normals[16] = glm::vec3(0.0f, -1.0f, 0.0f);
 
-			mesh->positions[18] = glm::vec3(1.0f, -1.0f, 1.0f);
-			mesh->normals[18] = glm::vec3(0.0f, -1.0f, 0.0f);
+			meshSection->positions[17] = glm::vec3(1.0f, -1.0f, -1.0f);
+			meshSection->normals[17] = glm::vec3(0.0f, -1.0f, 0.0f);
 
-			mesh->positions[19] = glm::vec3(-1.0f, -1.0f, 1.0f);
-			mesh->normals[19] = glm::vec3(0.0f, -1.0f, 0.0f);
+			meshSection->positions[18] = glm::vec3(1.0f, -1.0f, 1.0f);
+			meshSection->normals[18] = glm::vec3(0.0f, -1.0f, 0.0f);
 
-			mesh->positions[20] = glm::vec3(1.0f, -1.0f, -1.0f);
-			mesh->normals[20] = glm::vec3(0.0f, 0.0f, -1.0f);
+			meshSection->positions[19] = glm::vec3(-1.0f, -1.0f, 1.0f);
+			meshSection->normals[19] = glm::vec3(0.0f, -1.0f, 0.0f);
 
-			mesh->positions[21] = glm::vec3(-1.0f, -1.0f, -1.0f);
-			mesh->normals[21] = glm::vec3(0.0f, 0.0f, -1.0f);
+			meshSection->positions[20] = glm::vec3(1.0f, -1.0f, -1.0f);
+			meshSection->normals[20] = glm::vec3(0.0f, 0.0f, -1.0f);
 
-			mesh->positions[22] = glm::vec3(-1.0f, 1.0f, -1.0f);
-			mesh->normals[22] = glm::vec3(0.0f, 0.0f, -1.0f);
+			meshSection->positions[21] = glm::vec3(-1.0f, -1.0f, -1.0f);
+			meshSection->normals[21] = glm::vec3(0.0f, 0.0f, -1.0f);
 
-			mesh->positions[23] = glm::vec3(1.0f, 1.0f, -1.0f);
-			mesh->normals[23] = glm::vec3(0.0f, 0.0f, -1.0f);
+			meshSection->positions[22] = glm::vec3(-1.0f, 1.0f, -1.0f);
+			meshSection->normals[22] = glm::vec3(0.0f, 0.0f, -1.0f);
+
+			meshSection->positions[23] = glm::vec3(1.0f, 1.0f, -1.0f);
+			meshSection->normals[23] = glm::vec3(0.0f, 0.0f, -1.0f);
 
 			for (int i = 0; i < 6; i++)
 			{
-				mesh->texCoords[i * 4 + 0] = glm::vec2(0.0f, 0.0f);
-				mesh->texCoords[i * 4 + 1] = glm::vec2(1.0f, 0.0f);
-				mesh->texCoords[i * 4 + 2] = glm::vec2(1.0f, 1.0f);
-				mesh->texCoords[i * 4 + 3] = glm::vec2(0.0f, 1.0f);
+				meshSection->texCoords[i * 4 + 0] = glm::vec2(0.0f, 0.0f);
+				meshSection->texCoords[i * 4 + 1] = glm::vec2(1.0f, 0.0f);
+				meshSection->texCoords[i * 4 + 2] = glm::vec2(1.0f, 1.0f);
+				meshSection->texCoords[i * 4 + 3] = glm::vec2(0.0f, 1.0f);
 			}
 
-			mesh->indices = {
+			meshSection->indices = {
 				0,1,2,
 				0,2,3,
 				4,5,6,
@@ -189,7 +200,10 @@ namespace Raven
 				20,22,23
 			};
 
-			mesh->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+			meshSection->bounds = MathUtils::BoundingBox(glm::vec3(-1.0f,-1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}
@@ -275,9 +289,11 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-			mesh->name = "Pyramid";
+			mesh->SetName("Pyramid");
 
-			mesh->indices = {
+			MeshSection* meshSection = new MeshSection();
+
+			meshSection->indices = {
 				0,1,2,
 				3,4,5,
 				6,7,8,
@@ -289,11 +305,14 @@ namespace Raven
 
 			for (auto i = 0; i < 18; i++)
 			{
-				mesh->positions.emplace_back(data[i].position);
-				mesh->texCoords.emplace_back(data[i].texCoord);
-				mesh->normals.emplace_back(data[i].normal);
-				mesh->bounds.Add(data[i].position);
+				meshSection->positions.emplace_back(data[i].position);
+				meshSection->texCoords.emplace_back(data[i].texCoord);
+				meshSection->normals.emplace_back(data[i].normal);
+				meshSection->bounds.Add(data[i].position);
 			}
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 
@@ -310,7 +329,10 @@ namespace Raven
 			float radius = 1.0f;
 
 			Mesh* mesh = new Mesh();
-			mesh->name = "Sphere";
+			mesh->SetName("Sphere");
+
+			MeshSection* meshSection = new MeshSection();
+
 			for (int i = 0; i <= stackCount; ++i)
 			{
 				float stackAngle = M_PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
@@ -330,10 +352,10 @@ namespace Raven
 					float s = static_cast<float>(j / sectorCount);
 					float t = static_cast<float>(i / stackCount);
 
-					mesh->positions.emplace_back(glm::vec3(x, y, z));
-					mesh->texCoords.emplace_back(glm::vec2(s, t));
-					mesh->normals.emplace_back(glm::normalize(glm::vec3(x, y, z)));
-					mesh->bounds.Add(glm::vec3(x, y, z));
+					meshSection->positions.emplace_back(glm::vec3(x, y, z));
+					meshSection->texCoords.emplace_back(glm::vec2(s, t));
+					meshSection->normals.emplace_back(glm::normalize(glm::vec3(x, y, z)));
+					meshSection->bounds.Add(glm::vec3(x, y, z));
 				}
 			}
 
@@ -350,28 +372,33 @@ namespace Raven
 					// k1 => k2 => k1+1
 					if (i != 0)
 					{
-						mesh->indices.emplace_back(k1);
-						mesh->indices.emplace_back(k2);
-						mesh->indices.emplace_back(k1 + 1);
+						meshSection->indices.emplace_back(k1);
+						meshSection->indices.emplace_back(k2);
+						meshSection->indices.emplace_back(k1 + 1);
 					}
 
 					// k1+1 => k2 => k2+1
 					if (i != (stackCount - 1))
 					{
-						mesh->indices.emplace_back(k1 + 1);
-						mesh->indices.emplace_back(k2);
-						mesh->indices.emplace_back(k2 + 1);
+						meshSection->indices.emplace_back(k1 + 1);
+						meshSection->indices.emplace_back(k2);
+						meshSection->indices.emplace_back(k2 + 1);
 					}
 				}
 			}
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
+
 			return mesh;
 		}
 
 		Mesh* CreatePlane(float width, float height, const glm::vec3& normal)
 		{
-
 			Mesh* mesh = new Mesh();
-			mesh->name = "Plane";
+			mesh->SetName("Plane");
+			MeshSection* meshSection = new MeshSection();
+
 			glm::vec3 vec = normal * 90.0f;
 			glm::quat rotation =
 				glm::quat(vec.z, glm::vec3(1.0f, 0.0f, 0.0f)) *
@@ -401,17 +428,20 @@ namespace Raven
 
 			for (auto& v : data)
 			{
-				mesh->positions.emplace_back(v.position);
-				mesh->texCoords.emplace_back(v.texCoord);
-				mesh->normals.emplace_back(v.normal);
-				mesh->bounds.Add(v.position);
+				meshSection->positions.emplace_back(v.position);
+				meshSection->texCoords.emplace_back(v.texCoord);
+				meshSection->normals.emplace_back(v.normal);
+				meshSection->bounds.Add(v.position);
 			}
 
-			mesh->indices =
+			meshSection->indices =
 			{
 				0, 1, 2,
 				2, 3, 0
 			};
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}
@@ -425,7 +455,9 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-			mesh->name = "Capsule";
+			mesh->SetName("Capsule");
+			MeshSection* meshSection = new MeshSection();
+
 
 			point = 0;
 
@@ -450,22 +482,22 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * radius * w, y * radius * w, z);
 
-					mesh->positions.emplace_back(p + glm::vec3(0.0f, 0.0f, 0.5f * midHeight));
-					mesh->normals.emplace_back(glm::normalize(p + glm::vec3(0.0f, 0.0f, 0.5f * midHeight)));
-					mesh->texCoords.emplace_back(glm::vec2(u, onethird * v));
+					meshSection->positions.emplace_back(p + glm::vec3(0.0f, 0.0f, 0.5f * midHeight));
+					meshSection->normals.emplace_back(glm::normalize(p + glm::vec3(0.0f, 0.0f, 0.5f * midHeight)));
+					meshSection->texCoords.emplace_back(glm::vec2(u, onethird * v));
 
 
 					point++;
 
 					if (i > 0 && j > 0)
 					{
-						mesh->indices.push_back(thisrow + i - 1);
-						mesh->indices.push_back(prevrow + i);
-						mesh->indices.push_back(prevrow + i - 1);
+						meshSection->indices.push_back(thisrow + i - 1);
+						meshSection->indices.push_back(prevrow + i);
+						meshSection->indices.push_back(prevrow + i - 1);
 
-						mesh->indices.push_back(thisrow + i - 1);
-						mesh->indices.push_back(thisrow + i);
-						mesh->indices.push_back(prevrow + i);
+						meshSection->indices.push_back(thisrow + i - 1);
+						meshSection->indices.push_back(thisrow + i);
+						meshSection->indices.push_back(prevrow + i);
 					};
 				};
 
@@ -494,10 +526,10 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * radius, y * radius, z);
 
-					mesh->positions.emplace_back(p);
-					mesh->normals.emplace_back(glm::vec3(x, 0.0f, z));
-					mesh->texCoords.emplace_back(glm::vec2(u, onethird * v));
-					mesh->bounds.Add(p);
+					meshSection->positions.emplace_back(p);
+					meshSection->normals.emplace_back(glm::vec3(x, 0.0f, z));
+					meshSection->texCoords.emplace_back(glm::vec2(u, onethird * v));
+					meshSection->bounds.Add(p);
 
 
 
@@ -505,12 +537,12 @@ namespace Raven
 
 					if (i > 0 && j > 0)
 					{
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(prevrow + i);
-						mesh->indices.emplace_back(prevrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i);
-						mesh->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(prevrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i);
+						meshSection->indices.emplace_back(prevrow + i);
 					};
 				};
 
@@ -541,27 +573,30 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * radius * w, y * radius * w, z);
 
-					mesh->positions.emplace_back(p + glm::vec3(0.0f, 0.0f, -0.5f * midHeight));
-					mesh->normals.emplace_back(glm::normalize(p + glm::vec3(0.0f, 0.0f, -0.5f * midHeight)));
-					mesh->texCoords.emplace_back(glm::vec2(u2, twothirds + ((v - 1.0f) * onethird)));
+					meshSection->positions.emplace_back(p + glm::vec3(0.0f, 0.0f, -0.5f * midHeight));
+					meshSection->normals.emplace_back(glm::normalize(p + glm::vec3(0.0f, 0.0f, -0.5f * midHeight)));
+					meshSection->texCoords.emplace_back(glm::vec2(u2, twothirds + ((v - 1.0f) * onethird)));
 
 
 					point++;
 
 					if (i > 0 && j > 0)
 					{
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(prevrow + i);
-						mesh->indices.emplace_back(prevrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i);
-						mesh->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(prevrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i);
+						meshSection->indices.emplace_back(prevrow + i);
 					};
 				};
 
 				prevrow = thisrow;
 				thisrow = point;
 			}
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}
@@ -573,7 +608,10 @@ namespace Raven
 
 
 			Mesh* mesh = new Mesh();
-			mesh->name = "Cylinder";
+			mesh->SetName("Cylinder");
+			MeshSection* meshSection = new MeshSection();
+
+
 			thisrow = 0;
 			prevrow = 0;
 			for (j = 0; j <= (rings + 1); j++)
@@ -596,21 +634,21 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * radius, y, z * radius);
 
-					mesh->positions.emplace_back(p);
-					mesh->normals.emplace_back(glm::vec3(x, 0.0f, z));
-					mesh->texCoords.emplace_back(glm::vec2(u, v * 0.5f));
-					mesh->bounds.Add(p);
+					meshSection->positions.emplace_back(p);
+					meshSection->normals.emplace_back(glm::vec3(x, 0.0f, z));
+					meshSection->texCoords.emplace_back(glm::vec2(u, v * 0.5f));
+					meshSection->bounds.Add(p);
 
 					point++;
 
 					if (i > 0 && j > 0)
 					{
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(prevrow + i);
-						mesh->indices.emplace_back(prevrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i - 1);
-						mesh->indices.emplace_back(thisrow + i);
-						mesh->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(prevrow + i);
+						meshSection->indices.emplace_back(prevrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i - 1);
+						meshSection->indices.emplace_back(thisrow + i);
+						meshSection->indices.emplace_back(prevrow + i);
 					};
 				};
 
@@ -623,9 +661,9 @@ namespace Raven
 			{
 				y = height * 0.5f;
 
-				mesh->positions.emplace_back(glm::vec3(0.0f, y, 0.0f));
-				mesh->normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
-				mesh->texCoords.emplace_back(glm::vec2(0.25f, 0.75f));
+				meshSection->positions.emplace_back(glm::vec3(0.0f, y, 0.0f));
+				meshSection->normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+				meshSection->texCoords.emplace_back(glm::vec2(0.25f, 0.75f));
 
 				point++;
 
@@ -642,17 +680,17 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * topRadius, y, z * topRadius);
 
-					mesh->positions.emplace_back(p);
-					mesh->normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
-					mesh->texCoords.emplace_back(glm::vec2(u, v));
+					meshSection->positions.emplace_back(p);
+					meshSection->normals.emplace_back(glm::vec3(0.0f, 1.0f, 0.0f));
+					meshSection->texCoords.emplace_back(glm::vec2(u, v));
 
 					point++;
 
 					if (i > 0)
 					{
-						mesh->indices.emplace_back(point - 2);
-						mesh->indices.emplace_back(point - 1);
-						mesh->indices.emplace_back(thisrow);
+						meshSection->indices.emplace_back(point - 2);
+						meshSection->indices.emplace_back(point - 1);
+						meshSection->indices.emplace_back(thisrow);
 					};
 				};
 			};
@@ -665,9 +703,9 @@ namespace Raven
 				thisrow = point;
 
 
-				mesh->positions.emplace_back(glm::vec3(0.0f, y, 0.0f));
-				mesh->normals.emplace_back(glm::vec3(0.0f, -1.0f, 0.0f));
-				mesh->texCoords.emplace_back(glm::vec2(0.75f, 0.75f));
+				meshSection->positions.emplace_back(glm::vec3(0.0f, y, 0.0f));
+				meshSection->normals.emplace_back(glm::vec3(0.0f, -1.0f, 0.0f));
+				meshSection->texCoords.emplace_back(glm::vec2(0.75f, 0.75f));
 
 				point++;
 
@@ -684,20 +722,24 @@ namespace Raven
 
 					glm::vec3 p = glm::vec3(x * bottomRadius, y, z * bottomRadius);
 
-					mesh->positions.emplace_back(p);
-					mesh->normals.emplace_back(glm::vec3(0.0f, -1.0f, 0.0f));
-					mesh->texCoords.emplace_back(glm::vec2(u, v));
+					meshSection->positions.emplace_back(p);
+					meshSection->normals.emplace_back(glm::vec3(0.0f, -1.0f, 0.0f));
+					meshSection->texCoords.emplace_back(glm::vec2(u, v));
 
 					point++;
 
 					if (i > 0)
 					{
-						mesh->indices.emplace_back(point - 1);
-						mesh->indices.emplace_back(point - 2);
-						mesh->indices.emplace_back(thisrow);
+						meshSection->indices.emplace_back(point - 1);
+						meshSection->indices.emplace_back(point - 2);
+						meshSection->indices.emplace_back(thisrow);
 					};
 				};
 			};
+
+
+			mesh->AddMeshSection(Ptr<MeshSection>(meshSection));
+			mesh->LoadRenderResource();
 
 			return mesh;
 		}

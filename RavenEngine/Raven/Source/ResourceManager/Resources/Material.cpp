@@ -9,13 +9,13 @@
 namespace Raven
 {
 
-Material::Material(Ptr<MaterialShader> inShader)
-	: IResource(EResourceType::RT_Material, true)
-	, shader(inShader)
+Material::Material()
+	: IResource()
 	, renderRsc(nullptr)
 	, dirtyFlag(EMaterialDirtyFlag::None)
 {
-
+	type = Material::GetType();
+	hasRenderResources = true;
 }
 
 
@@ -201,23 +201,23 @@ void Material::DirtyRemap()
 }
 
 
-void Material::LoadOnGpu()
+void Material::LoadRenderResource()
 {
-	RAVEN_ASSERT(!onGPU, "Material already loaded.");
-	onGPU = true;
+	RAVEN_ASSERT(!isOnGPU, "Material already loaded.");
+	isOnGPU = true;
 
 	// Render Material
 	renderRsc = new RenderRscMaterial(shader->GetRenderRsc());
 	renderRsc->LoadInputBlock(shader->GetBlockInput().name);
 	renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
 
-	Update();
+	UpdateRenderResource();
 }
 
 
-void Material::Update()
+void Material::UpdateRenderResource()
 {
-	RAVEN_ASSERT(onGPU, "Material not loaded on gpu.");
+	RAVEN_ASSERT(isOnGPU, "Material not loaded on gpu.");
 
 	// Remapping...
 	if (dirtyFlag == EMaterialDirtyFlag::Remap)
@@ -239,6 +239,23 @@ void Material::Update()
 
 	// Clear Flag
 	dirtyFlag = EMaterialDirtyFlag::None;
+}
+
+
+void Material::SetMaterialShader(Ptr<MaterialShader> inShader)
+{
+	shader = inShader;
+
+	if (isOnGPU)
+	{
+		// Reload Render Shader Resource.
+		renderRsc->ReloadShader(shader->GetRenderRsc());
+		renderRsc->LoadInputBlock(shader->GetBlockInput().name);
+		renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
+
+		DirtyRemap();
+	}
+
 }
 
 

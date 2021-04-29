@@ -34,10 +34,7 @@ RenderRscMesh::~RenderRscMesh()
 
 
 void RenderRscMesh::Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
-	const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
-	const std::vector<glm::vec4>& weight,
-	const std::vector<glm::ivec4>& blendIndices
-)
+	const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices)
 {
 	// Create/Update Position Buffer.
 	positionBuffer = GLBuffer::Create(
@@ -113,8 +110,26 @@ void RenderRscMesh::Load(const std::vector<glm::vec3>& positions, const std::vec
 }
 
 
+
+
+
+
+// -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- 
+// -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- -- - -- 
+
+
+
+
+
+
+
 RenderRscSkinnedMesh::RenderRscSkinnedMesh()
-	: weightBuffer(nullptr)
+	: vxarray(nullptr)
+	, positionBuffer(nullptr)
+	, normalBuffer(nullptr)
+	, texCoordBuffer(nullptr)
+	, indexBuffer(nullptr)
+	, weightBuffer(nullptr)
 	, indicesBuffer(nullptr)
 {
 
@@ -123,6 +138,11 @@ RenderRscSkinnedMesh::RenderRscSkinnedMesh()
 
 RenderRscSkinnedMesh::~RenderRscSkinnedMesh()
 {
+	delete vxarray;
+	delete positionBuffer;
+	delete normalBuffer;
+	delete texCoordBuffer;
+	delete indexBuffer;
 	delete weightBuffer;
 	delete indicesBuffer;
 }

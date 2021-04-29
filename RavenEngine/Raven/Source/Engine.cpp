@@ -258,9 +258,6 @@ namespace Raven
 
 		Terrain* terrain = new Terrain(GetModule<ResourceManager>()->GetResource<Texture2D>(path).get());
 
-		std::cout << terrain->heightMap->width << '\n';
-		std::cout << terrain->heightMap->height << " \n";
-
 		Scene* newScene = new Scene("TerrainScene");
 		newScene->dynamic = true;
 
@@ -296,7 +293,7 @@ namespace Raven
 		basicMatShader_1->AddSampler("AOTexture");
 		basicMatShader_1->AddSampler("metallicTexture");
 		basicMatShader_1->AddSampler("roughnessTexture");
-		basicMatShader_1->LoadOnGpu();
+		basicMatShader_1->LoadRenderResource();
 
 		// Basic Material...
 		Ptr<MaterialShader> basicMatShader_2(new MaterialShader());
@@ -315,7 +312,7 @@ namespace Raven
 		basicMatShader_2->AddSampler("AOTexture");
 		basicMatShader_2->AddSampler("metallicTexture");
 		basicMatShader_2->AddSampler("roughnessTexture");
-		basicMatShader_2->LoadOnGpu();
+		basicMatShader_2->LoadRenderResource();
 
 
 		//
@@ -364,7 +361,7 @@ namespace Raven
 			mat_0->SetScalar("roughness", 0.5f);
 			mat_0->SetScalar("metallic", 1.0f);
 			mat_0->SetScalar("specular", 1.0f);
-			mat_0->LoadOnGpu();
+			mat_0->LoadRenderResource();
 
 
 			Ptr<Material> mat_2(new Material(basicMatShader_2));
@@ -378,7 +375,7 @@ namespace Raven
 			mat_2->SetScalar("metallic", 1.0f);
 			mat_2->SetScalar("specular", 22.0f);
 			mat_2->SetScalar("alpha", 0.75f);
-			mat_2->LoadOnGpu();
+			mat_2->LoadRenderResource();
 
 
 			{

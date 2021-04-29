@@ -16,13 +16,14 @@ using WeakPtr = std::weak_ptr<T>;
 
 
 
-#define RAVEN_ASSERT(condition, ...)								\
-	{																\
-		if(!(condition))											\
-		{															\
-			LOGE("Assertion Failed : {0}", __VA_ARGS__);			\
-			__debugbreak(); 										\
-		}															\
+#define RAVEN_ASSERT(condition, ...)   \
+	{                                    \
+		if(!(condition))                   \
+		{                                  \
+			LOGE("Assertion Failed : {0}", __VA_ARGS__);   \
+			__debugbreak();       \
+			exit(-2234);          \
+		}                       \
 	}
 
 
@@ -38,4 +39,40 @@ using WeakPtr = std::weak_ptr<T>;
 
 // Values Defs...
 #define SMALL_NUM 1.e-6
+
+
+
+
+
+
+// Use to archive enum using cearal archive functions.
+template<class T>
+struct EnumAsInt
+{
+	EnumAsInt(T& e)
+	{
+		value = &e;
+	}
+
+	// Serialization Save.
+	template<typename Archive>
+	void save(Archive& archive) const
+	{
+		int32_t tmp = static_cast<int32_t>(*value);
+		archive(tmp)
+	}
+
+	// Serialization Load.
+	template<typename Archive>
+	void load(Archive& archive)
+	{
+		int32_t tmp;
+		archive(tmp);
+
+		*value = static_cast<T>();
+	}
+
+	T* value;
+};
+
 

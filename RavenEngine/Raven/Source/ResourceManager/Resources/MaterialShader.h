@@ -31,7 +31,7 @@ namespace Raven
 		virtual ~MaterialShader();
 
 		// Return Resrouce Type.
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Shader; }
+		inline static EResourceType Type() noexcept { return EResourceType::RT_MaterialShader; }
 
 		// Return the materail render resource.
 		inline RenderRscShader* GetRenderRsc() { return renderRsc; }
@@ -61,11 +61,12 @@ namespace Raven
 		// Return the shader type.
 		inline ERenderShaderType GetType() const { return type; }
 
-		// Load the shader on GPU.
-		void LoadOnGpu();
-
 		// Return the shader unifrom buffer.
 		inline UniformBuffer* GetUnifromBuffer() const { return materialUBO.get(); }
+
+		// Load the shader on GPU.
+		virtual void LoadRenderResource() override;
+
 
 	private:
 		// The Shader Render Resrouce.

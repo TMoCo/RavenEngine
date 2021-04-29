@@ -2,6 +2,7 @@
 #include "RenderRscShader.h"
 #include "UniformBuffer.h"
 
+#include "Render/RenderResource/RenderRscTexture.h"
 #include "Render/OpenGL/GLTexture.h"
 
 #include "ResourceManager/Resources/Material.h"
@@ -19,8 +20,8 @@ namespace Raven {
 
 
 
-RenderRscMaterial::RenderRscMaterial(RenderRscShader* shader)
-	: shader(shader)
+RenderRscMaterial::RenderRscMaterial(RenderRscShader* inShader)
+	: shader(inShader)
 	, materialBuffer(nullptr)
 	, blockIndex(-1)
 	, ubo(nullptr)
@@ -33,6 +34,18 @@ RenderRscMaterial::RenderRscMaterial(RenderRscShader* shader)
 RenderRscMaterial::~RenderRscMaterial()
 {
 	delete materialBuffer;
+}
+
+
+void RenderRscMaterial::ReloadShader(RenderRscShader* inShader)
+{
+	if (shader)
+	{
+		ClearMapping();
+		LoadInputBlock("");
+	}
+
+	shader = inShader;
 }
 
 
@@ -173,7 +186,7 @@ void RenderRscMaterial::MakeTexturesActive()
 		if (!inputTex.second || !(*inputTex.second))
 			continue;
 
-		RenderRscTexture* rtex = (*inputTex.second)->renderRscTexture;
+		RenderRscTexture* rtex = (*inputTex.second)->GetRenderRsc();
 		rtex->GetTexture()->Active(inputTex.first);
 	}
 }

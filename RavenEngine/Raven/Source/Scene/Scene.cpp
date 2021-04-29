@@ -94,6 +94,7 @@ namespace Raven {
 				output(*this);
 				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
 				
+				cereal::BinaryOutputArchive gg()
 			}
 
 			std::ofstream file(path, std::ios::binary);

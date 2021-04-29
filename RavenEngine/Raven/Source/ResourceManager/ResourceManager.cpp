@@ -7,6 +7,7 @@
 // Importers...
 #include "ResourceManager/Importers/ImageImporter.h"
 #include "ResourceManager/Importers/OBJImporter.h"
+#include "ResourceManager/Importers/FBXImporter.h"
 
 // Loaders...
 #include "ResourceManager/Loaders/ImageLoader.h"
@@ -142,6 +143,7 @@ void ResourceManager::Initialize()
 	// Importers...
 	RegisterImporter<ImageImporter>();
 	RegisterImporter<OBJImporter>();
+	RegisterImporter<FBXImporter>();
 
 	// Loaders...
 	RegisterLoader<ImageLoader>();
@@ -186,13 +188,15 @@ ILoader* ResourceManager::GetLoader(EResourceType rscType)
 
 bool ResourceManager::HasResource(const std::string& path)
 {
-
+	RAVEN_ASSERT(0, "TODO Implement HasResource.");
+	return false;
 }
 
 
 bool ResourceManager::IsResourceLoaded(const std::string& path)
 {
-
+	RAVEN_ASSERT(0, "TODO Implement HasResource.");
+	return false;
 }
 
 
@@ -279,6 +283,7 @@ bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::str
 
 	// Save...
 	GetLoader(info.GetType())->SaveResource(archive, newResource.get());
+	newResource->path = saveFile;
 
 	// Add the new resource to the registry.
 	registry.AddResource(saveFile, info, newResource);
@@ -289,7 +294,24 @@ bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::str
 
 bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 {
+	RavenInputArchive archive(path);
 
+	// Failed to open archive?
+	if (!archive.IsValid())
+	{
+		LOGE("Failed to open archive at file {0}.", path.c_str());
+		return false;
+	}
+
+	// Load Header.
+	ResourceHeaderInfo info = ILoader::LoadHeader(archive);
+
+	// Load the resource.
+	IResource* loadedRsc = loader->LoadResource(info, archive);
+	loadedRsc->path = path;
+
+	// Add the loaded resource to the registry.
+	registry.AddResource(path, info, Ptr<IResource>(loadedRsc));
 }
 
 

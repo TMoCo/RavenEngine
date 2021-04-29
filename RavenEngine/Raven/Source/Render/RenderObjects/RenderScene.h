@@ -7,6 +7,7 @@
 #include "Math/Frustum.h"
 #include "RenderBatch.h"
 
+
 #include "glm/matrix.hpp"
 
 
@@ -16,9 +17,14 @@
 namespace Raven
 {
 	class Scene;
+	class Transform;
+	class PrimitiveComponent;
 	class RenderLight;
 	class UniformBuffer;
 	class RenderShadowCascade;
+	class RenderPrimitiveCollector;
+
+
 
 
 
@@ -44,11 +50,31 @@ namespace Raven
 
 
 
+
+
+	// Holds data of an entity with a primitive component.
+	struct ScenePrimitiveData
+	{
+		// The Primitive Transform.
+		Transform* tr;
+
+		// The Primitive Component.
+		PrimitiveComponent* comp;
+	};
+
+
+
+
+
+
 	// RenderScene:
 	//		- The render representation of the scene.
 	//
 	class RenderScene
 	{
+		// Friend...
+		friend class RenderPrimitiveCollector;
+
 	public:
 		// Construct. 
 		RenderScene();
@@ -128,6 +154,9 @@ namespace Raven
 
 		// Gather all lights that intesect with the bounding sphere.
 		void GatherLights(const glm::vec3& center, float radius, std::vector<RenderLight*>& outLights);
+
+		// Gather all Primitive Components from scene.
+		void GatherScenePrimitives(Scene* scene, std::vector<ScenePrimitiveData>& outPrimitivesComp);
 
 		// Create New Primitive to render.
 		template<class PrimitiveType>

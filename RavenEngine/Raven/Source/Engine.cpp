@@ -17,6 +17,7 @@
 #include "Render/RenderTarget.h"
 
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/MeshFactory.h"
 #include "ResourceManager/Resources/Terrain.h"
 
 #include "ImGui/ImGuiEngine.h"
@@ -26,7 +27,8 @@
 #include "Scene/System/SystemManager.h"
 #include "Scene/System/GUISystem.h"
 #include "Scene/Component/TerrainComponent.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Entity/Entity.h"
@@ -253,9 +255,8 @@ namespace Raven
 		generator->GenerateSquareGradient(100, 100);
 		generator->GenerateNoise(100, 100, FileFormat::PNG);
 		std::string path("heightmap.png");
-		// load the generated height map into resource manager
-		GetModule<ResourceManager>()->LoadResource<Texture2D>(path);
 
+		// load the generated height map into resource manager
 		Terrain* terrain = new Terrain(GetModule<ResourceManager>()->GetResource<Texture2D>(path).get());
 
 		Scene* newScene = new Scene("TerrainScene");
@@ -323,35 +324,18 @@ namespace Raven
 			ResourceManager* RscManager = Engine::GetModule<ResourceManager>();
 
 			std::string modelPath_1 = "assets/models/Lantern/lantern_obj_1.obj";
-			RscManager->LoadResource<Mesh>(modelPath_1);
 			Ptr<Mesh> lanternModel_1 = RscManager->GetResource<Mesh>(modelPath_1);
 
 			std::string modelPath_2 = "assets/models/Lantern/lantern_obj_2.obj";
-			RscManager->LoadResource<Mesh>(modelPath_2);
 			Ptr<Mesh> lanternModel_2 = RscManager->GetResource<Mesh>(modelPath_2);
 
 			std::string tex0 = "assets/models/Lantern/lantern_Base_Color.jpg";
 			std::string tex1 = "assets/models/Lantern/lantern_Mixed_AO.jpg";
 			std::string tex2 = "assets/models/Lantern/lantern_Metallic.jpg";
 			std::string tex3 = "assets/models/Lantern/lantern_Roughness.jpg";
-			RscManager->LoadResource<Texture2D>(tex0);
-			RscManager->LoadResource<Texture2D>(tex1);
-			RscManager->LoadResource<Texture2D>(tex2);
-			RscManager->LoadResource<Texture2D>(tex3);
 
-			RscManager->GetResource<Texture2D>(tex0)->renderRscTexture = new RenderRscTexture();
-			RscManager->GetResource<Texture2D>(tex0)->LoadOnGpu();
-
-			RscManager->GetResource<Texture2D>(tex1)->renderRscTexture = new RenderRscTexture();
-			RscManager->GetResource<Texture2D>(tex1)->LoadOnGpu();
-
-			RscManager->GetResource<Texture2D>(tex2)->renderRscTexture = new RenderRscTexture();
-			RscManager->GetResource<Texture2D>(tex2)->LoadOnGpu();
-
-			RscManager->GetResource<Texture2D>(tex3)->renderRscTexture = new RenderRscTexture();
-			RscManager->GetResource<Texture2D>(tex3)->LoadOnGpu();
-
-			Ptr<Material> mat_0(new Material(basicMatShader_1));
+			Ptr<Material> mat_0(new Material());
+			mat_0->SetMaterialShader(basicMatShader_1);
 			mat_0->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
 			mat_0->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
 			mat_0->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
@@ -364,7 +348,8 @@ namespace Raven
 			mat_0->LoadRenderResource();
 
 
-			Ptr<Material> mat_2(new Material(basicMatShader_2));
+			Ptr<Material> mat_2(new Material());
+			mat_2->SetMaterialShader(basicMatShader_2);
 			mat_2->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
 			mat_2->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
 			mat_2->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
@@ -384,11 +369,13 @@ namespace Raven
 				tr.SetLocalPosition(glm::vec3(0.0f, -4.0f, 0.0f));
 				tr.SetLocalScale(glm::vec3(0.1f));
 
-				auto& model = meshEntity.GetOrAddComponent<Model>();
-				model.AddMesh(lanternModel_1);
-				model.AddMesh(lanternModel_2);
-				model.SetMaterial(0, mat_0);
-				model.SetMaterial(1, mat_2);
+				auto& model0 = meshEntity.GetOrAddComponent<MeshComponent>();
+				model0.SetMesh(lanternModel_1);
+				model0.SetMaterial(0, mat_0);
+
+				auto& model2 = meshEntity.GetOrAddComponent<MeshComponent>();
+				model2.SetMesh(lanternModel_2);
+				model2.SetMaterial(0, mat_2);
 			}
 
 
@@ -405,8 +392,8 @@ namespace Raven
 			tr.SetLocalScale(glm::vec3(3000.0f));
 			tr.SetLocalOrientation(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f));
 			
-			auto& model = meshEntity.GetOrAddComponent<Model>();
-			model.AddMesh(plane);
+			auto& model = meshEntity.GetOrAddComponent<MeshComponent>();
+			model.SetMesh(plane);
 		}
 
 

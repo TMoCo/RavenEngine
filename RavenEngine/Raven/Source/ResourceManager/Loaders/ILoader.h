@@ -181,8 +181,7 @@ namespace Raven
 			// Archive Header...
 			archive(
 				version,
-				type,
-				isBinary
+				type
 			);
 		}
 
@@ -201,8 +200,7 @@ namespace Raven
 			// Archive Header...
 			archive(
 				version,
-				type,
-				isBinary
+				type
 			);
 		}
 

@@ -4,7 +4,7 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Entity/EntityManager.h"
-#include "Model.h"
+#include "Model_deprecated.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "Scene/Component/Transform.h"
 #include <imgui.h>
@@ -17,9 +17,9 @@ namespace Raven
 	{
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& enManager = currentScene->GetEntityManager();
-		if (auto model = GetEntity().TryGetComponentFromParent<Model>()) 
+		if (auto model = GetEntity().TryGetComponentFromParent<Model_deprecated>()) 
 		{
-			mesh = model->GetMesh(meshIndex);
+			mesh = model->GetMeshSection(meshIndex);
 		}
 	}
 
@@ -52,9 +52,9 @@ namespace Raven
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& enManager = currentScene->GetEntityManager();
 	
-		auto model = GetEntity().TryGetComponentFromParent<Model>();
+		auto model = GetEntity().TryGetComponentFromParent<Model_deprecated>();
 		if (model) {
-			mesh = model->GetMesh(meshIndex);
+			mesh = model->GetMeshSection(meshIndex);
 			if (skeleton.GetRoot()->localTransform == nullptr)
 			{
 				skeleton.ResetTransfromTarget(model->GetEntity());

@@ -10,7 +10,8 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/MeshRenderer.h"
 
 #include "Scripts/LuaComponent.h"
@@ -43,7 +44,8 @@ namespace Raven {
 		entityManager = std::make_shared<EntityManager>(this);
 
 		entityManager->AddDependency<Camera, Transform>();
-		entityManager->AddDependency<Model, Transform>();
+		entityManager->AddDependency<MeshComponent, Transform>();
+		entityManager->AddDependency<SkinnedMeshComponent, Transform>();
 		entityManager->AddDependency<Light, Transform>();
 		entityManager->AddDependency<MeshRenderer, Transform>();
 
@@ -62,7 +64,7 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model,LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
+#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, MeshComponent, SkinnedMeshComponent, LuaComponent,MeshRenderer,SkinnedMeshRenderer,Animator
 
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
@@ -93,8 +95,6 @@ namespace Raven {
 				cereal::JSONOutputArchive output{ storage };
 				output(*this);
 				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-				
-				cereal::BinaryOutputArchive gg()
 			}
 
 			std::ofstream file(path, std::ios::binary);

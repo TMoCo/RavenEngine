@@ -9,7 +9,8 @@
 #include "Scene/Entity/EntityManager.h"
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/MeshRenderer.h"
 #include "Scripts/LuaComponent.h"
 #include "Core/Camera.h"
@@ -97,6 +98,7 @@ namespace Raven
 				{
 					if (ImGui::MenuItem(name))
 					{
+#if 0
 						auto entity = scene->CreateEntity(name);
 						auto & model = entity.AddComponent<Model>();
 						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(name));
@@ -105,6 +107,7 @@ namespace Raven
 						auto& render = entity.AddComponent<MeshRenderer>();
 						render.mesh = mesh;
 						render.meshIndex = 0;
+#endif
 					}
 				}
 				ImGui::EndMenu();

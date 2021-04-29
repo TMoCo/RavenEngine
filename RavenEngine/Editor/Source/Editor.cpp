@@ -11,7 +11,8 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Entity/Entity.h"
 #include "Scripts/LuaComponent.h"
 
@@ -50,7 +51,8 @@ namespace Raven
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
-		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(MeshComponent).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(SkinnedMeshComponent).hash_code()] = ICON_MDI_SHAPE;
 		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
@@ -336,6 +338,7 @@ namespace Raven
 		}
 		else if (StringUtils::IsModelFile(filePath))
 		{
+#if 0
 			if (StringUtils::GetExtension(filePath) == "fbx") 
 			{
 				GetWindow<FbxWindow>()->OpenFile(filePath);
@@ -345,6 +348,7 @@ namespace Raven
 			auto & model = modelEntity.AddComponent<Model>(filePath);
 			model.LoadFile();
 			selectedNode = modelEntity.GetHandle();
+#endif
 		}
 		else if (StringUtils::IsAudioFile(filePath))
 		{

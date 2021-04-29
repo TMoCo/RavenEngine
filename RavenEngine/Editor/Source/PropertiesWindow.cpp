@@ -10,7 +10,8 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/MeshRenderer.h"
 #include "Scripts/LuaComponent.h"
@@ -229,9 +230,10 @@ namespace MM
 
 
 	template<>
-	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
+	void ComponentEditorWidget<MeshComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
-		auto& model = reg.get<Model>(e);
+		auto& model = reg.get<MeshComponent>(e);
+#if 0
 		auto& meshes = model.GetMeshes();
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
@@ -305,6 +307,7 @@ namespace MM
 		}
 		ImGui::Separator();
 		ImGui::PopStyleVar();
+#endif
 
 	}
 

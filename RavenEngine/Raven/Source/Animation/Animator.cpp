@@ -7,7 +7,7 @@
 #include "ResourceManager/FbxLoader.h"
 #include "Engine.h"
 #include "Scene/SceneManager.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/Model_deprecated.h"
 #include "Animation.h"
 #include "AnimationController.h"
 

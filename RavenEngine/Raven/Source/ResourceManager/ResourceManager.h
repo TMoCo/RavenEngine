@@ -150,9 +150,9 @@ namespace Raven
 		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
 
 		// Find a Resource and 
-		template<class ResourceType,
-			std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > = true >
-		Ptr<ResourceType> GetResource(const std::string& path);
+		template<class TResource,
+			std::enable_if_t< std::is_base_of<IResource, TResource>::value, bool > = true >
+		Ptr<TResource> GetResource(const std::string& path);
 
 		// Return true if the Resource exist in the Resource registry whether loaded or not.
 		bool HasResource(const std::string& path);
@@ -271,21 +271,21 @@ namespace Raven
 	}
 
 
-	template<class ResourceType,
-		std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > >
-	Ptr<ResourceType> ResourceManager::GetResource(const std::string& path)
+	template<class TResource,
+		std::enable_if_t< std::is_base_of<IResource, TResource>::value, bool > >
+	Ptr<TResource> ResourceManager::GetResource(const std::string& path)
 	{
 		const ResourceData* rscData = registry.FindResource(path);
 
 		// Doesn't Exist?
 		if (!rscData)
 		{
-			LOGW("Error in GetResource, Resource Does not exit {0}", path.c_str())
+			LOGW("Error in GetResource, Resource Does not exit {0}", path.c_str());
 			return nullptr;
 		}
 
 		// Type Mismatch?
-		if (rscData->type != ResourceType::Type())
+		if (rscData->type != TResource::Type())
 		{
 			RAVEN_ASSERT(0, "Invalid Resrouce Type.");
 			return nullptr;
@@ -294,14 +294,14 @@ namespace Raven
 		// Not Loaded?
 		if (!rscData->rsc)
 		{
-			if ( !LoadResource<ResourceType>(path) )
+			if ( !LoadResource<TResource>(path) )
 			{
 				RAVEN_ASSERT(0, "Failed to load resource.");
 				return nullptr;
 			}
 		}
 
-		return static_pointer_cast<ResourceType>(rscData->rsc);
+		return std::static_pointer_cast<TResource, IResource>(rscData->rsc);
 	}
 
 

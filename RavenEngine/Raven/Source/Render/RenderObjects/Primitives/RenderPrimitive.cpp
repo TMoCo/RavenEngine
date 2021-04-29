@@ -1,6 +1,5 @@
-
-
 #include "RenderPrimitive.h"
+#include "Render/RenderResource/Shader/RenderRscMaterial.h"
 
 
 
@@ -45,7 +44,16 @@ void RenderPrimitive::SetMaterial(RenderRscMaterial* mat)
 }
 
 
+ERenderShaderDomain RenderPrimitive::GetMaterialDomain() const
+{
+	return material->GetShaderRsc()->GetDomain();
+}
 
+
+ERenderShaderType RenderPrimitive::GetShaderType() const
+{
+	return material->GetShaderRsc()->GetType();
+}
 
 
 } // End of namespace Raven.

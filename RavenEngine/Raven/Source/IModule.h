@@ -18,6 +18,7 @@ enum EModuleType
 	MT_SceneManager,
 	MT_ResourceManager,
 	MT_ProceduralGenerator,
+	MT_LuaVirtualMachine,
 	MT_MAX
 };
 

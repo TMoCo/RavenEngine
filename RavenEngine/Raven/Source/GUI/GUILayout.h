@@ -98,7 +98,7 @@ namespace Raven {
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::base_class<IResource>(thiss));
+			archive(cereal::base_class<IResource>(this));
 
 			archive(cereal::make_nvp("Layout Name", name),
 				cereal::make_nvp("Widgets", widgets));

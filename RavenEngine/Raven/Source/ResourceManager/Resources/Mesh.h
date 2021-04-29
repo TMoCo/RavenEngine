@@ -118,10 +118,14 @@ namespace Raven
 		}
 
 		// Return mesh section.
-		inline Ptr<MeshSection> GetMeshSection(uint32_t index) { return sections[index]; }
+		inline MeshSection* GetMeshSection(uint32_t index) { return sections[index].get(); }
+
+		// Return mesh section list.
+		inline auto& GetMeshSections() { return sections; }
+		inline const auto& GetMeshSections() const { return sections; }
 
 		// Return the number of sections in a mesh.
-		inline uint32_t GetNumSections() const { return sections.size(); }
+		inline uint32_t GetNumSections() const { return static_cast<uint32_t>(sections.size()); }
 
 		// Return the bounds of this mesh.
 		inline MathUtils::BoundingBox GetBounds() const { return bounds; }
@@ -130,7 +134,12 @@ namespace Raven
 		// Recompute/Update the bounding box the model.
 		inline void UpdateBounds()
 		{
+			bounds.Reset();
 
+			for (const auto& ms : sections)
+			{
+				bounds.Add(ms->bounds);
+			}
 		}
 
 	private:

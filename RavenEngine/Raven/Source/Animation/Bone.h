@@ -37,7 +37,9 @@ namespace Raven
 		}
 
 	
-			
+		Bone* parent;
+		std::vector<Bone*> childrens;
+
 		std::string name;
 		Transform* localTransform;
 		glm::mat4 offsetMatrix;

@@ -12,7 +12,9 @@
 
 namespace Raven 
 {
-	class Mesh;
+	class SkinnedMeshSection;
+
+
 	class MeshRenderer : public Component
 	{
 	public:
@@ -39,7 +41,7 @@ namespace Raven
 		void GetMeshFromModel();
 
 		int32_t meshIndex;
-		std::shared_ptr<Mesh> mesh;
+		SkinnedMeshSection* mesh;
 	};
 
 	
@@ -76,7 +78,7 @@ namespace Raven
 		void UpdateBones();
 
 		int32_t meshIndex;
-		std::shared_ptr<Mesh> mesh;
+		SkinnedMeshSection* mesh;
 		Skeleton skeleton;
 
 		// Current Bones Transform.

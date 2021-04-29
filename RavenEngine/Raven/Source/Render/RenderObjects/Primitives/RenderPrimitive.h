@@ -3,6 +3,7 @@
 
 
 #include "RenderPrimitive.h"
+#include "Render/RenderResource/Shader/RenderRscShader.h"
 
 #include "glm/matrix.hpp"
 
@@ -59,6 +60,12 @@ namespace Raven
 
 		// Return the lighst that are going to lit this primitive.
 		inline const std::vector<uint32_t>& GetLights() const { return lights; }
+
+		// Render Shader Domain from the material set to this primitive.
+		ERenderShaderDomain GetMaterialDomain() const;
+
+		// Render Shader Type from the material set to this primitive.
+		ERenderShaderType GetShaderType() const;
 
 	private:
 		// The material.

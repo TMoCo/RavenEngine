@@ -8,7 +8,8 @@
 #include "Utilities/StringUtils.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "Scene/Entity/Entity.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/Light.h"
 #include "Core/Camera.h"
 
@@ -253,8 +254,10 @@ return #name
 							auto icon = 
 								v->HasComponent<Camera>() ?
 								ICON_MDI_CAMERA : 
-								v->HasComponent<Model>() ?
+								v->HasComponent<MeshComponent>() ?
 								ICON_MDI_SQUARE : 
+								v->HasComponent<SkinnedMeshComponent>() ?
+								ICON_MDI_SQUARE :
 								v->HasComponent<Light>() ?
 								ICON_MDI_LIGHTBULB :
 								v->HasComponent<LuaComponent>() ?

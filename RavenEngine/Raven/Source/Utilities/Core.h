@@ -1,6 +1,10 @@
 #pragma once
 
+
+
 #include "Logger/Console.h"
+#include "Serialization.h"
+
 
 #include <memory>
 
@@ -15,6 +19,7 @@ using WeakPtr = std::weak_ptr<T>;
 
 
 
+#if RAVEN_DEBUG
 
 #define RAVEN_ASSERT(condition, ...)   \
 	{                                    \
@@ -26,6 +31,16 @@ using WeakPtr = std::weak_ptr<T>;
 		}                       \
 	}
 
+
+#define RAVEN_ENSURE(condition, ...) RAVEN_ASSERT(condition, __VA_ARGS__)
+
+
+#else
+
+#define RAVEN_ASSERT(condition, ...) 
+#define RAVEN_ENSURE(condition, ...) (condition)
+
+#endif
 
 
 
@@ -46,12 +61,14 @@ using WeakPtr = std::weak_ptr<T>;
 
 
 // Use to archive enum using cearal archive functions.
-template<class T>
+template<class TEnum, std::enable_if_t<std::is_enum<TEnum>::value, bool> = true >
 struct EnumAsInt
 {
-	EnumAsInt(T& e)
+	// Construct.
+	EnumAsInt(const TEnum& en)
 	{
-		value = &e;
+		// THIS IS EVIL....
+		value = &en;
 	}
 
 	// Serialization Save.
@@ -59,7 +76,7 @@ struct EnumAsInt
 	void save(Archive& archive) const
 	{
 		int32_t tmp = static_cast<int32_t>(*value);
-		archive(tmp)
+		archive(tmp);
 	}
 
 	// Serialization Load.
@@ -69,10 +86,11 @@ struct EnumAsInt
 		int32_t tmp;
 		archive(tmp);
 
-		*value = static_cast<T>();
+		// THIS IS EVIL....
+		*(const_cast<TEnum*>(value)) = static_cast<TEnum>(tmp);
 	}
 
-	T* value;
+	const TEnum* value;
 };
 
 

@@ -5,7 +5,7 @@
 #include "Logger/Console.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/Model_deprecated.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/MeshRenderer.h"
 #include "Scene/Entity/EntityManager.h"
@@ -191,14 +191,14 @@ namespace Raven {
 	}
 
 
-	void FbxLoader::Load(const std::string& path, Model* model)
+	void FbxLoader::Load(const std::string& path, Model_deprecated* model)
 	{
 		LoadHierarchy(path, model);
 		LoadMeshes(model);
 		LoadAnimation(model);
 	}
 
-	void FbxLoader::LoadHierarchy(const std::string& path, Model* model)
+	void FbxLoader::LoadHierarchy(const std::string& path, Model_deprecated* model)
 	{
 		file = path;
 		std::string err;
@@ -256,7 +256,7 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadBones(const ofbx::Mesh* fbxMesh, Model* model)
+	void FbxLoader::LoadBones(const ofbx::Mesh* fbxMesh, Model_deprecated* model)
 	{
 		if (skeleton == nullptr)
 		{
@@ -332,7 +332,7 @@ namespace Raven {
 
 	}
 
-	void FbxLoader::LoadMeshes(Model* model)
+	void FbxLoader::LoadMeshes(Model_deprecated* model)
 	{
 		int32_t c = scene->getMeshCount();
 	
@@ -355,10 +355,9 @@ namespace Raven {
 			}
 
 			const auto materials = geom->getMaterials();
-			Mesh* mesh = nullptr;
 			if (fbxMesh->getMaterialCount() < 2)
 			{
-				mesh = ImportMesh(model, fbxMesh, 0, trianglesCount - 1);
+				ImportMesh(model, fbxMesh, 0, trianglesCount - 1);
 			}
 			else
 			{
@@ -368,18 +367,19 @@ namespace Raven {
 				{
 					if (rangeStartVal != materials[triangleIndex])
 					{
-						auto mesh = ImportMesh(model, fbxMesh, rangeStart, triangleIndex - 1);
+						ImportMesh(model, fbxMesh, rangeStart, triangleIndex - 1);
 						// Start a new range
 						rangeStart = triangleIndex;
 						rangeStartVal = materials[triangleIndex];
 					}
 				}
-				mesh = ImportMesh(model, fbxMesh, rangeStart, trianglesCount - 1);
+				
+				ImportMesh(model, fbxMesh, rangeStart, trianglesCount - 1);
 			}
 		}
 	}
 	
-	Mesh* FbxLoader::ImportMesh(Model* model, const ofbx::Mesh* fbxMesh, int32_t triangleStart, int32_t triangleEnd)
+	void FbxLoader::ImportMesh(Model_deprecated* model, const ofbx::Mesh* fbxMesh, int32_t triangleStart, int32_t triangleEnd)
 	{
 		const int32_t firstVertexOffset = triangleStart * 3;
 		const int32_t lastVertexOffset = triangleEnd * 3;
@@ -391,48 +391,52 @@ namespace Raven {
 		auto normals = geom->getNormals();
 		auto uvs = geom->getUVs();
 		vertexCount = lastVertexOffset - firstVertexOffset + 3;
-		auto mesh = new Mesh();
-		mesh->name = fbxMesh->name;
-		mesh->positions.resize(vertexCount);
-		mesh->normals.resize(vertexCount);
-		mesh->texCoords.resize(vertexCount);
-		mesh->indices.resize(vertexCount);
-		mesh->blendIndices.resize(vertexCount);
-		mesh->blendWeights.resize(vertexCount);
+		auto meshSection = Ptr<SkinnedMeshSection>(new SkinnedMeshSection());
+		//meshSection->SetName(fbxMesh->name);
+		meshSection->positions.resize(vertexCount);
+		meshSection->normals.resize(vertexCount);
+		meshSection->texCoords.resize(vertexCount);
+		meshSection->indices.resize(vertexCount);
+		meshSection->blendIndices.resize(vertexCount);
+		meshSection->blendWeights.resize(vertexCount);
 		for (auto i = 0; i < vertexCount; ++i)
 		{
 			ofbx::Vec3 cp = vertices[i + firstVertexOffset];
 
-			mesh->positions[i] = glm::vec3(float(cp.x), float(cp.y), float(cp.z));
-			mesh->bounds.Add(mesh->positions[i]);
+			meshSection->positions[i] = glm::vec3(float(cp.x), float(cp.y), float(cp.z));
+			meshSection->bounds.Add(meshSection->positions[i]);
 
 			if (normals)
-				mesh->normals[i] = { float(normals[i + firstVertexOffset].x), float(normals[i + firstVertexOffset].y), float(normals[i + firstVertexOffset].z) };
+				meshSection->normals[i] = { float(normals[i + firstVertexOffset].x), float(normals[i + firstVertexOffset].y), float(normals[i + firstVertexOffset].z) };
 			if (uvs)
-				mesh->texCoords[i] = { float(uvs[i + firstVertexOffset].x), 1.0f - float(uvs[i + firstVertexOffset].y) };
+				meshSection->texCoords[i] = { float(uvs[i + firstVertexOffset].x), 1.0f - float(uvs[i + firstVertexOffset].y) };
 
 		}
 
 		for (int i = 0; i < vertexCount; i++)
 		{
-			mesh->indices[i] = i;
+			meshSection->indices[i] = i;
 		}
 
 		if (geom->getSkin() != nullptr)
 		{
-			LoadWeight(geom->getSkin(),firstVertexOffset,mesh);
+			LoadWeight(geom->getSkin(),firstVertexOffset, meshSection.get());
 		}
 		
+#if 0
 		auto ret = std::static_pointer_cast<Mesh>(
 			Engine::Get().GetModule<ResourceManager>()->AddResource(file, mesh)
 		);
+#endif
 
 
 		if (model != nullptr)  // bind Components to model when model is not null
 		{
-			model->AddMesh(ret);
+			model->AddMesh(meshSection);
 			auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 			Entity rootEntity{model->entity,currentScene};
+
+#if 0
 			auto ent = rootEntity.GetChildInChildren(fbxMesh->name);
 			if (ent.Valid())
 			{
@@ -450,13 +454,15 @@ namespace Raven {
 					ren.meshIndex = model->GetMeshes().size() - 1;
 				}
 			}
+#endif
+
 		}
-		return mesh;
+
 	}
 
 
 
-	void FbxLoader::LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, Mesh* mesh)
+	void FbxLoader::LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, SkinnedMeshSection* mesh)
 	{
 		if (skeleton != nullptr) 
 		{
@@ -509,7 +515,7 @@ namespace Raven {
 
 	
 
-	void FbxLoader::LoadAnimation(Model* model)
+	void FbxLoader::LoadAnimation(Model_deprecated* model)
 	{
 		float frameRate = scene->getSceneFrameRate();
 		if (frameRate <= 0)
@@ -531,7 +537,7 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadAnimation(const std::string& path, Model* model)
+	void FbxLoader::LoadAnimation(const std::string& path, Model_deprecated* model)
 	{
 		std::string err;
 		std::string name = StringUtils::GetFileName(path);
@@ -562,7 +568,7 @@ namespace Raven {
 	}
 
 
-	std::shared_ptr<AnimationClip> FbxLoader::ImportAnimation(Model * model,int32_t index,float frameRate)
+	std::shared_ptr<AnimationClip> FbxLoader::ImportAnimation(Model_deprecated * model,int32_t index,float frameRate)
 	{
 		const ofbx::AnimationStack* stack = scene->getAnimationStack(index);
 		const ofbx::AnimationLayer* layer = stack->getLayer(0);

@@ -35,7 +35,8 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneGraph.h"
 #include "Scene/Component/Component.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/Transform.h"
 
 
@@ -128,10 +129,8 @@ void RenderModule::Initialize()
 	// ~ITERATION_0----------------------------------------------------------------------------
 	// load the generated height map into resource manager
 	std::string evnTexPath = "assets/textures/T_Default_Environment_Map.jpg";
-	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>(evnTexPath);
 	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(evnTexPath).get();
-	envTexture->renderRscTexture = new RenderRscTexture();
-	envTexture->LoadOnGpu();
+
 	envTexture->GetRenderRsc()->GetTexture()->Bind();
 	envTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Mirror);
 	envTexture->GetRenderRsc()->GetTexture()->SetFilter(EGLFilter::Linear);
@@ -278,10 +277,7 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 void RenderModule::CreateDefaultMaterials()
 {
 	// Checker Texture...
-	Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>("assets/textures/T_Checker.png");
 	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Checker.png");
-	checkerTexture->renderRscTexture = new RenderRscTexture();
-	checkerTexture->LoadOnGpu();
 
 	// TODO: Better texture system.
 	checkerTexture->GetRenderRsc()->GetTexture()->Bind();

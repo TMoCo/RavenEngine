@@ -8,8 +8,9 @@
 
 namespace Raven
 {
-	class Model;
-	class Mesh;
+	class Model_deprecated;
+	class SkinnedMesh;
+	class SkinnedMeshSection;
 	class Skeleton;
 	class Animation;
 	struct AnimationClip;
@@ -19,9 +20,9 @@ namespace Raven
 	{
 	public:
 		~FbxLoader();
-		void Load(const std::string& file, Model* model);
-		void LoadHierarchy(const std::string& file, Model* model);
-		void LoadAnimation(const std::string& file, Model* model);
+		void Load(const std::string& file, Model_deprecated* model);
+		void LoadHierarchy(const std::string& file, Model_deprecated* model);
+		void LoadAnimation(const std::string& file, Model_deprecated* model);
 		void LoadBones(const std::string& file);
 
 		inline auto& GetAnimation() { return animation; }
@@ -29,12 +30,12 @@ namespace Raven
 
 
 	private:
-		std::shared_ptr<AnimationClip> ImportAnimation(Model* model, int32_t index, float frameRate);
-		void LoadBones(const ofbx::Mesh* fbxMesh, Model* model);
-		void LoadMeshes(Model* model);
-		void LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, Mesh* mesh);
-		Mesh* ImportMesh(Model* model, const ofbx::Mesh* aMesh, int32_t triangleStart, int32_t triangleEnd);
-		void LoadAnimation(Model* model);
+		std::shared_ptr<AnimationClip> ImportAnimation(Model_deprecated* model, int32_t index, float frameRate);
+		void LoadBones(const ofbx::Mesh* fbxMesh, Model_deprecated* model);
+		void LoadMeshes(Model_deprecated* model);
+		void LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, SkinnedMeshSection* mesh);
+		void ImportMesh(Model_deprecated* model, const ofbx::Mesh* aMesh, int32_t triangleStart, int32_t triangleEnd);
+		void LoadAnimation(Model_deprecated* model);
 		void LoadBones();
 
 		ofbx::IScene* scene = nullptr;

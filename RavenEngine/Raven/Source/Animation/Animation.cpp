@@ -362,9 +362,9 @@ namespace Raven
 					}
 					else
 					{
-						pos = target->GetLocalPosition() + localPos * weight;
+						pos = target->GetPosition() + localPos * weight;
 					}
-					target->SetLocalPosition(pos);
+					target->SetPosition(pos);
 				}
 				if (setRot)
 				{
@@ -375,9 +375,9 @@ namespace Raven
 					}
 					else
 					{
-						rot = target->GetLocalOrientation() + glm::radians(localRot * weight);
+						rot = target->GetRotationEuler() + glm::radians(localRot * weight);
 					}
-					target->SetLocalOrientation(rot);
+					target->SetRotationEuler(rot.x, rot.y, rot.z);
 				}
 			}
 		}

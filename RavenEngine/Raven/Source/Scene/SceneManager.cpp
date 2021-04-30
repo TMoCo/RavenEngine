@@ -73,8 +73,8 @@ namespace Raven
 		sceneIdx = queuedSceneIndex;
 		currentScene = allScenes[queuedSceneIndex].get();
 
-		if (!currentScene->dynamic)
-			currentScene->Load("./scenes/");
+		//if (!currentScene->dynamic)
+		//	currentScene->Load("./scenes/");
 
 		if(Engine::Get().GetEditorState() == EditorState::Play)
 			currentScene->OnInit();

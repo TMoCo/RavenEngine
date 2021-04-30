@@ -18,6 +18,8 @@
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
 #include "Editor.h"
+#include "ResourceManager/Resources/Mesh.h"
+
 
 #include <imgui_internal.h>
 
@@ -91,23 +93,17 @@ namespace Raven
 
 			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "Quad" };
 
-
 			if (ImGui::BeginMenu("Add 3D Object"))
 			{
 				for (auto name : shapes)
 				{
 					if (ImGui::MenuItem(name))
 					{
-#if 0
 						auto entity = scene->CreateEntity(name);
-						auto & model = entity.AddComponent<Model>();
-						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(name));
-						Ptr<Mesh> mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(model.GetPrimitiveType()));
-						model.AddMesh(mesh);
-						auto& render = entity.AddComponent<MeshRenderer>();
-						render.mesh = mesh;
-						render.meshIndex = 0;
-#endif
+						auto & model = entity.AddComponent<MeshComponent>();
+						
+						auto mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(PrimitiveType::GetPrimativeName(name)));
+						model.SetMesh(mesh);
 					}
 				}
 				ImGui::EndMenu();

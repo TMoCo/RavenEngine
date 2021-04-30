@@ -58,9 +58,9 @@ namespace Raven
 	public:
 		// Create an input archive
 		RavenInputArchive(const std::string& file)
-			: jsonArchive(fileStream)
 		{
 			fileStream.open(file, std::ios::in | std::ios::binary);
+			archive = new cereal::BinaryInputArchive(fileStream);
 		}
 
 
@@ -71,6 +71,8 @@ namespace Raven
 			{
 				fileStream.close();
 			}
+
+			delete archive;
 		}
 
 		// Return true if the archive stream is valid.
@@ -80,12 +82,13 @@ namespace Raven
 		template<class T>
 		inline void ArchiveLoad(T& obj)
 		{
-			jsonArchive(obj);
+			(*archive)(obj);
 		}
+
 
 	private:
 		// Jason Archive.
-		cereal::JSONInputArchive jsonArchive;
+		cereal::BinaryInputArchive* archive;
 
 		// The file stream.
 		std::ifstream fileStream;
@@ -104,9 +107,9 @@ namespace Raven
 	public:
 		// Create an output rchive
 		RavenOutputArchive(const std::string& file)
-			: jsonArchive(fileStream)
 		{
 			fileStream.open(file, std::ios::out | std::ios::binary);
+			archive = new cereal::BinaryOutputArchive(fileStream);
 		}
 
 
@@ -117,6 +120,8 @@ namespace Raven
 			{
 				fileStream.close();
 			}
+
+			delete archive;
 		}
 
 		// Return true if the archive stream is valid.
@@ -126,12 +131,12 @@ namespace Raven
 		template<class T>
 		inline void ArchiveSave(T& obj)
 		{
-			jsonArchive(obj);
+			(*archive)(obj);
 		}
 
 	private:
 		// Jason Archive.
-		cereal::JSONOutputArchive jsonArchive;
+		cereal::BinaryOutputArchive* archive;
 
 		// The file stream.
 		std::ofstream fileStream;
@@ -195,7 +200,10 @@ namespace Raven
 
 			// Not Raven Resource?
 			if (tag != ResourceS_HEADER_TAG)
+			{
+				LOGW("Failed to archive load a resrouce. Resrouce is not a RAVEN.");
 				return;
+			}
 
 			// Archive Header...
 			archive(

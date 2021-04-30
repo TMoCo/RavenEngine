@@ -202,6 +202,7 @@ void RenderScene::TraverseScene(Scene* scene)
 
 		// Collect Render Render Primitives...
 		collector.Reset();
+		collector.SetTransform(&trComp->GetWorldMatrix(), &trComp->GetWorldMatrix());
 		primComp->CollectRenderPrimitives(collector);
 
 		// Create a RenderPrimitive for each model, and add it to the correct batch.
@@ -621,6 +622,37 @@ void RenderScene::GatherLights(const glm::vec3& center, float radius, std::vecto
 
 void RenderScene::GatherScenePrimitives(Scene* scene, std::vector<ScenePrimitiveData>& outPrimitivesComp)
 {
+	// Iterate over all MeshComponent in the scene.
+	{
+		auto meshPrimitives = scene->GetRegistry().group<MeshComponent>(entt::get<Transform>);
+
+		for (auto entity : meshPrimitives)
+		{
+			auto& [mesh, trans] = meshPrimitives.get<MeshComponent, Transform>(entity);
+
+			ScenePrimitiveData scenePrim;
+			scenePrim.comp = &mesh;
+			scenePrim.tr = &trans;
+			outPrimitivesComp.push_back(scenePrim);
+		}
+	}
+
+
+	// Iterate over all SkinnedMeshComponent in the scene.
+	{
+		auto skinnedPrimitives = scene->GetRegistry().group<SkinnedMeshComponent>(entt::get<Transform>);
+
+		for (auto entity : skinnedPrimitives)
+		{
+			auto& [skinned, trans] = skinnedPrimitives.get<SkinnedMeshComponent, Transform>(entity);
+
+			ScenePrimitiveData scenePrim;
+			scenePrim.comp = &skinned;
+			scenePrim.tr = &trans;
+			outPrimitivesComp.push_back(scenePrim);
+		}
+	}
+
 
 }
 

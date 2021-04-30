@@ -109,12 +109,14 @@ namespace Raven
 				sections.resize(index + 1);
 
 			sections[index] = section;
+			UpdateBounds();
 		}
 
 		// Add new mesh section at the end of the sections list.
 		inline void AddMeshSection(Ptr<MeshSection> section)
 		{
 			sections.push_back(section);
+			UpdateBounds();
 		}
 
 		// Return mesh section.

@@ -65,9 +65,8 @@ template<class TEnum, std::enable_if_t<std::is_enum<TEnum>::value, bool> = true 
 struct EnumAsInt
 {
 	// Construct.
-	EnumAsInt(const TEnum& en)
+	EnumAsInt(TEnum& en)
 	{
-		// THIS IS EVIL....
 		value = &en;
 	}
 
@@ -86,11 +85,10 @@ struct EnumAsInt
 		int32_t tmp;
 		archive(tmp);
 
-		// THIS IS EVIL....
-		*(const_cast<TEnum*>(value)) = static_cast<TEnum>(tmp);
+		*value = static_cast<TEnum>(tmp);
 	}
-
-	const TEnum* value;
+	
+	TEnum* value;
 };
 
 

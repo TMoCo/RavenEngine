@@ -366,8 +366,8 @@ namespace Raven
 			{
 				auto meshEntity = newScene->CreateEntity("Lantern");
 				auto& tr = meshEntity.GetOrAddComponent<Transform>();
-				tr.SetLocalPosition(glm::vec3(0.0f, -4.0f, 0.0f));
-				tr.SetLocalScale(glm::vec3(0.1f));
+				tr.SetPosition(glm::vec3(0.0f, -4.0f, 0.0f));
+				tr.SetScale(glm::vec3(0.1f));
 
 				auto& model0 = meshEntity.GetOrAddComponent<MeshComponent>();
 				model0.SetMesh(lanternModel_1);
@@ -388,9 +388,9 @@ namespace Raven
 			
 			auto meshEntity = newScene->CreateEntity("Plane");
 			auto& tr = meshEntity.GetOrAddComponent<Transform>();
-			tr.SetLocalPosition(glm::vec3(0.0f, -4.3f, 0.0f));
-			tr.SetLocalScale(glm::vec3(3000.0f));
-			tr.SetLocalOrientation(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f));
+			tr.SetPosition(glm::vec3(0.0f, -4.3f, 0.0f));
+			tr.SetScale(glm::vec3(3000.0f));
+			tr.SetRotation(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f));
 			
 			auto& model = meshEntity.GetOrAddComponent<MeshComponent>();
 			model.SetMesh(plane);
@@ -417,7 +417,7 @@ namespace Raven
 				lightComp.clipDistance = 20.0f;
 
 				auto& tr = lightEntity.GetOrAddComponent<Transform>();
-				tr.SetLocalPosition(lightPositions[i]);
+				tr.SetPosition(lightPositions[i]);
 			}
 
 
@@ -433,7 +433,7 @@ namespace Raven
 				lightComp.clipDistance = 5000.0f;
 
 				auto& tr = lightEntity.GetOrAddComponent<Transform>();
-				tr.SetLocalPosition(lightPositions[i] + glm::vec4(700.0f));
+				tr.SetPosition(lightPositions[i] + glm::vec4(700.0f));
 			}
 
 		}

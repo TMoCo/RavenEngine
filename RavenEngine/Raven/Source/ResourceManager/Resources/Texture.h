@@ -108,9 +108,9 @@ namespace Raven
 
 			archive(
 				size, 
-				EnumAsInt<ETextureFormat>(format),
-				EnumAsInt<ETextureFilter>(filter),
-				EnumAsInt<ETextureWrap>(wrap),
+				EnumAsInt<const ETextureFormat>(format),
+				EnumAsInt<const ETextureFilter>(filter),
+				EnumAsInt<const ETextureWrap>(wrap),
 				isGenMipmaps
 			);
 		}

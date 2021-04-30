@@ -150,22 +150,21 @@ namespace Raven
 				.addConstructor <void (*) (glm::mat4)>()
 				.addConstructor <void (*) ()>()
 
-				.addFunction("GetLocalScale", &Transform::GetLocalScale)
-				.addFunction("GetLocalOrientation", &Transform::GetLocalOrientation)
-				.addFunction("GetLocalPosition", &Transform::GetLocalPosition)
-				.addFunction("ApplyTransform", &Transform::ApplyTransform)
-				.addFunction("UpdateLocalMatrix", &Transform::UpdateLocalMatrix)
-				.addFunction("SetLocalTransform", &Transform::SetLocalTransform)
-				.addFunction("SetLocalPosition", &Transform::SetLocalPosition)
-				.addFunction("SetLocalScale", &Transform::SetLocalScale)
-				.addFunction("SetLocalOrientation", &Transform::SetLocalOrientation)
-				.addFunction("GetWorldPosition", &Transform::GetWorldPosition)
-				.addFunction("GetWorldOrientation", &Transform::GetWorldOrientation)
-				.addFunction("GetForwardDirection", &Transform::GetForwardDirection)
+				.addFunction("GetScale", &Transform::GetScale)
+				.addFunction("GetPosition", &Transform::GetPosition)
+				.addFunction("GetRotation", &Transform::GetRotation)
 
-				.addProperty("localScale", &Transform::GetLocalScale, &Transform::SetLocalScale)
-				.addProperty("localPosition", &Transform::GetLocalPosition, &Transform::SetLocalPosition)
-				.addProperty("localOrientation", &Transform::GetLocalOrientation, &Transform::SetLocalOrientation)
+				.addFunction("Dirty", &Transform::Dirty)
+				.addFunction("UpdateDirty", &Transform::UpdateDirty)
+
+				.addFunction("SetScale", &Transform::SetScale)
+				.addFunction("SetPosition", &Transform::SetPosition)
+				.addFunction("SetRotation", &Transform::SetRotation)
+				.addFunction("SetWorldPosition", &Transform::SetWorldPosition)
+
+				.addProperty("Scale", &Transform::GetScale, &Transform::SetScale)
+				.addProperty("Position", &Transform::GetPosition, &Transform::SetPosition)
+				.addProperty("Rotation", &Transform::GetRotation, &Transform::SetRotation)
 
 				.endClass();
 			

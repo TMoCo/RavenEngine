@@ -128,8 +128,9 @@ void RenderModule::Initialize()
 
 	// ~ITERATION_0----------------------------------------------------------------------------
 	// load the generated height map into resource manager
-	std::string evnTexPath = "assets/textures/T_Default_Environment_Map.jpg";
-	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(evnTexPath).get();
+	Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Default_Environment_Map.jpg");
+
+	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Default_Environment_Map.raven").get();
 
 	envTexture->GetRenderRsc()->GetTexture()->Bind();
 	envTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Mirror);
@@ -276,8 +277,10 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 
 void RenderModule::CreateDefaultMaterials()
 {
+	Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Checker.png");
+
 	// Checker Texture...
-	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Checker.png");
+	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Checker.raven");
 
 	// TODO: Better texture system.
 	checkerTexture->GetRenderRsc()->GetTexture()->Bind();

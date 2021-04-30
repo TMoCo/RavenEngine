@@ -126,7 +126,7 @@ namespace Raven
 		//    - We use std::array and EModuleType as its indices for each module.
 		//
 		//    - While this is not flexible for adding new modules its much faster, GetModule<>() will be used
-		//			many times in the engine and we want to reduce the cost of it.
+		//      many times in the engine and we want to reduce the cost of it.
 		//
 		std::array<IModule*, MT_MAX> engineModules;
 

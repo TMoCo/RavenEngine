@@ -5,9 +5,14 @@
 #pragma once
 
 
+#include "Component.h"
+#include "Utilities/Serialization.h"
+
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "Component.h"
+
+
 
 namespace Raven 
 {
@@ -23,98 +28,164 @@ namespace Raven
 	constexpr glm::vec3 ONE(1.0f, 1.0f, 1.0f);
 
 
-	class Transform final : public Component
+
+	// Transform
+	//    - 
+	class Transform : public Component
 	{
 	public:
+		// Construct Identity.
 		Transform();
-		Transform(const glm::mat4 & matrix);
-		Transform(const glm::vec3 & position);
+
+		// Construct from matrix.
+		Transform(const glm::mat4& matrix);
+
+		// Construct from Position.
+		Transform(const glm::vec3& inPosition);
+
+		// Destruct.
 		~Transform();
 
-		void SetWorldMatrix(const glm::mat4& mat);
-		void SetLocalTransform(const glm::mat4& localMat);
-		void SetOffsetTransform(const glm::mat4& localMat);
-		void SetLocalPosition(const glm::vec3& localPos);
-		void SetLocalScale(const glm::vec3& localScale);
-		//void SetLocalOrientation(const glm::quat& quat);
-		void SetLocalOrientation(const glm::vec3& rotation);
+		// Return the transform in world coordinate.
+		inline auto& GetWorldMatrix() 
+		{ 
+			if (isWorldMatrixDiry) 
+				UpdateWorldMatrix();
 
-		inline auto& GetWorldMatrix() { if (dirty) UpdateLocalMatrix();  return worldMatrix; }
-		inline auto& GetLocalMatrix() { if (dirty) UpdateLocalMatrix();  return localMatrix; }
+			return worldMatrix; 
+		}
 
-		inline auto GetWorldPosition() const { return glm::vec3{ worldMatrix[3][0], worldMatrix[3][1], worldMatrix[3][2] }; }
-		inline auto GetWorldOrientation() const { return glm::quat_cast(worldMatrix); };
+		// Return the transform in world coordinate const version.
+		inline const auto& GetWorldMatrix() const { return const_cast<Transform*>(this)->GetWorldMatrix(); }
 
-		inline auto& GetLocalPosition() const { return localPosition; }
-		inline auto& GetLocalScale() const { return localScale; }
-		inline auto& GetLocalOrientation() const { return localOrientation; }
-		inline auto& GetOffsetMatrix() const { return offsetMatrix; }
+		// Return the transform as a matrix..
+		inline const auto& GetLocalMatrix() const { if (isLocalMatrixCacheDiry) UpdateLocalMatrix();  return localMatrix_cache; }
 
+		// Return World Position.
+		inline auto GetWorldPosition() const 
+		{ 
+			if (isWorldMatrixDiry) 
+				UpdateWorldMatrix();
 
+			return glm::vec3{ worldMatrix[3][0], worldMatrix[3][1], worldMatrix[3][2] }; 
+		}
+
+		// Return World Rotation.
+		inline auto GetWorldRotation() const 
+		{
+			if (isWorldMatrixDiry)
+				UpdateWorldMatrix();
+
+			return glm::quat_cast(worldMatrix);
+		};
+
+		// Get Local...
+		inline auto& GetPosition() const { return position; }
+		inline auto& GetScale() const { return scale; }
+		inline auto& GetRotation() const { return rotation; }
+		inline auto GetRotationEuler() const { return glm::eulerAngles(rotation); } // Order of rotation v' = Yaw * Pitch * Roll * v;
+
+		// Set Local...
+		void SetPosition(const glm::vec3& v);
+		void SetScale(const glm::vec3& v);
+		void SetRotation(const glm::quat& v);
+		void SetRotationEuler(float pitch, float yaw, float roll); // Order of rotation v' = Yaw * Pitch * Roll * v;
+
+		// Set World...
+		void SetWorldPosition(const glm::vec3& v);
+		void SetWorldScale(const glm::vec3& v);
+		void SetWorldRotation(const glm::quat& v);
+		void SetWorldRotation(float pitch, float yaw, float roll); // Order of rotation v' = Yaw * Pitch * Roll * v;
+
+		// Set Matrix...
+		void SetMatrixTransform(const glm::mat4& mtx);
+		void SetWorldMatrixTransform(const glm::mat4& mtx);
+
+		// Reset Transform to identity.
 		void ResetTransform();
 
-		inline auto HasUpdated() const { return hasUpdated; }
-		inline void SetHasUpdated(bool set) { hasUpdated = set; }
-
-		void UpdateLocalMatrix();
-		void ApplyTransform();
-
+		// Get Transformation Up-Vector.
 		glm::vec3 GetUpDirection() const;
 
+		// Get Transformation Right-Vector.
 		glm::vec3 GetRightDirection() const;
 		
+		// Get Transformation Forward-Vector.
 		glm::vec3 GetForwardDirection() const;
 	
-
-		static glm::vec3 GetScaleFromMatrix(const glm::mat4& mat);
-
-
+		// Serialize Save.
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("Position", localPosition), cereal::make_nvp("Rotation", localOrientation), cereal::make_nvp("Scale", localScale), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+
+			archive(
+				cereal::make_nvp("Position", position),
+				cereal::make_nvp("Scale", scale),
+				cereal::make_nvp("Rotation", rotation)
+			);
 		}
 
+		// Serialize Load.
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::make_nvp("Position", localPosition), cereal::make_nvp("Rotation", localOrientation), cereal::make_nvp("Scale",  localScale), cereal::make_nvp("Id", entity));
-			dirty = true;
-			initLocalPosition = localPosition;
-			initLocalScale = localScale;
-			initLocalOrientation = localOrientation;
+			archive(cereal::base_class<Component>(this));
+
+			archive(
+				cereal::make_nvp("Position", position),
+				cereal::make_nvp("Scale", scale),
+				cereal::make_nvp("Rotation", rotation)
+			);
 		}
 
-	protected:
-		glm::mat4 localMatrix = glm::mat4(1);
-		glm::mat4 worldMatrix = glm::mat4(1);
-		glm::mat4 offsetMatrix = glm::mat4(1);
+		// Update world matrix only if its dirty.
+		void UpdateDirty();
 
+		// Mark the cached matrices as dirty.
+		void Dirty();
 
-
-		glm::vec3 localPosition = {};
-		glm::vec3 localScale = {};
-		glm::vec3 localOrientation = {};
-
-		glm::vec3 initLocalPosition = {};
-		glm::vec3 initLocalScale = {};
-		glm::vec3 initLocalOrientation = {};
-
-
-		bool hasUpdated = false;
-		bool dirty = false;
-	};
-
-
-
-	class BoneWarpper : public Component
-	{
 	public:
-		Mesh * mesh;
-		std::vector<uint32_t> indices;
-	};
+		// Extract scale from a matrix.
+		static glm::vec3 ExtractScale(const glm::mat4& mtx);
 
-};
+	private:
+		// Update local matrix cache.
+		void UpdateLocalMatrix() const;
+
+		// Update world matrix.
+		void UpdateWorldMatrix() const;
+
+		// Update Children Transforms.
+		void UpdateChildrenWorld() const;
+
+		// Return parent world matrix.
+		bool GetParentWorldMatrix(glm::mat4& outMtx) const;
+
+	private:
+		// The Local Translation.
+		glm::vec3 position;
+
+		// The Local Scale.
+		glm::vec3 scale;
+
+		// The Local Orientation.
+		glm::quat rotation;
+
+		// The world matrix of this component computed when transformation changed.
+		mutable glm::mat4 worldMatrix;
+
+		// if true the world matrix need to be updated.
+		mutable bool isWorldMatrixDiry;
+
+		// Local cache for the local transform to not compute the local matrix every time.
+		mutable glm::mat4 localMatrix_cache;
+
+		// True if the local matrix cache doesn't match the
+		mutable bool isLocalMatrixCacheDiry;
+	};
+	
+}
 
 
 

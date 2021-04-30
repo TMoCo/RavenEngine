@@ -125,7 +125,8 @@ namespace Raven
 					SetImGuizmoOperation(ImGuizmo::OPERATION::BOUNDS);
 				}
 			}
-			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));
+			
+			//editorCameraTransform.SetWorldMatrixTransform(glm::mat4(1.f));
 		}
 
 	}
@@ -264,12 +265,12 @@ namespace Raven
 					{
 						auto mat = glm::make_mat4(delta);
 						
-						transform->SetLocalScale(transform->GetLocalScale() * Transform::GetScaleFromMatrix(mat));
+						transform->SetScale(transform->GetScale() * Transform::ExtractScale(mat));
 					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
-						transform->SetLocalTransform(mat);
+						transform->SetMatrixTransform(mat);
 						//TOOD
 					}
 				}

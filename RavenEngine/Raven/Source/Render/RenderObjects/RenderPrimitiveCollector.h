@@ -40,6 +40,13 @@ namespace Raven
 		// Clear all collected primitives form the collector.
 		void Reset();
 
+		// Set current collector transform.
+		inline void SetTransform(const glm::mat4* world, const glm::mat4* normal)
+		{
+			worldMatrix = world;
+			normalMatrix = normal;
+		}
+
 	private:
 		// The Render Scene.
 		RenderScene* owner;
@@ -48,10 +55,10 @@ namespace Raven
 		std::vector<RenderPrimitive*> primitive;
 
 		// Current World Matrix to set the new render primitives 
-		glm::mat4 worldMatrix;
+		const glm::mat4* worldMatrix;
 
 		// Current Normal Matrix to set the new render primitives 
-		glm::mat4 normalMatrix;
+		const glm::mat4* normalMatrix;
 	};
 
 }

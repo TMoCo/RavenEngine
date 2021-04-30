@@ -117,6 +117,8 @@ namespace Raven
 		void Destroy();
 		bool Valid();
 
+
+
 	private:
 		entt::entity entityHandle = entt::null;
 		Scene* scene = nullptr;

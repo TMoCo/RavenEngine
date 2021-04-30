@@ -91,13 +91,13 @@ namespace Raven {
 	static void SetTransform(const ofbx::Object* object, Transform& transform) {
 		ofbx::Vec3 p = object->getLocalTranslation();
 		glm::vec3 pos = (glm::vec3(static_cast<float>(p.x), static_cast<float>(p.y), static_cast<float>(p.z)));
-		transform.SetLocalPosition(FixOrientation(pos));
+		transform.SetPosition(FixOrientation(pos));
 		ofbx::Vec3 r = object->getLocalRotation();
 		glm::vec3 rot = FixOrientation(glm::vec3(static_cast<float>(r.x), static_cast<float>(r.y), static_cast<float>(r.z)));
-		transform.SetLocalOrientation(rot);
+		transform.SetRotation(rot);
 		ofbx::Vec3 s = object->getLocalScaling();
 		glm::vec3 scl = glm::vec3(static_cast<float>(s.x), static_cast<float>(s.y), static_cast<float>(s.z));
-		transform.SetLocalScale(scl);
+		transform.SetScale(scl);
 	}
 
 	static void computeTangents(ofbx::Vec3* out, int vertex_count, const ofbx::Vec3* vertices, const ofbx::Vec3* normals, const ofbx::Vec2* uvs)
@@ -292,7 +292,9 @@ namespace Raven {
 					bone.localTransform = entity.TryGetComponent<Transform>();
 					if (entity.Valid() && bone.localTransform)
 					{
+#if 0
 						bone.localTransform->SetOffsetTransform(bone.offsetMatrix);
+#endif
 					}
 				}
 				bones.emplace_back(link);

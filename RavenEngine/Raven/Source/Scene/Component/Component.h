@@ -14,7 +14,21 @@ namespace Raven
 	public:
 		virtual ~Component() = default;
 		entt::entity entity = entt::null;
-		Entity GetEntity();
+		Entity GetEntity() const;
+
+		// serialize save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::make_nvp("Id", entity));
+		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::make_nvp("Id", entity));
+		}
 	};
 
 	class NameComponent : public Component
@@ -24,11 +38,23 @@ namespace Raven
 
 		NameComponent(const std::string & name) :name(name) {}
 
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("Name", name), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Name", name));
 		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Name", name));
+		}
+
+		// Component Name.
 		std::string name;
 	};
 
@@ -38,11 +64,24 @@ namespace Raven
 	public:
 		ActiveComponent() = default;
 		ActiveComponent(bool active) :active(active) {}
+
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("Active", active), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Active", active));
 		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Active", active));
+		}
+
+
 		bool active = true;
 	};
 
@@ -81,10 +120,30 @@ namespace Raven
 		entt::entity next = entt::null;
 		entt::entity prev = entt::null;
 
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("First", first), cereal::make_nvp("Next", next), cereal::make_nvp("Previous", prev), cereal::make_nvp("Parent", parent), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(
+				cereal::make_nvp("First", first),
+				cereal::make_nvp("Next", next),
+				cereal::make_nvp("Previous", prev),
+				cereal::make_nvp("Parent", parent)
+			);
+		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(
+				cereal::make_nvp("First", first),
+				cereal::make_nvp("Next", next),
+				cereal::make_nvp("Previous", prev),
+				cereal::make_nvp("Parent", parent)
+			);
 		}
 	};
 

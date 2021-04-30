@@ -12,6 +12,8 @@ namespace Raven {
 
 void Raven::GetFormatInfo(ETextureFormat format, int32_t& BPP)
 {
+	BPP = 0;
+
 	switch (format)
 	{
 	case Raven::ETextureFormat::R8:
@@ -35,7 +37,6 @@ void Raven::GetFormatInfo(ETextureFormat format, int32_t& BPP)
 		break;
 	}
 
-	BPP = 0;
 }
 
 

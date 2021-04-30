@@ -30,6 +30,7 @@ namespace Raven {
 ResourceHeaderInfo ILoader::LoadHeader(RavenInputArchive& archive)
 {
 	ResourceHeaderInfo header;
+
 	archive.ArchiveLoad(header);
 
 	return header;
@@ -62,13 +63,14 @@ void ResourcesRegistry::AddResource(const std::string& path, const ResourceHeade
 	data.info = info;
 	data.type = info.GetType();
 	data.path = path;
+	data.cleanPath = CleanRscPath(path);
 	data.rsc = newResource;
 
-	uint32_t index = static_cast<uint32_t>(resources.size() - 1);
+	uint32_t index = static_cast<uint32_t>(resources.size());
 	resources.push_back(data);
 
 	// Map path to resource.
-	resourcePathMap[path] = index;
+	resourcePathMap[data.cleanPath] = index;
 
 	// Is Loaded?
 	if (newResource)
@@ -105,7 +107,11 @@ void ResourcesRegistry::Reset()
 
 const ResourceData* ResourcesRegistry::FindResource(const std::string& path) const
 {
-	auto iter = resourcePathMap.find(path);
+	// Clean the path before searching.
+	std::string cleanPath = CleanRscPath(path);
+
+	// Search...
+	auto iter = resourcePathMap.find(cleanPath);
 
 	// Not Found?
 	if (iter == resourcePathMap.end())
@@ -116,6 +122,31 @@ const ResourceData* ResourcesRegistry::FindResource(const std::string& path) con
 	return &resources[iter->second];
 }
 
+
+std::string ResourcesRegistry::CleanRscPath(const std::string& path) const
+{
+	std::string cleanPath;
+
+	if (path.empty())
+		return cleanPath;
+
+	if (path.size() > 2 && path[0] == '.' && (path[1] == '/' || path[1] == '\\'))
+	{
+		cleanPath = StringUtils::RemoveExtension(path.substr(2));
+	}
+	else if (path.size() > 1 && (path[1] == '/' || path[1] == '\\'))
+	{
+		cleanPath = StringUtils::RemoveExtension(path.substr(1));
+	}
+	else
+	{
+		cleanPath = StringUtils::RemoveExtension(path);
+	}
+
+	std::replace(cleanPath.begin(), cleanPath.end(), '\\', '/');
+
+	return cleanPath;
+}
 
 
 
@@ -200,10 +231,10 @@ bool ResourceManager::IsResourceLoaded(const std::string& path)
 }
 
 
-bool ResourceManager::Import(const std::string& file, std::string* optionalSaveDir)
+bool ResourceManager::Import(const std::string& file, std::string optionalSaveDir)
 {
-	std::string ext = StringUtils::GetFileName(file);
-	std::string name = StringUtils::GetExtension(file);
+	std::string name = StringUtils::GetFileNameWithoutExtension(file);
+	std::string ext = StringUtils::GetExtension(file);
 
 	// -- - -- - - - --- 
 	// 1. Import.
@@ -246,9 +277,9 @@ bool ResourceManager::Import(const std::string& file, std::string* optionalSaveD
 		std::string outputFile = "./" + newResource->GetName() + ".raven";
 
 		// Override Save Directory?
-		if (optionalSaveDir)
+		if (!optionalSaveDir.empty())
 		{
-			outputFile = *optionalSaveDir + newResource->GetName() + ".raven";
+			outputFile = optionalSaveDir + newResource->GetName() + ".raven";
 		}
 
 
@@ -260,6 +291,7 @@ bool ResourceManager::Import(const std::string& file, std::string* optionalSaveD
 		{
 			return false;
 		}
+
 	}
 
 
@@ -269,7 +301,8 @@ bool ResourceManager::Import(const std::string& file, std::string* optionalSaveD
 
 bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile)
 {
-	RavenOutputArchive archive(saveFile);
+	std::string absSavePath = StringUtils::GetCurrentWorkingDirectory() + "/" + saveFile;
+	RavenOutputArchive archive(absSavePath);
 
 	// Failed to open archive?
 	if (!archive.IsValid())
@@ -305,6 +338,12 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 
 	// Load Header.
 	ResourceHeaderInfo info = ILoader::LoadHeader(archive);
+
+	// Invalid Raven Resrouce?
+	if (!info.IsValid())
+	{
+		return false;
+	}
 
 	// Load the resource.
 	IResource* loadedRsc = loader->LoadResource(info, archive);

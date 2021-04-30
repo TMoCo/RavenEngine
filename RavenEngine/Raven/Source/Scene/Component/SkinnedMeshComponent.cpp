@@ -38,7 +38,7 @@ void SkinnedMeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rco
 		SkinnedMeshSection* meshSection = mesh->GetMeshSection(i);
 
 		// Invalid?
-		if (meshSection)
+		if (!meshSection)
 		{
 			continue;
 		}

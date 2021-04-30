@@ -39,6 +39,9 @@ namespace Raven
 		// The Relative Resource Path.
 		std::string path;
 
+		// a cleaned relative path used for mapping.
+		std::string cleanPath;
+
 		// The header data that contains information about the Resource.
 		ResourceHeaderInfo info;
 
@@ -74,6 +77,9 @@ namespace Raven
 
 		// Find a resrouce from path.
 		const ResourceData* FindResource(const std::string& path) const;
+
+		// Clean Resrouce Path.
+		std::string CleanRscPath(const std::string& path) const;
 	};
 
 
@@ -167,11 +173,13 @@ namespace Raven
 
 		// Import new Resource from other file formats using our importers.
 		// @param file: the file we want to import could be an image or .obj file etc...
-		// @param optionalSaveDir: if not null will save the Resource to this directory.
+		// @param optionalSaveDir: if not empty will save the Resource to this directory.
 		// @return true if successfully imported.
-		bool Import(const std::string& file, std::string* optionalSaveDir = nullptr);
+		bool Import(const std::string& file, std::string optionalSaveDir = "");
 
 		// Save a new resource and add it to be the Resource registry.
+		// @param newResource: a new unsaved resource.
+		// @param saveFile: a relative resource path.
 		bool SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile);
 
 		// Save existing Resource.

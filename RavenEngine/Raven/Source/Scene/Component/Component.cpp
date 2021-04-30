@@ -169,9 +169,9 @@ namespace Raven
 		}
 	}
 
-	Raven::Entity Component::GetEntity()
+	Raven::Entity Component::GetEntity() const
 	{
-		return {entity,Engine::Get().GetModule<SceneManager>()->GetCurrentScene()};
+		return { entity, Engine::GetModule<SceneManager>()->GetCurrentScene() };
 	}
 
 }

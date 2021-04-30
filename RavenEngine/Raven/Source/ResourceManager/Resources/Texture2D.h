@@ -110,7 +110,9 @@ namespace Raven
 			archive(cereal::base_class<ITexture>(this));
 
 			// Save data as binary.
-			archive.saveBinaryValue(data.GetData(), data.GetSize(), "Texture2DData");
+			uint32_t dataSize = data.GetSize();
+			archive(dataSize);
+			archive.saveBinary(data.GetData(), data.GetSize());
 		}
 
 		// Serialization Save.
@@ -120,7 +122,11 @@ namespace Raven
 			archive(cereal::base_class<ITexture>(this));
 
 			// Save data as binary.
-			archive.loadBinaryValue(data.GetData(), data.GetSize(), "Texture2DData");
+			uint32_t dataSize = 0;
+			archive(dataSize);
+			data.Allocate(dataSize);
+
+			archive.loadBinary(data.GetData(), data.GetSize());
 		}
 
 

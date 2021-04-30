@@ -43,7 +43,7 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 		MeshSection* meshSection = mesh->GetMeshSection(i);
 
 		// Invalid?
-		if (meshSection)
+		if (!meshSection)
 		{
 			continue;
 		}

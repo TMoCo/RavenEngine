@@ -44,9 +44,9 @@ namespace MM
 	{
 		auto& transform = reg.get<Transform>(e);
 
-		auto rotation = glm::degrees(transform.GetLocalOrientation());
-		auto position = transform.GetLocalPosition();
-		auto scale = transform.GetLocalScale();
+		auto rotation = glm::degrees(transform.GetRotationEuler());
+		auto position = transform.GetPosition();
+		auto scale = transform.GetScale();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
@@ -58,7 +58,7 @@ namespace MM
 
 		if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.05))
 		{
-			transform.SetLocalPosition(position);
+			transform.SetPosition(position);
 		}
 
 		ImGui::PopItemWidth();
@@ -71,7 +71,8 @@ namespace MM
 
 		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),0.1))
 		{
-			transform.SetLocalOrientation(glm::radians(rotation));
+			rotation = glm::radians(rotation);
+			transform.SetRotationEuler(rotation.x, rotation.y, rotation.z);
 		}
 
 		ImGui::PopItemWidth();
@@ -82,7 +83,7 @@ namespace MM
 		ImGui::PushItemWidth(-1);
 		if (ImGui::DragFloat3("##Scale", glm::value_ptr(scale), 0.05))
 		{
-			transform.SetLocalScale(scale);
+			transform.SetScale(scale);
 		}
 
 		ImGui::PopItemWidth();
@@ -233,19 +234,18 @@ namespace MM
 	void ComponentEditorWidget<MeshComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
 		auto& model = reg.get<MeshComponent>(e);
-#if 0
-		auto& meshes = model.GetMeshes();
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
 
 	
-		ImGui::TextUnformatted("Primitive Type");
 
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
+#if 0
+		auto& meshes = model.GetMeshes();
 		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
 
 		std::string shapeCurrent = PrimitiveType::GetPrimativeName(model.GetPrimitiveType());

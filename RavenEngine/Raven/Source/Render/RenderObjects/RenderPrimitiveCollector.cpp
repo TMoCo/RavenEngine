@@ -13,6 +13,8 @@ namespace Raven {
 
 RenderPrimitiveCollector::RenderPrimitiveCollector(RenderScene* sceneOwner)
 	: owner(sceneOwner)
+	, worldMatrix(nullptr)
+	, normalMatrix(nullptr)
 {
 
 }
@@ -27,8 +29,9 @@ void RenderPrimitiveCollector::Reset()
 RenderMesh* RenderPrimitiveCollector::NewMesh()
 {
 	RenderMesh* rmesh = owner->NewPrimitive<RenderMesh>();
-	rmesh->SetWorldMatrix(worldMatrix);
-	rmesh->SetNormalMatrix(normalMatrix);
+	rmesh->SetWorldMatrix(*worldMatrix);
+	rmesh->SetNormalMatrix(*normalMatrix);
+	primitive.push_back(rmesh);
 
 	return rmesh;
 }
@@ -37,8 +40,9 @@ RenderMesh* RenderPrimitiveCollector::NewMesh()
 RenderSkinnedMesh* RenderPrimitiveCollector::NewSkinnedMesh()
 {
 	RenderSkinnedMesh* rskinned = owner->NewPrimitive<RenderSkinnedMesh>();
-	rskinned->SetWorldMatrix(worldMatrix);
-	rskinned->SetNormalMatrix(normalMatrix);
+	rskinned->SetWorldMatrix(*worldMatrix);
+	rskinned->SetNormalMatrix(*normalMatrix);
+	primitive.push_back(rskinned);
 
 	return rskinned;
 }

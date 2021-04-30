@@ -96,7 +96,7 @@ IResource* ImageImporter::ImportImage2D(const std::string& path)
 	// Render Resrouce...
 	texture->LoadRenderResource();
 
-	texture->SetName(StringUtils::GetFileName(path));
+	texture->SetName(StringUtils::GetFileNameWithoutExtension(path));
 
 	return texture;
 }

@@ -155,7 +155,16 @@ namespace Raven
 
 				selectedNode = entt::null;
 				if (selected)
+				{
+					// we reload the scene, so destroy the rigid bodies in the physics engine
+					auto &registry = Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+					auto view = registry.view<RigidBody>();
+					for (auto v : view)
+					{
+						view.get<RigidBody>(v).DestroyRigidBody();
+					}
 					LoadCachedScene();
+				}
 				else
 				{
 					CacheScene();
@@ -537,7 +546,6 @@ namespace Raven
 	void Editor::CacheScene()
 	{
 		//Serialize the scene
-	
 		for (auto & win : editorWindows)
 		{
 			win.second->SaveWorkspace();

@@ -131,7 +131,6 @@ namespace Raven
 		if (std::find(loaders.begin(), loaders.end(), loader) == loaders.end())
 		{
 			loaders.push_back(std::move(loader));
-			LOGV("Added a loader of type " + ILoader::TypeToString(loaders.rbegin()->get()->GetType()));
 		}
 	}
 

@@ -35,6 +35,7 @@
 #include "Animation/AnimationController.h"
 
 
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
@@ -95,6 +96,15 @@ namespace MM
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
+
+		// also update the rigid body if available
+		auto rb = reg.try_get<RigidBody>(e);
+		if (rb)
+		{
+			rb->SetInitTransform(transform);
+			LOGE(glm::to_string(rb->GetInitTransform().GetWorldPosition()));
+		}
+
 	}
 
 	template<>
@@ -338,6 +348,9 @@ namespace MM
 	template<>
 	void ComponentEditorWidget<RigidBody>(entt::registry& reg, entt::registry::entity_type e)
 	{
+		//
+		// Edit rigid body properties
+		//
 		auto& rigidBody = reg.get<RigidBody>(e);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
@@ -375,19 +388,169 @@ namespace MM
 		ImGui::TextUnformatted("Set mass");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat("##Set mass", &mass, 0.05f))
+		if (ImGui::DragFloat("##Set mass", &mass, 0.05f, 0.0f, 100000.0f))
 		{
-			rigidBody.SetMass(mass < 0.0f ? 0.0f : mass);
+			rigidBody.SetMass(mass);
 		}
 		
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 
+		float lDamping = rigidBody.GetLinearDamping();
+
+		ImGui::TextUnformatted("Linear damping");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Linear damping", &lDamping, 0.05f, 0.0f, 100.0f))
+		{
+			rigidBody.SetLinearDamping(lDamping);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		float aDamping = rigidBody.GetAngularDamping();
+
+		ImGui::TextUnformatted("Angular damping");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Angular damping", &aDamping, 0.05f, 0.0f, 100.0f))
+		{
+			rigidBody.SetAngularDamping(aDamping);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		static const char* types[3] = { "Static", "Kinematic", "Dynamic"};
+		int selected = static_cast<int>(rigidBody.GetBodyType());
+
+		ImGui::TextUnformatted("Set body type");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		ImGui::ListBox("##Set body type", &selected, types, IM_ARRAYSIZE(types), 3);
+		if (selected != static_cast<int>(rigidBody.GetBodyType()))
+		{
+			rigidBody.SetBodyType(static_cast<RigidBodyType>(selected));
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+				
+		//
+		// Edit rigid body's colliders
+		//
+
+
+		if (rigidBody.GetNumColliders() != 0)
+		{
+			ImGui::Separator();
+			ImGui::TextUnformatted("Select collider");
+			ImGui::NextColumn();
+
+			ImGui::PushItemWidth(-1);
+			ImGui::ListBoxHeader("##Select collider", rigidBody.GetNumColliders(), 1);
+
+			static int colliderIdx  = 0;
+			auto colliders = rigidBody.GetAllColliders(); // ptr to the body's colliders
+			// loop over all the body's colliders
+			for (int i = 0; i < rigidBody.GetNumColliders(); i++)
+			{
+				const bool isSelected = colliderIdx == i;
+				if (ImGui::Selectable(ColliderPrimitive::GetColliderPrimitiveName((*colliders)[i]->GetColliderType()).c_str(), isSelected))
+				{
+					colliderIdx = i;
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+
+			}
+			ImGui::ListBoxFooter();
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			auto& collider = (*colliders)[colliderIdx];
+
+			// ui for editing the type of collider
+			collider->OnImGui();
+
+			// ui for editing the collider's relative transform to the body it belongs to
+			auto& transform = collider->GetRelativeTransform();
+
+			auto rotation = glm::degrees(transform.GetLocalOrientation());
+			auto position = transform.GetLocalPosition();
+			// no scaling
+
+			ImGui::TextUnformatted("Position");
+			ImGui::NextColumn();
+			ImGui::PushItemWidth(-1);
+
+			if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.05))
+			{
+				// update the tansform
+				transform.SetLocalPosition(position);
+				// in the physics engine as well
+				collider->SetTransform(transform);
+
+			}
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			ImGui::TextUnformatted("Rotation");
+			ImGui::NextColumn();
+			ImGui::PushItemWidth(-1);
+
+
+			if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation), 0.1))
+			{
+				transform.SetLocalOrientation(glm::radians(rotation));
+				// in the physics engine as well
+				collider->SetTransform(transform);
+			}
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			ImGui::Columns(1);
+			// button for removing the collider 
+			if (ImGui::Button("Remove collider"))
+			{
+				rigidBody.RemoveCollider(colliderIdx);
+			}
+		}
+
+		// 
+		// Add colliders to the rigid body
+		// 
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("Add new collider"))
+		{
+			for (auto& name : ColliderPrimitive::NAMES)
+			{
+				if (ImGui::MenuItem(name.c_str()))
+				{
+					// add a collider to the rigid body
+					rigidBody.AddCollider(ColliderFactory::CreateCollider(ColliderPrimitive::GetColliderPrimitiveType(name)));
+				}
+			}
+			ImGui::EndMenu();
+		}
+		
+		ImGui::Columns(2);
+		ImGui::Separator();
+
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 	}
-
 };
 
 namespace Raven
@@ -421,7 +584,6 @@ namespace Raven
 				ImGui::End();
 				return;
 			}
-
 
 			auto activeComponent = registry.try_get<ActiveComponent>(selected);
 			bool active = activeComponent ? activeComponent->active : true;
@@ -516,10 +678,13 @@ namespace Raven
 				// if transform does exists, change the rigidbody's initial transform
 				if (t)
 				{
-					rb->SetInitTransform(*t);
+					LOGV("Has tranform");
+					Transform initT = *t;
+					initT.SetLocalScale(glm::vec3(1.0f, 1.0f, 1.0f));
+					initT.UpdateLocalMatrix();
+					rb->SetInitTransform(initT);
+					rb->InitRigidBody();
 				}
-				// and initialise the body again
-				rb->InitRigidBody();
 			}
 		});
 	}

@@ -265,6 +265,13 @@ namespace Raven
 	{
 		Scene* newScene = new Scene("Physics Test World");
 		newScene->dynamic = true;
+		// get the terrain generator and generate a height map
+		auto generator = GetModule<TerrainGeneration>();
+		generator->GenerateSquareGradient(100, 100);
+		generator->GenerateNoise(100, 100, FileFormat::PNG);
+		std::string path("heightmap.png");
+		// load the generated height map into resource manager
+		GetModule<ResourceManager>()->LoadResource<Texture2D>(path);
 
 		/*
 		// delete previous physics world

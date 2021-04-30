@@ -96,8 +96,7 @@ namespace Raven {
 			{
 				cereal::JSONOutputArchive output{ storage };
 				output(*this);
-				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-				
+				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);				
 			}
 
 			std::ofstream file(path, std::ios::binary);
@@ -113,15 +112,7 @@ namespace Raven {
 	{
 		PRINT_FUNC();
 
-		auto view = entityManager->GetRegistry().view<RigidBody>();
-		for (auto& v : view)
-		{
-			view.get(v).DestroyRigidBody();
-		}
-		Engine::Get().GetModule<PhysicsModule>()->RecreateWorld();
-		
 		entityManager->Clear();
-		// on load, also recreate the physics world
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
 		std::string path = filePath + name;
 
@@ -161,16 +152,14 @@ namespace Raven {
 				input(*this);
 				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 			}
-			else 
+			else
 			{
 				LOGE("No saved scene file found {0}", path);
 				in.close();
 			}
 		}
-		LOGC(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()->getNbRigidBodies());
-
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
-
+		
 	}
 
 	Raven::Entity Scene::CreateEntity()
@@ -243,17 +232,23 @@ namespace Raven {
 			auto& lua = GetRegistry().get<LuaComponent>(v);
 			lua.OnInit();
 		}
-
-		auto rbView = GetRegistry().view<RigidBody, Transform>();
-		for (auto v : rbView)
+		// on scene init, we need to initialise the physics engine
+		auto view = entityManager->GetRegistry().view<RigidBody>();
+		for (auto v : view)
 		{
-			auto& rb = GetRegistry().get<RigidBody>(v);
-			// initialise the transform in the rigid body engine to be the entity's transform
+			auto& rb = entityManager->GetRegistry().get<RigidBody>(v);
+			// initialise the body
+			rb.InitRigidBody();
+			// initialise the start transform in the rigid body engine to be the entity's current transform
 			rb.SetInitTransform(GetRegistry().get<Transform>(v)); // rigid body needs transform to exist so this should never fail
 			rb.InitTransform();
-			LOGC(glm::to_string(rb.GetInitTransform().GetWorldMatrix()));
+			// initialise the colliders attached to the body (if any)
+			for (auto& collider : *rb.GetAllColliders())
+			{
+				collider->SetBody(rb.GetBody());
+				collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
+			}
 		}
-
 	}
 
 	void Scene::OnClean()

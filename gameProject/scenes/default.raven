@@ -2,15 +2,35 @@
     "value0": {
         "SceneName": "default"
     },
-    "value1": 3,
-    "value2": 0,
+    "value1": 4,
+    "value2": 3145728,
     "value3": 1,
     "value4": 2,
-    "value5": 3,
-    "value6": 0,
-    "value7": {
+    "value5": 1048579,
+    "value6": 4,
+    "value7": 3145728,
+    "value8": {
         "Position": {
+            "value0": 0.699999988079071,
+            "value1": 5.0,
+            "value2": 0.0
+        },
+        "Rotation": {
             "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 1048575
+    },
+    "value9": 2,
+    "value10": {
+        "Position": {
+            "value0": 2.3499999046325685,
             "value1": 0.0,
             "value2": 0.0
         },
@@ -26,8 +46,27 @@
         },
         "Id": 1048575
     },
-    "value8": 1,
-    "value9": {
+    "value11": 1048579,
+    "value12": {
+        "Position": {
+            "value0": -1.0,
+            "value1": -2.0,
+            "value2": 0.0
+        },
+        "Rotation": {
+            "value0": 0.0,
+            "value1": 0.0,
+            "value2": 0.0
+        },
+        "Scale": {
+            "value0": 1.0,
+            "value1": 1.0,
+            "value2": 1.0
+        },
+        "Id": 1048575
+    },
+    "value13": 1,
+    "value14": {
         "Position": {
             "value0": 0.0,
             "value1": 15.0,
@@ -45,46 +84,32 @@
         },
         "Id": 1
     },
-    "value10": 2,
-    "value11": {
-        "Position": {
-            "value0": 1.0,
-            "value1": 10.0,
-            "value2": 0.0
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": 0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        },
-        "Id": 1048575
-    },
-    "value12": 3,
-    "value13": 0,
-    "value14": {
+    "value15": 4,
+    "value16": 3145728,
+    "value17": {
         "Name": "Cube1",
         "Id": 1048575
     },
-    "value15": 1,
-    "value16": {
+    "value18": 1,
+    "value19": {
         "Name": "Camera",
         "Id": 1048575
     },
-    "value17": 2,
-    "value18": {
+    "value20": 2,
+    "value21": {
         "Name": "Cube2",
         "Id": 1048575
     },
-    "value19": 0,
-    "value20": 0,
-    "value21": 1,
-    "value22": 1,
+    "value22": 1048579,
     "value23": {
+        "Name": "Cube3",
+        "Id": 1048575
+    },
+    "value24": 0,
+    "value25": 0,
+    "value26": 1,
+    "value27": 1,
+    "value28": {
         "Scale": 1.0,
         "Aspect": 1.3828996419906617,
         "FOV": 45.0,
@@ -92,39 +117,52 @@
         "Far": 100.0,
         "Id": 1
     },
-    "value24": 0,
-    "value25": 0,
-    "value26": 2,
-    "value27": 0,
-    "value28": {
+    "value29": 0,
+    "value30": 0,
+    "value31": 3,
+    "value32": 3145728,
+    "value33": {
         "PrimitiveType": 2,
         "FilePath": "",
-        "Id": 0
+        "Id": 3145728
     },
-    "value29": 2,
-    "value30": {
+    "value34": 2,
+    "value35": {
         "PrimitiveType": 2,
         "FilePath": "",
         "Id": 2
     },
-    "value31": 0,
-    "value32": 2,
-    "value33": 0,
-    "value34": {
-        "MeshIndex": 0,
-        "Id": 0
+    "value36": 1048579,
+    "value37": {
+        "PrimitiveType": 2,
+        "FilePath": "",
+        "Id": 1048579
     },
-    "value35": 2,
-    "value36": {
-        "MeshIndex": 0,
-        "Id": 2
-    },
-    "value37": 0,
     "value38": 0,
-    "value39": 2,
-    "value40": 2,
+    "value39": 3,
+    "value40": 3145728,
     "value41": {
+        "MeshIndex": 0,
+        "Id": 3145728
+    },
+    "value42": 2,
+    "value43": {
+        "MeshIndex": 0,
+        "Id": 2
+    },
+    "value44": 1048579,
+    "value45": {
+        "MeshIndex": 0,
+        "Id": 1048579
+    },
+    "value46": 0,
+    "value47": 0,
+    "value48": 3,
+    "value49": 3145728,
+    "value50": {
         "Type": 2,
+        "Can sleep": true,
+        "Gravity enabled": true,
         "Mass": 1.0,
         "Linear Damping": 0.0,
         "Angular Damping": 0.0,
@@ -163,9 +201,11 @@
             }
         ]
     },
-    "value42": 0,
-    "value43": {
+    "value51": 2,
+    "value52": {
         "Type": 0,
+        "Can sleep": true,
+        "Gravity enabled": true,
         "Mass": 1.0,
         "Linear Damping": 0.0,
         "Angular Damping": 0.0,
@@ -174,6 +214,48 @@
                 "polymorphic_id": 1,
                 "ptr_wrapper": {
                     "id": 2147483650,
+                    "data": {
+                        "Half extents": {
+                            "value0": 1.0,
+                            "value1": 1.0,
+                            "value2": 1.0
+                        },
+                        "Relative transform": {
+                            "Position": {
+                                "value0": 0.0,
+                                "value1": 0.0,
+                                "value2": 0.0
+                            },
+                            "Rotation": {
+                                "value0": 0.0,
+                                "value1": -0.0,
+                                "value2": 0.0
+                            },
+                            "Scale": {
+                                "value0": 1.0,
+                                "value1": 1.0,
+                                "value2": 1.0
+                            },
+                            "Id": 1048575
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "value53": 1048579,
+    "value54": {
+        "Type": 0,
+        "Can sleep": true,
+        "Gravity enabled": true,
+        "Mass": 1.0,
+        "Linear Damping": 0.0,
+        "Angular Damping": 0.0,
+        "Colliders": [
+            {
+                "polymorphic_id": 1,
+                "ptr_wrapper": {
+                    "id": 2147483651,
                     "data": {
                         "Half extents": {
                             "value0": 1.0,

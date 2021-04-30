@@ -46,8 +46,7 @@ namespace Raven
 			/*
 			*/
 			auto& registry = scene->GetRegistry();
-			auto group = scene->GetRegistry().group<RigidBody>(entt::get<Transform>);
-
+			auto& group = scene->GetRegistry().group<RigidBody, Transform>();
 			for (auto entity : group)
 			{
 				const auto& [rigBod, trans] = group.get<RigidBody, Transform>(entity);

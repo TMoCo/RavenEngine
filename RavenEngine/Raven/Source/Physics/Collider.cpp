@@ -31,6 +31,7 @@ namespace Raven
 	// when deleting the collider, remove it from the body it's attached to
 	Collider::~Collider()
 	{
+		//body->removeCollider(collider);
 	}
 
 	// call this when creating a collider 
@@ -140,7 +141,7 @@ namespace Raven
 		Collider(body, ColliderPrimitive::Sphere),
 		radius(1.0f)
 	{
-		InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
+		//InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
 	}
 
 	// creates the collider by adding it to the body 

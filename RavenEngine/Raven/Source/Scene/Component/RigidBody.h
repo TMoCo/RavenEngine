@@ -14,6 +14,8 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Component.h"
 
+#include "Scene/System/PhysicsSystem.h"
+
 //
 // Wrapper component class for rp3d rigid bodies
 //
@@ -36,6 +38,7 @@ namespace Raven
 	class RigidBody : public Component
 	{
 		friend PhysicsModule;
+		friend PhysicsSystem;
 	public:
 		// a collision body needs a transform to exist
 		RigidBody();
@@ -44,6 +47,8 @@ namespace Raven
 
 		void InitRigidBody();
 		void DestroyRigidBody();
+
+		rp3d::RigidBody* GetBody() { return body; }
 
 		// add a collider to the collision body
 		void AddCollider(Collider* collider);
@@ -98,6 +103,8 @@ namespace Raven
 		void save(Archive& archive) const
 		{
 			archive(cereal::make_nvp("Type", static_cast<int>(type)),
+					cereal::make_nvp("Can sleep", canSleep),
+					cereal::make_nvp("Gravity enabled", gravityEnabled),
 					cereal::make_nvp("Mass", mass),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
@@ -107,26 +114,14 @@ namespace Raven
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			// nb, this only loads shape data and creates instances of the collider objects.
+			// nb, this only loads body and shape data. They still need to be initialised (done on scene init)
 			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), 
+					cereal::make_nvp("Can sleep", canSleep),
+					cereal::make_nvp("Gravity enabled", gravityEnabled),
 					cereal::make_nvp("Mass", mass),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
 					cereal::make_nvp("Colliders", colliders));
-			// we also need to set the body properties in the physics engine
-			this->SetBodyType(type);
-			this->SetMass(mass);
-			this->SetLinearDamping(linearDamping);
-			this->SetAngularDamping(angularDamping);
-			// the colliders need to be added to the physics engine, so loop and add them to the body
-			auto physCommon = Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon();
-			for (auto& collider : colliders)
-			{
-				// essentially the same as the AddCollider function, minus the adding to the collider vector (already there)
-				collider->SetBody(this->body);
-				collider->InitShape(physCommon);
-				this->body->addCollider(collider->GetShape(), Rp3dConvert::ToRp3dTransform(collider->GetRelativeTransform()));
-			}
 		}
 
 	private:
@@ -146,7 +141,7 @@ namespace Raven
 
 		RigidBodyType type;
 
-		rp3d::Transform initTransform;
+		Transform initTransform;
 
 		// a copy of the previous state, used for slerping 
 		rp3d::Transform previousState;

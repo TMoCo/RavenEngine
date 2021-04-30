@@ -35,6 +35,7 @@
 #include "Animation/AnimationController.h"
 
 
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
@@ -101,6 +102,7 @@ namespace MM
 		if (rb)
 		{
 			rb->SetInitTransform(transform);
+			LOGE(glm::to_string(rb->GetInitTransform().GetWorldPosition()));
 		}
 
 	}
@@ -420,7 +422,7 @@ namespace MM
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 
-		const char* types[3] = { "Static", "Kinematic", "Dynamic"};
+		static const char* types[3] = { "Static", "Kinematic", "Dynamic"};
 		int selected = static_cast<int>(rigidBody.GetBodyType());
 
 		ImGui::TextUnformatted("Set body type");
@@ -549,7 +551,6 @@ namespace MM
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 	}
-
 };
 
 namespace Raven
@@ -669,8 +670,6 @@ namespace Raven
 			{
 				lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
 			}
-			/*
-			*/
 			auto rb = r.try_get<RigidBody>(entity);
 			if (rb)
 			{
@@ -684,7 +683,6 @@ namespace Raven
 					initT.SetLocalScale(glm::vec3(1.0f, 1.0f, 1.0f));
 					initT.UpdateLocalMatrix();
 					rb->SetInitTransform(initT);
-					// and initialise the body again
 					rb->InitRigidBody();
 				}
 			}

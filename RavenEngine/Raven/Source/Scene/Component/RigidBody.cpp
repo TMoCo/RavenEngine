@@ -9,40 +9,41 @@
 #include "Utilities/ToRp3d.h"
 
 #include <glm/gtc/type_ptr.hpp> // make mat from array of values
+#include <glm/gtx/string_cast.hpp>
 
 namespace Raven
 {
 	// default constructor to register as a valid entity
 	RigidBody::RigidBody() : 
 		world(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()),
-		initTransform(rp3d::Transform::identity()),
+		initTransform(Transform::Identity()),
 		body(nullptr),
 		mass(1.0f),
+		linearDamping(0.0f),
+		angularDamping(0.0f),
 		type(RigidBodyType::Static)
-	{
-		InitRigidBody();
-	}
+	{}
 
 	RigidBody::~RigidBody()
-	{
-		//colliders.clear();
-	}
+	{}
 
 	void RigidBody::InitRigidBody()
 	{
-		previousState = initTransform;
 		
 		// if body already exists, delete it and replace with a new default body
 		if (body)
 			world->destroyRigidBody(body);
+		auto initT = Rp3dConvert::ToRp3dTransform(initTransform);
+		body = world->createRigidBody(initT);
 
-		body = world->createRigidBody(previousState);
+		previousState = initT;
+		body->setMass(mass);
+		body->setIsAllowedToSleep(canSleep);
+		body->enableGravity(gravityEnabled);
+		body->setLinearDamping(linearDamping);
+		body->setAngularDamping(angularDamping);
+		// set the type after the parameters, otherwise rp3d will change types without telling you >:-((
 		body->setType(static_cast<rp3d::BodyType>(type));
-
-		canSleep	   = body->isAllowedToSleep();
-		gravityEnabled = body->isGravityEnabled();
-		linearDamping  = body->getLinearDamping();
-		angularDamping = body->getAngularDamping();
 	}
 
 	void RigidBody::DestroyRigidBody()
@@ -53,20 +54,14 @@ namespace Raven
 
 	void RigidBody::AddCollider(Collider* collider)
 	{
-		// update the parent body of the collider
-		collider->SetBody(this->body);
-		// adding the collider to the body makes it exist in physics world
-		collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
 		// update the body's vector containing colliders 
 		colliders.emplace_back(collider);
-		LOGV(body->getNbColliders());
 	}
 
 	void RigidBody::RemoveCollider(uint32_t index)
 	{
-		// NB THIS DOES NOT CHECK IF THE INDEX IS OUT OF BOUNDS (do this through editor?)
+		// NB THIS DOES NOT CHECK IF THE INDEX IS OUT OF BOUNDS
 		colliders.erase(colliders.begin() + index); // deletes the pointer
-		LOGV(body->getNbColliders());
 	}
 
 	std::shared_ptr<Collider> RigidBody::GetCollider(uint32_t index)
@@ -119,17 +114,17 @@ namespace Raven
 
 	void RigidBody::SetInitTransform(const Transform& t)
 	{
-		initTransform = Rp3dConvert::ToRp3dTransform(t);
+		initTransform = t;
 	}
 
 	Transform RigidBody::GetInitTransform()
 	{
-		return Rp3dConvert::ToTransform(initTransform);
+		return initTransform;
 	}
 
 	void RigidBody::InitTransform()
 	{
-		body->setTransform(initTransform);
+		body->setTransform(Rp3dConvert::ToRp3dTransform(initTransform));
 	}
 
 	uint32_t RigidBody::GetNumColliders()
@@ -144,11 +139,11 @@ namespace Raven
 	// set if the body is affected by gravity or not
 	void RigidBody::EnableGravity(bool b)
 	{
-		body->enableGravity(b);
+		gravityEnabled = b;
 	}
 	bool RigidBody::GravityEnabled()
 	{
-		return body->isGravityEnabled();
+		return gravityEnabled;
 	}
 
 	void RigidBody::SetMass(float m)
@@ -185,17 +180,16 @@ namespace Raven
 
 	void RigidBody::SetIsAllowedToSleep(bool b)
 	{
-		body->setIsAllowedToSleep(b);
+		canSleep = b;
 	}
 	bool RigidBody::CanSleep()
 	{ 
-		return body->isAllowedToSleep(); 
+		return canSleep; 
 	}
 
 	void RigidBody::SetBodyType(RigidBodyType t)
 	{
 		type = t;
-		body->setType(static_cast<rp3d::BodyType>(t));
 	}
 	RigidBodyType RigidBody::GetBodyType()
 	{

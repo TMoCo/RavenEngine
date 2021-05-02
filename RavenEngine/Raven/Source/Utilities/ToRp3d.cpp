@@ -37,5 +37,15 @@ namespace Raven
 			// a new Raven::Transform with the rp3d transform data
 			return Transform(t);
 		}
+
+		glm::quat ToGLMQuat(const rp3d::Quaternion other)
+		{
+			glm::quat out;
+			out.x = other.x;
+			out.y = other.y;
+			out.z = other.z;
+			out.w = other.w;
+			return out;
+		}
 	}
 }

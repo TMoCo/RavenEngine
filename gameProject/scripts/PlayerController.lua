@@ -23,6 +23,12 @@ function PlayerController:OnUpdate(dt)
 
 	walkAccel = 5
 	jumpPower = 500
+
+
+	---------------------------
+	-- Keyboard Input Handling
+	---------------------------
+
 	if Input.IsKeyHeld(KeyCode.LeftShift) then
 		walkAccel = 10
 	end
@@ -31,15 +37,15 @@ function PlayerController:OnUpdate(dt)
 		--LOGV("A is pressed")
 
 		f = self:GetRigidBody():GetRightVector()
-		f = f:scale(-1 * walkAccel)
-		totalLinear = totalLinear + f
+		f1 = glm.vec3(-walkAccel*f.x, 0, -walkAccel*f.z)
+		totalLinear = totalLinear + f1
 	end
 	if Input.IsKeyHeld(KeyCode.D) then
 		--LOGV("D is pressed")
 
 		f = self:GetRigidBody():GetRightVector()
-		f = f:scale(walkAccel)
-		totalLinear = totalLinear + f
+		f1 = glm.vec3(walkAccel*f.x, 0, walkAccel*f.z)
+		totalLinear = totalLinear + f1
 	end
 	
 	
@@ -47,16 +53,16 @@ function PlayerController:OnUpdate(dt)
 		--LOGV("W is pressed")
 
 		f = self:GetRigidBody():GetForwardVector()
-		f = f:scale(-1 * walkAccel)
-		totalLinear = totalLinear + f
+		f1 = glm.vec3(-walkAccel*f.x, 0, -walkAccel*f.z)
+		totalLinear = totalLinear + f1
 	end
 	
 	if Input.IsKeyHeld(KeyCode.S) then
 		--LOGV("S is pressed")
 
 		f = self:GetRigidBody():GetForwardVector()
-		f = f:scale(walkAccel)
-		totalLinear = totalLinear + f
+		f1 = glm.vec3(walkAccel*f.x, 0, walkAccel*f.z)
+		totalLinear = totalLinear + f1
 	end
 
 	if Input.IsKeyPressed(KeyCode.Space) then
@@ -64,6 +70,12 @@ function PlayerController:OnUpdate(dt)
 		f = f:scale(jumpPower)
 		totalLinear = totalLinear + f
 	end
+
+	self:GetRigidBody():ApplyForce(totalLinear)
+
+	---------------------------
+	-- Mouse Input Handling
+	---------------------------
 
 	if not self.lastMPos then
 		self.lastMPos = Input.GetMousePosition()
@@ -73,14 +85,11 @@ function PlayerController:OnUpdate(dt)
 	mDiff = Input.GetMousePosition() - self.lastMPos
 	if (mDiff.x ~= 0) then
 		
-		f = glm.vec3(0,-1 * mDiff.x,0)
-		self:GetRigidBody():ApplyTorque(f)
+		turnDelta = -(mDiff.x)/500
+		self:GetRigidBody():RotateBody(glm.vec3(0,1,0), turnDelta)
 
 		self.lastMPos = Input.GetMousePosition()
 	end
-
-	self:GetRigidBody():ApplyForce(totalLinear)
-
 end
 
 return PlayerController;

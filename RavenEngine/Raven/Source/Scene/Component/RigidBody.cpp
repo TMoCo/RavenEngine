@@ -10,6 +10,7 @@
 
 #include <glm/gtc/type_ptr.hpp> // make mat from array of values
 #include <glm/gtc/quaternion.hpp> 
+#include <glm/gtx/quaternion.hpp> 
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -48,7 +49,7 @@ namespace Raven
 		// set the type after the parameters, otherwise rp3d will change types without telling you >:-((
 		body->setType(static_cast<rp3d::BodyType>(type));
 
-		if (!canTopple) body->setLocalInertiaTensor(rp3d::Vector3(0, 1, 0));
+		if (!canTopple) body->setLocalInertiaTensor(rp3d::Vector3(0, 0, 0));
 
 	}
 
@@ -135,30 +136,25 @@ namespace Raven
 
 	glm::quat RigidBody::GetOrientation()
 	{
-		auto& orientation = body->getTransform().getOrientation();
-		glm::quat glmOrientation;
-		glmOrientation.x = orientation.x;
-		glmOrientation.y = orientation.y;
-		glmOrientation.z = orientation.z;
-		glmOrientation.w = orientation.w;
-
-		return glmOrientation;
+		auto& o = body->getTransform().getOrientation();
+		
+		return Rp3dConvert::ToGLMQuat(o);
 	}
 
 
 	glm::vec3 RigidBody::GetForwardVector()
 	{
-		return glm::normalize(GetOrientation() * FORWARD);
+		return GetOrientation() * FORWARD;
 	}
 
 	glm::vec3 RigidBody::GetRightVector()
 	{
-		return glm::normalize(GetOrientation() * RIGHT);
+		return GetOrientation() * RIGHT;
 	}
 
 	glm::vec3 RigidBody::GetUpVector()
 	{
-		return glm::normalize(GetOrientation() * UP);
+		return GetOrientation() * UP;
 	}
 
 	uint32_t RigidBody::GetNumColliders()
@@ -262,4 +258,17 @@ namespace Raven
 	{
 		body->applyTorque(Rp3dConvert::ToRp3dVector3(t));
 	}
+
+	void RigidBody::RotateBody(const glm::vec3 axis, float deg)
+	{
+		float rad = glm::radians(deg);
+		// Create the quaternion to rotate the body the desired amount
+		rp3d::Quaternion q = rp3d::Quaternion::fromEulerAngles(Rp3dConvert::ToRp3dVector3(axis * rad));
+
+		// Get the tranform of the rigid body and rotate it
+		rp3d::Transform t = GetBody()->getTransform();
+		t.setOrientation(q * t.getOrientation());
+		GetBody()->setTransform(t);
+	}
+
 }

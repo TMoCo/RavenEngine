@@ -113,6 +113,7 @@ namespace Raven
 				.addFunction("ApplyForceAtLocalPos", &RigidBody::ApplyForceAtLocalPos)
 				.addFunction("ApplyForceAtWorldPos", &RigidBody::ApplyForceAtWorldPos)
 				.addFunction("ApplyTorque", &RigidBody::ApplyTorque)
+				.addFunction("RotateBody", &RigidBody::RotateBody)
 				.addFunction("GetEntity", &RigidBody::GetEntity)
 				.endClass();
 				

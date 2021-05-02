@@ -4,20 +4,20 @@
     },
     "value1": 4,
     "value2": 3145728,
-    "value3": 3145727,
+    "value3": 4194303,
     "value4": 2,
-    "value5": 2097155,
-    "value6": 3,
+    "value5": 3145729,
+    "value6": 2,
     "value7": 3145728,
     "value8": {
         "Position": {
-            "value0": 0.699999988079071,
+            "value0": 0.0,
             "value1": 5.2007551193237309,
-            "value2": -5.9080986976623539
+            "value2": 0.0
         },
         "Rotation": {
             "value0": -3.141592502593994,
-            "value1": -8.742278367890322e-8,
+            "value1": -8.742279078433057e-8,
             "value2": -3.141592502593994
         },
         "Scale": {
@@ -31,7 +31,7 @@
     "value10": {
         "Position": {
             "value0": 0.0,
-            "value1": 0.0,
+            "value1": -0.0,
             "value2": 0.0
         },
         "Rotation": {
@@ -46,101 +46,66 @@
         },
         "Id": 1048575
     },
-    "value11": 2097155,
-    "value12": {
-        "Position": {
-            "value0": -0.9542591571807861,
-            "value1": 1.9713134765625,
-            "value2": -6.467270851135254
-        },
-        "Rotation": {
-            "value0": 0.0,
-            "value1": -0.0,
-            "value2": 0.0
-        },
-        "Scale": {
-            "value0": 1.0,
-            "value1": 1.0,
-            "value2": 1.0
-        },
-        "Id": 1048575
-    },
-    "value13": 3,
-    "value14": 3145728,
-    "value15": {
+    "value11": 2,
+    "value12": 3145728,
+    "value13": {
         "Name": "Player",
         "Id": 1048575
     },
-    "value16": 2097155,
-    "value17": {
-        "Name": "Obstacle",
-        "Id": 1048575
-    },
-    "value18": 2,
-    "value19": {
+    "value14": 2,
+    "value15": {
         "Name": "Floor",
         "Id": 1048575
     },
-    "value20": 0,
-    "value21": 0,
-    "value22": 1,
-    "value23": 3145728,
-    "value24": {
-        "Scale": 1.0,
-        "Aspect": 1.4290000200271607,
+    "value16": 0,
+    "value17": 0,
+    "value18": 1,
+    "value19": 3145728,
+    "value20": {
+        "Scale": 0.0,
+        "Aspect": 1.25,
         "FOV": 90.25,
-        "Near": 0.18799999356269837,
+        "Near": 0.009999999776482582,
         "Far": 188.39300537109376,
         "Id": 3145728
     },
-    "value25": 0,
-    "value26": 0,
-    "value27": 3,
-    "value28": 3145728,
-    "value29": {
+    "value21": 0,
+    "value22": 0,
+    "value23": 2,
+    "value24": 3145728,
+    "value25": {
         "PrimitiveType": 2,
         "FilePath": "",
         "Id": 3145728
     },
-    "value30": 2,
-    "value31": {
+    "value26": 2,
+    "value27": {
         "PrimitiveType": 2,
         "FilePath": "",
         "Id": 2
     },
-    "value32": 2097155,
-    "value33": {
-        "PrimitiveType": 2,
-        "FilePath": "",
-        "Id": 2097155
-    },
-    "value34": 1,
-    "value35": 3145728,
-    "value36": {
+    "value28": 1,
+    "value29": 3145728,
+    "value30": {
         "FilePath": "./scripts/PlayerController.lua",
         "Parent": 3145728
     },
-    "value37": 3,
-    "value38": 3145728,
-    "value39": {
+    "value31": 2,
+    "value32": 3145728,
+    "value33": {
         "MeshIndex": 0,
         "Id": 3145728
     },
-    "value40": 2,
-    "value41": {
+    "value34": 2,
+    "value35": {
         "MeshIndex": 0,
         "Id": 2
     },
-    "value42": 2097155,
-    "value43": {
-        "MeshIndex": 0,
-        "Id": 2097155
-    },
-    "value44": 0,
-    "value45": 0,
-    "value46": 3,
-    "value47": 3145728,
-    "value48": {
+    "value36": 0,
+    "value37": 0,
+    "value38": 2,
+    "value39": 3145728,
+    "value40": {
         "Type": 2,
         "Can sleep": true,
         "Gravity enabled": true,
@@ -178,14 +143,14 @@
                             },
                             "Id": 1048575
                         },
-                        "Friction Coeff": 1.0
+                        "Friction Coeff": 0.0
                     }
                 }
             }
         ]
     },
-    "value49": 2,
-    "value50": {
+    "value41": 2,
+    "value42": {
         "Type": 0,
         "Can sleep": true,
         "Gravity enabled": false,
@@ -203,50 +168,6 @@
                             "value0": 100.0,
                             "value1": 1.0,
                             "value2": 100.0
-                        },
-                        "Relative transform": {
-                            "Position": {
-                                "value0": 0.0,
-                                "value1": 0.0,
-                                "value2": 0.0
-                            },
-                            "Rotation": {
-                                "value0": 0.0,
-                                "value1": -0.0,
-                                "value2": 0.0
-                            },
-                            "Scale": {
-                                "value0": 1.0,
-                                "value1": 1.0,
-                                "value2": 1.0
-                            },
-                            "Id": 1048575
-                        },
-                        "Friction Coeff": 0.30000001192092898
-                    }
-                }
-            }
-        ]
-    },
-    "value51": 2097155,
-    "value52": {
-        "Type": 0,
-        "Can sleep": true,
-        "Gravity enabled": false,
-        "Can Topple": true,
-        "Mass": 1.0,
-        "Linear Damping": 0.0,
-        "Angular Damping": 0.0,
-        "Colliders": [
-            {
-                "polymorphic_id": 1,
-                "ptr_wrapper": {
-                    "id": 2147483651,
-                    "data": {
-                        "Half extents": {
-                            "value0": 1.0,
-                            "value1": 1.0,
-                            "value2": 1.0
                         },
                         "Relative transform": {
                             "Position": {

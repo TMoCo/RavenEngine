@@ -79,10 +79,6 @@ namespace Raven
 				return glm::cross(*t, *t2);
 			}
 
-			template <class T>
-			static T scale(const T* t, const float s) {
-				return  (*t) * s;
-			}
 		};
 
 
@@ -100,7 +96,6 @@ namespace Raven
 				.addFunction("__mul", &VecHelper::mul<glm::vec2>)
 				.addFunction("__sub", &VecHelper::sub<glm::vec2>)
 				.addFunction("dot", &VecHelper::dot<glm::vec2>)
-				.addFunction("scale", &VecHelper::scale<glm::vec2>)
 				.endClass()
 
 				.beginClass <glm::vec3>("vec3")
@@ -115,7 +110,6 @@ namespace Raven
 				.addFunction("dot", &VecHelper::dot<glm::vec3>)
 				.addFunction("cross", &VecHelper::cross<glm::vec3>)
 				.addFunction("normalize", &VecHelper::normalize<glm::vec3>)
-				.addFunction("scale", &VecHelper::scale<glm::vec3>)
 				.endClass()
 
 

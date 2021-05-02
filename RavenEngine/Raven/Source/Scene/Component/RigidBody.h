@@ -110,6 +110,7 @@ namespace Raven
 		void ApplyForceAtWorldPos(const glm::vec3& f, const glm::vec3& pos);
 		void ApplyTorque(const glm::vec3& t);
 
+		void RotateBody(const glm::vec3 axis, float deg);
 
 		// load and save the colliders attached to the body
 		template<typename Archive>

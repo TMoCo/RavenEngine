@@ -29,5 +29,6 @@ namespace Raven
 
 		// from physics to engine
 		Transform ToTransform(const rp3d::Transform& other);
+		glm::quat ToGLMQuat(const rp3d::Quaternion other);
 	}
 }

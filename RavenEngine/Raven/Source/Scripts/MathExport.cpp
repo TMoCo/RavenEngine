@@ -73,9 +73,15 @@ namespace Raven
 				return  glm::normalize(*t);
 			}
 
+
 			template <>
 			static glm::vec3 cross(const glm::vec3* t, const glm::vec3* t2) {
 				return glm::cross(*t, *t2);
+			}
+
+			template <class T>
+			static T scale(const T* t, const float s) {
+				return  (*t) * s;
 			}
 		};
 
@@ -87,7 +93,6 @@ namespace Raven
 
 				.beginClass <glm::vec2>("vec2")
 				.addConstructor <void (*) (float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec2, 0>, &VecHelper::set <glm::vec2, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec2, 1>, &VecHelper::set <glm::vec2, 1>)
 				.addFunction("__tostring", &VecHelper::toString<glm::vec2>)
@@ -95,11 +100,11 @@ namespace Raven
 				.addFunction("__mul", &VecHelper::mul<glm::vec2>)
 				.addFunction("__sub", &VecHelper::sub<glm::vec2>)
 				.addFunction("dot", &VecHelper::dot<glm::vec2>)
+				.addFunction("scale", &VecHelper::scale<glm::vec2>)
 				.endClass()
 
 				.beginClass <glm::vec3>("vec3")
 				.addConstructor <void (*) (float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec3, 0>, &VecHelper::set <glm::vec3, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec3, 1>, &VecHelper::set <glm::vec3, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec3, 2>, &VecHelper::set <glm::vec3, 2>)
@@ -110,12 +115,12 @@ namespace Raven
 				.addFunction("dot", &VecHelper::dot<glm::vec3>)
 				.addFunction("cross", &VecHelper::cross<glm::vec3>)
 				.addFunction("normalize", &VecHelper::normalize<glm::vec3>)
+				.addFunction("scale", &VecHelper::scale<glm::vec3>)
 				.endClass()
 
 
 				.beginClass <glm::vec4>("vec4")
 				.addConstructor <void (*) (float, float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec4, 0>, &VecHelper::set <glm::vec4, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec4, 1>, &VecHelper::set <glm::vec4, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec4, 2>, &VecHelper::set <glm::vec4, 2>)

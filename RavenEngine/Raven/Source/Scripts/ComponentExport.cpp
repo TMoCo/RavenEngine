@@ -8,6 +8,7 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/RigidBody.h"
 #include "Animation/Animator.h"
 
 #include "LuaComponent.h"
@@ -60,6 +61,7 @@ namespace Raven
 				.EXPORT_COMPONENTS(Light)
 				.EXPORT_COMPONENTS(Animator)
 				.EXPORT_COMPONENTS(LuaComponent)
+				.EXPORT_COMPONENTS(RigidBody)
 
 				.endClass()
 
@@ -98,6 +100,20 @@ namespace Raven
 				.addFunction("SetValue", &Animator::SetValue<std::string>)
 				.addFunction("SetValue", &Animator::SetValue<bool>)
 				.addFunction("GetEntity", &Animator::GetEntity)
+				.endClass()
+
+				.beginClass<RigidBody>("RigidBody")
+				//.addProperty("Mass", &RigidBody::GetMass, &RigidBody::SetMass)
+				.addFunction("SetLinearDamping", &RigidBody::SetLinearDamping)
+				.addFunction("SetAngularDamping", &RigidBody::SetAngularDamping)
+				.addFunction("GetForwardVector", &RigidBody::GetForwardVector)
+				.addFunction("GetRightVector", &RigidBody::GetRightVector)
+				.addFunction("GetUpVector", &RigidBody::GetUpVector)
+				.addFunction("ApplyForce", &RigidBody::ApplyForce)
+				.addFunction("ApplyForceAtLocalPos", &RigidBody::ApplyForceAtLocalPos)
+				.addFunction("ApplyForceAtWorldPos", &RigidBody::ApplyForceAtWorldPos)
+				.addFunction("ApplyTorque", &RigidBody::ApplyTorque)
+				.addFunction("GetEntity", &RigidBody::GetEntity)
 				.endClass();
 				
 

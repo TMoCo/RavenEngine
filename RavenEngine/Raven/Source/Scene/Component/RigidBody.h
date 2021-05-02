@@ -16,6 +16,8 @@
 
 #include "Scene/System/PhysicsSystem.h"
 
+#include <glm/gtc/quaternion.hpp> 
+
 //
 // Wrapper component class for rp3d rigid bodies
 //
@@ -73,11 +75,20 @@ namespace Raven
 		void SetTransform(const Transform& t);
 		Transform GetTransform();
 
+		// Get Information About the body's transform
+		glm::quat GetOrientation();
+		glm::vec3 GetForwardVector();
+		glm::vec3 GetRightVector();
+		glm::vec3 GetUpVector();
+
 		uint32_t GetNumColliders();
 
 		// set if the body is affected by gravity or not
 		void EnableGravity(bool b);
 		bool GravityEnabled();
+
+		void EnableTopple(bool t);
+		bool ToppleEnabled();
 
 		void SetMass(float m);
 		float GetMass();
@@ -86,6 +97,7 @@ namespace Raven
 		void SetAngularDamping(float d);
 		void SetIsAllowedToSleep(bool b);
 		void SetBodyType(RigidBodyType t);
+
 
 		float GetLinearDamping();
 		float GetAngularDamping();
@@ -98,6 +110,7 @@ namespace Raven
 		void ApplyForceAtWorldPos(const glm::vec3& f, const glm::vec3& pos);
 		void ApplyTorque(const glm::vec3& t);
 
+
 		// load and save the colliders attached to the body
 		template<typename Archive>
 		void save(Archive& archive) const
@@ -105,6 +118,7 @@ namespace Raven
 			archive(cereal::make_nvp("Type", static_cast<int>(type)),
 					cereal::make_nvp("Can sleep", canSleep),
 					cereal::make_nvp("Gravity enabled", gravityEnabled),
+					cereal::make_nvp("Can Topple", canTopple),
 					cereal::make_nvp("Mass", mass),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
@@ -118,6 +132,7 @@ namespace Raven
 			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), 
 					cereal::make_nvp("Can sleep", canSleep),
 					cereal::make_nvp("Gravity enabled", gravityEnabled),
+					cereal::make_nvp("Can Topple", canTopple),
 					cereal::make_nvp("Mass", mass),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
@@ -138,6 +153,7 @@ namespace Raven
 
 		bool canSleep;
 		bool gravityEnabled;
+		bool canTopple;
 
 		RigidBodyType type;
 

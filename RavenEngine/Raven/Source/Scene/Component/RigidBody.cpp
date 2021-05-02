@@ -9,7 +9,9 @@
 #include "Utilities/ToRp3d.h"
 
 #include <glm/gtc/type_ptr.hpp> // make mat from array of values
+#include <glm/gtc/quaternion.hpp> 
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 namespace Raven
 {
@@ -21,6 +23,7 @@ namespace Raven
 		mass(1.0f),
 		linearDamping(0.0f),
 		angularDamping(0.0f),
+		canTopple(true),
 		type(RigidBodyType::Static)
 	{}
 
@@ -44,6 +47,9 @@ namespace Raven
 		body->setAngularDamping(angularDamping);
 		// set the type after the parameters, otherwise rp3d will change types without telling you >:-((
 		body->setType(static_cast<rp3d::BodyType>(type));
+
+		if (!canTopple) body->setLocalInertiaTensor(rp3d::Vector3(0, 1, 0));
+
 	}
 
 	void RigidBody::DestroyRigidBody()
@@ -127,6 +133,34 @@ namespace Raven
 		body->setTransform(Rp3dConvert::ToRp3dTransform(initTransform));
 	}
 
+	glm::quat RigidBody::GetOrientation()
+	{
+		auto& orientation = body->getTransform().getOrientation();
+		glm::quat glmOrientation;
+		glmOrientation.x = orientation.x;
+		glmOrientation.y = orientation.y;
+		glmOrientation.z = orientation.z;
+		glmOrientation.w = orientation.w;
+
+		return glmOrientation;
+	}
+
+
+	glm::vec3 RigidBody::GetForwardVector()
+	{
+		return glm::normalize(GetOrientation() * FORWARD);
+	}
+
+	glm::vec3 RigidBody::GetRightVector()
+	{
+		return glm::normalize(GetOrientation() * RIGHT);
+	}
+
+	glm::vec3 RigidBody::GetUpVector()
+	{
+		return glm::normalize(GetOrientation() * UP);
+	}
+
 	uint32_t RigidBody::GetNumColliders()
 	{
 		return colliders.size();
@@ -144,6 +178,17 @@ namespace Raven
 	bool RigidBody::GravityEnabled()
 	{
 		return gravityEnabled;
+	}
+
+	// set if the body is able to toppple over
+	// Disable for player entity
+	void RigidBody::EnableTopple(bool b)
+	{
+		canTopple = b;
+	}
+	bool RigidBody::ToppleEnabled()
+	{
+		return canTopple;
 	}
 
 	void RigidBody::SetMass(float m)

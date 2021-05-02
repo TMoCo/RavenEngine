@@ -382,6 +382,19 @@ namespace MM
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 
+		bool toppleEnabled = rigidBody.ToppleEnabled();
+
+		ImGui::TextUnformatted("Enable toppling");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Checkbox("##Enable toppling", &toppleEnabled))
+		{
+			rigidBody.EnableTopple(toppleEnabled);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
 		float mass = rigidBody.GetMass();
 
 		ImGui::TextUnformatted("Set mass");
@@ -400,7 +413,7 @@ namespace MM
 		ImGui::TextUnformatted("Linear damping");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat("##Linear damping", &lDamping, 0.05f, 0.0f, 100.0f))
+		if (ImGui::DragFloat("##Linear damping", &lDamping, 0.05f, 0.0f, 1.0f))
 		{
 			rigidBody.SetLinearDamping(lDamping);
 		}
@@ -413,7 +426,7 @@ namespace MM
 		ImGui::TextUnformatted("Angular damping");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat("##Angular damping", &aDamping, 0.05f, 0.0f, 100.0f))
+		if (ImGui::DragFloat("##Angular damping", &aDamping, 0.05f, 0.0f, 1.0f))
 		{
 			rigidBody.SetAngularDamping(aDamping);
 		}

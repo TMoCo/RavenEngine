@@ -83,6 +83,9 @@ namespace Raven
 
 		Transform GetRelativeTransform();
 
+		void SetFriction(float f);
+		float GetFriction();
+
 	protected:
 		// pointer to the collider, set by the collision body class
 		rp3d::Collider* collider;
@@ -95,6 +98,9 @@ namespace Raven
 
 		// pointer to the body the collider belongs to
 		rp3d::CollisionBody* body;
+
+		// The coefficient of friction for the collider
+		float frictionCoeff;
 	};
 
 	// Box collider class
@@ -118,7 +124,8 @@ namespace Raven
 		{
 			// archive the collider
 			archive(cereal::make_nvp("Half extents", extents),
-					cereal::make_nvp("Relative transform", relativeTransform));
+					cereal::make_nvp("Relative transform", relativeTransform),
+					cereal::make_nvp("Friction Coeff", frictionCoeff));
 		}
 
 		template<typename Archive>
@@ -126,7 +133,8 @@ namespace Raven
 		{
 			// load the extents
 			archive(cereal::make_nvp("Half extents", extents),
-					cereal::make_nvp("Relative transform", relativeTransform));
+					cereal::make_nvp("Relative transform", relativeTransform),
+				cereal::make_nvp("Friction Coeff", frictionCoeff));
 		}
 
 	private:

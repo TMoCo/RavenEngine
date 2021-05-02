@@ -25,6 +25,7 @@ namespace Raven
 		type(shapeType),							   // When creating a new collider, specify the type
 		body(initBody),
 		collider(nullptr),
+		frictionCoeff(0.3),
 		relativeTransform(t) // initialise the relative transform to the identity matrix
 	{}
 
@@ -62,6 +63,19 @@ namespace Raven
 		return relativeTransform;
 	}
 
+	// BEN
+	void Collider::SetFriction(float f)
+	{
+		frictionCoeff = f;
+		if (collider) collider->getMaterial().setFrictionCoefficient(frictionCoeff);
+	}
+
+	// BEN
+	float Collider::GetFriction()
+	{
+		return frictionCoeff;
+	}
+
 	//
 	// Box collider class
 	//
@@ -88,6 +102,7 @@ namespace Raven
 		{
 			rp3d::CollisionShape* s = ColliderShapeFactory::CreateBoxShape(physicsCommon, this);
 			collider = body->addCollider(s, Rp3dConvert::ToRp3dTransform(relativeTransform));
+			collider->getMaterial().setFrictionCoefficient(frictionCoeff); // BEN
 		}
 	}
 
@@ -102,6 +117,19 @@ namespace Raven
 		{
 			// need to update collider's extents in collider and in engine
 			SetExtents(extents);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		float fric = GetFriction();
+
+		ImGui::TextUnformatted("Friction");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Friction", &fric, 0.05f, 0.0f, 1.0f))
+		{
+			SetFriction(fric);
 		}
 
 		ImGui::PopItemWidth();

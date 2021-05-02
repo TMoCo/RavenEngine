@@ -1,6 +1,6 @@
 
 #include "SkeletonCache.h"
-#include "ResourceManager/FbxLoader.h"
+#include "ResourceManager/FbxLoader_deprecated.h"
 
 namespace Raven 
 {

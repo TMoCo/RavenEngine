@@ -1,49 +1,144 @@
-
-
 #include "Skeleton.h"
+
+
+
 #include <vector>
 #include <iostream>
-#include "Bone.h"
-#include "Scene/Entity/Entity.h"
+
+
+
 
 namespace Raven
 {
-	Bone& Skeleton::AddBone(int32_t parentId)
+
+
+Skeleton::Skeleton()
+	: IResource()
+	, isBuilt(false)
+{
+	type = Skeleton::StaticGetType();
+}
+
+
+Skeleton::~Skeleton()
+{
+
+}
+
+
+Bone& Skeleton::CreateBone(int32_t parentId)
+{
+	RAVEN_ASSERT(!isBuilt, "Skeleton is built and finished, you can't create new bones.");
+
+	// New Bone.
+	auto& bone = bones.emplace_back();
+
+	// Index mapping.
+	bone.id = bones.size() - 1;
+	bone.parentIdx = parentId;
+
+	// Is Root?
+	if (parentId == -1)
 	{
-		auto& bone = bones.emplace_back();
-		bone.id = bones.size() - 1;
-		bone.parentIdx = parentId;
-		if (parentId == -1) 
-		{
-			root = &bone;
-		}
-		return bone;
+		root = &bone;
 	}
 
-	int32_t Skeleton::IndexOf(const std::string& name)
+	return bone;
+}
+
+
+int32_t Skeleton::GetBoneIndex(const std::string& name)
+{
+	for (int32_t i = 0; i < bones.size(); i++)
 	{
-		for (int32_t i = 0; i < bones.size(); i++)
+		if (bones[i].name == name)
+			return i;
+	}
+	
+	return -1;
+}
+
+
+void Skeleton::ResetTransforms()
+{
+	RAVEN_ASSERT(isBuilt, "Skeleton is not built.");
+
+	for (auto & bone : bones)
+	{
+		bone.SetPosition(glm::vec3(0.0f));
+		bone.SetRotation(glm::vec3(0.0f));
+	}
+}
+
+
+void Skeleton::Build()
+{
+	RAVEN_ASSERT(!isBuilt, "Skeleton rebuild not allowed.");
+
+	// Build skeleton bones.
+	for (Bone& bone : bones)
+	{
+		// Has Parent?
+		if (bone.parentIdx != -1)
 		{
-			if (bones[i].name == name)
-				return i;
+			bone.parent = &bones[bone.parentIdx];
+			bone.parent->children.push_back(&bone);
 		}
-		return -1;
 	}
 
-	void Skeleton::ResetTransfromTarget(Entity entity)
+	// Done.
+	isBuilt = true;
+}
+
+
+
+
+// -- - --- - -- - --- - -- - --- - -- - --- - -- - --- - -- - --- - -- - --- - -- - --- - -- - --- - 
+
+
+
+SkeletonInstance::SkeletonInstance(Ptr<Skeleton> inParent)
+	: parent(inParent)
+{
+	RAVEN_ASSERT(parent != nullptr, "Invalid Skeleton.");
+
+	boneTransforms.resize(parent->GetBones().size(), glm::mat4(1.0f));
+}
+
+
+SkeletonInstance::~SkeletonInstance()
+{
+
+}
+
+
+void SkeletonInstance::UpdateBones()
+{
+	// First mark all cached transform dirty.
+	DirtyTransforms();
+
+	const auto& bones = parent->GetBones();
+	int32_t boneCount = static_cast<int32_t>(bones.size());
+
+	for (int32_t i = 0; i < boneCount; ++i)
 	{
-		for (auto & bone : bones)
-		{
-			auto & en = entity.GetChildInChildren(bone.name);
-			if (bone.parentIdx == -1) 
-			{
-				root = &bone;
-			}
-			if (en.Valid()) 
-			{
-				bone.localTransform = en.TryGetComponent<Transform>();
-			}
-		}
+		boneTransforms[i] = bones[i].GetWorldTransform() * bones[i].GetOffsetMatrix();
 	}
 
-};
+}
+
+
+void SkeletonInstance::DirtyTransforms()
+{
+	auto& bones = parent->GetBones();
+	int32_t boneCount = static_cast<int32_t>(bones.size());
+
+	for (int32_t i = 0; i < boneCount; ++i)
+	{
+		bones[i].DirtyWorldMatrix();
+	}
+}
+
+
+
+} // End of namespace Raven.

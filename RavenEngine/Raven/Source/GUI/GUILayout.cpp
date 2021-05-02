@@ -13,7 +13,7 @@ namespace Raven {
 	GUILayout::GUILayout() 
 		: IResource()
 	{
-		type = RT_GuiLayout;
+		type = GUILayout::StaticGetType();
 	}
 
 	/** Add a widget to the layout */

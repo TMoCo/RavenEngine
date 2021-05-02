@@ -19,6 +19,8 @@ namespace Raven
 {
 	class Animation;
 	class Scene;
+	class SkinnedMeshComponent;
+
 	struct Condition
 	{
 		enum class Type
@@ -173,7 +175,7 @@ namespace Raven
 			LoadAnimation();
 		}
 
-		void OnUpdate(float dt,Scene * scene,entt::entity entity);
+		void OnUpdate(float dt, SkinnedMeshComponent* skinnedComp);
 
 
 	private:
@@ -191,7 +193,7 @@ namespace Raven
 		//###runtime value
 		int32_t currentNodeId = 0;
 		int32_t currentLink = 0;
-		Animation currentAnimation;
+		Ptr<Animation> currentAnimation;
 
 
 		std::unordered_map<int32_t, Transition>::iterator iterId;

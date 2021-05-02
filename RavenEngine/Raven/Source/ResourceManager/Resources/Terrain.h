@@ -72,7 +72,7 @@ namespace Raven
 			return true;
 		}
 
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Terrain; } // return the resource type
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Terrain; } // return the resource type
 
 		// store heights in a texture
 		Texture2D* heightMap;

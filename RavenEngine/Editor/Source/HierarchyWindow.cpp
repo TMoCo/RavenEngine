@@ -19,6 +19,7 @@
 #include "IconsMaterialDesignIcons.h"
 #include "Editor.h"
 #include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/MeshFactory.h"
 
 
 #include <imgui_internal.h>
@@ -101,6 +102,7 @@ namespace Raven
 					{
 						auto entity = scene->CreateEntity(name);
 						auto & model = entity.AddComponent<MeshComponent>();
+						auto& tr = entity.GetOrAddComponent<Transform>();
 						
 						auto mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(PrimitiveType::GetPrimativeName(name)));
 						model.SetMesh(mesh);
@@ -200,9 +202,17 @@ namespace Raven
 					auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
 					if (hierarchyComponent)
 					{
+						Transform* tr = registry.try_get<Transform>(entity);
+						glm::mat4 worldMtx = tr ? tr->GetWorldMatrix() : glm::mat4(1.0f);
+
 						Hierarchy::Reparent(entity, entt::null, registry, *hierarchyComponent);
 						Entity e(entity, scene);
 						e.RemoveComponent<Hierarchy>();
+
+						if (tr)
+						{
+							tr->SetWorldMatrixTransform(worldMtx);
+						}
 					}
 				}
 				ImGui::EndDragDropTarget();
@@ -393,12 +403,21 @@ namespace Raven
 					{
 						if (acceptable)
 						{
+							Transform* tr = registry.try_get<Transform>(entity);
+							glm::mat4 worldMtx = tr ? tr->GetWorldMatrix() : glm::mat4(1.0f);
+
 							if (hierarchyComponent)
 								Hierarchy::Reparent(entity, node, registry, *hierarchyComponent);
 							else
 							{
 								registry.emplace<Hierarchy>(entity, node);
 							}
+
+							if (tr)
+							{
+								tr->SetWorldMatrixTransform(worldMtx);
+							}
+
 							droppedEntity = node;
 						}
 					}

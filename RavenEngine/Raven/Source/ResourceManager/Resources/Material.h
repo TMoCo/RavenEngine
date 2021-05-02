@@ -51,7 +51,7 @@ namespace Raven
 		virtual ~Material();
 
 		// Return the type.
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Material; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Material; }
 
 		// Return the materail render resource.
 		inline RenderRscMaterial* GetRenderRsc() { return renderRsc; }

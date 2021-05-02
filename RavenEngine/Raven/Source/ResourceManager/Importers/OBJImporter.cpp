@@ -20,7 +20,7 @@ namespace Raven {
 
 OBJImporter::OBJImporter()
 {
-
+  type = StaticGetType();
 }
 
 
@@ -30,7 +30,7 @@ void OBJImporter::ListExtensions(std::vector<std::string>& outExt)
 }
 
 
-bool OBJImporter::Import(const std::string& path, std::vector<IResource*>& resources)
+bool OBJImporter::Import(const std::string& path, std::vector< Ptr<IResource> >& resources)
 {
   IResource* newRsc = LoadOBJ(path);
 
@@ -40,7 +40,7 @@ bool OBJImporter::Import(const std::string& path, std::vector<IResource*>& resou
     return false;
   }
 
-  resources.push_back(newRsc);
+  resources.emplace_back(newRsc);
 	return true;
 }
 

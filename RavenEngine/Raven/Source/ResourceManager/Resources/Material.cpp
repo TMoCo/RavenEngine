@@ -14,7 +14,7 @@ Material::Material()
 	, renderRsc(nullptr)
 	, dirtyFlag(EMaterialDirtyFlag::None)
 {
-	type = Material::GetType();
+	type = Material::StaticGetType();
 	hasRenderResources = true;
 }
 

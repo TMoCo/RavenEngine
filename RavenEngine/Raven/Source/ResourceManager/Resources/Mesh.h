@@ -73,12 +73,12 @@ namespace Raven
 		Mesh() 
 			: IResource() 
 		{
-			type = Mesh::GetType();
+			type = Mesh::StaticGetType();
 			hasRenderResources = true;
 		}
 
 		// return the resource type
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Mesh; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Mesh; }
 
 		// Load Render Resrouces.
 		inline virtual void LoadRenderResource() override

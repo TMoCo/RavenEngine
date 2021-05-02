@@ -47,6 +47,10 @@ namespace Raven
 		bool rootMotion = false;
 		std::string animFile;
 		std::shared_ptr<AnimationController> controller;
+
+	public:
+		bool isSimpleAnimator = false;
+		Animation* anime = nullptr;
 	};
 
 	template<>

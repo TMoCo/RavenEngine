@@ -1,28 +1,32 @@
-
 #include "Animation.h"
+
+#include "Skeleton.h"
+#include "Math/MathUtils.h"
+
+#include "Scene/Component/Transform.h"
+
 #include <algorithm>
 #include <glm/glm.hpp>
-#include "Scene/Component/Transform.h"
-#include "Math/MathUtils.h"
+
 
 namespace Raven
 {
-    Animation::Animation()
-    {
-    }
-    Animation::~Animation()
-    {
-    }
-    
-    void Animation::SetClips(const std::vector<std::shared_ptr<AnimationClip>>& clips)
-    {
-        this->clips = clips;
-        states.clear();
-    }
+	Animation::Animation()
+	{
+		type = StaticGetType();
+	}
 
-	void Animation::AddClip(const std::shared_ptr<AnimationClip>& clip)
+
+	void Animation::SetClips(const std::vector<std::shared_ptr<AnimationClip>>& clips)
+	{
+		this->clips = clips;
+		states.clear();
+	}
+
+	void Animation::AddClip(const Ptr<AnimationClip>& clip)
 	{
 		clips.emplace_back(clip);
+		states.clear();
 	}
 
 	const std::string& Animation::GetClipName(int32_t index) const
@@ -70,10 +74,12 @@ namespace Raven
 		}
     }
 
-	void Animation::Play(int32_t index, const Entity& entt, float fadeLength)
+	void Animation::Play(int32_t index, SkeletonInstance* inSkeletonInstance, float fadeLength)
     {
 		started = true;
-		entity = entt;
+		skeletonInstance = inSkeletonInstance;
+		RAVEN_ASSERT(skeletonInstance->GetParent() == skeleton.get(), "Skiliton missmatch.");
+
 		if (paused)
 		{
 			paused = false;
@@ -249,6 +255,11 @@ namespace Raven
 	
 			firstState = false;
 
+			if (skeletonInstance)
+			{
+				skeletonInstance->UpdateBones();
+			}
+
 			if (removeLater)
 			{
 				i = states.erase(i);
@@ -291,26 +302,33 @@ namespace Raven
 		const auto& clip = *clips[state.clipIndex];
 		if (state.targets.size() == 0)
 		{
-			state.targets.resize(clip.curves.size(), nullptr);
+			state.targets.resize(clip.curves.size(), -1);
 		}
 
 		for (int i = 0; i < clip.curves.size(); ++i)
 		{
 			const auto& curve = clip.curves[i];
-			Transform* target = state.targets[i];
-			if (target == nullptr)
+
+			Bone* target = nullptr;
+
+			// Get Target...
+			if (state.targets[i] == -1)
 			{
-				auto find = entity.FindByPath(curve.path);
-				if (find.Valid())
+				if (skeleton->IsValidBoneIndex(curve.index))
 				{
-					target = find.TryGetComponent<Transform>();
-					state.targets[i] = target;
-				}
-				else
-				{
-					continue;
+					state.targets[i] = curve.index;
+					target = &skeleton->GetBone(curve.index);
 				}
 			}
+			else
+			{
+				target = &skeleton->GetBone(state.targets[i]);
+			}
+
+			// Invalid Target?
+			if (!target)
+				continue;
+
 
 			glm::vec3 localPos(0);
 			glm::vec3 localRot(0);
@@ -375,9 +393,9 @@ namespace Raven
 					}
 					else
 					{
-						rot = target->GetRotationEuler() + glm::radians(localRot * weight);
+						rot = target->GetRotation() + glm::radians(localRot * weight);
 					}
-					target->SetRotationEuler(rot.x, rot.y, rot.z);
+					target->SetRotation(rot);
 				}
 			}
 		}

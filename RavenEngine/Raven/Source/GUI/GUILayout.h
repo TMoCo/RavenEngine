@@ -82,7 +82,7 @@ namespace Raven {
 		void drawLayout();
 
 		// return the resource type
-		inline static EResourceType Type() noexcept { return EResourceType::RT_GuiLayout; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_GuiLayout; }
 
 		std::string name = "TestLayout";
 

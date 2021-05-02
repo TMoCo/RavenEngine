@@ -4,7 +4,7 @@
 #include "Animator.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "Utilities/StringUtils.h"
-#include "ResourceManager/FbxLoader.h"
+#include "ResourceManager/FbxLoader_deprecated.h"
 #include "Engine.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Component/Model_deprecated.h"

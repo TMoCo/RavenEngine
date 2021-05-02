@@ -15,11 +15,11 @@ namespace Raven
 	class Animation;
 	struct AnimationClip;
 
-
-	class FbxLoader 
+	// deprecated Moved to Fbx Importer.
+	class FbxLoader_deprecated
 	{
 	public:
-		~FbxLoader();
+		~FbxLoader_deprecated();
 		void Load(const std::string& file, Model_deprecated* model);
 		void LoadHierarchy(const std::string& file, Model_deprecated* model);
 		void LoadAnimation(const std::string& file, Model_deprecated* model);

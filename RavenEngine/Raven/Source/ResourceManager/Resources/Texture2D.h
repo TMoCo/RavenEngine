@@ -86,10 +86,10 @@ namespace Raven
 		Texture2D();
 
 		// Destruct.
-		inline virtual ~Texture2D();
+		virtual ~Texture2D();
 
 		// return the resource type
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Texture2D; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Texture2D; }
 
 		// Create/Load the texture render resrouce.
 	  virtual void LoadRenderResource() override;

@@ -12,6 +12,10 @@
 #include "AnimationCache.h"
 #include "Logger/Console.h"
 
+#include "Engine.h"
+#include "ResourceManager/ResourceManager.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
+
 
 namespace Raven
 {
@@ -253,14 +257,18 @@ namespace Raven
 		in.close();
 	}
 
-	void AnimationController::OnUpdate(float dt, Scene* scene, entt::entity entity)
+	void AnimationController::OnUpdate(float dt, SkinnedMeshComponent* skinnedComp)
 	{
-		if (currentAnimation.GetClipCount() > 0)
+		if (!currentAnimation)
+			return;
+
+		if (currentAnimation->GetClipCount() > 0)
 		{
-			if (!currentAnimation.IsStarted()) {
-				currentAnimation.Play(0, { entity,scene });
+			if (!currentAnimation->IsStarted()) 
+			{
+				currentAnimation->Play(0, skinnedComp->GetSkeleton());
 			}
-			currentAnimation.OnUpdate(dt);
+			currentAnimation->OnUpdate(dt);
 		}
 
 
@@ -297,8 +305,11 @@ namespace Raven
 
 	void AnimationController::LoadAnimation()
 	{
+		//if(currentNodeId != 0)
+		//	currentAnimation = *AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
+
 		if(currentNodeId != 0)
-			currentAnimation = *AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
+			currentAnimation = Engine::GetModule<ResourceManager>()->GetResource<Animation>(animatorNodes[currentNodeId].name);
 	}
 
 };

@@ -17,7 +17,7 @@
 namespace Raven
 {
 	class SkinnedMesh;
-
+	class SkeletonInstance;
 
 
 
@@ -39,10 +39,13 @@ namespace Raven
 		inline const auto& GetMesh() const { return mesh; };
 
 		// Set a new mesh to the list of meshes in the model.
-		inline void SetMesh(Ptr<SkinnedMesh> newMesh);
+		void SetMesh(Ptr<SkinnedMesh> newMesh);
 
 		// Called by the render to collect render primitives for drawing.
 		virtual void CollectRenderPrimitives(RenderPrimitiveCollector& rcollector) override;
+
+		// Return the skeleton of this skinned mesh.
+		inline SkeletonInstance* GetSkeleton() { return skeleton.get(); }
 
 	public:
 		// Serialization Save.
@@ -64,6 +67,8 @@ namespace Raven
 		// The Model Mesh, each mapped to a materail on the same index.
 		Ptr<SkinnedMesh> mesh;
 
+		// The instance of the skeleton used to update the bone transforms.
+		Ptr<SkeletonInstance> skeleton;
 	};
 
 };

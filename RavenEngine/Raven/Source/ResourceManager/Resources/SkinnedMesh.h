@@ -18,6 +18,9 @@
 
 namespace Raven
 {
+	class Skeleton;
+
+
 	// SkinnedMeshSection:
 	//			- 
 	class SkinnedMeshSection
@@ -99,12 +102,12 @@ namespace Raven
 		SkinnedMesh()
 			: IResource()
 		{
-			type = SkinnedMesh::GetType();
+			type = SkinnedMesh::StaticGetType();
 			hasRenderResources = true;
 		}
 
 		// return the resource type
-		inline static EResourceType Type() noexcept { return EResourceType::RT_SkinnedMesh; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_SkinnedMesh; }
 
 		// Load Render Resrouces.
 		inline virtual void LoadRenderResource() override
@@ -135,12 +138,16 @@ namespace Raven
 				sections.resize(index + 1);
 
 			sections[index] = section;
+
+			UpdateBounds();
 		}
 
 		// Add new mesh section at the end of the sections list.
 		inline void AddMeshSection(Ptr<SkinnedMeshSection> section)
 		{
 			sections.push_back(section);
+
+			UpdateBounds();
 		}
 
 		// Return mesh section.
@@ -155,6 +162,12 @@ namespace Raven
 
 		// Return the bounds of this mesh.
 		inline MathUtils::BoundingBox GetBounds() const { return bounds; }
+
+		// Return the skeleton of this skinned mesh.
+		inline const Ptr<Skeleton>& GetSkeleton() const { return skeleton; }
+
+		// Set the skeleton of this skinned mesh.
+		inline void SetSkeleton(Ptr<Skeleton> inSkeleton) { skeleton = inSkeleton; }
 
 
 		// Normalize weights for all skinned mesh sections.
@@ -189,6 +202,9 @@ namespace Raven
 
 		// The boudning box of all mesh sections.
 		MathUtils::BoundingBox bounds;
+
+		// The skeleton of this skinned mesh.
+		Ptr<Skeleton> skeleton;
 	};
 
 }

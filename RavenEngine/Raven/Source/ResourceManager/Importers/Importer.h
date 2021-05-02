@@ -48,14 +48,14 @@ namespace Raven
 
 		}
 
-		// Return the resrouce type.
+		// Return the importer type.
 		inline EImporterType GetType() const noexcept { return type; }
 
 		// List all extensions supported by this importer.
 		virtual void ListExtensions(std::vector<std::string>& outExt) = 0;
 
 		// Import a new resrouce.
-		virtual bool Import(const std::string& path, std::vector<IResource*>& resources) = 0;
+		virtual bool Import(const std::string& path, std::vector< Ptr<IResource> >& resources) = 0;
 
 	protected:
 		// The type of importer.

@@ -1,6 +1,6 @@
 
 #include "AnimationCache.h"
-#include "ResourceManager/FbxLoader.h"
+#include "ResourceManager/FbxLoader_deprecated.h"
 
 namespace Raven 
 {
@@ -15,7 +15,7 @@ namespace Raven
 		auto iter = animations.find(name);
 		if (iter == animations.end())
 		{
-			FbxLoader loader;
+			FbxLoader_deprecated loader;
 			loader.LoadAnimation(name, nullptr);
 			auto anim = loader.GetAnimation();
 			if (anim == nullptr) {

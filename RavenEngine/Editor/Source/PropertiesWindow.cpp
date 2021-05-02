@@ -413,7 +413,7 @@ namespace Raven
 					{
 						auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
 						auto name = StringUtils::GetFileName(file);
-						registry.emplace<LuaComponent>(selected, file, scene).entity = selected;
+						registry.emplace<LuaComponent>(selected, file, scene).SetEntity_Evil(selected, scene);
 					}
 				}
 				ImGui::EndDragDropTarget();

@@ -37,7 +37,8 @@ namespace Raven
 			Hierarchy::Reparent(entityHandle, entity.entityHandle, scene->GetRegistry(), *hierarchyComponent);
 		else
 		{
-			scene->GetRegistry().emplace<Hierarchy>(entityHandle, entity.entityHandle);
+			//scene->GetRegistry().emplace<Hierarchy>(entityHandle, entity.entityHandle);
+			AddComponent<Hierarchy>();
 		}
 	}
 

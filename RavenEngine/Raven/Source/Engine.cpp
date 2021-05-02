@@ -37,13 +37,18 @@
 
 #include "ProceduralGenerator/TerrainGeneration.h"
 #include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/Resources/SkinnedMesh.h"
 #include "ResourceManager/Resources/MaterialShader.h"
 #include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Importers/FBXImporter.h"
 
 
 #include "Devices/Input.h"
 #include "Scripts/LuaSystem.h"
 #include "Animation/AnimationSystem.h"
+#include "Animation/Animation.h"
+#include "Animation/Animator.h"
+#include "Animation/Skeleton.h"
 #include "Scripts/LuaVirtualMachine.h"
 
 
@@ -85,6 +90,10 @@ namespace Raven
 	int Engine::Run()
 	{
 		auto win = GetModule<Raven::Window>();
+
+
+		NewGameScene();
+
 
 		// Main Loop...
 		while (!win->ShouldClose())
@@ -250,194 +259,77 @@ namespace Raven
 
 	void Engine::NewGameScene()
 	{
-		// get the terrain generator and generate a height map
-		auto generator = GetModule<TerrainGeneration>();
-		generator->GenerateSquareGradient(100, 100);
-		generator->GenerateNoise(100, 100, FileFormat::PNG);
-		std::string path("heightmap.png");
-
-		// load the generated height map into resource manager
-		Terrain* terrain = new Terrain(GetModule<ResourceManager>()->GetResource<Texture2D>(path).get());
-
 		Scene* newScene = new Scene("TerrainScene");
 		newScene->dynamic = true;
 
-		auto terrainEntity = newScene->CreateEntity("terrain");
-		terrainEntity.AddComponent<TerrainComponent>(path, std::shared_ptr<Terrain>(terrain));
 
 		{
-			auto& lightEntity = newScene->CreateEntity("THE_SUN");
-			auto& lightComp = lightEntity.GetOrAddComponent<Light>();
-			auto& tr = lightEntity.GetOrAddComponent<Transform>();
+			GetModule<ResourceManager>()->Import("./assets/ybot.fbx");
+			Ptr<SkinnedMesh> skinnedMesh = GetModule<ResourceManager>()->GetResource<SkinnedMesh>("SKINNEDMESH_ybot");
+			Ptr<Animation> ybotAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_ybot");
 
-			lightComp.type = (int32_t)LightType::DirectionalLight;
-			lightComp.color = glm::vec4(1.0f, 0.95f, 0.8f, 1.0f);
-			lightComp.intensity = 0.0f;
-			lightComp.direction = glm::normalize(glm::vec3(-1.0f));
-		}
+			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
+			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
+			GetModule<ResourceManager>()->Import("./assets/Idle.fbx");
+			Ptr<Animation> idleAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_Idle");
 
-
-		// Basic Material...
-		Ptr<MaterialShader> basicMatShader_1( new MaterialShader() );
-		basicMatShader_1->SetDomain(ERenderShaderDomain::Mesh);
-		basicMatShader_1->SetType(ERenderShaderType::Opaque);
-		basicMatShader_1->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
-		basicMatShader_1->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
-		basicMatShader_1->GetBlockInput().AddInput(EShaderInputType::Float, "alpha");
-		basicMatShader_1->GetBlockInput().EndUniformBlock();
-		basicMatShader_1->AddSampler("baseColorTexture");
-		basicMatShader_1->AddSampler("AOTexture");
-		basicMatShader_1->AddSampler("metallicTexture");
-		basicMatShader_1->AddSampler("roughnessTexture");
-		basicMatShader_1->LoadRenderResource();
-
-		// Basic Material...
-		Ptr<MaterialShader> basicMatShader_2(new MaterialShader());
-		basicMatShader_2->SetDomain(ERenderShaderDomain::Mesh);
-		basicMatShader_2->SetType(ERenderShaderType::Translucent);
-		basicMatShader_2->SetMaterialFunction("shaders/Materials/BasicMaterial.glsl");
-		basicMatShader_2->GetBlockInput().BeginUniformBlock("MaterialParamtersBlock");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Vec4, "color");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Vec4, "emission");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "roughness");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "metallic");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "specular");
-		basicMatShader_2->GetBlockInput().AddInput(EShaderInputType::Float, "alpha");
-		basicMatShader_2->GetBlockInput().EndUniformBlock();
-		basicMatShader_2->AddSampler("baseColorTexture");
-		basicMatShader_2->AddSampler("AOTexture");
-		basicMatShader_2->AddSampler("metallicTexture");
-		basicMatShader_2->AddSampler("roughnessTexture");
-		basicMatShader_2->LoadRenderResource();
-
-
-		//
-		int res = 7;
-		glm::vec2 size(1000.0f);
-
-		{
-			ResourceManager* RscManager = Engine::GetModule<ResourceManager>();
-
-			std::string modelPath_1 = "assets/models/Lantern/lantern_obj_1.obj";
-			Ptr<Mesh> lanternModel_1 = RscManager->GetResource<Mesh>(modelPath_1);
-
-			std::string modelPath_2 = "assets/models/Lantern/lantern_obj_2.obj";
-			Ptr<Mesh> lanternModel_2 = RscManager->GetResource<Mesh>(modelPath_2);
-
-			std::string tex0 = "assets/models/Lantern/lantern_Base_Color.jpg";
-			std::string tex1 = "assets/models/Lantern/lantern_Mixed_AO.jpg";
-			std::string tex2 = "assets/models/Lantern/lantern_Metallic.jpg";
-			std::string tex3 = "assets/models/Lantern/lantern_Roughness.jpg";
-
-			Ptr<Material> mat_0(new Material());
-			mat_0->SetMaterialShader(basicMatShader_1);
-			mat_0->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
-			mat_0->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
-			mat_0->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
-			mat_0->SetTexture("roughnessTexture", RscManager->GetResource<Texture2D>(tex3).get());
-			mat_0->SetColor("color", glm::vec4(1.0f, 0.1, 0.1, 1.0));
-			mat_0->SetColor("emission", glm::vec4(0.0f));
-			mat_0->SetScalar("roughness", 0.5f);
-			mat_0->SetScalar("metallic", 1.0f);
-			mat_0->SetScalar("specular", 1.0f);
-			mat_0->LoadRenderResource();
-
-
-			Ptr<Material> mat_2(new Material());
-			mat_2->SetMaterialShader(basicMatShader_2);
-			mat_2->SetTexture("baseColorTexture", RscManager->GetResource<Texture2D>(tex0).get());
-			mat_2->SetTexture("AOTexture", RscManager->GetResource<Texture2D>(tex1).get());
-			mat_2->SetTexture("metallicTexture", RscManager->GetResource<Texture2D>(tex2).get());
-			mat_2->SetTexture("roughnessTexture", RscManager->GetResource<Texture2D>(tex3).get());
-			mat_2->SetColor("color", glm::vec4(1.0f));
-			mat_2->SetColor("emission", glm::vec4(0.0f));
-			mat_2->SetScalar("roughness", 1.0f);
-			mat_2->SetScalar("metallic", 1.0f);
-			mat_2->SetScalar("specular", 22.0f);
-			mat_2->SetScalar("alpha", 0.75f);
-			mat_2->LoadRenderResource();
+			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
+			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
+			GetModule<ResourceManager>()->Import("./assets/Walking.fbx");
+			Ptr<Animation> walkAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_Walking");
 
 
 			{
-				auto meshEntity = newScene->CreateEntity("Lantern");
+				auto meshEntity = newScene->CreateEntity("FBX_MODEL_1");
 				auto& tr = meshEntity.GetOrAddComponent<Transform>();
 				tr.SetPosition(glm::vec3(0.0f, -4.0f, 0.0f));
 				tr.SetScale(glm::vec3(0.1f));
 
-				auto& model0 = meshEntity.GetOrAddComponent<MeshComponent>();
-				model0.SetMesh(lanternModel_1);
-				model0.SetMaterial(0, mat_0);
+				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
+				model0.SetMesh(skinnedMesh);
+				model0.SetMaterial(0, nullptr);
 
-				auto& model2 = meshEntity.GetOrAddComponent<MeshComponent>();
-				model2.SetMesh(lanternModel_2);
-				model2.SetMaterial(0, mat_2);
+
+				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
+				modelAnimator.isSimpleAnimator = true;
+				modelAnimator.anime = walkAnim.get();
 			}
 
 
-
-		}
-
-
-		{
-			Ptr<Mesh> plane = Ptr<Mesh>( MeshFactory::CreateQuad() );
-			
-			auto meshEntity = newScene->CreateEntity("Plane");
-			auto& tr = meshEntity.GetOrAddComponent<Transform>();
-			tr.SetPosition(glm::vec3(0.0f, -4.3f, 0.0f));
-			tr.SetScale(glm::vec3(3000.0f));
-			tr.SetRotation(glm::vec3(-glm::half_pi<float>(), 0.0f, 0.0f));
-			
-			auto& model = meshEntity.GetOrAddComponent<MeshComponent>();
-			model.SetMesh(plane);
-		}
-
-
-		{
-			glm::vec4 lightPositions[4] = {
-				 glm::vec4( 4.0f, 9.0f, 4.0f, 1.0f),
-				 glm::vec4(-4.0f, 9.0f, 4.0f, 1.0f),
-				 glm::vec4(-4.0f, 9.0f,-4.0f, 1.0f),
-				 glm::vec4( 4.0f, 9.0f,-4.0f, 1.0f),
-			};
-
-			for (int32_t i = 0; i < 4; ++i)
 			{
-				auto& lightEntity = newScene->CreateEntity("Lights");
+				auto meshEntity = newScene->CreateEntity("FBX_MODEL_2");
+				auto& tr = meshEntity.GetOrAddComponent<Transform>();
+				tr.SetPosition(glm::vec3(0.0f, -4.0f, -20.0f));
+				tr.SetScale(glm::vec3(0.1f));
 
-				auto& lightComp = lightEntity.GetOrAddComponent<Light>();
-				lightComp.type = (int32_t)LightType::PointLight;
-				lightComp.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-				lightComp.intensity = 370.0f;
-				lightComp.radius = 17.0f;
-				lightComp.clipDistance = 20.0f;
+				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
+				model0.SetMesh(skinnedMesh);
+				model0.SetMaterial(0, nullptr);
 
-				auto& tr = lightEntity.GetOrAddComponent<Transform>();
-				tr.SetPosition(lightPositions[i]);
+
+				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
+				modelAnimator.isSimpleAnimator = true;
+				modelAnimator.anime = idleAnim.get();
 			}
 
 
-			for (int32_t i = 0; i < 4; ++i)
 			{
-				auto& lightEntity = newScene->CreateEntity("Lights");
+				auto meshEntity = newScene->CreateEntity("FBX_MODEL_3");
+				auto& tr = meshEntity.GetOrAddComponent<Transform>();
+				tr.SetPosition(glm::vec3(0.0f, -4.0f, 20.0f));
+				tr.SetScale(glm::vec3(0.1f));
 
-				auto& lightComp = lightEntity.GetOrAddComponent<Light>();
-				lightComp.type = (int32_t)LightType::PointLight;
-				lightComp.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-				lightComp.intensity = 70.0f;
-				lightComp.radius = 17.0f;
-				lightComp.clipDistance = 5000.0f;
+				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
+				model0.SetMesh(skinnedMesh);
+				model0.SetMaterial(0, nullptr);
 
-				auto& tr = lightEntity.GetOrAddComponent<Transform>();
-				tr.SetPosition(lightPositions[i] + glm::vec4(700.0f));
+
+				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
+				modelAnimator.isSimpleAnimator = true;
+				modelAnimator.anime = ybotAnim.get();
 			}
-
+			
 		}
-		
 
 		// Switch the scene....
 		uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);

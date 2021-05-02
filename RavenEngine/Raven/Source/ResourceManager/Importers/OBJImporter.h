@@ -16,11 +16,14 @@ namespace Raven
 		// Construct.
 		OBJImporter();
 
+		// Return the importer type.
+		inline static EImporterType StaticGetType() noexcept { return IMP_OBJ; }
+
 		// List all supported extensions by this importer.
 		virtual void ListExtensions(std::vector<std::string>& outExt) override;
 
 		// Import a new resrouce.
-		virtual bool Import(const std::string& path, std::vector<IResource*>& resources) override;
+		virtual bool Import(const std::string& path, std::vector< Ptr<IResource> >& resources) override;
 
 	private:
 		// Load a mesh resource from an obj file.

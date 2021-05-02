@@ -185,6 +185,9 @@ namespace Raven
 		// Save existing Resource.
 		bool SaveResource(Ptr<IResource> rsc);
 
+		// Return importer of type TImporter, can be used to update import settings for the next import.
+		template<class TImporter>
+		TImporter* GetImporter();
 
 	private:
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
@@ -257,7 +260,7 @@ namespace Raven
 	template<class TResource>
 	bool ResourceManager::LoadResource(const std::string& path)
 	{
-		ILoader* loader = GetLoader(TResource::Type());
+		ILoader* loader = GetLoader(TResource::StaticGetType());
 
 		return LoadResource(loader, path);
 	}
@@ -293,7 +296,7 @@ namespace Raven
 		}
 
 		// Type Mismatch?
-		if (rscData->type != TResource::Type())
+		if (rscData->type != TResource::StaticGetType())
 		{
 			RAVEN_ASSERT(0, "Invalid Resrouce Type.");
 			return nullptr;
@@ -348,6 +351,22 @@ namespace Raven
 			importersExtMap.insert( std::make_pair(ext, newImporter) );
 		}
 
+	}
+
+
+	template<class TImporter>
+	TImporter* ResourceManager::GetImporter()
+	{
+		// Find importer of type.
+		for (auto& importer : importers)
+		{
+			if (importer->GetType() == TImporter::StaticGetType())
+			{
+				return static_cast<TImporter*>(importer.get());
+			}
+		}
+
+		return nullptr;
 	}
 
 

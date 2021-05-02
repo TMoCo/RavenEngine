@@ -22,9 +22,10 @@ namespace Raven
 		template<class Archive>
 		void load(Archive& archive)
 		{
+			archive(cereal::base_class<Component>(this));
+
 			archive(
-				cereal::make_nvp("MeshIndex", meshIndex),
-				cereal::make_nvp("Id", entity)
+				cereal::make_nvp("MeshIndex", meshIndex)
 			);
 			GetMeshFromModel();
 		}
@@ -32,9 +33,10 @@ namespace Raven
 		template<class Archive>
 		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<Component>(this));
+
 			archive(
-				cereal::make_nvp("MeshIndex", meshIndex),
-				cereal::make_nvp("Id", entity)
+				cereal::make_nvp("MeshIndex", meshIndex)
 			);
 		}
 
@@ -51,9 +53,9 @@ namespace Raven
 		template<class Archive>
 		void load(Archive& archive)
 		{
+			archive(cereal::base_class<Component>(this));
 			archive(
 				cereal::make_nvp("MeshIndex", meshIndex),
-				cereal::make_nvp("Id", entity),
 				cereal::make_nvp("Skeleton", skeleton)
 			);
 			GetMeshFromModel();
@@ -62,9 +64,9 @@ namespace Raven
 		template<class Archive>
 		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<Component>(this));
 			archive(
 				cereal::make_nvp("MeshIndex", meshIndex),
-				cereal::make_nvp("Id", entity),
 				cereal::make_nvp("Skeleton", skeleton)
 			);
 		}

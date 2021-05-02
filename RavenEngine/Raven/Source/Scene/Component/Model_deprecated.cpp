@@ -10,7 +10,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity/EntityManager.h"
-#include "ResourceManager/FbxLoader.h"
+#include "ResourceManager/FbxLoader_deprecated.h"
 #include "Utilities/StringUtils.h"
 #include "Animation/SkeletonCache.h"
 #include "MeshRenderer.h"
@@ -123,7 +123,7 @@ namespace Raven
 		Entity ent = GetEntity();
 		if (ent.GetChildren().empty())
 		{
-			FbxLoader loader;
+			FbxLoader_deprecated loader;
 			loader.LoadHierarchy(filePath, this);
 
 			for (auto i = 0; i < meshes.size(); i++)
@@ -215,7 +215,7 @@ namespace Raven
 
 	void Model_deprecated::GetMeshRenderers(std::vector<ModelMeshRendererData>& outMesRenderers, Scene* scene)
 	{
-		Entity ent(entity, scene);
+		Entity ent = GetEntity();
 		outMesRenderers.resize(mesh->GetNumSections());
 		GetMeshRenderersImp(outMesRenderers, ent);
 	}

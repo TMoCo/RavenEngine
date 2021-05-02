@@ -14,8 +14,9 @@ namespace Raven
 	Entity EntityManager::Create(const std::string& name)
 	{
 		auto e = registry.create();
-		registry.emplace<NameComponent>(e, name);
-		return Entity(e, scene);
+		Entity entity(e, scene);
+		entity.AddComponent<NameComponent>(name);
+		return entity;
 	}
 
 	void EntityManager::Clear()

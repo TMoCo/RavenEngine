@@ -35,6 +35,8 @@ namespace Raven
 #endif
 			T & t = scene->GetRegistry().emplace<T>(entityHandle, std::forward<Args>(args)...);
 			t.entity = entityHandle;
+			t.sceneOwner = scene;
+
 			return t;
 		}
 
@@ -43,6 +45,7 @@ namespace Raven
 		{
 			T & t = scene->GetRegistry().get_or_emplace<T>(entityHandle, std::forward<Args>(args)...);
 			t.entity = entityHandle;
+			t.sceneOwner = scene;
 			return t;
 		}
 
@@ -51,7 +54,7 @@ namespace Raven
 		{
 			T & t = scene->GetRegistry().emplace_or_replace<T>(entityHandle, std::forward<Args>(args)...);
 			t.entity = entityHandle;
-			
+			t.sceneOwner = scene;
 		}
 
 		template<typename T>

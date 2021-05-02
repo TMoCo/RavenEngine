@@ -34,6 +34,8 @@ namespace Raven
 		RT_Terrain            = 7,
 		RT_Scene              = 8,
 		RT_GuiLayout          = 9,
+		RT_Skeleton           = 10,
+		RT_Animation          = 11
 	};
 
 

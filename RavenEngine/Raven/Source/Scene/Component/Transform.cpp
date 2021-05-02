@@ -72,10 +72,11 @@ void Transform::UpdateLocalMatrix() const
 
 void Transform::UpdateWorldMatrix() const
 {
+	Entity ent = GetEntity();
+
 	// Is Entity Valid?
-	if (entity != entt::null)
+	if (ent.Valid())
 	{
-		Entity ent = GetEntity();
 		Entity parentEnt = ent.GetParent();
 
 		if (parentEnt.Valid())
@@ -105,11 +106,12 @@ void Transform::UpdateWorldMatrix() const
 
 void Transform::UpdateChildrenWorld() const
 {
+	Entity ent = GetEntity();
+
 	// Is Entity Valid?
-	if (entity == entt::null)
+	if (!ent.Valid())
 		return;
 
-	Entity ent = GetEntity();
 	std::vector<Entity> children = ent.GetChildren();
 
 	for (auto& child : children)
@@ -128,10 +130,11 @@ void Transform::UpdateChildrenWorld() const
 
 bool Transform::GetParentWorldMatrix(glm::mat4& outMtx) const
 {
+	Entity ent = GetEntity();
+
 	// Is Entity Valid?
-	if (entity != entt::null)
+	if (ent.Valid())
 	{
-		Entity ent = GetEntity();
 		Entity parentEnt = ent.GetParent();
 
 		if (parentEnt.Valid())
@@ -312,7 +315,7 @@ void Transform::SetWorldMatrixTransform(const glm::mat4& mtx)
 	glm::mat4 invWorldMtx;
 	if (GetParentWorldMatrix(invWorldMtx))
 	{
-		invWorldMtx = glm::inverse(mtx);
+		invWorldMtx = glm::inverse(invWorldMtx);
 		invWorldMtx = invWorldMtx * mtx;
 		SetMatrixTransform(invWorldMtx);
 	}

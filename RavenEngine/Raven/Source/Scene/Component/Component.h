@@ -7,14 +7,32 @@
 #include <entt/entt.hpp>
 namespace Raven 
 {
+	class Scene;
+
 	//TODO serialize function is not implementation
 	class Entity;
 	class Component 
 	{
+		friend class Entity;
+
+	private:
+		// Handle to the entity this component is part of.
+		entt::entity entity = entt::null;
+
+		// The scene this component is in and owned by.
+		Scene* sceneOwner = nullptr;
+
 	public:
 		virtual ~Component() = default;
-		entt::entity entity = entt::null;
 		Entity GetEntity() const;
+		entt::entity GetEntityHandle() const;
+
+		// This is an Evil function created to while refactroing old code.
+		inline void SetEntity_Evil(entt::entity inEntity, Scene* inScene)
+		{ 
+			entity = inEntity;
+			sceneOwner = inScene;
+		}
 
 		// serialize save.
 		template<typename Archive>

@@ -366,10 +366,10 @@ namespace Raven
 				controller->GetCurrentAnimationName() == node.nodeName) {
 
 				auto& cur = controller->GetCurrAnimation();
-				if (auto clip = cur.GetPlayingClip(); clip >= 0)
+				if (auto clip = cur->GetPlayingClip(); clip >= 0)
 				{
-					float time = cur.GetPlayingTime();
-					float timeLength = cur.GetClipLength(clip);
+					float time = cur->GetPlayingTime();
+					float timeLength = cur->GetClipLength(clip);
 					ImGui::ProgressBar(time / timeLength, { 100, 10 });
 				}
 			}

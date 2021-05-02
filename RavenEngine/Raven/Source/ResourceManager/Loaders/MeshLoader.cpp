@@ -33,13 +33,17 @@ IResource* MeshLoader::LoadResource(const ResourceHeaderInfo& info, RavenInputAr
 
 void MeshLoader::SaveResource(RavenOutputArchive& archive, IResource* Resource)
 {
-	RAVEN_ASSERT(0, "TODO RAVEN Implement MeshLoader.");
+	//RAVEN_ASSERT(0, "TODO RAVEN Implement MeshLoader.");
 }
 
 
 void MeshLoader::ListResourceTypes(std::vector<EResourceType>& outRscTypes)
 {
 	outRscTypes.push_back(RT_Mesh);
+
+	// ??
+	outRscTypes.push_back(RT_SkinnedMesh);
+	outRscTypes.push_back(RT_Skeleton);
 }
 
 

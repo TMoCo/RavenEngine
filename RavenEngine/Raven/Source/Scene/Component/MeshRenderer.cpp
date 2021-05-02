@@ -32,10 +32,12 @@ namespace Raven
 
 		std::string name = "No root bone";
 		
+#if 0
 		ImGuiHelper::Property("Root Bone", 
 			skeleton.GetRoot() ? skeleton.GetRoot()->name :
 			name
 		);
+#endif
 
 		std::string index = std::to_string(meshIndex);
 		ImGuiHelper::Property("Mesh Index", index,true);
@@ -52,6 +54,7 @@ namespace Raven
 		auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
 		auto& enManager = currentScene->GetEntityManager();
 	
+#if 0
 		auto model = GetEntity().TryGetComponentFromParent<Model_deprecated>();
 		if (model) {
 			mesh = model->GetMeshSection(meshIndex);
@@ -60,18 +63,19 @@ namespace Raven
 				skeleton.ResetTransfromTarget(model->GetEntity());
 			}
 		}
+#endif
 	}
 
 
 	void SkinnedMeshRenderer::UpdateBones()
 	{
-		if (bones.size() != skeleton.GetBoneSize())
-			bones.resize( skeleton.GetBoneSize() );
+		if (bones.size() != skeleton.GetBones().size())
+			bones.resize( skeleton.GetBones().size() );
 
-		for (auto i = 0; i < skeleton.GetBoneSize(); i++)
+		for (auto i = 0; i < skeleton.GetBones().size(); i++)
 		{
 			auto& bone = skeleton.GetBone(i);
-			bones[i] = bone.localTransform->GetWorldMatrix() * bone.offsetMatrix;
+			bones[i] = bone.GetWorldTransform() * bone.GetOffsetMatrix();
 		}
 	}
 

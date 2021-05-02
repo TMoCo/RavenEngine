@@ -17,11 +17,11 @@ namespace Raven {
 MaterialShader::MaterialShader()
 	: IResource()
 	, renderRsc(nullptr)
-	, domain(ERenderShaderDomain::Mesh)
-	, type(ERenderShaderType::Opaque)
+	, sdomain(ERenderShaderDomain::Mesh)
+	, stype(ERenderShaderType::Opaque)
 	, isComputeMaterialVertex(false)
 {
-	type = MaterialShader::GetType();
+	type = MaterialShader::StaticGetType();
 	hasRenderResources = true;
 }
 
@@ -50,9 +50,9 @@ void MaterialShader::LoadRenderResource()
 
 	RenderRscShaderCreateData rscData;
 	rscData.name = name;
-	rscData.type = type;
+	rscData.type = stype;
 	rscData.AddFunction(stages, materialFunction);
-	renderRsc = RenderRscShader::Create(domain, rscData); // Build Shader
+	renderRsc = RenderRscShader::Create(sdomain, rscData); // Build Shader
 
 	// Shader Input...
 	if (blockInput.size != -1)
@@ -87,13 +87,13 @@ void MaterialShader::SetMaterialFunction(const std::string& func, bool hasComput
 void MaterialShader::SetDomain(ERenderShaderDomain val)
 {
 	RAVEN_ASSERT(val != ERenderShaderDomain::Custom, "Custom Domain not supported by shader resource.");
-	domain = val;
+	sdomain = val;
 }
 
 
 void MaterialShader::SetType(ERenderShaderType val)
 {
-	type = val;
+	stype = val;
 }
 
 

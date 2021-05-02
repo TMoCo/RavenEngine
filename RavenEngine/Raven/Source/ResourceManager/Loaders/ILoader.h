@@ -42,6 +42,8 @@ namespace Raven
 		LT_Scene,
 		LT_Audio,
 		LT_GuiLayout,
+		LT_Animation,
+
 		LT_MAX
 	};
 

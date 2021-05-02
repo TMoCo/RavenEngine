@@ -45,7 +45,7 @@ void Raven::GetFormatInfo(ETextureFormat format, int32_t& BPP)
 
 Texture2D::Texture2D()
 {
-	type = Texture2D::Type();
+	type = Texture2D::StaticGetType();
 
 }
 

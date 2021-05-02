@@ -2,16 +2,23 @@
 // This file is part of the Raven Game Engine			                    //
 //////////////////////////////////////////////////////////////////////////////
 #pragma once
+
+
+#include "Utilities/Core.h"
+#include "ResourceManager/Resources/IResource.h"
+#include "AnimationCurve.h"
+
 #include <vector>
 #include <memory>
 #include <string>
-#include "AnimationCurve.h"
-#include "Scene/Entity/Entity.h" 
+
 
 namespace Raven
 {
 	class Transform;
 	class AnimationController;
+	class SkeletonInstance;
+	class Skeleton;
 
 	enum class AnimationCurvePropertyType
 	{
@@ -37,7 +44,8 @@ namespace Raven
 
 	struct AnimationCurveWrapper
 	{
-		std::string path;
+		//std::string path;
+		int32_t index;
 		std::vector<AnimationCurveProperty> properties;
 	};
 
@@ -67,11 +75,14 @@ namespace Raven
 		Out,
 	};
 
+
+
+
 	struct AnimationState
 	{
 		int32_t clipIndex;
 		float playStartTime;
-		std::vector<Transform*> targets;
+		std::vector<int32_t> targets;
 		FadeState fadeState;
 		float fadeStartTime;
 		float fadeLength;
@@ -80,15 +91,19 @@ namespace Raven
 		float playingTime;
 	};
 
-
-	class Animation 
+	//
+	class Animation : public IResource
 	{
 	public:
 		Animation();
-		virtual ~Animation();
+		virtual ~Animation() { }
+
+
+		// return the resource type
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Animation; }
 
 		void SetClips(const std::vector<std::shared_ptr<AnimationClip>>& clips);
-		void AddClip(const std::shared_ptr<AnimationClip>& clips);
+		void AddClip(const Ptr<AnimationClip>& clip);
 		const std::string& GetClipName(int32_t index) const;
 		float GetClipLength(int32_t index) const;
 		float GetCurrentClipLength() const;
@@ -106,11 +121,13 @@ namespace Raven
 		inline auto GetClipCount() const { return clips.size(); }
 		inline auto GetTime() const { return time; }
 
-		void Play(int32_t index,const Entity & entt, float fadeLength = 0.3f);
+		void Play(int32_t index, SkeletonInstance* inSkeletonInstance, float fadeLength = 0.3f);
 		void Stop();
 		void Pause();
 
 		void OnUpdate(float dt);
+
+		inline void SetSkeleton(Ptr<Skeleton> inSkeleton) { skeleton = inSkeleton; }
 
 	private:
 		void UpdateTime(float dt);
@@ -125,7 +142,11 @@ namespace Raven
 		bool stopped = true;	
 		bool started = false;
 
-		Entity entity;
+		// The skeleton this animation reference.
+		Ptr<Skeleton> skeleton;
 
+		// The skeleton this animation currently updating.
+		SkeletonInstance* skeletonInstance;
 	};
-};
+
+}

@@ -6,6 +6,11 @@
 #include "Animation.h"
 #include "AnimationController.h"
 #include "Engine.h"
+
+
+#include "Scene/Component/SkinnedMeshComponent.h"
+
+
 namespace Raven
 {
 
@@ -19,17 +24,39 @@ namespace Raven
 
 	void AnimationSystem::OnUpdate(float dt, Scene* scene)
 	{
-		if (Engine::Get().GetEditorState() == EditorState::Play) 
+		if (true || Engine::Get().GetEditorState() == EditorState::Play) 
 		{
 			auto animators = scene->GetRegistry().view<Animator>();
 
 			for (auto e : animators)
 			{
 				auto& animator = scene->GetRegistry().get<Animator>(e);
-				if (animator.controller != nullptr)
+
+				Entity skinnedEnttity{ e, scene };
+				SkinnedMeshComponent* skinnedComp = skinnedEnttity.TryGetComponent<SkinnedMeshComponent>();
+
+				if (animator.isSimpleAnimator)
 				{
-					animator.controller->OnUpdate(dt, scene, e);
+					if (animator.anime)
+					{
+						if (!animator.anime->IsStarted())
+						{
+							animator.anime->Play(0, skinnedComp->GetSkeleton());
+						}
+						else
+						{
+							animator.anime->OnUpdate(dt);
+						}
+					}
 				}
+				else
+				{
+					if (animator.controller && skinnedComp)
+					{
+						animator.controller->OnUpdate(dt, skinnedComp);
+					}
+				}
+				
 			}
 		}
 	}

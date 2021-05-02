@@ -15,7 +15,7 @@ namespace Raven {
 
 ImageImporter::ImageImporter()
 {
-	type = IMP_Image;
+	type = StaticGetType();
 }
 
 
@@ -27,7 +27,7 @@ void ImageImporter::ListExtensions(std::vector<std::string>& outExt)
 }
 
 
-bool ImageImporter::Import(const std::string& path, std::vector<IResource*>& resources)
+bool ImageImporter::Import(const std::string& path, std::vector< Ptr<IResource> >& resources)
 {
 	// the extension of the file we want to import.
 	std::string ext = StringUtils::GetExtension(path);
@@ -40,7 +40,7 @@ bool ImageImporter::Import(const std::string& path, std::vector<IResource*>& res
 		if (!img2D)
 			return false;
 
-		resources.push_back(img2D);
+		resources.emplace_back(img2D);
 	}
 
 	return true;

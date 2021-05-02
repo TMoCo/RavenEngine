@@ -13,6 +13,7 @@
 #include "ResourceManager/Loaders/ImageLoader.h"
 #include "ResourceManager/Loaders/MeshLoader.h"
 #include "ResourceManager/Loaders/LayoutLoader.h"
+#include "ResourceManager/Loaders/AnimationLoader.h"
 
 
 #include <fstream>
@@ -180,6 +181,7 @@ void ResourceManager::Initialize()
 	RegisterLoader<ImageLoader>();
 	RegisterLoader<MeshLoader>();
 	RegisterLoader<LayoutLoader>();
+	RegisterLoader<AnimationLoader>();
 
 }
 
@@ -254,7 +256,7 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 
 	// -- - -- - - - --- 
 	// Import...
-	std::vector<IResource*> newResources;
+	std::vector< Ptr<IResource> > newResources;
 	bool isImportSuccess = importer->Import(file, newResources);
 
 	// Failed to Import?
@@ -285,9 +287,7 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 
 		// -- - -- - - - --- 
 		// Save...
-		Ptr<IResource> rscPtr(newResource);
-
-		if (!SaveNewResource(rscPtr, outputFile))
+		if ( !SaveNewResource(newResource, outputFile) )
 		{
 			return false;
 		}

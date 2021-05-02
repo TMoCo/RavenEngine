@@ -1,5 +1,5 @@
 
-#include "FbxLoader.h"
+#include "FbxLoader_deprecated.h"
 
 #include "ResourceManager/FileSystem.h"
 #include "Logger/Console.h"
@@ -182,7 +182,7 @@ namespace Raven {
 	}
 
 
-	FbxLoader::~FbxLoader()
+	FbxLoader_deprecated::~FbxLoader_deprecated()
 	{
 		if (scene) 
 		{
@@ -191,14 +191,14 @@ namespace Raven {
 	}
 
 
-	void FbxLoader::Load(const std::string& path, Model_deprecated* model)
+	void FbxLoader_deprecated::Load(const std::string& path, Model_deprecated* model)
 	{
 		LoadHierarchy(path, model);
 		LoadMeshes(model);
 		LoadAnimation(model);
 	}
 
-	void FbxLoader::LoadHierarchy(const std::string& path, Model_deprecated* model)
+	void FbxLoader_deprecated::LoadHierarchy(const std::string& path, Model_deprecated* model)
 	{
 		file = path;
 		std::string err;
@@ -233,7 +233,7 @@ namespace Raven {
 		{
 			int32_t i = 0;
 			auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
-			Entity parent(model->entity, currentScene);
+			Entity parent = model->GetEntity();
 
 			while (ofbx::Object* child = root->resolveObjectLink(i++))
 			{
@@ -256,7 +256,7 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadBones(const ofbx::Mesh* fbxMesh, Model_deprecated* model)
+	void FbxLoader_deprecated::LoadBones(const ofbx::Mesh* fbxMesh, Model_deprecated* model)
 	{
 		if (skeleton == nullptr)
 		{
@@ -280,9 +280,10 @@ namespace Raven {
 			if (cluster->getIndicesCount() == 0)
 				continue;
 			const auto link = cluster->getLink();
-			auto boneIndex = skeleton->IndexOf(link->name);//create a bone if missing
+			auto boneIndex = skeleton->GetBoneIndex(link->name);//create a bone if missing
 			if (boneIndex == -1)
 			{
+#if 0
 				auto & bone = skeleton->AddBone(skeleton->IndexOf(link->getParent()->name));
 				bone.name = link->name;
 				bone.offsetMatrix = glm::inverse(GetOffsetMatrix(fbxMesh, link));
@@ -292,12 +293,11 @@ namespace Raven {
 					bone.localTransform = entity.TryGetComponent<Transform>();
 					if (entity.Valid() && bone.localTransform)
 					{
-#if 0
 						bone.localTransform->SetOffsetTransform(bone.offsetMatrix);
-#endif
 					}
 				}
 				bones.emplace_back(link);
+#endif
 			}
 		}
 	}
@@ -316,7 +316,7 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadBones()
+	void FbxLoader_deprecated::LoadBones()
 	{
 		int32_t i = 0;
 		while (const ofbx::Object* child = scene->getRoot()->resolveObjectLink(i++))
@@ -329,12 +329,12 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadBones(const std::string& file)
+	void FbxLoader_deprecated::LoadBones(const std::string& file)
 	{
 
 	}
 
-	void FbxLoader::LoadMeshes(Model_deprecated* model)
+	void FbxLoader_deprecated::LoadMeshes(Model_deprecated* model)
 	{
 		int32_t c = scene->getMeshCount();
 	
@@ -381,7 +381,7 @@ namespace Raven {
 		}
 	}
 	
-	void FbxLoader::ImportMesh(Model_deprecated* model, const ofbx::Mesh* fbxMesh, int32_t triangleStart, int32_t triangleEnd)
+	void FbxLoader_deprecated::ImportMesh(Model_deprecated* model, const ofbx::Mesh* fbxMesh, int32_t triangleStart, int32_t triangleEnd)
 	{
 		const int32_t firstVertexOffset = triangleStart * 3;
 		const int32_t lastVertexOffset = triangleEnd * 3;
@@ -436,7 +436,7 @@ namespace Raven {
 		{
 			model->AddMesh(meshSection);
 			auto currentScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
-			Entity rootEntity{model->entity,currentScene};
+			Entity rootEntity = model->GetEntity();
 
 #if 0
 			auto ent = rootEntity.GetChildInChildren(fbxMesh->name);
@@ -464,7 +464,7 @@ namespace Raven {
 
 
 
-	void FbxLoader::LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, SkinnedMeshSection* mesh)
+	void FbxLoader_deprecated::LoadWeight(const ofbx::Skin* skin, int32_t firstVertexOffset, SkinnedMeshSection* mesh)
 	{
 		if (skeleton != nullptr) 
 		{
@@ -476,7 +476,7 @@ namespace Raven {
 
 				const auto link = cluster->getLink();
 
-				const int32_t boneIndex = skeleton->IndexOf(link->name);
+				const int32_t boneIndex = skeleton->GetBoneIndex(link->name);
 				if (boneIndex == -1)
 				{
 					LOGC("Missing bone");
@@ -517,7 +517,7 @@ namespace Raven {
 
 	
 
-	void FbxLoader::LoadAnimation(Model_deprecated* model)
+	void FbxLoader_deprecated::LoadAnimation(Model_deprecated* model)
 	{
 		float frameRate = scene->getSceneFrameRate();
 		if (frameRate <= 0)
@@ -539,7 +539,7 @@ namespace Raven {
 		}
 	}
 
-	void FbxLoader::LoadAnimation(const std::string& path, Model_deprecated* model)
+	void FbxLoader_deprecated::LoadAnimation(const std::string& path, Model_deprecated* model)
 	{
 		std::string err;
 		std::string name = StringUtils::GetFileName(path);
@@ -570,7 +570,7 @@ namespace Raven {
 	}
 
 
-	std::shared_ptr<AnimationClip> FbxLoader::ImportAnimation(Model_deprecated * model,int32_t index,float frameRate)
+	std::shared_ptr<AnimationClip> FbxLoader_deprecated::ImportAnimation(Model_deprecated * model,int32_t index,float frameRate)
 	{
 		const ofbx::AnimationStack* stack = scene->getAnimationStack(index);
 		const ofbx::AnimationLayer* layer = stack->getLayer(0);
@@ -601,7 +601,7 @@ namespace Raven {
 			if ( rotationNode) 
 			{
 				auto& curve0 = clip->curves.emplace_back();
-				curve0.path = GetBonePath(bones[i]);
+				//curve0.path = GetBonePath(bones[i]);
 				auto& cur0 = curve0.properties.emplace_back();
 				GetCurveData(cur0, rotationNode->getCurve(0));
 				cur0.type = AnimationCurvePropertyType::LocalRotationX;
@@ -616,7 +616,7 @@ namespace Raven {
 			if (translationNode) 
 			{
 				auto& curve = clip->curves.emplace_back();
-				curve.path = GetBonePath(bones[i]);
+				//curve.path = GetBonePath(bones[i]);
 				auto& cur0 = curve.properties.emplace_back();
 				GetCurveData(cur0, translationNode->getCurve(0));
 				cur0.type = AnimationCurvePropertyType::LocalPositionX;

@@ -265,7 +265,7 @@ namespace Raven
 					{
 						auto mat = glm::make_mat4(delta);
 						
-						transform->SetScale(transform->GetScale() * Transform::ExtractScale(mat));
+						transform->SetScale(transform->GetScale() + Transform::ExtractScale(mat));
 					}
 					else
 					{

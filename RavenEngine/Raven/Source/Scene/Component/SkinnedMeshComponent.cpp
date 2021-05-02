@@ -1,10 +1,9 @@
-#pragma once
-
-
-
 #include "SkinnedMeshComponent.h"
+
 #include "ResourceManager/Resources/SkinnedMesh.h"
 #include "ResourceManager/Resources/Material.h"
+#include "Animation/Skeleton.h"
+
 #include "Render/RenderObjects/Primitives/RenderSkinnedMesh.h"
 
 
@@ -27,6 +26,14 @@ SkinnedMeshComponent::~SkinnedMeshComponent()
 void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 {
 	mesh = newMesh;
+
+	// Has Valid Skeleton?
+	if (mesh->GetSkeleton())
+	{
+		skeleton = Ptr<SkeletonInstance>(new SkeletonInstance(mesh->GetSkeleton()));
+		skeleton->UpdateBones();
+	}
+
 	localBounds = mesh->GetBounds();
 }
 
@@ -48,11 +55,8 @@ void SkinnedMeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rco
 		// Add mesh section to be render.
 		RenderSkinnedMesh* rmesh = rcollector.NewSkinnedMesh();
 		rmesh->SetMesh(meshSection->renderRscMesh.get());
-
-		//auto skinned = meshRenderers[i].skinned;
-		//skinned->UpdateBones();
-		//RAVEN_ASSERT(skinned->bones.size() <= RENDER_SKINNED_MAX_BONES, "");
-		//rmesh->SetBones(&skinned->bones);
+		RAVEN_ASSERT(skeleton->GetBones()->size() <= RENDER_SKINNED_MAX_BONES, "");
+		rmesh->SetBones(skeleton->GetBones());
 
 		// Material to use while rendering the mesh section.
 		Material* mat = GetMaterial(i);

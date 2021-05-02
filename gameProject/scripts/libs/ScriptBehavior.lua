@@ -7,6 +7,10 @@ function ScriptBehavior:GetAnimator()
 	return self.entity:GetAnimator()
 end
 
+function ScriptBehavior:GetRigidBody()
+	return self.entity:GetRigidBody()
+end
+
 
 function ScriptBehavior:GetNameComponent()
 	return self.entity:GetNameComponent()

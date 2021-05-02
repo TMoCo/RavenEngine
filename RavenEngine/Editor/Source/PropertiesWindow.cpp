@@ -102,7 +102,6 @@ namespace MM
 		if (rb)
 		{
 			rb->SetInitTransform(transform);
-			LOGE(glm::to_string(rb->GetInitTransform().GetWorldPosition()));
 		}
 
 	}

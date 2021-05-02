@@ -149,7 +149,6 @@ namespace Raven
 	void RigidBody::SetMass(float m)
 	{
 		mass = m;
-		body->setMass(mass);
 	}
 	float RigidBody::GetMass()
 	{
@@ -160,7 +159,6 @@ namespace Raven
 	{
 		// d >= 0 
 		linearDamping = d;
-		body->setLinearDamping(d);
 	}
 	float RigidBody::GetLinearDamping()
 	{
@@ -171,7 +169,6 @@ namespace Raven
 	{
 		// d >= 0 
 		angularDamping = d;
-		body->setAngularDamping(d);
 	}
 	float RigidBody::GetAngularDamping()
 	{

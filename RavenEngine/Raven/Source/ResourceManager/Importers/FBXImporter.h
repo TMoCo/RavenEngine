@@ -28,8 +28,7 @@ namespace Raven
 	class Mesh;
 	class Skeleton;
 	class SkinnedMesh;
-	class Animation;
-	struct AnimationClip;
+	class AnimationClip;
 
 
 
@@ -81,7 +80,7 @@ namespace Raven
 		Skeleton* ImportSkeleton();
 
 		// Load all animation clips.
-		Animation* ImportAnimation();
+		void ImportAnimation(std::vector< Ptr<AnimationClip> >& clips);
 
 		// Import animation clips.
 		Ptr<AnimationClip> ImportAnimationClip(int32_t index, float frameRate);

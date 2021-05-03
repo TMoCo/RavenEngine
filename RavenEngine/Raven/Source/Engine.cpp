@@ -57,34 +57,32 @@
 
 namespace Raven 
 {
-	Ptr<Material> TESTING_MAT;
+
+// Create Singleton instance.
+Engine* Engine::instance = CreateEngine();
 
 
 
 
-	Engine::Engine()
-		: engineTime(0.0f)
-	{
 
-	}
+Engine::Engine()
+	: engineTime(0.0f)
+{
 
-	Engine::~Engine()
-	{
+}
 
-	}
+Engine::~Engine()
+{
+
+}
 
 
-	Engine& Engine::Get()
-	{
-		static std::unique_ptr<Engine> instance(CreateEngine());
-		return *instance;
-	}
+void Engine::Initialize()
+{
+	// Module
+	LoadModules();
 
-	void Engine::Initialize()
-	{
-		// Module
-		LoadModules();
-	}
+}
 
 
 	int Engine::Run()
@@ -139,37 +137,6 @@ namespace Raven
 
 		// Update Render...
 		GetModule<RenderModule>()->Update(dt);
-
-
-
-
-		// ~TESTING---------------------------------------------------------------------------------------------
-		if (TESTING_MAT)
-		{
-			static float roughnessTime = 0.0f;
-			roughnessTime += dt;
-		}
-
-		auto lightsEttView = GetModule<Raven::SceneManager>()->GetCurrentScene()->GetRegistry().group<Light>(entt::get<Transform>);
-
-		//
-		bool isSearchForSun = true;
-
-		// Iterate over all lights in the scene.
-		for (auto entity : lightsEttView)
-		{
-			const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
-
-			if (light.type == 0)
-				continue;
-
-			GetModule<RenderModule>()->GetDebug()->DrawBox(light.position, glm::vec3(10.0), light.color);
-		}
-
-		// ~TESTING---------------------------------------------------------------------------------------------
-
-
-
 
 	}
 
@@ -264,71 +231,93 @@ namespace Raven
 
 
 		{
-			GetModule<ResourceManager>()->Import("./assets/ybot.fbx");
+			if (!Engine::GetModule<ResourceManager>()->AddResrouce("MESH_lantern.raven"))
+			{
+				GetModule<ResourceManager>()->Import("./assets/models/Lantern/lantern.obj");
+			}
+
+			{
+				Ptr<Mesh> mesh = GetModule<ResourceManager>()->GetResource<Mesh>("MESH_lantern");
+
+				auto meshEntity = newScene->CreateEntity("MESH_lantern");
+				auto& tr = meshEntity.GetOrAddComponent<Transform>();
+				tr.SetPosition(glm::vec3(0.0f, 20.0f, 0.0f));
+				tr.SetScale(glm::vec3(0.5f));
+
+				auto& model0 = meshEntity.GetOrAddComponent<MeshComponent>();
+				model0.SetMesh(mesh);
+			}
+
+
+			if (!Engine::GetModule<ResourceManager>()->AddResrouce("SKINNEDMESH_ybot.raven"))
+			{
+				GetModule<ResourceManager>()->Import("./assets/ybot.fbx");
+			}
+			else
+			{
+				Engine::GetModule<ResourceManager>()->AddResrouce("SKELETON_ybot.raven");
+				Engine::GetModule<ResourceManager>()->AddResrouce("ANIM_CLIP_ybot_0.raven");
+			}
+
 			Ptr<SkinnedMesh> skinnedMesh = GetModule<ResourceManager>()->GetResource<SkinnedMesh>("SKINNEDMESH_ybot");
-			Ptr<Animation> ybotAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_ybot");
-
-			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
-			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
-			GetModule<ResourceManager>()->Import("./assets/Idle.fbx");
-			Ptr<Animation> idleAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_Idle");
-
-			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
-			GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
-			GetModule<ResourceManager>()->Import("./assets/Walking.fbx");
-			Ptr<Animation> walkAnim = GetModule<ResourceManager>()->GetResource<Animation>("SKELETON_ANIM_Walking");
 
 
+			if (!Engine::GetModule<ResourceManager>()->AddResrouce("ANIM_CLIP_Idle_0.raven"))
 			{
-				auto meshEntity = newScene->CreateEntity("FBX_MODEL_1");
+				GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
+				GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
+				GetModule<ResourceManager>()->Import("./assets/Idle.fbx");
+			}
+
+
+			if (!Engine::GetModule<ResourceManager>()->AddResrouce("ANIM_CLIP_Walking_0.raven"))
+			{
+				GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
+				GetModule<ResourceManager>()->GetImporter<FBXImporter>()->settings.skeleton = skinnedMesh->GetSkeleton();
+				GetModule<ResourceManager>()->Import("./assets/Walking.fbx");
+			}
+
+
+			std::vector< Ptr<AnimationClip> > clip;
+			clip.push_back(GetModule<ResourceManager>()->GetResource<AnimationClip>("ANIM_CLIP_Idle_0.raven"));
+			clip.push_back(GetModule<ResourceManager>()->GetResource<AnimationClip>("ANIM_CLIP_Walking_0.raven"));
+
+			int32_t num = 5;
+
+			for (int32_t i = 0; i < num * num; ++i)
+			{
+				float f = (float)i / (float)(num * num);
+				float fx = (float)(i / num) / (float)(num * num);
+				float fy = (float)(i % num) / (float)(num * num);
+
+				auto meshEntity = newScene->CreateEntity("FBX_MODEL_" + std::to_string(i));
 				auto& tr = meshEntity.GetOrAddComponent<Transform>();
-				tr.SetPosition(glm::vec3(0.0f, -4.0f, 0.0f));
+				tr.SetPosition(glm::vec3(fx * 45.0f * num, -4.0f, fy * 45.0f * num));
 				tr.SetScale(glm::vec3(0.1f));
 
 				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
 				model0.SetMesh(skinnedMesh);
 				model0.SetMaterial(0, nullptr);
 
+				Ptr<Animation> anim(new Animation());
 
-				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
-				modelAnimator.isSimpleAnimator = true;
-				modelAnimator.anime = walkAnim.get();
-			}
-
-
-			{
-				auto meshEntity = newScene->CreateEntity("FBX_MODEL_2");
-				auto& tr = meshEntity.GetOrAddComponent<Transform>();
-				tr.SetPosition(glm::vec3(0.0f, -4.0f, -20.0f));
-				tr.SetScale(glm::vec3(0.1f));
-
-				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
-				model0.SetMesh(skinnedMesh);
-				model0.SetMaterial(0, nullptr);
+				if (i > (num * num / 2))
+				{
+					anim->AddClip(clip[0]);
+				}
+				else
+				{
+					anim->AddClip(clip[1]);
+				}
 
 
 				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
 				modelAnimator.isSimpleAnimator = true;
-				modelAnimator.anime = idleAnim.get();
+				modelAnimator.anim = anim;
+				modelAnimator.offset = f * 4.0f;
 			}
 
 
-			{
-				auto meshEntity = newScene->CreateEntity("FBX_MODEL_3");
-				auto& tr = meshEntity.GetOrAddComponent<Transform>();
-				tr.SetPosition(glm::vec3(0.0f, -4.0f, 20.0f));
-				tr.SetScale(glm::vec3(0.1f));
-
-				auto& model0 = meshEntity.GetOrAddComponent<SkinnedMeshComponent>();
-				model0.SetMesh(skinnedMesh);
-				model0.SetMaterial(0, nullptr);
-
-
-				auto& modelAnimator = meshEntity.GetOrAddComponent<Animator>();
-				modelAnimator.isSimpleAnimator = true;
-				modelAnimator.anime = ybotAnim.get();
-			}
-			
 		}
 
 		// Switch the scene....

@@ -1,6 +1,12 @@
 #pragma once
+
+
+#include "Core.h"
+
+
 #include <glm/glm.hpp>
 #include "imgui/imgui.h"
+
 
 namespace glm
 {
@@ -31,4 +37,112 @@ namespace glm
 // ImGui vector serialization
 template<class Archive> void serialize(Archive& archive, ImVec2& v) { archive(v.x, v.y); }
 template<class Archive> void serialize(Archive& archive, ImVec4& v) { archive(v.x, v.y, v.z, v.w); }
+
+
+
+
+
+namespace Raven
+{
+	// Compress data.
+	extern bool Compress(uint32_t size, const uint8_t* data, uint8_t*& comp, uint32_t& outCompSize);
+
+	// Uncompress data.
+	extern bool Uncompress(uint32_t compSize, const uint8_t* comp, uint8_t* data, uint32_t size);
+
+	// Compress data then save it.
+	template<class Archive>
+	void SaveCompressed(Archive& archive, uint32_t size, const uint8_t* data)
+	{
+		RAVEN_ASSERT(size != 0 && data != nullptr, "Invalid Input.");
+
+		uint32_t compressedSize = 0;
+		uint8_t* compressedData = nullptr;
+		bool status = Compress(size, data, compressedData, compressedSize);
+		RAVEN_ASSERT(status, "Failed to compress");
+
+		archive(compressedSize);
+		archive.saveBinary(compressedData, compressedSize);
+
+		free(compressedData);
+	}
+
+	// Loaed Compressed data then uncompress it.
+	template<class Archive>
+	void LoadCompressed(Archive& archive, uint32_t size, uint8_t* data)
+	{
+		RAVEN_ASSERT(size != 0 && data != nullptr, "Invalid Input.");
+
+		// Load Size.
+		uint32_t compressedSize = 0;
+		archive(compressedSize);
+
+		// Allocate and load.
+		uint8_t* compressedData = (uint8_t*)malloc((size_t)compressedSize);
+		archive.loadBinary(compressedData, compressedSize);
+
+		bool status = Uncompress(compressedSize, compressedData, data, size);
+		RAVEN_ASSERT(status, "Failed to compress");
+
+		free(compressedData);
+	}
+
+	// Archve save a vector.
+	template<class Archive, class T>
+	void SaveVector(Archive& archive, const std::vector<T>& v)
+	{
+		uint32_t size = v.size();
+		archive(size);
+
+		// Archive one element at a time.
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			archive(v[i]);
+		}
+	}
+
+	// Archve load a vector.
+	template<class Archive, class T>
+	void LoadVector(Archive& archive, std::vector<T>& v)
+	{
+		uint32_t size = 0;
+		archive(size);
+		v.resize(size);
+
+		// Archive one element at a time.
+		for (uint32_t i = 0; i < size; ++i)
+		{
+			archive(v[i]);
+		}
+	}
+
+	// Archve save a vector as binary data.
+	template<class Archive, class T>
+	void SaveVectorBinary(Archive& archive, const std::vector<T>& v)
+	{
+		uint32_t size = v.size();
+		archive(size);
+
+		if (size != 0)
+		{
+			archive.saveBinary(v.data(), size * sizeof(T));
+		}
+	}
+
+	// Archve load a vector as binary data.
+	template<class Archive, class T>
+	void LoadVectorBinary(Archive& archive, std::vector<T>& v)
+	{
+		uint32_t size = 0;
+		archive(size);
+		v.resize(size);
+
+		if (size != 0)
+		{
+			archive.loadBinary(v.data(), size * sizeof(T));
+		}
+	}
+}
+
+
 

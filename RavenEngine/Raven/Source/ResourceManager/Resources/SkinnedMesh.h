@@ -4,11 +4,14 @@
 
 #pragma once
 
-#include "Utilities/Core.h"
-#include "Math/BoundingBox.h"
 
+#include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/Primitives/RenderRscMesh.h"
+
+#include "Utilities/Serialization.h"
+#include "Math/BoundingBox.h"
+
 
 #include "glm/glm.hpp"
 #include "glm/glm.hpp"
@@ -41,6 +44,7 @@ namespace Raven
 			renderRscMesh->Load(
 				positions,
 				normals,
+				tangents,
 				texCoords,
 				indices,
 				blendWeights,
@@ -66,11 +70,45 @@ namespace Raven
 		}
 
 
+		// Serialization Save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			// Save Geometry.
+			SaveVectorBinary(archive, positions);
+			SaveVectorBinary(archive, normals);
+			SaveVectorBinary(archive, tangents);
+			SaveVectorBinary(archive, texCoords);
+			SaveVectorBinary(archive, indices);
+			SaveVectorBinary(archive, blendIndices);
+			SaveVectorBinary(archive, blendWeights);
+			archive(bounds);
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			// Save Load.
+			LoadVectorBinary(archive, positions);
+			LoadVectorBinary(archive, normals);
+			LoadVectorBinary(archive, tangents);
+			LoadVectorBinary(archive, texCoords);
+			LoadVectorBinary(archive, indices);
+			LoadVectorBinary(archive, blendIndices);
+			LoadVectorBinary(archive, blendWeights);
+			archive(bounds);
+		}
+
+
 		// Position Buffer.
 		std::vector<glm::vec3> positions;
 
 		// Normals Buffer.
 		std::vector<glm::vec3> normals;
+
+		// Tangents Buffer.
+		std::vector<glm::vec3> tangents;
 
 		// Texture Coordinate Buffer.
 		std::vector<glm::vec2> texCoords;
@@ -113,6 +151,7 @@ namespace Raven
 		inline virtual void LoadRenderResource() override
 		{
 			RAVEN_ASSERT(!isOnGPU, "Resrouce already on GPU. use UpdateRenderRsc to update.");
+			isOnGPU = true;
 
 			for (auto& section : sections)
 			{
@@ -183,6 +222,57 @@ namespace Raven
 			}
 		}
 
+		// Serialization Save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::base_class<IResource>(this));
+
+			uint32_t numSections = (uint32_t)sections.size();
+			archive(numSections);
+
+			// Only archive valid mesh sections.
+			for (uint32_t i = 0; i < numSections; ++i)
+			{
+				bool isValid = sections[i] != nullptr;
+				archive(isValid);
+
+				if (isValid)
+					archive(*sections[i]);
+			}
+
+			// Save Resrouce Reference -> Skeleton.
+			ResourceRef::Save(archive, skeleton.get());
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<IResource>(this));
+
+			uint32_t numSections;
+			archive(numSections);
+			sections.resize(numSections);
+
+			// Only archive valid mesh sections.
+			for (uint32_t i = 0; i < numSections; ++i)
+			{
+				bool isValid = false;
+				archive(isValid);
+				if (isValid)
+				{
+					sections[i] = Ptr<SkinnedMeshSection>(new SkinnedMeshSection());
+					archive(*sections[i]);
+				}
+			}
+
+			// Load Resrouce Reference -> Skeleton.
+			skeleton = ResourceRef::Load(archive).FindOrLoad<Skeleton>();
+
+			// Update bounds after loading.
+			UpdateBounds();
+		}
 
 	private:
 		// Recompute/Update the bounding box the model.

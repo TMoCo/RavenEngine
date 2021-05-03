@@ -3,6 +3,7 @@
 #include "ResourceManager/FileSystem.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/Resources/SkinnedMesh.h"
+#include "ResourceManager/MeshFactory.h"
 
 #include "Animation/Skeleton.h"
 #include "Animation/Animation.h"
@@ -75,6 +76,7 @@ glm::quat FbxLoader::FixOrientation(const glm::quat& v)
 
 FbxLoader::FbxLoader()
 	: skeleton(nullptr)
+	, fbx_scene(nullptr)
 {
 	fbx_orientation = FbxOrientation::Y_UP;
 	fbx_scale = 1.f;
@@ -86,7 +88,10 @@ FbxLoader::FbxLoader()
 
 FbxLoader::~FbxLoader()
 {
-
+	if (fbx_scene)
+	{
+		fbx_scene->destroy();
+	}
 }
 
 
@@ -388,11 +393,19 @@ Mesh* FbxLoader::ImportMesh()
 	// Add the sections to the new mesh.
 	for (int32_t i = 0; i < meshSections.size(); ++i)
 	{
+		auto& section = meshSections[i];
+
 		// Empty Section?
-		if (meshSections[i]->positions.empty())
+		if (section->positions.empty())
 			continue;
 
-		mesh->AddMeshSection(meshSections[i]);
+		// Generate Tangents...
+		section->tangents.resize(section->normals.size());
+		Raven::ComputeTangents(section->tangents.data(), section->indices.size(), section->indices.data(),
+			section->positions.data(), section->normals.data(), section->texCoords.data());
+
+		// Add.
+		mesh->AddMeshSection(section);
 	}
 
 	return mesh;
@@ -410,11 +423,19 @@ SkinnedMesh* FbxLoader::ImportSkinnedMesh()
 	// Add the sections to the new mesh.
 	for (int32_t i = 0; i < meshSections.size(); ++i)
 	{
+		auto& section = meshSections[i];
+
 		// Empty Section?
-		if (meshSections[i]->positions.empty())
+		if (section->positions.empty())
 			continue;
 
-		mesh->AddMeshSection(meshSections[i]);
+		// Generate Tangents...
+		section->tangents.resize(section->normals.size());
+		Raven::ComputeTangents(section->tangents.data(), section->indices.size(), section->indices.data(),
+			section->positions.data(), section->normals.data(), section->texCoords.data());
+
+		// Add.
+		mesh->AddMeshSection(section);
 	}
 
 	return mesh;
@@ -476,29 +497,28 @@ Skeleton* FbxLoader::ImportSkeleton()
 }
 
 
-Animation* FbxLoader::ImportAnimation()
+void FbxLoader::ImportAnimation(std::vector< Ptr<AnimationClip> >& clips)
 {
 	// Load skeleton before importing animation.
 	if (!skeleton)
-		return nullptr;
+		return;
 
 	float frameRate = fbx_scene->getSceneFrameRate();
 	if (frameRate <= 0)
 		frameRate = 30.0f;
 
-	Animation* animation = new Animation();
 
 	const int animCount = fbx_scene->getAnimationStackCount();
 
 	for (int32_t animIndex = 0; animIndex < animCount; animIndex++)
 	{
 		auto clip = ImportAnimationClip(animIndex, frameRate);
-		if (clip != nullptr) {
-			animation->AddClip(clip);
+
+		if (clip != nullptr) 
+		{
+			clips.emplace_back(clip);
 		}
 	}
-
-	return animation;
 }
 
 
@@ -535,7 +555,7 @@ Ptr<AnimationClip> FbxLoader::ImportAnimationClip(int32_t index, float frameRate
 
 	char name[256];
 	takeInfo->name.toString(name);
-	clip->name = name;
+	clip->clipName = name;
 
 	// Import curves
 	for (int32_t i = 0; i < fbx_bones.size(); i++)
@@ -675,10 +695,19 @@ void FBXImporter::ImportAnimation(FbxLoader& fbx, Ptr<Skeleton> skeleton, const 
 	// Set the skeleton to be used for animation importing.
 	fbx.skeleton = skeleton.get();
 
-	Ptr<Animation> animation(fbx.ImportAnimation());
-	animation->SetSkeleton(skeleton);
-	animation->SetName("SKELETON_ANIM_" + name);
-	resources.push_back(animation);
+	// Import...
+	std::vector< Ptr<AnimationClip> > clips;
+	fbx.ImportAnimation(clips);
+
+	for (uint32_t i = 0; i < (uint32_t)clips.size(); ++i)
+	{
+		clips[i]->skeleton = skeleton;
+		clips[i]->SetName("ANIM_CLIP_" + name + "_" + std::to_string(i));
+
+		// Add.
+		resources.emplace_back(clips[i]);
+	}
+
 }
 
 

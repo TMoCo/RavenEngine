@@ -33,7 +33,8 @@ RenderRscMesh::~RenderRscMesh()
 }
 
 
-void RenderRscMesh::Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
+void RenderRscMesh::Load(const std::vector<glm::vec3>& positions,
+	const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents,
 	const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices)
 {
 	// Create/Update Position Buffer.
@@ -49,6 +50,14 @@ void RenderRscMesh::Load(const std::vector<glm::vec3>& positions, const std::vec
 		EGLBufferType::Array,
 		(int)(normals.size() * sizeof(glm::vec3)),
 		normals.data(),
+		EGLBufferUsage::StaticDraw
+	);
+
+	// Create/Update Tangent Buffer.
+	tangentBuffer = GLBuffer::Create(
+		EGLBufferType::Array,
+		(int)(tangents.size() * sizeof(glm::vec3)),
+		tangents.data(),
 		EGLBufferUsage::StaticDraw
 	);
 
@@ -93,10 +102,20 @@ void RenderRscMesh::Load(const std::vector<glm::vec3>& positions, const std::vec
 				0                  // offset
 			},
 
-			// Attribute 2 - TexCoords
+			// Attribute 2 - Tangents
+			{
+				tangentBuffer,     // Buffer
+				2,                 // Index
+				3,                 // Type-Size
+				EGLTypes::Float,   // Type
+				sizeof(glm::vec3), // Stride
+				0                  // offset
+			},
+
+			// Attribute 3 - TexCoords
 			{
 				texCoordBuffer,		 // Buffer
-				2,                 // Index
+				3,                 // Index
 				2,                 // Type-Size
 				EGLTypes::Float,   // Type
 				sizeof(glm::vec2), // Stride
@@ -130,7 +149,7 @@ RenderRscSkinnedMesh::RenderRscSkinnedMesh()
 	, texCoordBuffer(nullptr)
 	, indexBuffer(nullptr)
 	, weightBuffer(nullptr)
-	, indicesBuffer(nullptr)
+	, boneIndicesBuffer(nullptr)
 {
 
 }
@@ -144,11 +163,14 @@ RenderRscSkinnedMesh::~RenderRscSkinnedMesh()
 	delete texCoordBuffer;
 	delete indexBuffer;
 	delete weightBuffer;
-	delete indicesBuffer;
+	delete boneIndicesBuffer;
 }
 
 
-void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals, const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices, const std::vector<glm::vec4>& weight, const std::vector<glm::ivec4>& blendIndices)
+void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions,
+	const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents,
+	const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
+	const std::vector<glm::vec4>& weight, const std::vector<glm::ivec4>& blendIndices)
 {
 	// Create/Update Position Buffer.
 	positionBuffer = GLBuffer::Create(
@@ -166,6 +188,14 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const s
 		EGLBufferUsage::StaticDraw
 	);
 
+	// Create/Update Tangent Buffer.
+	tangentBuffer = GLBuffer::Create(
+		EGLBufferType::Array,
+		(int)(tangents.size() * sizeof(glm::vec3)),
+		tangents.data(),
+		EGLBufferUsage::StaticDraw
+	);
+
 	// Create/Update TexCoordinate Buffer.
 	texCoordBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
@@ -174,8 +204,7 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const s
 		EGLBufferUsage::StaticDraw
 	);
 
-
-
+	// Create/Update Weight Buffer.
 	weightBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
 		(int)(weight.size() * sizeof(glm::vec4)),
@@ -183,8 +212,8 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const s
 		EGLBufferUsage::StaticDraw
 	);
 
-
-	indicesBuffer = GLBuffer::Create(
+	// Create/Update Bone Indices Buffer.
+	boneIndicesBuffer = GLBuffer::Create(
 		EGLBufferType::Array,
 		(int)(blendIndices.size() * sizeof(glm::ivec4)),
 		blendIndices.data(),
@@ -224,20 +253,30 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const s
 			0                  // offset
 		},
 
-		// Attribute 2 - TexCoords
+		// Attribute 2 - Tangent
+		{
+			tangentBuffer,      // Buffer
+			2,                 // Index
+			3,                 // Type-Size
+			EGLTypes::Float,   // Type
+			sizeof(glm::vec3), // Stride
+			0                  // offset
+		},
+
+		// Attribute 3 - TexCoords
 		{
 			texCoordBuffer,		 // Buffer
-			2,                 // Index
+			3,                 // Index
 			2,                 // Type-Size
 			EGLTypes::Float,   // Type
 			sizeof(glm::vec2), // Stride
 			0                  // offset
 		},
 
-		// Attribute 3 - weight
+		// Attribute 4 - Weights
 		{
 			weightBuffer,		 // Buffer
-			3,                 // Index
+			4,                 // Index
 			4,                 // Type-Size
 			EGLTypes::Float,   // Type
 			sizeof(glm::vec4), // Stride
@@ -245,14 +284,14 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions, const s
 		}
 		,
 
-		// Attribute 4 - indices
+		// Attribute 5 - Bone Indices
 		{
-			indicesBuffer,		 // Buffer
-			4,                 // Index
-			4,                 // Type-Size
-			EGLTypes::Int,   // Type
-			sizeof(glm::ivec4), // Stride
-			0                  // offset
+			boneIndicesBuffer,   // Buffer
+			5,                   // Index
+			4,                   // Type-Size
+			EGLTypes::Int,       // Type
+			sizeof(glm::ivec4),  // Stride
+			0                    // offset
 		}
 	};
 

@@ -590,7 +590,7 @@ namespace Raven {
 
 		char name[256];
 		takeInfo->name.toString(name);
-		clip->name = name;
+		clip->clipName = name;
 
 		// Import curves
 		for (int32_t i = 0; i < bones.size(); i++)

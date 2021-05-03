@@ -2,6 +2,8 @@
 #include "Utilities/StringUtils.h"
 
 #include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/MeshFactory.h"
+
 
 
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -106,16 +108,20 @@ IResource* OBJImporter::LoadOBJ(const std::string& path)
       }
 
       meshSection->indices.push_back(static_cast<uint32_t>(meshSection->indices.size()));
-
     }
+
+
+    // Generate Tangents...
+    meshSection->tangents.resize(meshSection->normals.size());
+    Raven::ComputeTangents(meshSection->tangents.data(), meshSection->indices.size(), meshSection->indices.data(),
+      meshSection->positions.data(), meshSection->normals.data(), meshSection->texCoords.data());
 
     mesh->AddMeshSection(meshSection);
   }
 
 
   //
-  mesh->LoadRenderResource();
-  mesh->SetName( StringUtils::GetFileName(path) );
+  mesh->SetName( "MESH_" + StringUtils::GetFileNameWithoutExtension(path) );
 
   return mesh;
 }

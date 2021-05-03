@@ -10,6 +10,11 @@
 #include "Core/EditorCamera.h"
 #include "Core/Ray.h"
 
+
+#include "glm/vec3.hpp"
+
+
+
 namespace Raven
 {
 	class Camera;
@@ -77,6 +82,7 @@ namespace Raven
 		uint32_t imGuizmoOperation = 4;
 
 		bool showGizmos = true;
+		glm::vec3 gizmoOrigScale = glm::vec3(1.0f);
 
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;

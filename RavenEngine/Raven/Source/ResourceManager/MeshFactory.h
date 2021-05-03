@@ -55,4 +55,11 @@ namespace Raven
 		Mesh* CreateCylinder(float bottomRadius = 1.0f, float topRadius = 1.0f, float height = 1.0f, int32_t radialSegments = 64, int32_t rings = 8);
 		Mesh* CreateTerrain();
 	};
-};
+
+
+	// Compute Tangents from vertices, normals, uvs.
+	void ComputeTangents(glm::vec3* out, uint32_t indices_count, uint32_t* indices,
+		const glm::vec3* vertices, const glm::vec3* normals, const glm::vec2* uvs);
+
+}
+

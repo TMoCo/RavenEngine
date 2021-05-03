@@ -28,18 +28,32 @@ namespace Raven
 		// Construct.
 		Bone();
 
-		//
+		// Serialization Load.
 		template<class Archive>
 		void load(Archive& archive)
 		{
-			RAVEN_ASSERT(0, "TODO: Implement Bone Archive.");
+			archive(
+				name,
+				id,
+				parentIdx,
+				offsetMatrix,
+				restPosition,
+				restRotation
+			);
 		}
 
-		//
+		// Serialization Save.
 		template<class Archive>
 		void save(Archive& archive) const 
 		{
-			RAVEN_ASSERT(0, "TODO: Implement Bone Archive.");
+			archive(
+				name,
+				id,
+				parentIdx,
+				offsetMatrix,
+				restPosition,
+				restRotation
+			);
 		}
 
 		// Apply reset pose to current bone transform.

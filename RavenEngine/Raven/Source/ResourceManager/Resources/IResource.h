@@ -14,6 +14,12 @@
 
 
 
+
+#define INVALID_RSC_INDEX static_cast<uint32_t>(-1)
+
+
+
+
 namespace Raven
 {
 	// Types of all the supported resource by the engine.
@@ -35,7 +41,7 @@ namespace Raven
 		RT_Scene              = 8,
 		RT_GuiLayout          = 9,
 		RT_Skeleton           = 10,
-		RT_Animation          = 11
+		RT_AnimationClip      = 11
 	};
 
 
@@ -57,12 +63,17 @@ namespace Raven
 		case RT_Mesh: return "Mesh";
 		case RT_SkinnedMesh: return "SkinnedMesh";
 		case RT_Terrain: return "Terrain";
+		case RT_Skeleton: return "Skeleton";
 
 		// Scene.
 		case RT_Scene: return "scene";
 
 		// GUI.
 		case RT_GuiLayout: return "GuiLayout";
+
+		// Animation.
+		case RT_AnimationClip: return "AnimationClip";
+
 		}
 
 		RAVEN_ASSERT(0, "Invalid resource Type.");
@@ -80,6 +91,9 @@ namespace Raven
 	class IResource
 	{
 		friend class ResourceManager;
+		friend class ResourceRef;
+		friend class ILoader;
+		friend class ResourcesRegistry;
 
 	public:
 		// Default Construct.
@@ -87,6 +101,8 @@ namespace Raven
 			: type(EResourceType::RT_None)
 			, hasRenderResources(false)
 			, isOnGPU(false) 
+			, load_version(0)
+			, resourceIndex(INVALID_RSC_INDEX)
 		{
 
 		}
@@ -143,14 +159,132 @@ namespace Raven
 		// Is the resource loaded on GPU.
 		bool isOnGPU;
 
+		// The version of the resrouce when loaded.
+		uint32_t load_version;
+
 	private:
 		// The name of the resource.
 		std::string name;
 
 		// The path to the resource on disk.
 		std::string path;
+
+		// Index of the resources in the resource registry.
+		uint32_t resourceIndex;
 	};
 
+
+
+
+	// ResourceRef:
+	//    - Used to reference a resource for archiving operations.
+	//
+	class ResourceRef
+	{
+		// Friend...
+		friend class ResourceManager;
+
+		// No Copy Assignment
+		ResourceRef& operator=(const ResourceRef&) = delete;
+
+	private:
+		// The Resource relative path.
+		std::string path;
+
+		// The type of the Resource.
+		EResourceType type;
+
+		// Index of the resrouce in the resrouce manager.
+		IResource* rsc;
+
+		
+		// Private Contruct.
+		ResourceRef()
+			: type(EResourceType::RT_None)
+			, rsc(nullptr)
+		{
+
+		}
+
+
+	public:
+		// Contruct.
+		ResourceRef(IResource* resource)
+			: path(resource->path)
+			, type(resource->type)
+			, rsc(resource)
+		{
+
+		}
+
+		// Copy Construct.
+		ResourceRef(const ResourceRef& other)
+			: path(other.path)
+			, type(other.type)
+			, rsc(other.rsc)
+		{
+
+		}
+
+		// Create ResourceRef from input archive.
+		template<typename Archive>
+		static inline void Save(Archive& archive, IResource* resource)
+		{
+			if (resource)
+			{
+				const ResourceRef ref(resource);
+				archive(EnumAsInt<const EResourceType>(ref.type), ref.path);
+			}
+			else
+			{
+				const ResourceRef invalidRef;
+				archive(EnumAsInt<const EResourceType>(invalidRef.type), invalidRef.path);
+			}
+		}
+
+
+		// Create ResourceRef from input archive.
+		template<typename Archive>
+		static inline ResourceRef Load(Archive& archive)
+		{
+			ResourceRef ref;
+			archive(EnumAsInt<EResourceType>(ref.type), ref.path);
+
+			return ref;
+		}
+
+
+		// Return the relative path to the Resource.
+		inline const std::string& GetPath() const { return path; }
+
+		// Return true if the Resource is loaded and valid.
+		bool IsValid() const { return rsc != nullptr; }
+
+		// Find or load the Resource. 
+		Ptr<IResource> FindOrLoad();
+
+		// Return the resrouce if previously found.
+		Ptr<IResource> GetResrouce();
+
+		// Template FindOrLoad.
+		template<class TResource>
+		Ptr<TResource> FindOrLoad() 
+		{ 
+			Ptr<IResource> rsc = FindOrLoad();
+			RAVEN_ASSERT(!rsc || TResource::StaticGetType() == rsc->GetType(), "Type Mismatch");
+			return std::static_pointer_cast<TResource, IResource>(rsc);
+		}
+
+		// Template GetResrouce.
+		template<class TResource>
+		Ptr<TResource> GetResrouce()
+		{
+			Ptr<IResource> rsc = GetResrouce();
+			RAVEN_ASSERT(!rsc || TResource::StaticGetType() == rsc->GetType(), "Type Mismatch");
+			return std::static_pointer_cast<TResource, IResource>(rsc);
+		}
+
+	};
 
 
 }

@@ -265,14 +265,17 @@ namespace Raven
 					{
 						auto mat = glm::make_mat4(delta);
 						
-						transform->SetScale(transform->GetScale() + Transform::ExtractScale(mat));
+						transform->SetScale(gizmoOrigScale * Transform::ExtractScale(mat));
 					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
 						transform->SetMatrixTransform(mat);
-						//TOOD
 					}
+				}
+				else
+				{
+					gizmoOrigScale = transform->GetScale();
 				}
 			}
 		}

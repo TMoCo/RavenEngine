@@ -21,7 +21,7 @@ namespace Raven
 	class GLVertexArray;
 	class GLBuffer;
 
-	//
+	// RenderRscMesh:
 	//
 	class RenderRscMesh : public RenderRscPrimitive
 	{
@@ -33,8 +33,9 @@ namespace Raven
 		~RenderRscMesh();
 
 		// Load Mesh Data
-		virtual void Load(const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
-			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices );
+		virtual void Load(const std::vector<glm::vec3>& positions,
+			const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents,
+			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices);
 
 		// Return the vertex array that defines this mesh Vertex Input.
 		inline GLVertexArray* GetArray() { return vxarray; }
@@ -47,16 +48,19 @@ namespace Raven
 		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
 		GLVertexArray* vxarray;
 
-		// OpeGL Buffer for Mesh Positions.
+		// OpenGL Buffer for Mesh Positions.
 		GLBuffer* positionBuffer;
 
-		// OpeGL Buffer for Mesh Normals.
+		// OpenGL Buffer for Mesh Normals.
 		GLBuffer* normalBuffer;
 
-		// OpeGL Buffer for Mesh Texture Coordinate.
+		// OpenGL Buffer for Mesh Normals.
+		GLBuffer* tangentBuffer;
+
+		// OpenGL Buffer for Mesh Texture Coordinate.
 		GLBuffer* texCoordBuffer;
 
-		// OpeGL Buffer for Mesh Indices.
+		// OpenGL Buffer for Mesh Indices.
 		GLBuffer* indexBuffer;
 
 		// Number of indices in the index buffer.
@@ -65,7 +69,7 @@ namespace Raven
 
 
 
-	//
+	// RenderRscSkinnedMesh:
 	//
 	class RenderRscSkinnedMesh : public RenderRscPrimitive
 	{
@@ -77,12 +81,10 @@ namespace Raven
 		~RenderRscSkinnedMesh();
 
 		// Load Mesh Data
-		void Load(
-			const std::vector<glm::vec3>& positions, const std::vector<glm::vec3>& normals,
+		void Load(const std::vector<glm::vec3>& positions,
+			const std::vector<glm::vec3>& normals, const std::vector<glm::vec3>& tangents,
 			const std::vector<glm::vec2>& texCoord, const std::vector<unsigned int>& indices,
-			const std::vector<glm::vec4>& weight,
-			const std::vector<glm::ivec4>& blendIndices
-		);
+			const std::vector<glm::vec4>& weight, const std::vector<glm::ivec4>& blendIndices);
 
 		// Return the vertex array that defines this mesh Vertex Input.
 		inline GLVertexArray* GetArray() { return vxarray; }
@@ -94,26 +96,29 @@ namespace Raven
 		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
 		GLVertexArray* vxarray;
 
-		// OpeGL Buffer for Mesh Positions.
+		// OpenGL Buffer for Mesh Positions.
 		GLBuffer* positionBuffer;
 
-		// OpeGL Buffer for Mesh Normals.
+		// OpenGL Buffer for Mesh Normals.
 		GLBuffer* normalBuffer;
 
-		// OpeGL Buffer for Mesh Texture Coordinate.
+		// OpenGL Buffer for Mesh Normals.
+		GLBuffer* tangentBuffer;
+
+		// OpenGL Buffer for Mesh Texture Coordinate.
 		GLBuffer* texCoordBuffer;
 
-		// OpeGL Buffer for Mesh Indices.
+		// OpenGL Buffer for Mesh Indices.
 		GLBuffer* indexBuffer;
 
 		// Number of indices in the index buffer.
 		int32_t numIndices;
 
-		//
+		// OpenGL Buffer for skin weight.
 		GLBuffer* weightBuffer;
 
-		//
-		GLBuffer* indicesBuffer;
+		// OpenGL Buffer for bone indices.
+		GLBuffer* boneIndicesBuffer;
 	};
 
 }

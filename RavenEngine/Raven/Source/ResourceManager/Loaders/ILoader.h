@@ -43,6 +43,7 @@ namespace Raven
 		LT_Audio,
 		LT_GuiLayout,
 		LT_Animation,
+		LT_SkinnedMesh,
 
 		LT_MAX
 	};
@@ -84,6 +85,7 @@ namespace Raven
 		template<class T>
 		inline void ArchiveLoad(T& obj)
 		{
+			ILoader::SetLoadVersion(obj, version);
 			(*archive)(obj);
 		}
 
@@ -95,6 +97,10 @@ namespace Raven
 		// The file stream.
 		std::ifstream fileStream;
 
+
+	public:
+		// The version of the loaded file
+		uint32_t version;
 	};
 
 
@@ -233,6 +239,9 @@ namespace Raven
 	{
 		NOCOPYABLE(ILoader);
 
+		// Friend Archive.
+		friend class RavenInputArchive;
+
 	public:
 		// Construct.
 		ILoader()
@@ -283,6 +292,13 @@ namespace Raven
 
 		// List all resources that supported by this loader.
 		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) = 0;
+
+	private:
+		// Set load version value to the resrouce we are loading.
+		template< class T, std::enable_if_t< !std::is_base_of<IResource, T>::value, bool > = true >
+		static void SetLoadVersion(T& rsc, uint32_t load_version) { }
+		static void SetLoadVersion(IResource& rsc, uint32_t load_version) { rsc.load_version = load_version; }
+
 
 	};
 }

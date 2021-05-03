@@ -308,8 +308,7 @@ namespace Raven
 		//if(currentNodeId != 0)
 		//	currentAnimation = *AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
 
-		if(currentNodeId != 0)
-			currentAnimation = Engine::GetModule<ResourceManager>()->GetResource<Animation>(animatorNodes[currentNodeId].name);
+		RAVEN_ASSERT(0, "TODO: Use the new Resrouce System.");
 	}
 
 };

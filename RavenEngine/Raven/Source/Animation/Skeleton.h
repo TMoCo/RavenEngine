@@ -59,7 +59,10 @@ namespace Raven
 		{
 			archive(cereal::base_class<IResource>(this));
 
-			RAVEN_ASSERT(0, "TODO: Implement Skeleton::load");
+			LoadVector(archive, bones);
+
+			// Build loaded skeleton.
+			Build();
 		}
 
 		// Serialization Save.
@@ -68,7 +71,7 @@ namespace Raven
 		{
 			archive(cereal::base_class<IResource>(this));
 
-			RAVEN_ASSERT(0, "TODO: Implement Skeleton::save");
+			SaveVector(archive, bones);
 		}
 
 		// Reset Bone Transforms.

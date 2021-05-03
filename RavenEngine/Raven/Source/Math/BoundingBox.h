@@ -4,11 +4,13 @@
 
 #pragma once
 
-#include <utility>
+
+#include "Utilities/Serialization.h"
+#include "Math/MathUtils.h"
 
 #include "glm/glm.hpp"
 
-#include "Math/MathUtils.h"
+#include <utility>
 
 
 namespace Raven
@@ -77,6 +79,25 @@ namespace Raven
 
 			// Transform the bounding box and return it.
 			BoundingBox Transform(const glm::mat4& mtx) const;
+
+
+			// Serialization Save.
+			template<typename Archive>
+			void save(Archive& archive) const
+			{
+				archive(isValid);
+				archive(min);
+				archive(max);
+			}
+
+			// Serialization Load.
+			template<typename Archive>
+			void load(Archive& archive)
+			{
+				archive(isValid);
+				archive(min);
+				archive(max);
+			}
 
 		private:
 			// If false then min and max values are invalid.

@@ -1,8 +1,10 @@
 #include "ResourceManager.h"
+#include "Engine.h"
 
 
 #include "Utilities/Core.h"
 #include "Utilities/StringUtils.h"
+#include "Utilities/Serialization.h"
 
 // Importers...
 #include "ResourceManager/Importers/ImageImporter.h"
@@ -14,11 +16,77 @@
 #include "ResourceManager/Loaders/MeshLoader.h"
 #include "ResourceManager/Loaders/LayoutLoader.h"
 #include "ResourceManager/Loaders/AnimationLoader.h"
+#include "ResourceManager/Loaders/SkinnedMeshLoader.h"
 
+
+#include "miniz.h"
 
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+
+
+// -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
+
+
+
+
+bool Raven::Compress(uint32_t size, const uint8_t* data, uint8_t*& comp, uint32_t& outCompSize)
+{
+	RAVEN_ASSERT(!comp, "We allocate our own memory.");
+
+	int cmp_status;
+	mz_ulong comp_size = compressBound(size);
+
+	// Allocate buffers to hold compressed data.
+	comp = (mz_uint8*)malloc((size_t)comp_size);
+
+	if (!comp)
+	{
+		LOGE("Invalid memory allocation.");
+		return false;
+	}
+
+	// Compress.
+	cmp_status = compress(comp, &comp_size, (const unsigned char*)data, size);
+
+	if (cmp_status != Z_OK)
+	{
+		LOGE("compress() failed!.");
+		return false;
+	}
+
+	outCompSize = (uint32_t)comp_size;
+	return true;
+}
+
+
+bool Raven::Uncompress(uint32_t compSize, const uint8_t* comp, uint8_t* data, uint32_t size)
+{
+	RAVEN_ASSERT(data && comp, "Invalid Input.");
+
+	int cmp_status;
+	mz_ulong uncomp_size = (mz_ulong)size;
+
+	// Decompress.
+	cmp_status = uncompress(data, &uncomp_size, (const unsigned char*)comp, (mz_ulong)compSize);
+
+	if (cmp_status != Z_OK)
+	{
+		LOGE("uncompress() failed!.");
+		return false;
+	}
+
+	RAVEN_ASSERT(size == uncomp_size, "Uncompress Size Mismatch.");
+	return true;
+}
+
+
+
+
+
+// -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
+
 
 
 
@@ -26,6 +94,31 @@
 namespace Raven {
 
 
+
+
+
+Ptr<IResource> ResourceRef::FindOrLoad()
+{
+	// Invalid Ref?
+	if (type == INVALID_RSC_INDEX || path.empty())
+		return nullptr;
+
+	Ptr<IResource> resource = Engine::GetModule<ResourceManager>()->FindOrLoad(*this);
+	rsc = resource.get();
+	return resource;
+}
+
+
+Ptr<IResource> ResourceRef::GetResrouce()
+{
+	if (!IsValid())
+		return nullptr;
+
+	return Engine::GetModule<ResourceManager>()->GetResource(*this);
+}
+
+
+// -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
 
 
 ResourceHeaderInfo ILoader::LoadHeader(RavenInputArchive& archive)
@@ -60,24 +153,39 @@ ResourceHeaderInfo ILoader::SaveHeader(RavenOutputArchive& archive, IResource* r
 
 void ResourcesRegistry::AddResource(const std::string& path, const ResourceHeaderInfo& info, Ptr<IResource> newResource)
 {
-	ResourceData data;
-	data.info = info;
-	data.type = info.GetType();
-	data.path = path;
-	data.cleanPath = CleanRscPath(path);
-	data.rsc = newResource;
+	std::string cleanPath = CleanRscPath(path);
+	uint32_t index = INVALID_RSC_INDEX;
 
-	uint32_t index = static_cast<uint32_t>(resources.size());
-	resources.push_back(data);
+	if (!resourcePathMap.count(cleanPath))
+	{
+		ResourceData data;
+		data.info = info;
+		data.type = info.GetType();
+		data.path = path;
+		data.cleanPath = cleanPath;
+		data.rsc = newResource;
 
-	// Map path to resource.
-	resourcePathMap[data.cleanPath] = index;
+		index = static_cast<uint32_t>(resources.size());
+		resources.push_back(data);
+
+		// Map path to resource.
+		resourcePathMap[cleanPath] = index;
+	}
+	else
+	{
+		// Get resource data from path.
+		index = resourcePathMap[cleanPath];
+	}
+
 
 	// Is Loaded?
 	if (newResource)
 	{
+		resources[index].rsc = newResource;
 		resourceMap[newResource.get()] = index;
+		newResource->resourceIndex = index;
 	}
+	
 }
 
 
@@ -150,6 +258,17 @@ std::string ResourcesRegistry::CleanRscPath(const std::string& path) const
 }
 
 
+const ResourceData* ResourcesRegistry::GetResource(uint32_t index) const
+{
+	if (index >= 0 && index < resources.size())
+	{
+		return &resources[index];
+	}
+
+	return nullptr;
+}
+
+
 
 
 // -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
@@ -180,6 +299,7 @@ void ResourceManager::Initialize()
 	// Loaders...
 	RegisterLoader<ImageLoader>();
 	RegisterLoader<MeshLoader>();
+	RegisterLoader<SkinnedMeshLoader>();
 	RegisterLoader<LayoutLoader>();
 	RegisterLoader<AnimationLoader>();
 
@@ -358,8 +478,17 @@ bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::str
 }
 
 
+bool ResourceManager::LoadResource(const std::string& path, EResourceType type)
+{
+	ILoader* loader = GetLoader(type);
+	return LoadResource(loader, path);
+}
+
+
 bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 {
+	std::string absPath = StringUtils::GetCurrentWorkingDirectory() + "/" + path;
+
 	RavenInputArchive archive(path);
 
 	// Failed to open archive?
@@ -378,12 +507,100 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 		return false;
 	}
 
+	// Set current load version.
+	archive.version = info.GetVersion();
+
 	// Load the resource.
 	IResource* loadedRsc = loader->LoadResource(info, archive);
 	loadedRsc->path = path;
 
+
+	// Load Render Resrouces...
+	if (loadedRsc->HasRenderResources() && !loadedRsc->IsOnGPU())
+	{
+		loadedRsc->LoadRenderResource();
+	}
+
 	// Add the loaded resource to the registry.
 	registry.AddResource(path, info, Ptr<IResource>(loadedRsc));
+
+	return true;
+}
+
+
+bool ResourceManager::AddResrouce(const std::string& path)
+{
+	std::string absPath = StringUtils::GetCurrentWorkingDirectory() + "/" + path;
+
+	RavenInputArchive archive(path);
+
+	// Failed to open archive?
+	if (!archive.IsValid())
+	{
+		LOGW("Failed to add reference to a resrouce file {0}.", path.c_str());
+		return false;
+	}
+
+	// Load Header.
+	ResourceHeaderInfo info = ILoader::LoadHeader(archive);
+
+	// Invalid Raven Resrouce?
+	if (!info.IsValid())
+	{
+		LOGE("Failed to add resrouce. Resrouce is not RAVEN.");
+		return false;
+	}
+
+	// Add the loaded resource to the registry.
+	registry.AddResource(path, info, nullptr);
+
+	return true;
+}
+
+
+Ptr<IResource> ResourceManager::FindOrLoad(const ResourceRef& ref)
+{
+	const ResourceData* rscData = registry.FindResource(ref.path);
+
+	// Doesn't Exist?
+	if (!rscData)
+	{
+		LOGW("No Resource found that matches the one in ResourceRef.");
+		return nullptr;
+	}
+
+	// Type Mismatch?
+	if (rscData->type != ref.type)
+	{
+		RAVEN_ASSERT(0, "Type Mismatch");
+		return nullptr;
+	}
+
+	Ptr<IResource> resource;
+
+	// Not Loaded?
+	if (!rscData->rsc)
+	{
+		if (!LoadResource(rscData->path, rscData->type))
+		{
+			RAVEN_ASSERT(0, "Failed to load resource.");
+			return nullptr;
+		}
+	}
+
+	return rscData->rsc;
+}
+
+
+Ptr<IResource> ResourceManager::GetResource(const ResourceRef& ref)
+{
+	const ResourceData* rscData = registry.GetResource(ref.rsc->resourceIndex);
+
+	// Not Found?
+	if (!rscData)
+		return nullptr;
+
+	return rscData->rsc;
 }
 
 

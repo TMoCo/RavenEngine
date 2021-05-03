@@ -812,5 +812,41 @@ namespace Raven
 		return PrimitiveType::Cube;
 	}
 
+
+
+	void ComputeTangents(glm::vec3* out, uint32_t indices_count, uint32_t* indices,
+		const glm::vec3* vertices, const glm::vec3* normals, const glm::vec2* uvs)
+	{
+		for (int i = 0; i < indices_count; i += 3)
+		{
+			const glm::vec3 v0 = vertices[ indices[i + 0] ];
+			const glm::vec3 v1 = vertices[ indices[i + 1] ];
+			const glm::vec3 v2 = vertices[ indices[i + 2] ];
+			const glm::vec2 uv0 = uvs[ indices[i + 0] ];
+			const glm::vec2 uv1 = uvs[ indices[i + 1] ];
+			const glm::vec2 uv2 = uvs[ indices[i + 2] ];
+
+			const glm::vec3 dv10 = v1 - v0;
+			const glm::vec3 dv20 = v2 - v0;
+			const glm::vec2 duv10 = uv1 - uv0;
+			const glm::vec2 duv20 = uv2 - uv0;
+
+			const float dir = duv20.x * duv10.y - duv20.y * duv10.x < 0 ? -1.f : 1.f;
+			glm::vec3 tangent;
+			tangent.x = (dv20.x * duv10.y - dv10.x * duv20.y) * dir;
+			tangent.y = (dv20.y * duv10.y - dv10.y * duv20.y) * dir;
+			tangent.z = (dv20.z * duv10.y - dv10.z * duv20.y) * dir;
+
+			const float l = 1 / sqrtf(float(tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z));
+			tangent.x *= l;
+			tangent.y *= l;
+			tangent.z *= l;
+
+			out[ indices[i] + 0 ] = tangent;
+			out[ indices[i] + 1 ] = tangent;
+			out[ indices[i] + 2 ] = tangent;
+		}
+	}
+
 };
 

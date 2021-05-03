@@ -15,6 +15,7 @@ namespace Raven
 Skeleton::Skeleton()
 	: IResource()
 	, isBuilt(false)
+	, root(nullptr)
 {
 	type = Skeleton::StaticGetType();
 }
@@ -36,12 +37,6 @@ Bone& Skeleton::CreateBone(int32_t parentId)
 	// Index mapping.
 	bone.id = bones.size() - 1;
 	bone.parentIdx = parentId;
-
-	// Is Root?
-	if (parentId == -1)
-	{
-		root = &bone;
-	}
 
 	return bone;
 }
@@ -84,7 +79,18 @@ void Skeleton::Build()
 			bone.parent = &bones[bone.parentIdx];
 			bone.parent->children.push_back(&bone);
 		}
+		else
+		{
+			root = &bone;
+			root->parent = nullptr;
+		}
+
+		// Rest to rest-pose.
+		bone.ResetPose();
 	}
+
+	// No Root Found?
+	RAVEN_ASSERT(root != nullptr, "Root Not Found.");
 
 	// Done.
 	isBuilt = true;

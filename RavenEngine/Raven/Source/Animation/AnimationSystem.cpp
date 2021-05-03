@@ -37,15 +37,18 @@ namespace Raven
 
 				if (animator.isSimpleAnimator)
 				{
-					if (animator.anime)
+					if (animator.anim)
 					{
-						if (!animator.anime->IsStarted())
+						if (!animator.anim->IsStarted())
 						{
-							animator.anime->Play(0, skinnedComp->GetSkeleton());
+							animator.anim->Play(0, skinnedComp->GetSkeleton());
+
+							if (animator.offset > 0.000001f)
+								animator.anim->OnUpdate(animator.offset);
 						}
 						else
 						{
-							animator.anime->OnUpdate(dt);
+							animator.anim->OnUpdate(dt);
 						}
 					}
 				}

@@ -1,15 +1,22 @@
 #pragma once
+
+#include "Utilities/Core.h"
+
 #include <glm/glm.hpp>
 #include <string>
 #include <array>
+
+
 
 namespace Raven
 {
 	class Mesh;
 
-	namespace PrimitiveType 
+
+	// BasicShapes Types.
+	namespace EBasicShape
 	{
-		enum Id
+		enum Type
 		{
 			Plane = 0,
 			Quad = 1,
@@ -18,11 +25,10 @@ namespace Raven
 			Sphere = 4,
 			Capsule = 5,
 			Cylinder = 6,
-			Terrain = 7,
-			File = 8,
 			LENGTH
 		};
 
+		// Basic Shape Names.
 		const std::array<std::string, LENGTH> NAMES = 
 		{
 			"Plane",
@@ -32,34 +38,52 @@ namespace Raven
 			"Sphere",
 			"Capsule",
 			"Cylinder",
-			"Terrain",
-			"File",
 		};
-		std::string GetPrimativeName(PrimitiveType::Id type);
-		PrimitiveType::Id GetPrimativeName(const std::string& type);;
+
+		// Convert EBasicShape to its name.
+		std::string GetBasicShapeName(EBasicShape::Type type);
+
+		// Convert basic shape name to its type.
+		EBasicShape::Type GetPrimativeName(const std::string& name);
 	};
 
 
 
-	namespace MeshFactory
+	// MeshFactory:
+	//    - create & manage basic shapes resrouces.
+	//
+	class MeshFactory
 	{
-		Mesh* CreatePrimitive(PrimitiveType::Id type);
-		Mesh* CreateQuad();
-		Mesh* CreateQuad(float x, float y, float width, float height);
-		Mesh* CreateQuad(const glm::vec2& position, const glm::vec2& size);
-		Mesh* CreateCube();
-		Mesh* CreatePyramid();
-		Mesh* CreateSphere(uint32_t xSegments = 64, uint32_t ySegments = 64);
-		Mesh* CreateCapsule(float radius = 1.0f, float midHeight = 1.0f, int32_t radialSegments = 64, int32_t rings = 8);
-		Mesh* CreatePlane(float width, float height, const glm::vec3& normal);
-		Mesh* CreateCylinder(float bottomRadius = 1.0f, float topRadius = 1.0f, float height = 1.0f, int32_t radialSegments = 64, int32_t rings = 8);
-		Mesh* CreateTerrain();
+	public:
+		// Return the basic shape resrouce, if it doesn't exist create a new one.
+		static Ptr<Mesh> GetBasicShape(EBasicShape::Type type);
+
+	private:
+		// Return the path of a basic shape resrouce.
+		static std::string GetBasicShapeResroucePath(EBasicShape::Type type);
+
+
+		// -- -- - - -- -- - - -- -- - - -- -- - - 
+		//          Create Basic Shapes.
+		// -- -- - - -- -- - - -- -- - - -- -- - -
+
+		static Mesh* CreateQuad();
+		static Mesh* CreateQuad(float x, float y, float width, float height);
+		static Mesh* CreateQuad(const glm::vec2& position, const glm::vec2& size);
+		static Mesh* CreateCube();
+		static Mesh* CreatePyramid();
+		static Mesh* CreateSphere(uint32_t xSegments = 64, uint32_t ySegments = 64);
+		static Mesh* CreateCapsule(float radius = 1.0f, float midHeight = 1.0f, int32_t radialSegments = 64, int32_t rings = 8);
+		static Mesh* CreatePlane(float width, float height, const glm::vec3& normal);
+		static Mesh* CreateCylinder(float bottomRadius = 1.0f, float topRadius = 1.0f, float height = 1.0f, int32_t radialSegments = 64, int32_t rings = 8);
+	
 	};
 
 
 	// Compute Tangents from vertices, normals, uvs.
 	void ComputeTangents(glm::vec3* out, uint32_t indices_count, uint32_t* indices,
 		const glm::vec3* vertices, const glm::vec3* normals, const glm::vec2* uvs);
+
 
 }
 

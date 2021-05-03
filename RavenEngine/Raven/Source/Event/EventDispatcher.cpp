@@ -125,7 +125,7 @@ namespace Raven
 
 	void EventDispatcher::DispatchEvents()
 	{
-		//# clear handler what wait for delete
+		//# clear handlers that are waiting to be deleted
 		for (EventHandler *eventHandler : eventHandlerDeleteSet)
 		{
 			auto i = std::find(eventHandlers.begin(), eventHandlers.end(), eventHandler);
@@ -135,6 +135,7 @@ namespace Raven
 		}
 
 		eventHandlerDeleteSet.clear();
+
 		//# sort with priority
 		for (EventHandler *eventHandler : eventHandlerAddSet)
 		{
@@ -154,6 +155,7 @@ namespace Raven
 
 		std::pair<std::promise<bool>, std::unique_ptr<Event>> event;
 
+		// dispatch events
 		for (;;)
 		{
 			std::unique_lock<std::mutex> lock(eventQueueMutex);

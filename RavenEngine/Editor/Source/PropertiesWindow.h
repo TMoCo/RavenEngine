@@ -26,6 +26,5 @@ namespace Raven
 		bool init = false;
 		MM::EntityEditor<entt::entity> enttEditor;
 		AnimationController* controller = nullptr;
-
 	};
 };

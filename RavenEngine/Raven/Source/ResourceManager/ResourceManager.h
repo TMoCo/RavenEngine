@@ -189,6 +189,12 @@ namespace Raven
 		template<class TImporter>
 		TImporter* GetImporter();
 
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+		//           Scan directory for resources
+		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
+
+		void ScanDirectory(const std::string& path);
+
 	private:
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//             Importers & Loaders 
@@ -210,7 +216,6 @@ namespace Raven
 
 		// Load a resrouce using specific loader.
 		bool LoadResource(ILoader* loader, const std::string& path);
-
 
 	private:
 		// Create & Register a new loader to the Resource manager.

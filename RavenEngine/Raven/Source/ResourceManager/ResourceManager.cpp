@@ -18,7 +18,7 @@
 
 #include <fstream>
 #include <iostream>
-
+#include <filesystem>
 
 
 
@@ -183,6 +183,8 @@ void ResourceManager::Initialize()
 	RegisterLoader<LayoutLoader>();
 	RegisterLoader<AnimationLoader>();
 
+	// scan the directory and populate the 
+
 }
 
 
@@ -191,6 +193,37 @@ void ResourceManager::Destroy()
 	registry.Reset();
 }
 
+
+void ResourceManager::ScanDirectory(const std::string& path)
+{
+	// construct a path from the input string
+	auto p = std::filesystem::path(path);
+	// use the path passed as argument to explore the directory (if it is)
+	if (std::filesystem::is_directory(p))
+	{
+		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		{
+			// extract file extension 
+			std::string ext = StringUtils::GetExtension(path);
+
+			// raven extension, load the resource
+			if (ext == std::string("raven"))
+			{
+				ResourceHeaderInfo info = ILoader::LoadHeader(RavenInputArchive(path));
+				LoadResource(GetLoader(info.GetType()), path);
+			}
+
+			// if file extension on is supported (an importer exists), notify the registry
+			if (GetImporter(ext))
+			{
+				registry.AddResource(path, ILoader::LoadHeader(RavenInputArchive(path)), nullptr);
+			}
+
+			// recursivivly check for subdirectories
+			ScanDirectory(entry.path().string());
+		}
+	}
+}
 
 IImporter* ResourceManager::GetImporter(const std::string& ext)
 {

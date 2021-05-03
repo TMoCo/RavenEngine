@@ -5,12 +5,39 @@
 #pragma once
 #include <string>
 #include <entt/entt.hpp>
+
+
+
+
+
+
 namespace Raven 
 {
-	class Scene;
 
-	//TODO serialize function is not implementation
+// All components types, Please add yours when you create a new one.
+#define ALL_COMPONENTS Transform, \
+	NameComponent, \
+	ActiveComponent, \
+	MeshComponent, \
+	SkinnedMeshComponent, \
+	Hierarchy, \
+	Camera, \
+	Light, \
+	CameraControllerComponent, \
+	LuaComponent, \
+	Animator, \
+	RigidBody
+
+
+
+	// Forward Declaration
+	class Scene;
 	class Entity;
+
+
+	// Component:
+	//		- Parent class for all componenets.
+	//
 	class Component 
 	{
 		friend class Entity;

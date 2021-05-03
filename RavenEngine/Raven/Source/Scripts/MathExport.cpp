@@ -73,10 +73,12 @@ namespace Raven
 				return  glm::normalize(*t);
 			}
 
+
 			template <>
 			static glm::vec3 cross(const glm::vec3* t, const glm::vec3* t2) {
 				return glm::cross(*t, *t2);
 			}
+
 		};
 
 
@@ -87,7 +89,6 @@ namespace Raven
 
 				.beginClass <glm::vec2>("vec2")
 				.addConstructor <void (*) (float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec2, 0>, &VecHelper::set <glm::vec2, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec2, 1>, &VecHelper::set <glm::vec2, 1>)
 				.addFunction("__tostring", &VecHelper::toString<glm::vec2>)
@@ -99,7 +100,6 @@ namespace Raven
 
 				.beginClass <glm::vec3>("vec3")
 				.addConstructor <void (*) (float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec3, 0>, &VecHelper::set <glm::vec3, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec3, 1>, &VecHelper::set <glm::vec3, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec3, 2>, &VecHelper::set <glm::vec3, 2>)
@@ -115,7 +115,6 @@ namespace Raven
 
 				.beginClass <glm::vec4>("vec4")
 				.addConstructor <void (*) (float, float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec4, 0>, &VecHelper::set <glm::vec4, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec4, 1>, &VecHelper::set <glm::vec4, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec4, 2>, &VecHelper::set <glm::vec4, 2>)

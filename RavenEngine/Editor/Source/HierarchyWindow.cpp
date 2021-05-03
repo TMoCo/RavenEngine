@@ -92,7 +92,7 @@ namespace Raven
 				entity.GetOrAddComponent<Transform>();
 			}
 
-			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "Quad" };
+			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Quad" };
 
 			if (ImGui::BeginMenu("Add 3D Object"))
 			{
@@ -104,7 +104,7 @@ namespace Raven
 						auto & model = entity.AddComponent<MeshComponent>();
 						auto& tr = entity.GetOrAddComponent<Transform>();
 						
-						auto mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(PrimitiveType::GetPrimativeName(name)));
+						auto mesh = Ptr<Mesh>(MeshFactory::GetBasicShape(EBasicShape::GetPrimativeName(name)));
 						model.SetMesh(mesh);
 					}
 				}

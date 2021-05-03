@@ -90,7 +90,7 @@ namespace Raven
 		inline const auto& GetLocalBounds() { return localBounds; }
 
 		inline auto GetPrimitiveType() const { return primitiveType; }
-		inline auto SetPrimitiveType(PrimitiveType::Id type) { primitiveType = type; }
+		inline auto SetPrimitiveType(EBasicShape::Type type) { primitiveType = type; }
 
 		inline auto GetFileName() const { return filePath; }
 
@@ -111,7 +111,6 @@ namespace Raven
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-
 			archive(
 				cereal::make_nvp("PrimitiveType", primitiveType), 
 				cereal::make_nvp("FilePath", filePath),
@@ -158,7 +157,7 @@ namespace Raven
 		// The Model Materials, used by meshes mapped to the same index.
 		std::vector< Ptr<Material> > materials;
 
-		PrimitiveType::Id primitiveType;
+		EBasicShape::Type primitiveType;
 
 		// The local bounding box of the model that contain all its meshes.
 		MathUtils::BoundingBox localBounds;

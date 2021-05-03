@@ -26,6 +26,7 @@ project "Game"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"
@@ -42,6 +43,7 @@ project "Game"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"

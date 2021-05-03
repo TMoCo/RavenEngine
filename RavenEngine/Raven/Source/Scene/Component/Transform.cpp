@@ -20,6 +20,11 @@ namespace Raven
 {
 
 
+const Transform Transform::Identity( glm::mat4(1.0f) );
+
+
+
+
 Transform::Transform()
 	: position(0.0f)
 	, scale(1.0f)
@@ -337,6 +342,20 @@ glm::vec3 Transform::ExtractScale(const glm::mat4& mtx)
 
 	return mtxScale;
 }
+
+
+void Transform::SetTransform(Transform& other)
+{
+	localMatrix_cache = other.GetLocalMatrix();
+	worldMatrix = other.GetWorldMatrix();
+	position = other.GetPosition();
+	rotation = other.GetRotation();
+
+	isLocalMatrixCacheDiry = false;
+	isWorldMatrixDiry = false;
+	UpdateChildrenWorld();
+}
+
 
 
 

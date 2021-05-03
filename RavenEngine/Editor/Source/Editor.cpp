@@ -11,6 +11,7 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
+#include "Scene/Component/RigidBody.h"
 #include "Scene/Component/MeshComponent.h"
 #include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Entity/Entity.h"
@@ -54,6 +55,7 @@ namespace Raven
 		iconMap[typeid(MeshComponent).hash_code()] = ICON_MDI_SHAPE;
 		iconMap[typeid(SkinnedMeshComponent).hash_code()] = ICON_MDI_SHAPE;
 		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
+		iconMap[typeid(RigidBody).hash_code()] = ICON_MDI_APPLE;
 
 		ImGuizmo::SetGizmoSizeClipSpace(0.25f);
 		auto winSize = Engine::Get().GetModule<Window>()->GetWindowSize();
@@ -156,7 +158,16 @@ namespace Raven
 
 				selectedNode = entt::null;
 				if (selected)
+				{
+					// we reload the scene, so destroy the rigid bodies in the physics engine
+					auto &registry = Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
+					auto view = registry.view<RigidBody>();
+					for (auto v : view)
+					{
+						view.get<RigidBody>(v).DestroyRigidBody();
+					}
 					LoadCachedScene();
+				}
 				else
 				{
 					CacheScene();
@@ -543,7 +554,6 @@ namespace Raven
 	void Editor::CacheScene()
 	{
 		//Serialize the scene
-	
 		for (auto & win : editorWindows)
 		{
 			win.second->SaveWorkspace();

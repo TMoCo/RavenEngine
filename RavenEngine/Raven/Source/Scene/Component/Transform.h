@@ -46,6 +46,9 @@ namespace Raven
 		// Destruct.
 		~Transform();
 
+		// Identity Transform.
+		static const Transform Identity;
+
 		// Return the transform in world coordinate.
 		inline auto& GetWorldMatrix() 
 		{ 
@@ -89,7 +92,11 @@ namespace Raven
 		void SetPosition(const glm::vec3& v);
 		void SetScale(const glm::vec3& v);
 		void SetRotation(const glm::quat& v);
-		void SetRotationEuler(float pitch, float yaw, float roll); // Order of rotation v' = Yaw * Pitch * Roll * v;
+
+		// Set Euler Angles:
+		//     Order of rotation v' = Yaw * Pitch * Roll * v;
+		void SetRotationEuler(float pitch, float yaw, float roll);
+		inline void SetRotationEuler(const glm::vec3 angles) { SetRotationEuler(angles.x, angles.y, angles.z); }
 
 		// Set World...
 		void SetWorldPosition(const glm::vec3& v);
@@ -100,6 +107,9 @@ namespace Raven
 		// Set Matrix...
 		void SetMatrixTransform(const glm::mat4& mtx);
 		void SetWorldMatrixTransform(const glm::mat4& mtx);
+
+		// Set Transform
+		void SetTransform(Transform& other);
 
 		// Reset Transform to identity.
 		void ResetTransform();

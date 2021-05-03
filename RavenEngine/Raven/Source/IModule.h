@@ -1,12 +1,10 @@
+//////////////////////////////////////////////////////////////////////////////
+// This file is part of the Raven Game Engine			                    //
+//////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-
-
 #include <vector>
-
-
-
-
 
 /** Modules Types. */
 enum EModuleType
@@ -19,11 +17,9 @@ enum EModuleType
 	MT_ResourceManager,
 	MT_ProceduralGenerator,
 	MT_LuaVirtualMachine,
+	MT_Physics,
 	MT_MAX
 };
-
-
-
 
 /**
  * Interface for modules in the engine.

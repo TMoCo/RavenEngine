@@ -19,7 +19,9 @@ project "RavenEngine"
 	{
 		"Source/**.h",
 		"Source/**.c",
-		"Source/**.cpp"
+		"Source/**.cpp",
+		"../../gameProject/scripts/**.lua",
+		"../../gameProject/shaders/**.glsl"
 	}
 
 	removefiles
@@ -40,6 +42,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"
@@ -57,6 +60,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}"
@@ -65,10 +69,8 @@ project "RavenEngine"
 	links
 	{
 		"imgui",
-		"spdlog",
+		"spdlog"
 	}
-
-
 
 	defines
 	{
@@ -116,7 +118,7 @@ project "RavenEngine"
 
 		links
 		{
-			"glfw","glew32","lua","openfbx","node-editor"
+			"glfw","glew32","lua", "reactphysics3d", "openfbx","node-editor"
 		}
 
 		buildoptions

@@ -26,7 +26,7 @@ namespace Raven
 	}
 
 	Model_deprecated::Model_deprecated(const std::string & fileName)
-		: primitiveType(PrimitiveType::File), filePath(fileName)
+		: primitiveType(EBasicShape::Capsule), filePath(fileName)
 	{
 		mesh = Ptr<SkinnedMesh>(new SkinnedMesh());
 	}

@@ -7,9 +7,7 @@ root_dir = os.getcwd()
 
 Arch = _OPTIONS["arch"]
 
-
-
-IncludeDir = {}  
+IncludeDir = {}
 IncludeDir["GLFW"] = "%{root_dir}/RavenEngine/Dependencies/glfw/include/"
 IncludeDir["Glew"] = "%{root_dir}/RavenEngine/Dependencies/glew-2.1.0/include/"
 IncludeDir["stb"] = "%{root_dir}/RavenEngine/Dependencies/stb/"
@@ -20,6 +18,7 @@ IncludeDir["cereal"] = "%{root_dir}/RavenEngine/Dependencies/cereal/include"
 IncludeDir["spdlog"] = "%{root_dir}/RavenEngine/Dependencies/spdlog/include"
 IncludeDir["glm"] = "%{root_dir}/RavenEngine/Dependencies/glm"
 IncludeDir["OpenFBX"] ="%{root_dir}/RavenEngine/Dependencies/OpenFBX/"
+IncludeDir["reactphysics3d"] = "%{root_dir}/RavenEngine/Dependencies/rp3d/include"
 IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
 IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
 IncludeDir["NodeEditor"] ="%{root_dir}/RavenEngine/Dependencies/node-editor"
@@ -58,6 +57,8 @@ workspace( settings.workspace_name )
 			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/OpenFBX/premake5")
 			SetRecommendedSettings()
+		require("RavenEngine/Dependencies/rp3d/premake5")
+			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/lua/premake5")
 			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/node-editor/premake5")
@@ -71,4 +72,4 @@ workspace( settings.workspace_name )
 
 workspace( settings.workspace_name )
 
-	startproject("Game")
+	startproject("RavenEditor")

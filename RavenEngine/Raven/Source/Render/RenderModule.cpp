@@ -212,17 +212,14 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 	
 #else
-	glm::vec3 offset = glm::vec3(0.0f, -4.0f, 0.0f);
-	float dist = 17.0f;
-	glm::mat4 view = glm::lookAt(glm::vec3(cos(camRot), 0.9f, sin(camRot)) * dist + offset, offset, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
+	glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 10.0f, -20.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), rtScene->GetAspectRatio(), 0.01f, 10000.0f);
 #endif
 
 	rscene->SetView(view);
 	rscene->SetProjection(proj, near, far);
 
 	// ~TESTING-------------------------------------------------------
-
 
 	// Build Render Data form the scene...
 	rscene->Build(scene);

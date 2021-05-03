@@ -24,6 +24,14 @@ namespace Raven
 	void RavenGame::Initialize()
 	{
 		Raven::Engine::Initialize();
+		//auto scene = new Scene("controller_test.raven");
+
+		//GetModule<SceneManager>()->AddScene(scene);
+
+		//scene->SetInitCallback([](Scene* _scene) {
+
+		//	});
+
 
 	}
 

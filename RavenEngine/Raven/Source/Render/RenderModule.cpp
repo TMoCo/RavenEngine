@@ -128,7 +128,7 @@ void RenderModule::Initialize()
 
 	// ~ITERATION_0----------------------------------------------------------------------------
 	// load the generated height map into resource manager
-	if (!Engine::GetModule<ResourceManager>()->AddResrouce("T_Default_Environment_Map.raven"))
+	if (!Engine::GetModule<ResourceManager>()->AddResource("T_Default_Environment_Map.raven"))
 	{
 		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Default_Environment_Map.jpg");
 	}
@@ -278,7 +278,7 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 
 void RenderModule::CreateDefaultMaterials()
 {
-	if (!Engine::GetModule<ResourceManager>()->AddResrouce("T_Checker.raven"))
+	if (!Engine::GetModule<ResourceManager>()->AddResource("T_Checker.raven"))
 	{
 		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Checker.png");
 	}

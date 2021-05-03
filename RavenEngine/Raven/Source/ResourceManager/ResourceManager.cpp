@@ -528,7 +528,7 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 }
 
 
-bool ResourceManager::AddResrouce(const std::string& path)
+bool ResourceManager::AddResource(const std::string& path)
 {
 	std::string absPath = StringUtils::GetCurrentWorkingDirectory() + "/" + path;
 

@@ -158,6 +158,11 @@ namespace Raven
 		// Save existing Resource.
 		bool SaveResource(Ptr<IResource> rsc);
 
+		bool AddResource(const std::string& path);
+
+		template<class TImporter>
+		TImporter* GetImporter();
+
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//           Scan directory for resources
 		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
@@ -175,6 +180,7 @@ namespace Raven
 		// Return the loader of type TLoader
 		template <class TLoader>
 		TLoader* GetLoader();
+
 
 		// Return the loader that can load this resource type.
 		ILoader* GetLoader(EResourceType rscType);

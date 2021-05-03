@@ -28,14 +28,27 @@ namespace Raven
 			return rp3d::Quaternion(quat.x, quat.y, quat.z, quat.w);
 		}
 
-		Transform ToTransform(const rp3d::Transform& other)
+		// As RP3D does not encode model scale in it's transform we have to add the scaling of the object before updating the transform
+		Transform ToTransform(const rp3d::Transform& other, const glm::vec3& scale)
 		{
 			// construct from a glm mat4
 			glm::mat4 t;
 			// column major
 			other.getOpenGLMatrix(glm::value_ptr(t));
+
+			glm::mat4 scaleMat(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
 			// a new Raven::Transform with the rp3d transform data
-			return Transform(t);
+			return Transform(scaleMat * t);
+		}
+
+		glm::quat ToGLMQuat(const rp3d::Quaternion other)
+		{
+			glm::quat out;
+			out.x = other.x;
+			out.y = other.y;
+			out.z = other.z;
+			out.w = other.w;
+			return out;
 		}
 
 		glm::quat ToGLMQuat(const rp3d::Quaternion other)

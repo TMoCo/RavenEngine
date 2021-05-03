@@ -13,7 +13,7 @@ namespace Raven
 	class SkinnedMeshSection;
 	class Skeleton;
 	class Animation;
-	struct AnimationClip;
+	class AnimationClip;
 
 	// deprecated Moved to Fbx Importer.
 	class FbxLoader_deprecated

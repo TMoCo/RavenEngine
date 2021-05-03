@@ -1,3 +1,4 @@
+
 #pragma once
 
 
@@ -9,17 +10,20 @@
 
 namespace Raven
 {
-	// AnimationLoader:
-	//    - 
+	// SkinnedMeshLoader:
+	//    - loader for skinned mesh & skeleton.
 	//
-	class AnimationLoader : public ILoader
+	class SkinnedMeshLoader : public ILoader
 	{
 	public:
 		// Construct.
-		AnimationLoader();
+		SkinnedMeshLoader();
+
+		// Destrcut.
+		virtual ~SkinnedMeshLoader();
 
 		// Loader Type.
-		inline static ELoaderType Type() { return ELoaderType::LT_Animation; }
+		inline static ELoaderType Type() { return ELoaderType::LT_SkinnedMesh; }
 
 		// Load Resource from archive.
 		virtual IResource* LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive) override;
@@ -29,8 +33,6 @@ namespace Raven
 
 		// List all resources that supported by this loader.
 		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) override;
+
 	};
 }
-
-
-

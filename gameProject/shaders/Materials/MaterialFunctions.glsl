@@ -49,6 +49,9 @@ struct MaterialData
 	// The normal in world coordinate.
 	vec3 normal;
 	
+	// The tangent in world coordinate.
+	vec3 tangent;
+	
 	// The texture coordinate.
 	vec2 texCoord;
 };
@@ -65,7 +68,7 @@ struct MaterialOutput
 	// The emission value.
 	vec3 emission;
 	
-	// The normal in tangent space.
+	// The normal in world coordinate.
 	vec3 normal;
 	
 	// Material Roughness -> [0.0, 1.0].
@@ -90,13 +93,57 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
 	outParams.color = vec3(1.0, 0.0, 0.0);
 	outParams.emission = vec3(0.0);
-	outParams.normal = vec3(0.0, 0.0, 1.0);
 	outParams.roughness = 0.0;
 	outParams.metallic = 0.0;
 	outParams.specular = 1.0;
 	outParams.alpha = 1.0;
+	
+	// This is normal in world coord.
+	outParams.normal = inData.normal;
 }
 #endif
+
+
+
+
+
+// Compute Tangnet Matrix to World Matrix.
+mat3 ComputeTBNMatrix(vec3 N, vec3 T)
+{
+	// Orthogonalize.
+	T = normalize(T - dot(T, N) * N);
+	
+	// Bi-Tangent.
+    vec3 B = normalize( cross(T, N) );
+	
+	//return mat3(T, B, N);
+	
+	return mat3(
+		vec3(T.x, B.x, N.x),
+		vec3(T.y, B.y, N.y),
+		vec3(T.z, B.z, N.z)
+	);
+}
+
+
+
+// Sample normal from normal map.
+vec3 SampleNormalMap(sampler2D tex, vec2 coord)
+{
+	return texture(tex, coord).xyz * 2.0 - 1.0;
+}
+
+
+// Convert [-1, 1] Normal Texture values to World Normal.
+vec3 TangentToWorld(vec3 NV, vec3 N, vec3 T)
+{	
+	// Tangent Matrix
+	mat3 TBN = ComputeTBNMatrix(N, T);
+	
+	return NV * TBN;
+}
+
+
 
 
 #endif // End of STAGE_FRAGMENT_SHADER

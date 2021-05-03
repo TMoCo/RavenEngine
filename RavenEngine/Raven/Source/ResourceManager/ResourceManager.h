@@ -80,45 +80,11 @@ namespace Raven
 
 		// Clean Resrouce Path.
 		std::string CleanRscPath(const std::string& path) const;
+
+		// Return a resrouce using at index.
+		const ResourceData* GetResource(uint32_t index) const;
+
 	};
-
-
-
-	// ResourceRef:
-	//    - Used to reference a resource for archiving operations.
-	//
-	template< class ResourceType,
-		std::enable_if_t< std::is_base_of<IResource, ResourceType>::value, bool > = true >
-	class ResourceRef
-	{
-		// Friend...
-		friend class ResourceManager;
-
-	private:
-		// The Resource relative path.
-		std::string path;
-
-		// The type of the Resource.
-		EResourceType type;
-
-		// The Resource.
-		Ptr<IResource> rsc;
-
-	public:
-		// Return the relative path to the Resource.
-		inline const std::string& GetPath() const { return path; }
-
-		// Return a raw pointer to the Resource.
-		inline Ptr<IResource> Get() const { return rsc; }
-
-		// Return true if the Resource is loaded and valid.
-		inline bool IsValid() const { return rsc != nullptr; }
-
-		// Find or load the Resource. 
-		bool FindOrLoad();
-	};
-
-
 
 
 
@@ -142,6 +108,7 @@ namespace Raven
 
 		// Destruct.
 		virtual ~ResourceManager();
+
 	
 		// inherited from IModule, must be overridden
 		virtual void Initialize() override;
@@ -166,6 +133,12 @@ namespace Raven
 		// Return true if the Resource exist in the registry and loaded.
 		bool IsResourceLoaded(const std::string& path);
 
+		// Find or Load the resrouce ResourceRef is currently referencing.
+		Ptr<IResource> FindOrLoad(const ResourceRef& ref);
+
+		// Return the resrouce ResourceRef is currently referencing.
+		Ptr<IResource> GetResource(const ResourceRef& ref);
+
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//                 Save/Import resources
@@ -185,18 +158,13 @@ namespace Raven
 		// Save existing Resource.
 		bool SaveResource(Ptr<IResource> rsc);
 
-		// Return importer of type TImporter, can be used to update import settings for the next import.
-		template<class TImporter>
-		TImporter* GetImporter();
-
 	private:
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//             Importers & Loaders 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 
-		// Load a Resource at that path.
-		template<class TResource>
-		bool LoadResource(const std::string& path);
+		// Load a Resource of a specific type at a specific path
+		bool LoadResource(const std::string& path, EResourceType type);
 
 		// Return the loader of type TLoader
 		template <class TLoader>
@@ -211,6 +179,13 @@ namespace Raven
 		// Load a resrouce using specific loader.
 		bool LoadResource(ILoader* loader, const std::string& path);
 
+	public:
+		// Return importer of type TImporter, can be used to update import settings for the next import.
+		template<class TImporter>
+		TImporter* GetImporter();
+
+		// Add resrouce path to the registry.
+		bool AddResrouce(const std::string& path);
 
 	private:
 		// Create & Register a new loader to the Resource manager.
@@ -255,17 +230,6 @@ namespace Raven
 	// --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 
 
-
-
-	template<class TResource>
-	bool ResourceManager::LoadResource(const std::string& path)
-	{
-		ILoader* loader = GetLoader(TResource::StaticGetType());
-
-		return LoadResource(loader, path);
-	}
-
-
 	template <class TLoader>
 	TLoader* ResourceManager::GetLoader()
 	{
@@ -305,7 +269,7 @@ namespace Raven
 		// Not Loaded?
 		if (!rscData->rsc)
 		{
-			if ( !LoadResource<TResource>(path) )
+			if ( !LoadResource(rscData->path, rscData->type) )
 			{
 				RAVEN_ASSERT(0, "Failed to load resource.");
 				return nullptr;

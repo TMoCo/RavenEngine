@@ -10,6 +10,6 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 	outParams.roughness = 1.0;
 	outParams.metallic = 0.0;
 	outParams.specular = 1.0;
-	outParams.normal = vec3(0.0, 0.0, 1.0);
+	outParams.normal = inData.normal;
 }
 

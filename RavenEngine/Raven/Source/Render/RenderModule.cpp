@@ -128,7 +128,11 @@ void RenderModule::Initialize()
 
 	// ~ITERATION_0----------------------------------------------------------------------------
 	// load the generated height map into resource manager
-	Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Default_Environment_Map.jpg");
+	if (!Engine::GetModule<ResourceManager>()->AddResrouce("T_Default_Environment_Map.raven"))
+	{
+		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Default_Environment_Map.jpg");
+	}
+
 
 	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Default_Environment_Map.raven").get();
 
@@ -277,7 +281,10 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 
 void RenderModule::CreateDefaultMaterials()
 {
-	Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Checker.png");
+	if (!Engine::GetModule<ResourceManager>()->AddResrouce("T_Checker.raven"))
+	{
+		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Checker.png");
+	}
 
 	// Checker Texture...
 	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Checker.raven");

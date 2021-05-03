@@ -10,8 +10,8 @@ in VertexOutput
 {
 	vec3 position;
 	vec3 normal;
+	vec3 tangent;
 	vec2 texCoord;
-	
 } inFrag;
 
 
@@ -48,13 +48,16 @@ void main()
 {
 	// Normalize Input Normal
 	vec3 normal = normalize(inFrag.normal);
+	vec3 tangent = normalize(inFrag.tangent);
 
 	
 	// Material Input...
 	MaterialData matIn;
 	matIn.position = inFrag.position;
 	matIn.normal = normal;
+	matIn.tangent = inFrag.tangent;
 	matIn.texCoord = inFrag.texCoord;
+	
 	
 	// Material Compute Output.
 	MaterialOutput matOut;
@@ -77,7 +80,7 @@ void main()
 #if RENDER_PASS_FORWARD
 	// Surface Data.
 	LightSurfaceData surface;
-	surface.n = normal;
+	surface.n = matOut.normal;
 	surface.p = inFrag.position;
 	surface.albedo = matOut.color;
 	surface.specular = clamp(matOut.specular, 0.0, 1.0);
@@ -106,7 +109,7 @@ void main()
 	// Output G-Buffer...
 	outAlbedo.rgb = matOut.color;
 	outEmission.rgb = matOut.emission;
-	outNormal.rgb = normal;
+	outNormal.rgb = matOut.normal;
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
 	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);

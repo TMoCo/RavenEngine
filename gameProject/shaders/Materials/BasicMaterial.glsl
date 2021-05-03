@@ -1,51 +1,42 @@
 
-// Basic Material Paramters.
+
+// Input Basic Materail Paramters
 layout(std140) uniform MaterialParamtersBlock
 {
-	vec4 color;
-	vec4 emission;
-	float roughness;
-	float metallic;
-	float specular;
-	float alpha;
-}inMaterial;
+	vec4 Color;
+	vec4 Emission;
+	float Roughness;
+	float Metallic;
+	float Specular;
+	float Alpha;
+	
+} inMaterial;
 
 
 
-
-//
-uniform sampler2D baseColorTexture;
-uniform sampler2D AOTexture;
-uniform sampler2D metallicTexture;
-uniform sampler2D roughnessTexture;
+// Input Textures
+uniform sampler2D ColorTexture;
+uniform sampler2D MetallicTexture;
+uniform sampler2D RoughnessTexture;
+uniform sampler2D NormalTexture;
 
 
 
 
 // Baisc Materail:
 // 		- is just a simple pass through material.
+//
 void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
-	vec3 v = normalize(inCommon.viewPos - inData.position);
-	float NDotV =  dot(v, inData.normal);
-	
-	
-	
-	float r = texture(roughnessTexture, inData.texCoord).r;
-	vec3 bc = sRGBToLinearSample(baseColorTexture, inData.texCoord).rgb * 2.0;
-	float ao = texture(AOTexture, inData.texCoord).r;
-	
-	outParams.color = bc * ao * inMaterial.color.rgb;
-	outParams.emission = inMaterial.emission.rgb;
-	outParams.roughness =  r * 0.7;
-	outParams.metallic =  min(1.0, (texture(metallicTexture, inData.texCoord).r) * inMaterial.metallic + 0.87);
-	outParams.specular = inMaterial.specular;
-	
-
-	
-	outParams.alpha = inMaterial.alpha + 0.2;
+	outParams.color = inMaterial.Color * sRGBToLinearSample(ColorTexture, inData.texCoord);
+	outParams.emission = inMaterial.Emission;
+	outParams.roughness = inMaterial.Roughness * texture(RoughnessTexture, inData.texCoord);
+	outParams.metallic = inMaterial.Metallic * texture(MetallicTexture, inData.texCoord);
+	outParams.specular = inMaterial.Specular;
+	outParams.alpha = inMaterial.alpha;
 	
 	// Default...
-	outParams.normal = vec3(0.0, 0.0, 1.0);
+	vec3 normal = texture(NormalTexture, inData.texCoord)
+	outParams.normal = NormalMapToWorld(normal, inData.normal, inData.tangent);
 }
 

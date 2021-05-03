@@ -13,7 +13,7 @@ namespace Raven
 {
 	Animation::Animation()
 	{
-		type = StaticGetType();
+
 	}
 
 
@@ -31,7 +31,7 @@ namespace Raven
 
 	const std::string& Animation::GetClipName(int32_t index) const
     {
-        return clips[index]->name;
+        return clips[index]->clipName;
     }
 
     float Animation::GetClipLength(int32_t index) const
@@ -78,7 +78,7 @@ namespace Raven
     {
 		started = true;
 		skeletonInstance = inSkeletonInstance;
-		RAVEN_ASSERT(skeletonInstance->GetParent() == skeleton.get(), "Skiliton missmatch.");
+		RAVEN_ASSERT(skeletonInstance->GetParent() == clips[index]->skeleton.get(), "Skeleton Mismatch.");
 
 		if (paused)
 		{
@@ -314,15 +314,15 @@ namespace Raven
 			// Get Target...
 			if (state.targets[i] == -1)
 			{
-				if (skeleton->IsValidBoneIndex(curve.index))
+				if (clips[state.clipIndex]->skeleton->IsValidBoneIndex(curve.index))
 				{
 					state.targets[i] = curve.index;
-					target = &skeleton->GetBone(curve.index);
+					target = &clips[state.clipIndex]->skeleton->GetBone(curve.index);
 				}
 			}
 			else
 			{
-				target = &skeleton->GetBone(state.targets[i]);
+				target = &clips[state.clipIndex]->skeleton->GetBone(state.targets[i]);
 			}
 
 			// Invalid Target?

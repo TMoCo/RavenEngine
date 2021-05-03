@@ -3,7 +3,7 @@
 
 
 #include "Logger/Console.h"
-#include "Serialization.h"
+
 
 
 #include <memory>
@@ -92,3 +92,6 @@ struct EnumAsInt
 };
 
 
+
+// Common Include...
+#include "Serialization.h"

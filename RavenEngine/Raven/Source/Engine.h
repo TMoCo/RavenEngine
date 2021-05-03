@@ -44,7 +44,7 @@ namespace Raven
 		~Engine();
 
 		// Return engine singleton instance
-		static Engine& Get();
+		inline static Engine& Get() { return *instance; }
 
 		// Initialise the engine
 		virtual void Initialize();
@@ -130,6 +130,9 @@ namespace Raven
 		//
 		std::array<IModule*, MT_MAX> engineModules;
 
+		// The Singleton instance.
+		static Engine* instance;
+
 		EditorState state = EditorState::Play; //default as Play, if editor is loaded, the state will be set as preview.
 
 		EventDispatcher eventDispatcher;
@@ -142,6 +145,7 @@ namespace Raven
 		double engineTime;
 	};
 };
+
 
 Raven::Engine* CreateEngine();
 

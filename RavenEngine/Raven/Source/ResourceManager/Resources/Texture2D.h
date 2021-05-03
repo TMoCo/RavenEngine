@@ -112,7 +112,11 @@ namespace Raven
 			// Save data as binary.
 			uint32_t dataSize = data.GetSize();
 			archive(dataSize);
-			archive.saveBinary(data.GetData(), data.GetSize());
+
+			if (dataSize != 0)
+			{
+				SaveCompressed(archive, dataSize, data.GetData());
+			}
 		}
 
 		// Serialization Save.
@@ -124,9 +128,12 @@ namespace Raven
 			// Save data as binary.
 			uint32_t dataSize = 0;
 			archive(dataSize);
-			data.Allocate(dataSize);
 
-			archive.loadBinary(data.GetData(), data.GetSize());
+			if (dataSize != 0)
+			{
+				data.Allocate(dataSize);
+				LoadCompressed(archive, dataSize, data.GetData());
+			}
 		}
 
 

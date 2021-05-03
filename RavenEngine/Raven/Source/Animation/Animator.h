@@ -50,7 +50,8 @@ namespace Raven
 
 	public:
 		bool isSimpleAnimator = false;
-		Animation* anime = nullptr;
+		float offset = 0.0f;
+		Ptr<Animation> anim = nullptr;
 	};
 
 	template<>

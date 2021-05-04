@@ -33,7 +33,7 @@ namespace Raven
 		SkinnedMeshComponent();
 
 		// Destruct.
-		~SkinnedMeshComponent();
+		virtual ~SkinnedMeshComponent();
 
 		// Retun the list mesh in the model.
 		inline auto& GetMesh() { return mesh; };

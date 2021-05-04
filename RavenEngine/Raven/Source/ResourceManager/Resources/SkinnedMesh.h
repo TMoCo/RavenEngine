@@ -149,6 +149,11 @@ namespace Raven
 			hasRenderResources = true;
 		}
 
+		virtual ~SkinnedMesh()
+		{
+
+		}
+
 		// return the resource type
 		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_SkinnedMesh; }
 

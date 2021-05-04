@@ -27,8 +27,6 @@ SkinnedMeshComponent::~SkinnedMeshComponent()
 
 void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 {
-	Entity entity = GetEntity();
-
 	// Cleanup...
 	if (skeleton)
 	{
@@ -37,6 +35,13 @@ void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 
 	// Set new...
 	mesh = newMesh;
+
+	// Invalid?
+	if (!mesh)
+	{
+		localBounds = MathUtils::BoundingBox();
+		return;
+	}
 
 	// Has Valid Skeleton?
 	if (mesh->GetSkeleton())

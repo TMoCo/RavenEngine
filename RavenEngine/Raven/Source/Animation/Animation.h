@@ -108,6 +108,11 @@ namespace Raven
 			type = AnimationClip::StaticGetType();
 		}
 
+		virtual ~AnimationClip()
+		{
+
+		}
+
 		// return the resource type
 		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_AnimationClip; }
 

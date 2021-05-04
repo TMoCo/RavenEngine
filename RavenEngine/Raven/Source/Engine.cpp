@@ -95,6 +95,17 @@ int Engine::Run()
 {
 	auto win = GetModule<Raven::Window>();
 
+
+	// ~TESTING.........................................................
+	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Capsule.raven");
+	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Cube.raven");
+	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Pyramid.raven");
+	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Sphere.raven");
+	// ~TESTING.........................................................
+
+
+	//NewGameScene();
+
 	// Main Loop...
 	while (!win->ShouldClose())
 	{
@@ -144,6 +155,7 @@ void Engine::OnUpdate(float dt)
 	// Update the system managers
 	systemManager->OnUpdate(dt, GetModule<Raven::SceneManager>()->GetCurrentScene());
 
+	// Update Current Scene.
 	GetModule<Raven::SceneManager>()->GetCurrentScene()->OnUpdate(dt);
 
 	// Update Render...
@@ -251,7 +263,7 @@ void Engine::OnSceneCreated(Scene* scene)
 void Engine::NewGameScene()
 {
 	Scene* newScene = new Scene("Physics Test World");
-	newScene->dynamic = true;
+	newScene->isNeedLoading = false;
 
 
 	// delete previous physics world
@@ -379,7 +391,7 @@ void Engine::NewGameScene()
 	uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
 
 	// load scene using its id
-	GetModule<SceneManager>()->SwitchScene(sceneIdx);
+	GetModule<SceneManager>()->SwitchToScene(sceneIdx);
 
 }
 

@@ -184,6 +184,11 @@ namespace Raven
 			hasRenderResources = true;
 		}
 
+		virtual ~Mesh()
+		{
+
+		}
+
 		// return the resource type
 		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Mesh; }
 

@@ -653,11 +653,11 @@ namespace Raven
 
 	void PropertiesWindow::OnSceneCreated(Scene* scene)
 	{
-		if (init)
-			return;
 		auto& editor = static_cast<Editor&>(Engine::Get());
 		auto& iconMap = editor.GetComponentIconMap();
 
+		if (!init)
+		{
 #define TRIVIAL_COMPONENT(ComponentType,show) \
 	{ \
 		std::string name; \
@@ -679,6 +679,9 @@ namespace Raven
 		TRIVIAL_COMPONENT(LuaComponent, true);
 		TRIVIAL_COMPONENT(Animator, true);
 		TRIVIAL_COMPONENT(RigidBody, true);
+
+		init = true;
+		}
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
 			auto lua = r.try_get<LuaComponent>(entity);

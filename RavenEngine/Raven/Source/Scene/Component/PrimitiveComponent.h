@@ -38,7 +38,7 @@ namespace Raven
 		PrimitiveComponent();
 
 		// Destruct.
-		~PrimitiveComponent();
+		virtual ~PrimitiveComponent();
 
 		// Set material at index, the material is going to be used by a mesh on the same index.
 		void SetMaterial(uint32_t index, Ptr<Material> mat);

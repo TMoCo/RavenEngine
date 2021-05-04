@@ -34,7 +34,7 @@ namespace Raven
 		MeshComponent();
 
 		// Destruct.
-		~MeshComponent();
+		virtual ~MeshComponent();
 
 		// Retun the list mesh in the model.
 		inline auto& GetMesh() { return mesh; };

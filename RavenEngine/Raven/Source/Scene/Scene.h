@@ -21,7 +21,7 @@ namespace Raven
 	{
 	public:
 		Scene(const std::string& name);
-		virtual ~Scene() = default;
+		virtual ~Scene() { }
 
 		virtual void OnInit();
 		virtual void OnClean();
@@ -38,8 +38,8 @@ namespace Raven
 		void SetSize(uint32_t w, uint32_t h);
 		entt::registry& GetRegistry();
 
-		virtual void Save(const std::string& filePath, bool binary = false);
-		virtual void Load(const std::string& filePath, bool binary = false);
+		virtual void Save(const std::string& inFilePath,  bool binary = false);
+		virtual void Load(const std::string& inFilePath,  bool binary = false);
 
 		Entity CreateEntity();
 		Entity CreateEntity(const std::string & name);
@@ -59,13 +59,13 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("SceneName",name));
+			archive(cereal::make_nvp("SceneName", name));
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::make_nvp("SceneName", name));
+			archive(cereal::make_nvp("SceneName", loadName));
 		}
 
 	private:
@@ -76,6 +76,7 @@ namespace Raven
 		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
 		std::string name;
+		std::string loadName;
 		uint32_t width = 0;
 		uint32_t height = 0;
 		NOCOPYABLE(Scene);
@@ -86,7 +87,12 @@ namespace Raven
 		Transform* overrideTransform = nullptr;
 
 		std::function<void(Scene *scene)> initCallback;
+
 	public:
-		bool dynamic = false;
+		// True if the scene will be loaded when the scene manager switch to it and apply it.
+		bool isNeedLoading = true;
+
+		// The relative path this scene is saved to or loaded from.
+		std::string path;
 	};
 };

@@ -146,32 +146,28 @@ namespace Raven
 		if (Engine::Get().GetEditorState() == EditorState::Next)
 			Engine::Get().SetEditorState(EditorState::Paused);
 
-		bool selected;
+
+		bool isStartState = Engine::Get().GetEditorState() == EditorState::Play 
+			|| Engine::Get().GetEditorState() == EditorState::Paused;
+
+		bool isPausedState = Engine::Get().GetEditorState() == EditorState::Paused;
+
+
+		// --- -- - --- -- -- - - -- - 
+		// Play/Stop Button...
 		{
-			selected = Engine::Get().GetEditorState() == EditorState::Play;
-			if (selected)
+			if (isStartState)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
 
-			if (ImGui::Button(ICON_MDI_PLAY))
+			if (ImGui::Button(isStartState ? ICON_MDI_STOP : ICON_MDI_PLAY))
 			{
-				Engine::Get().SetEditorState(selected ? EditorState::Preview : EditorState::Play);
-
-				selectedNode = entt::null;
-				if (selected)
+				if (isStartState)
 				{
-					// we reload the scene, so destroy the rigid bodies in the physics engine
-					auto &registry = Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->GetRegistry();
-					auto view = registry.view<RigidBody>();
-					for (auto v : view)
-					{
-						view.get<RigidBody>(v).DestroyRigidBody();
-					}
-					LoadCachedScene();
+					StopPlay();
 				}
 				else
 				{
-					CacheScene();
-					Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->OnInit();
+					StartPlay();
 				}
 			}
 
@@ -179,29 +175,31 @@ namespace Raven
 			ImGuiHelper::Tooltip("Play");
 
 
-			if (selected)
+			if (isStartState)
 				ImGui::PopStyleColor();
 		}
 
-		//ImGui::SameLine();
-
+		// --- -- - --- -- -- - - -- - 
+		// Play/Paused Button...
 		{
-			selected = Engine::Get().GetEditorState() == EditorState::Paused;
-			if (selected)
+
+			if (isPausedState)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
 
 			if (ImGui::Button(ICON_MDI_PAUSE))
-				Engine::Get().SetEditorState(selected ? EditorState::Play : EditorState::Paused);
+			{
+				PausePlay();
+			}
 
 			ImGuiHelper::Tooltip("Pause");
 
-
-			if (selected)
+			if (isPausedState)
 				ImGui::PopStyleColor();
 		}
 
-		//ImGui::SameLine();
-
+		// --- -- - --- -- -- - - -- - 
+		// Next Button...
+#if 0  // Not Sure what next does to the sceen. purpose in here.
 		{
 			selected = Engine::Get().GetEditorState() == EditorState::Next;
 			if (selected)
@@ -216,6 +214,7 @@ namespace Raven
 			if (selected)
 				ImGui::PopStyleColor();
 		}
+#endif
 
 		//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 240.0f);
 		ImGui::PopStyleColor();
@@ -371,9 +370,8 @@ namespace Raven
 		}
 		else if (StringUtils::IsSceneFile(filePath))
 		{
-			CacheScene();//save 
-			GetModule<SceneManager>()->AddSceneFromFile(filePath);
-			GetModule<SceneManager>()->SwitchScene();
+			RAVEN_ASSERT(0, "TODO: Add resources to the scene or laod a new scene resrouce.");
+			OpenScene(filePath);
 		}
 		else if (StringUtils::IsTextureFile(filePath))
 		{
@@ -539,28 +537,91 @@ namespace Raven
 		ImGui::End();
 	}
 
-	void Editor::LoadCachedScene()
+	void Editor::NewSceneForStartPlay()
 	{
-		//load from disk
-		auto name = "./scenes/"+ GetModule<SceneManager>()->GetCurrentScene()->GetName() + ".raven";
+		// Saven Origianl as cache.
+		auto scenePath = "./scenes/" + originalScene->GetName() + "_play_cache.raven";
+		auto originpath = originalScene->path;
+		originalScene->Save(scenePath);
+		originalScene->path = originpath;
+
 		struct stat fileInfo;
-		auto exists = (!stat(name.c_str(), &fileInfo)) != 0;
+		auto exists = (!stat(scenePath.c_str(), &fileInfo)) != 0;
+
 		if (exists) 
 		{
-			GetModule<SceneManager>()->GetCurrentScene()->Load("./scenes/");
+			auto newPlayScene = GetModule<SceneManager>()->AddScene<Scene>(originalScene->GetName() + "_Play_Scene");
+			newPlayScene->path = scenePath;
+			newPlayScene->isNeedLoading = true;
+
+			// Switch to play scene.
+			GetModule<SceneManager>()->SwitchToScene(newPlayScene->GetName());
+			GetModule<SceneManager>()->Apply();
+
+			playScene = newPlayScene;
 		}
 	}
 
-	void Editor::CacheScene()
+	void Editor::ReloadOriginalScene()
 	{
 		//Serialize the scene
 		for (auto & win : editorWindows)
 		{
-			win.second->SaveWorkspace();
+			win.second->SaveWorkspace(); // ???
 		}
 
-		GetModule<SceneManager>()->GetCurrentScene()->Save("./scenes/");
+		// Switch to play scene.
+		GetModule<SceneManager>()->SwitchToScene(originalScene->GetName());
+		GetModule<SceneManager>()->Apply();
+
+		auto* rmScene = playScene.lock().get();
+		GetModule<SceneManager>()->RemoveScene( rmScene->GetName() );
 	}
+
+
+	void Editor::StartPlay()
+	{
+		Engine::Get().SetEditorState(EditorState::Play);
+
+		// The original scene we want to revert to when we stop playing.
+		originalScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
+
+		// we reload the scene, so destroy the rigid bodies in the physics engine
+		auto& registry = originalScene->GetRegistry();
+
+		auto view = registry.view<RigidBody>();
+		for (auto v : view)
+		{
+			view.get<RigidBody>(v).DestroyRigidBody();
+		}
+
+		// Create a copy of the original scene to start playing...
+		NewSceneForStartPlay();
+
+	}
+
+
+	void Editor::StopPlay()
+	{
+		Engine::Get().SetEditorState(EditorState::Preview);
+		ReloadOriginalScene();
+	}
+
+
+	void Editor::PausePlay()
+	{
+		if (Engine::Get().GetEditorState() == EditorState::Play)
+			Engine::Get().SetEditorState(EditorState::Paused);
+		else
+			Engine::Get().SetEditorState(EditorState::Play);
+	}
+
+
+	void Editor::OpenScene(const std::string& file)
+	{
+		RAVEN_ASSERT(0, "TODO: Implement Open Scene.");
+	}
+
 };
 
 Raven::Engine* CreateEngine() {

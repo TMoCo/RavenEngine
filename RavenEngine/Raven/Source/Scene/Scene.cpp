@@ -72,8 +72,9 @@ namespace Raven {
 	void Scene::Save(const std::string& filePath, bool binary)
 	{
 		PRINT_FUNC();
+		path = filePath;
+
 		// loop through the scene and serialize each entity and its components
-		std::string path = filePath + name;
 		if (binary)
 		{
 			/*path += std::string(".bin");
@@ -92,7 +93,6 @@ namespace Raven {
 		else
 		{
 			std::stringstream storage;
-			path += std::string(".raven");
 
 			{
 				cereal::JSONOutputArchive output{ storage };
@@ -101,7 +101,7 @@ namespace Raven {
 				
 			}
 
-			std::ofstream file(path, std::ios::binary);
+			std::ofstream file(filePath, std::ios::binary);
 
 			file << storage.str();
 
@@ -113,10 +113,10 @@ namespace Raven {
 	void Scene::Load(const std::string& filePath, bool binary)
 	{
 		PRINT_FUNC();
+		path = filePath;
 
 		entityManager->Clear();
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
-		std::string path = filePath + name;
 
 		if (binary)
 		{
@@ -135,9 +135,8 @@ namespace Raven {
 		}
 		else
 		{
-			path += std::string(".raven");
 
-			std::ifstream in(path);
+			std::ifstream in(filePath);
 			if (in.good())
 			{
 				std::string data;
@@ -160,8 +159,9 @@ namespace Raven {
 				in.close();
 			}
 		}
+
 		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
-		
+		isNeedLoading = false;
 	}
 
 	Raven::Entity Scene::CreateEntity()

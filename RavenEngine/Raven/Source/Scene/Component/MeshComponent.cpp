@@ -32,7 +32,7 @@ MeshComponent::~MeshComponent()
 void MeshComponent::SetMesh(Ptr<Mesh> newMesh)
 {
 	mesh = newMesh;
-	localBounds = mesh->GetBounds();
+	localBounds = mesh != nullptr ? mesh->GetBounds() : MathUtils::BoundingBox();
 }
 
 

@@ -50,7 +50,7 @@ namespace Raven
 			for (auto entity : group)
 			{
 				const auto& [rigBod, trans] = group.get<RigidBody, Transform>(entity);
-				auto scale = rigBod.initTransform.GetLocalScale();
+				auto scale = rigBod.initTransform.GetScale();
 
 
 				trans.SetTransform(Rp3dConvert::ToTransform(rp3d::Transform::interpolateTransforms(rigBod.GetPreviousState(), rigBod.GetCurrentState(), Engine::Get().GetModule<PhysicsModule>()->GetLerpFactor()), scale)); // interpolate states to get transform used in rendering

@@ -6,9 +6,13 @@
 #include "Bone.h"
 
 
+
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/memory.hpp>
+
+
+#include "entt/entt.hpp"
 
 #include <memory>
 #include <string>
@@ -18,6 +22,14 @@
 
 namespace Raven 
 {
+	class Entity;
+	class Scene;
+	class Transform;
+	class SkinnedMeshComponent;
+
+
+
+
 
 	// Skeleton:
 	//		- a skeleton made of bones.
@@ -94,34 +106,21 @@ namespace Raven
 
 	// SkeletonInstance:
 	//    - Dynamic skeleton data for updating the bone transforms for each SkinnedMeshComponent.
+	//
 	class SkeletonInstance
 	{
 	public:
 		// Construct.
-		SkeletonInstance(Ptr<Skeleton> inParent);
+		SkeletonInstance(SkinnedMeshComponent* inOwner, Ptr<Skeleton> inParent);
 
 		// Destruct.
 		~SkeletonInstance();
-
-		// Serialization Save.
-		template<typename Archive>
-		void save(Archive& archive) const
-		{
-			RAVEN_ASSERT(0, "Not Implemented");
-		}
-
-		// Serialization Load.
-		template<typename Archive>
-		void load(Archive& archive)
-		{
-			RAVEN_ASSERT(0, "Not Implemented");
-		}
 
 		// Update the bones transforms to match the current skeleton bones.
 		void UpdateBones();
 
 		// Return a pointer to the list of all bones tranforms of this instance.
-		inline const std::vector<glm::mat4>* GetBones() const { return &boneTransforms; }
+		inline const std::vector<glm::mat4>* GetBones() const { return &bonesTransformation; }
 
 		// Return the parent skeleton of this instance.
 		inline Skeleton* GetParent() const { return parent.get(); }
@@ -129,12 +128,49 @@ namespace Raven
 		// Dirty bone transforms.
 		void DirtyTransforms();
 
+		// Build transformation hierarchy.
+		void BuildTransformHierarchy();
+
+		// Destroy transformation hierarchy.
+		void DestroyTransformHierarchy();
+
+		// Load transformation hierarchy.
+		template<typename Archive>
+		void SaveTransformHierarchy(Archive& archive) const
+		{
+			uint32_t count = (uint32_t)skeletonTransforms.size();
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				archive(skeletonTransforms[i]);
+			}
+		}
+
+		// Save transformation hierarchy.
+		template<typename Archive>
+		void LoadTransformHierarchy(Archive& archive)
+		{
+			uint32_t count = 0;
+			archive(count);
+			skeletonTransforms.resize(count);
+
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				archive(skeletonTransforms[i]);
+			}
+		}
+
 	private:
 		// All bone transforms for this instance.
-		std::vector<glm::mat4> boneTransforms;
+		std::vector<glm::mat4> bonesTransformation;
 
 		// Parent Skeleton of this instance.
 		Ptr<Skeleton> parent;
+
+		// Transforms component for each bone in the skeleton
+		std::vector<entt::entity> skeletonTransforms;
+
+		// The skinned mesh component that ownes this class
+		SkinnedMeshComponent* owner;
 	};
 
 }

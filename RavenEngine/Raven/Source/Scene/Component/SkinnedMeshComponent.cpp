@@ -3,6 +3,7 @@
 #include "ResourceManager/Resources/SkinnedMesh.h"
 #include "ResourceManager/Resources/Material.h"
 #include "Animation/Skeleton.h"
+#include "Scene/Entity/Entity.h"
 
 #include "Render/RenderObjects/Primitives/RenderSkinnedMesh.h"
 
@@ -12,6 +13,7 @@ namespace Raven {
 
 
 SkinnedMeshComponent::SkinnedMeshComponent()
+	: isLoading(false)
 {
 	
 }
@@ -25,13 +27,27 @@ SkinnedMeshComponent::~SkinnedMeshComponent()
 
 void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 {
+	Entity entity = GetEntity();
+
+	// Cleanup...
+	if (skeleton)
+	{
+		skeleton->DestroyTransformHierarchy();
+	}
+
+	// Set new...
 	mesh = newMesh;
 
 	// Has Valid Skeleton?
 	if (mesh->GetSkeleton())
 	{
-		skeleton = Ptr<SkeletonInstance>(new SkeletonInstance(mesh->GetSkeleton()));
-		skeleton->UpdateBones();
+		skeleton = Ptr<SkeletonInstance>(new SkeletonInstance(this, mesh->GetSkeleton()));
+
+		if (!isLoading)
+		{
+			skeleton->BuildTransformHierarchy();
+			skeleton->UpdateBones();
+		}
 	}
 
 	localBounds = mesh->GetBounds();

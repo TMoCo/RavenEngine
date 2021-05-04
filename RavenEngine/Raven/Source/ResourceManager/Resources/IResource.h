@@ -128,7 +128,7 @@ namespace Raven
 		// Update the render resource. Note: only for resources with render data.
 		virtual void UpdateRenderResource() { RAVEN_ASSERT(0, "Invalid Operation."); }
 
-		// Set the resrouce name.
+		// Set the resource name.
 		inline void SetName(const std::string& newName) { name = newName; }
 
 		// Return the resource name.
@@ -159,7 +159,7 @@ namespace Raven
 		// Is the resource loaded on GPU.
 		bool isOnGPU;
 
-		// The version of the resrouce when loaded.
+		// The version of the resource when loaded.
 		uint32_t load_version;
 
 	private:
@@ -194,25 +194,21 @@ namespace Raven
 		// The type of the Resource.
 		EResourceType type;
 
-		// Index of the resrouce in the resrouce manager.
-		IResource* rsc;
+		// weak pointer to the resource, used for caching.
+		WeakPtr<IResource> rsc;
 
-		
-		// Private Contruct.
+	public:
+		// Default Construct - Invalid Reference.
 		ResourceRef()
 			: type(EResourceType::RT_None)
-			, rsc(nullptr)
 		{
 
 		}
 
-
-	public:
-		// Contruct.
+		// Construct.
 		ResourceRef(IResource* resource)
 			: path(resource->path)
 			, type(resource->type)
-			, rsc(resource)
 		{
 
 		}
@@ -254,34 +250,52 @@ namespace Raven
 		}
 
 
+		// Serialize the reference it self.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(EnumAsInt<const EResourceType>(type), path);
+		}
+
+		// Serialize the reference it self.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(EnumAsInt<EResourceType>(type), path);
+		}
+
+
 		// Return the relative path to the Resource.
 		inline const std::string& GetPath() const { return path; }
 
-		// Return true if the Resource is loaded and valid.
-		bool IsValid() const { return rsc != nullptr; }
+		// Return if the reference is valid, and try to reference a resource.
+		bool IsValid() const { return type != EResourceType::RT_None; }
+
+		// Return the cached resource as raw pointer, this will not try to load the resource.
+		// will return null if invalid or not loaded.
+		template<class TResource>
+		TResource* GetWeak() const 
+		{ 
+			return static_cast<TResource*>(rsc.expired() ? nullptr : rsc.lock().get());
+		}
 
 		// Find or load the Resource. 
 		Ptr<IResource> FindOrLoad();
 
-		// Return the resrouce if previously found.
-		Ptr<IResource> GetResrouce();
-
 		// Template FindOrLoad.
 		template<class TResource>
 		Ptr<TResource> FindOrLoad() 
-		{ 
-			Ptr<IResource> rsc = FindOrLoad();
-			RAVEN_ASSERT(!rsc || TResource::StaticGetType() == rsc->GetType(), "Type Mismatch");
-			return std::static_pointer_cast<TResource, IResource>(rsc);
-		}
-
-		// Template GetResrouce.
-		template<class TResource>
-		Ptr<TResource> GetResrouce()
 		{
-			Ptr<IResource> rsc = GetResrouce();
-			RAVEN_ASSERT(!rsc || TResource::StaticGetType() == rsc->GetType(), "Type Mismatch");
-			return std::static_pointer_cast<TResource, IResource>(rsc);
+			Ptr<IResource> rscPtr = rsc.lock();
+
+			// Invalid cache?
+			if (!rscPtr)
+			{
+				rscPtr = FindOrLoad(); // Find or Load in the resource registry.
+			}
+
+			RAVEN_ASSERT(!rscPtr || TResource::StaticGetType() == rscPtr->GetType(), "Type Mismatch");
+			return std::static_pointer_cast<TResource, IResource>(rscPtr);
 		}
 
 	};

@@ -21,8 +21,9 @@ namespace Raven
 	// Bone in a Skeleton.
 	class Bone
 	{
-		// Friend.
+		// Friends...
 		friend class Skeleton;
+		friend class SkeletonInstance;
 
 	public:
 		// Construct.

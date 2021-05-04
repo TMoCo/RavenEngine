@@ -821,9 +821,11 @@ Ptr<Mesh> MeshFactory::GetBasicShape(EBasicShape::Type type)
 	}
 
 	// Generate Tangents..
-	for (uint32_t i = 0; i < newShape->GetNumSections(); ++i)
+	auto& meshSetions = newShape->GetMeshLOD(0).sections;
+
+	for (uint32_t i = 0; i < meshSetions.size(); ++i)
 	{
-		MeshSection* meshSection = newShape->GetMeshSection(i);
+		MeshSection* meshSection = meshSetions[i].get();
 
 		meshSection->tangents.resize( meshSection->normals.size() );
 		Raven::ComputeTangents(meshSection->tangents.data(), meshSection->indices.size(), meshSection->indices.data(),

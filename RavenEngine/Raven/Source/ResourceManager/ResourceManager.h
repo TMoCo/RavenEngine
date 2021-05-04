@@ -158,8 +158,10 @@ namespace Raven
 		// Save existing Resource.
 		bool SaveResource(Ptr<IResource> rsc);
 
+		// Add a new resrouce path to the resource registry
 		bool AddResource(const std::string& path);
 
+		// Return an importer of type TImporter.
 		template<class TImporter>
 		TImporter* GetImporter();
 

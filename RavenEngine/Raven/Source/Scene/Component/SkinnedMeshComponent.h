@@ -3,6 +3,7 @@
 
 #include "Utilities/Core.h"
 #include "PrimitiveComponent.h"
+#include "ResourceManager/Resources/SkinnedMesh.h"
 
 
 #include <string>
@@ -52,14 +53,29 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<PrimitiveComponent>(this));
+
+			// Save Resrouce Reference -> SkinnedMesh.
+			ResourceRef::Save(archive, mesh.get());
+
+			skeleton->SaveTransformHierarchy(archive);
 		}
 
 		// Serialization Load.
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<PrimitiveComponent>(this));
+
+			isLoading = true;
+
+			// Load Resrouce Reference -> SkinnedMesh.
+			Ptr<SkinnedMesh> meshRef = ResourceRef::Load(archive).FindOrLoad<SkinnedMesh>();
+			SetMesh(meshRef);
+
+			skeleton->LoadTransformHierarchy(archive);
+
+			isLoading = false;
 		}
 
 
@@ -69,6 +85,9 @@ namespace Raven
 
 		// The instance of the skeleton used to update the bone transforms.
 		Ptr<SkeletonInstance> skeleton;
+
+		// if true we are currently loading the skinned mesh component.
+		bool isLoading;
 	};
 
 };

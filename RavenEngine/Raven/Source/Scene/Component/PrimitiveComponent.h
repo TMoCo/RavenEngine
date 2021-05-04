@@ -29,7 +29,7 @@ namespace Raven
 
 
 	// PrimitiveComponent:
-	//	-
+	//	- Parent class for all componenet that will be rendered like MeshComponent & SkinnedMeshComponent.
 	//
 	class PrimitiveComponent : public Component
 	{
@@ -57,18 +57,24 @@ namespace Raven
 		// Called by the render to collect render primitives for drawing.
 		virtual void CollectRenderPrimitives(RenderPrimitiveCollector& rcollector);
 
+		// Get/Set Clip Distance.
+		inline float GetClipDistance() { return clipDistance; }
+		inline void SetClipDistance(float distance) { clipDistance = distance; }
+
 	public:
 		// serialization load and save
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<Component>(this));
+			archive(clipDistance);
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<Component>(this));
+			archive(clipDistance);
 		}
 
 
@@ -79,6 +85,9 @@ namespace Raven
 	protected:
 		// The local bounding box of the component.
 		MathUtils::BoundingBox localBounds;
+
+		// The distance this model will be clipped at, if -1 then no clipping.
+		float clipDistance;
 	};
 
 };

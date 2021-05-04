@@ -104,18 +104,10 @@ Ptr<IResource> ResourceRef::FindOrLoad()
 		return nullptr;
 
 	Ptr<IResource> resource = Engine::GetModule<ResourceManager>()->FindOrLoad(*this);
-	rsc = resource.get();
+	rsc = resource;
 	return resource;
 }
 
-
-Ptr<IResource> ResourceRef::GetResrouce()
-{
-	if (!IsValid())
-		return nullptr;
-
-	return Engine::GetModule<ResourceManager>()->GetResource(*this);
-}
 
 
 // -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
@@ -478,6 +470,12 @@ bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::str
 }
 
 
+bool ResourceManager::SaveResource(Ptr<IResource> rsc)
+{
+	return SaveNewResource(rsc, rsc->path);
+}
+
+
 bool ResourceManager::LoadResource(const std::string& path, EResourceType type)
 {
 	ILoader* loader = GetLoader(type);
@@ -501,7 +499,7 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 	// Load Header.
 	ResourceHeaderInfo info = ILoader::LoadHeader(archive);
 
-	// Invalid Raven Resrouce?
+	// Invalid Raven Resource?
 	if (!info.IsValid())
 	{
 		return false;
@@ -515,7 +513,7 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 	loadedRsc->path = path;
 
 
-	// Load Render Resrouces...
+	// Load Render Resources...
 	if (loadedRsc->HasRenderResources() && !loadedRsc->IsOnGPU())
 	{
 		loadedRsc->LoadRenderResource();
@@ -537,17 +535,17 @@ bool ResourceManager::AddResource(const std::string& path)
 	// Failed to open archive?
 	if (!archive.IsValid())
 	{
-		LOGW("Failed to add reference to a resrouce file {0}.", path.c_str());
+		LOGW("Failed to add reference to a resource file {0}.", path.c_str());
 		return false;
 	}
 
 	// Load Header.
 	ResourceHeaderInfo info = ILoader::LoadHeader(archive);
 
-	// Invalid Raven Resrouce?
+	// Invalid Raven Resource?
 	if (!info.IsValid())
 	{
-		LOGE("Failed to add resrouce. Resrouce is not RAVEN.");
+		LOGE("Failed to add resource. Resource is not RAVEN.");
 		return false;
 	}
 
@@ -591,17 +589,6 @@ Ptr<IResource> ResourceManager::FindOrLoad(const ResourceRef& ref)
 	return rscData->rsc;
 }
 
-
-Ptr<IResource> ResourceManager::GetResource(const ResourceRef& ref)
-{
-	const ResourceData* rscData = registry.GetResource(ref.rsc->resourceIndex);
-
-	// Not Found?
-	if (!rscData)
-		return nullptr;
-
-	return rscData->rsc;
-}
 
 
 

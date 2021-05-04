@@ -38,9 +38,35 @@ void MeshComponent::SetMesh(Ptr<Mesh> newMesh)
 
 void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector)
 {
-	for (uint32_t i = 0; i < mesh->GetNumSections(); ++i)
+	MeshLOD* meshLOD;
+
+	// Has LODs?
+	uint32_t numLODs = mesh->GetNumLODs();
+
+	if (numLODs > 1)
 	{
-		MeshSection* meshSection = mesh->GetMeshSection(i);
+		uint32_t level;
+
+		for (level = 1; level < numLODs; ++level)
+		{
+			if (rcollector.GetViewDistance() < mesh->GetMeshLOD(level).distance)
+			{
+				level -= 1;
+				break;
+			}
+		}
+
+		meshLOD = &mesh->GetMeshLOD(level);
+	}
+	else
+	{
+		meshLOD = &mesh->GetMeshLOD(0);
+	}
+
+
+	for (uint32_t i = 0; i < meshLOD->sections.size(); ++i)
+	{
+		MeshSection* meshSection = meshLOD->sections[i].get();
 
 		// Invalid?
 		if (!meshSection)
@@ -65,6 +91,16 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 			}
 
 			rmesh->SetMaterial( mat->GetRenderRsc() );
+		}
+		else
+		{
+			auto& defaultMaterial = meshSection->defaultMaterial;
+
+			// Has Default Material?
+			if (defaultMaterial.IsValid())
+			{
+				mat = defaultMaterial.GetWeak<Material>();
+			}
 		}
 	}
 }

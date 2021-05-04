@@ -9,6 +9,7 @@
 #include "Math/BoundingBox.h"
 
 #include "ResourceManager/Resources/IResource.h"
+#include "ResourceManager/Resources/Material.h"
 #include "Render/RenderResource/Primitives/RenderRscMesh.h"
 
 
@@ -56,6 +57,7 @@ namespace Raven
 			SaveVectorBinary(archive, texCoords);
 			SaveVectorBinary(archive, indices);
 			archive(bounds);
+			archive(defaultMaterial);
 		}
 
 
@@ -70,6 +72,7 @@ namespace Raven
 			LoadVectorBinary(archive, texCoords);
 			LoadVectorBinary(archive, indices);
 			archive(bounds);
+			archive(defaultMaterial);
 		}
 
 
@@ -93,11 +96,82 @@ namespace Raven
 
 		// Render Resrouce Data.
 		Ptr<RenderRscMesh> renderRscMesh;
+
+		// Default material for this section.
+		ResourceRef defaultMaterial;
 	};
 
 
+	// MeshLOD:
+	//   - single level of detail in the mesh's list of LODs.
+	//
+	class MeshLOD
+	{
+	public:
+		// The LOD Mesh Sections.
+		std::vector< Ptr<MeshSection> > sections;
+
+		// The distance this LOD will be display at.
+		float distance;
+
+		// Construct.
+		MeshLOD()
+			: distance(32000.0f)
+		{
+
+		}
+
+		// Serialization Save.
+		template<typename Archive>
+		void SaveLOD(Archive& archive) const
+		{
+			archive(distance);
+
+			uint32_t numSections = (uint32_t)sections.size();
+			archive(numSections);
+
+			// Only archive valid mesh sections.
+			for (uint32_t i = 0; i < numSections; ++i)
+			{
+				bool isValid = sections[i] != nullptr;
+				archive(isValid);
+
+				if (isValid)
+					archive(*sections[i]);
+			}
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void LoadLOD(Archive& archive)
+		{
+			archive(distance);
+
+			uint32_t numSections;
+			archive(numSections);
+			sections.resize(numSections);
+
+			// Only archive valid mesh sections.
+			for (uint32_t i = 0; i < numSections; ++i)
+			{
+				bool isValid = false;
+				archive(isValid);
+				if (isValid)
+				{
+					sections[i] = Ptr<MeshSection>(new MeshSection());
+					archive(*sections[i]);
+				}
+			}
+		}
+
+	};
+
+
+
+
 	// Mesh:
-	//  - a mesh that is made of multiple seprate sections.
+	//  - a mesh that is made of multiple seprate sections eached mapped to there own material.
+	//  - support multiple level of details LODs.
 	//
 	class Mesh : public IResource
 	{
@@ -119,7 +193,7 @@ namespace Raven
 			RAVEN_ASSERT(!isOnGPU, "Resrouce already on GPU. use UpdateRenderRsc to update.");
 			isOnGPU = true;
 
-			for (auto& section : sections)
+			for (auto& section : meshLOD0.sections)
 			{
 				// Invalid Section?
 				if (!section)
@@ -136,35 +210,56 @@ namespace Raven
 			// TODO: update.
 		}
 
-		// Set a new mesh section.
+		// Set a new main mesh section.
 		inline void SetMeshSection(uint32_t index, Ptr<MeshSection> section)
 		{
-			if (sections.size() < index + 1)
-				sections.resize(index + 1);
+			if (meshLOD0.sections.size() < index + 1)
+				meshLOD0.sections.resize(index + 1);
 
-			sections[index] = section;
+			meshLOD0.sections[index] = section;
 			UpdateBounds();
 		}
 
 		// Add new mesh section at the end of the sections list.
 		inline void AddMeshSection(Ptr<MeshSection> section)
 		{
-			sections.push_back(section);
+			meshLOD0.sections.push_back(section);
 			UpdateBounds();
 		}
 
-		// Return mesh section.
-		inline MeshSection* GetMeshSection(uint32_t index) { return sections[index].get(); }
-
-		// Return mesh section list.
-		inline auto& GetMeshSections() { return sections; }
-		inline const auto& GetMeshSections() const { return sections; }
-
-		// Return the number of sections in a mesh.
-		inline uint32_t GetNumSections() const { return static_cast<uint32_t>(sections.size()); }
-
 		// Return the bounds of this mesh.
 		inline MathUtils::BoundingBox GetBounds() const { return bounds; }
+
+		// Add new mesh LOD level.
+		inline void AddNewLOD(const std::vector< Ptr<MeshSection> >& lodSections)
+		{
+			RAVEN_ASSERT(!meshLOD0.sections.empty(), "Should have at least LOD_0");
+
+			MeshLOD& lod = LODs.emplace_back( MeshLOD() );
+			lod.sections = lodSections;
+		}
+
+		// Remove LOD level.
+		inline void RemoveLOD(uint32_t level)
+		{
+			RAVEN_ASSERT(level == 0, "To remove level 0 you need to remove one section at a time.");
+			LODs.erase(LODs.begin() + level);
+		}
+
+		// Return the number of lods
+		inline uint32_t GetNumLODs() { return (uint32_t)LODs.size() + 1; }
+
+		// Return mesh lod at level.
+		inline MeshLOD& GetMeshLOD(uint32_t level) 
+		{
+			if (level == 0)
+				return meshLOD0;
+
+			return LODs[level];
+		}
+
+		// Return mesh lod at level.
+		inline const MeshLOD& GetMeshLOD(uint32_t level) const { return const_cast<const Mesh*>(this)->GetMeshLOD(level); }
 
 		// Serialization Save.
 		template<typename Archive>
@@ -172,19 +267,16 @@ namespace Raven
 		{
 			archive(cereal::base_class<IResource>(this));
 
-			uint32_t numSections = (uint32_t)sections.size();
-			archive(numSections);
+			// Save main mesh sections LOD0.
+			meshLOD0.SaveLOD(archive);
 
-			// Only archive valid mesh sections.
-			for (uint32_t i = 0; i < numSections; ++i)
+			// Save LODs...
+			uint32_t LODsSize = LODs.size();
+			archive(LODsSize);
+			for (uint32_t i = 0; i < LODsSize; ++i)
 			{
-				bool isValid = sections[i] != nullptr;
-				archive(isValid);
-
-				if (isValid)
-					archive(*sections[i]);
+				LODs[i].SaveLOD(archive);
 			}
-
 		}
 
 		// Serialization Load.
@@ -193,20 +285,17 @@ namespace Raven
 		{
 			archive(cereal::base_class<IResource>(this));
 
-			uint32_t numSections;
-			archive(numSections);
-			sections.resize(numSections);
+			// Load main mesh sections LOD0.
+			meshLOD0.LoadLOD(archive);
+			
+			// Load LODs...
+			uint32_t LODsSize = 0;
+			archive(LODsSize);
+			LODs.resize(LODsSize);
 
-			// Only archive valid mesh sections.
-			for (uint32_t i = 0; i < numSections; ++i)
+			for (uint32_t i = 0; i < LODsSize; ++i)
 			{
-				bool isValid = false;
-				archive(isValid);
-				if (isValid)
-				{
-					sections[i] = Ptr<MeshSection>(new MeshSection());
-					archive(*sections[i]);
-				}
+				LODs[i].LoadLOD(archive);
 			}
 
 			// Update bounds after loading.
@@ -219,15 +308,18 @@ namespace Raven
 		{
 			bounds.Reset();
 
-			for (const auto& ms : sections)
+			for (const auto& ms : meshLOD0.sections)
 			{
 				bounds.Add(ms->bounds);
 			}
 		}
 
 	private:
-		// List of all mesh sections.
-		std::vector< Ptr<MeshSection> > sections;
+		// this is the LOD_0 which is the original high-res mesh, contain list of all the mesh main sections, 
+		MeshLOD meshLOD0;
+
+		// Mesh LODs > 1, they should reflect meshSections LOD_0 in some way.
+		std::vector<MeshLOD> LODs;
 
 		// The boudning box of all mesh sections.
 		MathUtils::BoundingBox bounds;

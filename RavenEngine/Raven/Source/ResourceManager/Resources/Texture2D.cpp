@@ -71,8 +71,8 @@ void Texture2D::LoadRenderResource()
 	));
 
 	isOnGPU = true;
-	isGenMipmaps = false;
 }
+
 
 void Texture2D::UpdateRenderResource()
 {

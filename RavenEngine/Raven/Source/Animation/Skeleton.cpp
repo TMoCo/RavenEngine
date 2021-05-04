@@ -1,6 +1,11 @@
 #include "Skeleton.h"
 
 
+#include "Scene/Entity/Entity.h"
+#include "Scene/Scene.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
+#include "Scene/Component/Transform.h"
+
 
 #include <vector>
 #include <iostream>
@@ -103,12 +108,13 @@ void Skeleton::Build()
 
 
 
-SkeletonInstance::SkeletonInstance(Ptr<Skeleton> inParent)
+SkeletonInstance::SkeletonInstance(SkinnedMeshComponent* inOwner, Ptr<Skeleton> inParent)
 	: parent(inParent)
+	, owner(inOwner)
 {
 	RAVEN_ASSERT(parent != nullptr, "Invalid Skeleton.");
 
-	boneTransforms.resize(parent->GetBones().size(), glm::mat4(1.0f));
+	bonesTransformation.resize(parent->GetBones().size(), glm::mat4(1.0f));
 }
 
 
@@ -120,15 +126,26 @@ SkeletonInstance::~SkeletonInstance()
 
 void SkeletonInstance::UpdateBones()
 {
+	auto& registry = owner->GetEntity().GetScene()->GetRegistry();
+
 	// First mark all cached transform dirty.
 	DirtyTransforms();
 
+	// Update...
 	const auto& bones = parent->GetBones();
 	int32_t boneCount = static_cast<int32_t>(bones.size());
 
 	for (int32_t i = 0; i < boneCount; ++i)
 	{
-		boneTransforms[i] = bones[i].GetWorldTransform() * bones[i].GetOffsetMatrix();
+		bonesTransformation[i] = bones[i].GetWorldTransform() * bones[i].GetOffsetMatrix();
+
+		// Update Transform Componenets...
+		if ( registry.valid(skeletonTransforms[i]) )
+		{
+			Transform& trComp = registry.get<Transform>(skeletonTransforms[i]);
+			trComp.SetPosition( bones[i].GetPosition() );
+			trComp.SetRotation( bones[i].GetRotation() );
+		}
 	}
 
 }
@@ -144,6 +161,58 @@ void SkeletonInstance::DirtyTransforms()
 		bones[i].DirtyWorldMatrix();
 	}
 }
+
+
+void SkeletonInstance::BuildTransformHierarchy()
+{
+	RAVEN_ASSERT(skeletonTransforms.empty(), "Can't rebuild hierarchy.");
+	Entity entity = owner->GetEntity();
+	Scene* scene = entity.GetScene();
+	const auto& bones = parent->GetBones();
+
+	skeletonTransforms.resize(bones.size());
+
+	// Create Transforms...
+	for (const auto& bone : bones)
+	{
+		Entity newEntity = scene->CreateEntity();
+		newEntity.GetOrAddComponent<Transform>();
+		newEntity.GetOrAddComponent<Hierarchy>();
+		newEntity.GetOrAddComponent<NameComponent>().name = bone.name;
+		skeletonTransforms[bone.id] = newEntity.GetHandle();
+	}
+
+	// Reparent Transforms...
+	const auto& rootBone = *parent->GetRoot();
+	Entity(skeletonTransforms[rootBone.id], scene).SetParent(entity);
+
+	for (const auto& bone : bones)
+	{
+		if (bone.parentIdx == -1)
+			continue;
+
+		// Set Parent
+		Entity(skeletonTransforms[bone.id], scene).SetParent(
+			Entity(skeletonTransforms[bone.parentIdx], scene)
+		);
+	}
+
+}
+
+
+void SkeletonInstance::DestroyTransformHierarchy()
+{
+	Scene* scene = owner->GetEntity().GetScene();
+
+	// Destroy Transforms...
+	for (const auto& trComp : skeletonTransforms)
+	{
+		Entity(trComp, scene).Destroy();
+	}
+
+	skeletonTransforms.clear();
+}
+
 
 
 

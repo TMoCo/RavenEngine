@@ -36,6 +36,9 @@ namespace Raven
 		// Create new render primitive for collection.
 		RenderSkinnedMesh* NewSkinnedMesh();
 
+		// Return the view distance to the primitive.
+		inline float GetViewDistance() { return viewDist; }
+
 	private:
 		// Clear all collected primitives form the collector.
 		void Reset();
@@ -59,6 +62,9 @@ namespace Raven
 
 		// Current Normal Matrix to set the new render primitives 
 		const glm::mat4* normalMatrix;
+
+		// The distance from the view to the primitive, can be used for LODs.
+		float viewDist;
 	};
 
 }

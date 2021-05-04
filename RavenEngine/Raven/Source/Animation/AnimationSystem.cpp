@@ -24,7 +24,7 @@ namespace Raven
 
 	void AnimationSystem::OnUpdate(float dt, Scene* scene)
 	{
-		if (true || Engine::Get().GetEditorState() == EditorState::Play) 
+		if (Engine::Get().GetEditorState() == EditorState::Play) 
 		{
 			auto animators = scene->GetRegistry().view<Animator>();
 

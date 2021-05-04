@@ -127,20 +127,8 @@ void RenderModule::Initialize()
 
 
 	// ~ITERATION_0----------------------------------------------------------------------------
-	// load the generated height map into resource manager
-	if (!Engine::GetModule<ResourceManager>()->AddResource("T_Default_Environment_Map.raven"))
-	{
-		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Default_Environment_Map.jpg");
-	}
-
-
-	Texture2D* envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Default_Environment_Map.raven").get();
-
-	envTexture->GetRenderRsc()->GetTexture()->Bind();
-	envTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Mirror);
-	envTexture->GetRenderRsc()->GetTexture()->SetFilter(EGLFilter::Linear);
-	envTexture->GetRenderRsc()->GetTexture()->UpdateTexParams();
-	envTexture->GetRenderRsc()->GetTexture()->Unbind();
+	Engine::GetModule<ResourceManager>()->AddResource("./assets/textures/T_Default_Environment_Map.raven");
+	Ptr<Texture2D> envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("./assets/textures/T_Default_Environment_Map.raven");
 
 	RenderRscTexture* envMap = new RenderRscTexture();
 	rfilter->GenCubeMap(envTexture->GetRenderRsc(), envMap, true);
@@ -278,21 +266,10 @@ RenderSurface RenderModule::GetRequiredRenderSurface()
 
 void RenderModule::CreateDefaultMaterials()
 {
-	if (!Engine::GetModule<ResourceManager>()->AddResource("T_Checker.raven"))
-	{
-		Engine::GetModule<ResourceManager>()->Import("assets/textures/T_Checker.png");
-	}
-
 	// Checker Texture...
-	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("T_Checker.raven");
+	Engine::GetModule<ResourceManager>()->AddResource("./assets/textures/T_Checker.raven");
+	Ptr<Texture2D> checkerTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("./assets/textures/T_Checker.raven");
 
-	// TODO: Better texture system.
-	checkerTexture->GetRenderRsc()->GetTexture()->Bind();
-	checkerTexture->GetRenderRsc()->GetTexture()->SetWrap(EGLWrap::Repeat);
-	checkerTexture->GetRenderRsc()->GetTexture()->SetFilter(EGLFilter::TriLinear);
-	checkerTexture->GetRenderRsc()->GetTexture()->UpdateTexParams();
-	checkerTexture->GetRenderRsc()->GetTexture()->GenerateMipmaps();
-	checkerTexture->GetRenderRsc()->GetTexture()->Unbind();
 
 	// Default Mesh Material...
 	{

@@ -147,6 +147,8 @@ namespace Raven
 				cereal::make_nvp("Scale", scale),
 				cereal::make_nvp("Rotation", rotation)
 			);
+
+			Dirty();
 		}
 
 		// Update world matrix only if its dirty.

@@ -23,6 +23,7 @@ RenderPrimitiveCollector::RenderPrimitiveCollector(RenderScene* sceneOwner)
 void RenderPrimitiveCollector::Reset()
 {
 	primitive.clear();
+	viewDist = -1.0f;
 }
 
 

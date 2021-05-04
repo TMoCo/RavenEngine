@@ -7,6 +7,7 @@
 
 #include "Utilities/Core.h"
 #include "PrimitiveComponent.h"
+#include "ResourceManager/Resources/Mesh.h"
 
 
 
@@ -20,7 +21,6 @@
 
 namespace Raven
 {
-	class Mesh;
 
 
 
@@ -51,13 +51,20 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<PrimitiveComponent>(this));
+
+			// Save Resrouce Reference -> Mesh.
+			ResourceRef::Save(archive, mesh.get());
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			RAVEN_ASSERT(0, "Not Implemented");
+			archive(cereal::base_class<PrimitiveComponent>(this));
+
+			// Load Resrouce Reference -> Mesh.
+			Ptr<Mesh> meshRef = ResourceRef::Load(archive).FindOrLoad<Mesh>();
+			SetMesh(meshRef);
 		}
 
 	private:

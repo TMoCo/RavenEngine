@@ -83,6 +83,7 @@ namespace Raven
 			SaveVectorBinary(archive, blendIndices);
 			SaveVectorBinary(archive, blendWeights);
 			archive(bounds);
+			archive(defaultMaterial);
 		}
 
 		// Serialization Load.
@@ -98,6 +99,7 @@ namespace Raven
 			LoadVectorBinary(archive, blendIndices);
 			LoadVectorBinary(archive, blendWeights);
 			archive(bounds);
+			archive(defaultMaterial);
 		}
 
 
@@ -127,6 +129,9 @@ namespace Raven
 
 		// Render Resrouce Data.
 		Ptr<RenderRscSkinnedMesh> renderRscMesh;
+
+		// Default material for this section.
+		ResourceRef defaultMaterial;
 	};
 
 

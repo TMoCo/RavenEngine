@@ -217,7 +217,6 @@ namespace MM
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
-
 		const std::array<std::string,2> controllerTypes = { "FPS" ,"Editor"};
 		std::string currentController = CameraControllerComponent::TypeToString(controllerComp.GetType());
 		if (ImGui::BeginCombo("", currentController.c_str(), 0)) // The second parameter is the label previewed before opening the combo.

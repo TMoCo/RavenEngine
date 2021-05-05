@@ -436,7 +436,6 @@ namespace Raven
 				isAdd = true;
 			}
 
-
 			if (ImGui::Selectable("Add Material"))
 			{
 				Ptr<Material> material(new Material);
@@ -454,7 +453,6 @@ namespace Raven
 
 				isAdd = true;
 			}
-
 
 			if (isAdd)
 			{

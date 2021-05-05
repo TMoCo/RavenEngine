@@ -582,7 +582,6 @@ namespace Raven
 		GetModule<SceneManager>()->RemoveScene(rmScene);
 	}
 
-
 	void Editor::StartPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Play);
@@ -604,13 +603,11 @@ namespace Raven
 
 	}
 
-
 	void Editor::StopPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Preview);
 		ReloadOriginalScene();
 	}
-
 
 	void Editor::PausePlay()
 	{
@@ -620,7 +617,6 @@ namespace Raven
 			Engine::Get().SetEditorState(EditorState::Play);
 	}
 
-
 	void Editor::OpenScene(const std::string& file)
 	{
 		// First unload all opend scenes...
@@ -629,7 +625,6 @@ namespace Raven
 		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
 		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
 	}
-
 };
 
 Raven::Engine* CreateEngine() {

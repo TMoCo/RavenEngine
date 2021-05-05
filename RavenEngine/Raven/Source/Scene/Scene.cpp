@@ -13,6 +13,9 @@
 #include "Scene/Component/MeshComponent.h"
 #include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/RigidBody.h"
+#include "Scene/Component/SoundComponent.h"
+#include "Audio/AudioSource.h"
+
 
 #include "Scripts/LuaComponent.h"
 #include "Core/CameraController.h"

@@ -53,7 +53,7 @@
 #include "Animation/AnimationSystem.h"
 #include "Scripts/LuaVirtualMachine.h"
 
-
+#include "Audio/AudioSystem.h"
 
 
 #include <memory>
@@ -187,6 +187,8 @@ void Engine::LoadModules()
 	CreateModule<Raven::GUIModule>();
 	CreateModule<Raven::TerrainGeneration>();
 	CreateModule<Raven::PhysicsModule>();
+	
+
 
 	Input::Create();
 
@@ -207,6 +209,13 @@ void Engine::LoadModules()
 	GetSystemManager()->AddSystem<PhysicsSystem>(); // register the physics system
 	GetSystemManager()->AddSystem<LuaSystem>();
 	GetSystemManager()->AddSystem<AnimationSystem>()->OnInit();
+
+	auto audio = AudioSystem::Create();
+	GetSystemManager()->AddSystem<AudioSystem>(audio);
+	audio->OnInit();
+	audio->SetPaused(true);
+
+
 	guiSystem->OnInit();
 
 	//############	Register your system here ######################

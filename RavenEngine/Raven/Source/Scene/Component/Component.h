@@ -26,7 +26,8 @@ namespace Raven
 	CameraControllerComponent, \
 	LuaComponent, \
 	Animator, \
-	RigidBody
+	RigidBody, \
+	SoundComponent
 
 
 

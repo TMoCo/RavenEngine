@@ -11,6 +11,7 @@
 #include "MathExport.h"
 #include "Devices/Input.h"
 #include "Logger/LogExport.h"
+#include "Audio/AudioExport.h"
 #include "ComponentExport.h"
 #include <filesystem>
 
@@ -32,6 +33,7 @@ namespace Raven
 		LogExport::Export(L);
 		MathExport::Export(L);
 		ComponentExport::Export(L);
+		AudioExport::Export(L);
 	}
 
 	void LuaVirtualMachine::Destroy()

@@ -54,7 +54,7 @@ project "RavenEditor"
 	{
 		"RavenEngine",
 		"imgui",
-		"spdlog",
+		"spdlog"
 	}
 
 	defines
@@ -91,8 +91,10 @@ project "RavenEditor"
 		links
 		{
 			"glfw",
-			"OpenGL32","lua","openfbx","node-editor"
-			
+			"OpenGL32",
+			"lua",
+			"openfbx",
+			"node-editor"		
 		}
 
 		disablewarnings { 4307 }

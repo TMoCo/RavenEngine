@@ -147,7 +147,6 @@ namespace Raven
 		// then it will stay alive until no one is referencing it.
 		void UnloadResource(Ptr<IResource> rsc);
 
-
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//                 Save/Import resources
 		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
@@ -172,6 +171,9 @@ namespace Raven
 		// Return an importer of type TImporter.
 		template<class TImporter>
 		TImporter* GetImporter();
+
+		// Return a vector containing all the extensions supported by importers
+		std::vector<std::string> GetSupportedExtensions();
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//           Scan directory for resources
@@ -328,7 +330,6 @@ namespace Raven
 		{
 			importersExtMap.insert( std::make_pair(ext, newImporter) );
 		}
-
 	}
 
 

@@ -428,7 +428,6 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 		return false;
 	}
 
-
 	// Load render data?
 	for (auto newResource : newResources)
 	{
@@ -460,6 +459,16 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 	return true;
 }
 
+
+std::vector<std::string> ResourceManager::GetSupportedExtensions()
+{
+	std::vector<std::string> extensions;
+	for (auto& importer : importers)
+	{
+		importer->ListExtensions(extensions);
+	}
+	return extensions;
+}
 
 bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile)
 {

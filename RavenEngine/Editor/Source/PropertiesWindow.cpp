@@ -319,6 +319,7 @@ namespace MM
 #endif
 
 
+		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 

@@ -5,6 +5,7 @@
 #include "PropertiesWindow.h"
 #include "AssetsWindow.h"
 #include "FbxWindow.h"
+#include "ImportWindow.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -47,6 +48,7 @@ namespace Raven
 		addWindow(AssetsWindow);
 		addWindow(FbxWindow);
 		addWindow(NodeWindow);
+		addWindow(ImportWindow);
 
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;

@@ -18,7 +18,6 @@
 #include "Scene/Component/MeshComponent.h"
 #include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/CameraControllerComponent.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "Scene/Component/RigidBody.h"
 
 #include "Scripts/LuaComponent.h"
@@ -325,12 +324,6 @@ namespace MM
 
 	}
 
-	template<>
-	void ComponentEditorWidget<SkinnedMeshRenderer>(entt::registry& reg, entt::registry::entity_type e) 
-	{
-		auto& model = reg.get<SkinnedMeshRenderer>(e);
-		model.OnImGui();
-	}
 
 	template<>
 	void ComponentEditorWidget<Animator>(entt::registry& reg, entt::registry::entity_type e)

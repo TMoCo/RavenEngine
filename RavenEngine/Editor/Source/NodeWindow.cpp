@@ -7,7 +7,6 @@
 #include "Utilities/StringUtils.h"
 #include "Logger/Console.h"
 #include "Animation/Animation.h"
-#include "Animation/AnimationCache.h"
 #include "Animation/AnimationController.h"
 #include "PropertiesWindow.h"
 #include "Utilities/StringUtils.h"
@@ -18,6 +17,7 @@
 
 #include "Animation/Animator.h"
 #include "Editor.h"
+#include "ResourceManager/ResourceManager.h"
 
 
 namespace Raven 
@@ -68,10 +68,8 @@ namespace Raven
 				if (data)
 				{
 					std::string file = (char*)data->Data;
-					PRINT_FUNC();
-					LOGV("Receive file from assets window : {0}", file);
 
-					if (StringUtils::GetExtension(file) == "fbx")
+					if (Engine::GetModule<ResourceManager>()->GetResourceType(file) == RT_AnimationClip)
 					{
 						LoadAnimation(file);
 					}
@@ -90,11 +88,7 @@ namespace Raven
 
 	void NodeWindow::OpenFile(const std::string& name)
 	{
-		active = true;
-		controller =std::make_shared<AnimationController>(name);
-		if (context != nullptr)
-			ed::DestroyEditor(context);
-
+		controller = Engine::GetModule<ResourceManager>()->GetResource<AnimationController>(name);
 		LoadMeta();
 	}
 
@@ -110,7 +104,7 @@ namespace Raven
 		node.nodeName = "Entry";
 
 		ed::Config config;
-		settingFile = controller->GetFileName() + ".meta";
+		settingFile = controller->GetResourcePath() + ".meta";
 		config.SettingsFile = settingFile.c_str();
 		context = ed::CreateEditor(&config);
 		ed::SetCurrentEditor(context);
@@ -131,7 +125,7 @@ namespace Raven
 			n.inputId = node.second.in;
 			n.outputId = node.second.out;
 			n.nodeName = StringUtils::GetFileNameWithoutExtension(node.second.name);
-			n.filePath = node.second.name;
+			n.animClip = node.second.animClip;
 			nodeMap[n.id] = n;
 			nextId = std::max<int32_t>(nextId, n.outputId.Get());
 		}
@@ -166,16 +160,17 @@ namespace Raven
 		{
 			ed::SetCurrentEditor(context);
 			ed::SaveSettings();
-			controller->Save();
+			Engine::GetModule<ResourceManager>()->SaveResource(controller);
 		}
 	}
 
 	void NodeWindow::LoadAnimation(const std::string& file)
 	{
-		auto anim = AnimationCache::Get().Get(file);
-		if (anim != nullptr) 
+		auto clip = Engine::GetModule<ResourceManager>()->GetResource<AnimationClip>(file);
+
+		if (clip != nullptr)
 		{
-			AddNode(file);
+			AddNode(clip);
 		}
 	}
 
@@ -233,11 +228,11 @@ namespace Raven
 			if (controller && fromNode && toNode)
 			{
 				controller->Connect(
-					fromNode->filePath,
+					fromNode->animClip,
 					fromNode->id,
 					fromNode->inputId.Get(),
 					fromNode->outputId.Get(),
-					toNode->filePath,
+					toNode->animClip,
 					toNode->id,
 					toNode->inputId.Get(),
 					toNode->outputId.Get(),
@@ -441,14 +436,14 @@ namespace Raven
 		}
 	}
 
-	void NodeWindow::AddNode(const std::string& name)
+	void NodeWindow::AddNode(Ptr<AnimationClip> animClip)
 	{
 		auto& node2 = nodes.emplace_back();
 		node2.id = nextId++;
 		node2.inputId = nextId++;
 		node2.outputId = nextId++;
-		node2.nodeName = StringUtils::GetFileNameWithoutExtension(name);
-		node2.filePath = name;
+		node2.nodeName = animClip->GetName();
+		node2.animClip = ResourceRef(animClip.get());
 	}
 
 	void NodeWindow::LeftPanel()

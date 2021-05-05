@@ -30,18 +30,19 @@ namespace Raven
 
 		// Resources - The Value of each enum resource is important and should not change, please add 
 		//             new entries but keep the original reserved as it will affect the archiving system.
-		RT_Texture2D          = 0,
-		RT_TextureCube        = 1,
-		RT_DynamicTexture     = 2,
-		RT_MaterialShader     = 3,
-		RT_Material           = 4,
-		RT_Mesh               = 5,
-		RT_SkinnedMesh        = 6,
-		RT_Terrain            = 7,
-		RT_Scene              = 8,
-		RT_GuiLayout          = 9,
-		RT_Skeleton           = 10,
-		RT_AnimationClip      = 11
+		RT_Texture2D             = 0,
+		RT_TextureCube           = 1,
+		RT_DynamicTexture        = 2,
+		RT_MaterialShader        = 3,
+		RT_Material              = 4,
+		RT_Mesh                  = 5,
+		RT_SkinnedMesh           = 6,
+		RT_Terrain               = 7,
+		RT_Scene                 = 8,
+		RT_GuiLayout             = 9,
+		RT_Skeleton              = 10,
+		RT_AnimationClip         = 11,
+		RT_AnimationController   = 12
 	};
 
 
@@ -73,6 +74,7 @@ namespace Raven
 
 		// Animation.
 		case RT_AnimationClip: return "AnimationClip";
+		case RT_AnimationController: return "AnimationController";
 
 		}
 
@@ -134,6 +136,9 @@ namespace Raven
 		// Return the resource name.
 		inline const std::string& GetName() const { return name; }
 
+		// If the resource exist on disk, return the path it was saved at.
+		inline const std::string& GetResourcePath() const { return path; }
+
 		// Serialization Save.
 		template<typename Archive>
 		void save(Archive& archive) const
@@ -184,9 +189,6 @@ namespace Raven
 		// Friend...
 		friend class ResourceManager;
 
-		// No Copy Assignment
-		ResourceRef& operator=(const ResourceRef&) = delete;
-
 	private:
 		// The Resource relative path.
 		std::string path;
@@ -220,6 +222,15 @@ namespace Raven
 			, rsc(other.rsc)
 		{
 
+		}
+
+		// Copy Assignment
+		ResourceRef& operator=(const ResourceRef& other)
+		{
+			path = other.path;
+			type = other.type;
+			rsc = other.rsc;
+			return *this;
 		}
 
 		// Create ResourceRef from input archive.

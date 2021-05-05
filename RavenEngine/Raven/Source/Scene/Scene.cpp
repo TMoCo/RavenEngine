@@ -12,7 +12,6 @@
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/MeshComponent.h"
 #include "Scene/Component/SkinnedMeshComponent.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "Scene/Component/RigidBody.h"
 
 #include "Scripts/LuaComponent.h"
@@ -41,8 +40,11 @@
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
-		:name(initName)
+		: IResource()
+		, name(initName)
 	{
+		type = Scene::StaticGetType();
+
 		LOGV("{0} {1}", __FUNCTION__,initName);
 		entityManager = std::make_shared<EntityManager>(this);
 
@@ -50,7 +52,6 @@ namespace Raven {
 		entityManager->AddDependency<MeshComponent, Transform>();
 		entityManager->AddDependency<SkinnedMeshComponent, Transform>();
 		entityManager->AddDependency<Light, Transform>();
-		entityManager->AddDependency<MeshRenderer, Transform>();
 		entityManager->AddDependency<RigidBody, Transform>();
 
 		sceneGraph = std::make_shared<SceneGraph>();
@@ -69,100 +70,69 @@ namespace Raven {
 	}
 
 
-	void Scene::Save(const std::string& filePath, bool binary)
+	void Scene::SaveToStream(std::stringstream& storage)
 	{
 		PRINT_FUNC();
-		path = filePath;
 
-		// loop through the scene and serialize each entity and its components
-		if (binary)
-		{
-			/*path += std::string(".bin");
-
-			std::ofstream file(path, std::ios::binary);
-
-			{
-				// output finishes flushing its contents when it goes out of scope
-				cereal::BinaryOutputAr chive output{ file };
-				output(*this);
-				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-			}
-			file.flush();
-			file.close();*/
-		}
-		else
-		{
-			std::stringstream storage;
-
-			{
-				cereal::JSONOutputArchive output{ storage };
-				output(*this);
-				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-				
-			}
-
-			std::ofstream file(filePath, std::ios::binary);
-
-			file << storage.str();
-
-			file.flush();
-			file.close();
-		}
+		cereal::JSONOutputArchive output{ storage };
+		output(*this);
+		entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
 	}
 
-	void Scene::Load(const std::string& filePath, bool binary)
+
+	void Scene::SaveToFile(const std::string& filePath)
+	{
+		// First save to stream.
+		std::stringstream storage;
+		SaveToStream(storage);
+		std::ofstream file(filePath, std::ios::binary);
+
+		file << storage.str();
+		file.flush();
+		file.close();
+	}
+
+
+	void Scene::LoadFromStream(std::istream& storage)
 	{
 		PRINT_FUNC();
-		path = filePath;
 
 		entityManager->Clear();
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
 
-		if (binary)
-		{
-			/*path += std::string(".bin");
-			std::ifstream file(path, std::ios::binary);
-			if (!file.good())
-			{
-				LOGE("No saved scene file found {0}", path);
-				return;
-			}
+		cereal::JSONInputArchive input(storage);
+		input(*this);
+		entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 
-			cereal::BinaryInputArchive input(file);
-			input(*this);
-	
-			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);*/
+		sceneGraph->DisconnectOnConstruct(false, entityManager->GetRegistry());
+	}
+
+
+	void Scene::LoadFromFile(const std::string& filePath)
+	{
+		std::ifstream in(filePath);
+		if (in.good())
+		{
+			std::string data;
+			in.seekg(0, std::ios::end);
+			auto len = in.tellg();
+			in.seekg(0, std::ios::beg);
+			data.resize(len);
+			in.read(data.data(), len);
+			in.close();
+
+			std::istringstream istr;
+			istr.str(data);
+
+			LoadFromStream(istr);
 		}
 		else
 		{
-
-			std::ifstream in(filePath);
-			if (in.good())
-			{
-				std::string data;
-				in.seekg(0, std::ios::end);
-				auto len = in.tellg();
-				in.seekg(0, std::ios::beg);
-				data.resize(len);
-				in.read(data.data(), len);
-				in.close();
-
-				std::istringstream istr;
-				istr.str(data);
-				cereal::JSONInputArchive input(istr);
-				input(*this);
-				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
-			}
-			else
-			{
-				LOGE("No saved scene file found {0}", path);
-				in.close();
-			}
+			LOGE("No saved scene file found {0}", filePath);
+			in.close();
 		}
-
-		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
-		isNeedLoading = false;
 	}
+
 
 	Raven::Entity Scene::CreateEntity()
 	{

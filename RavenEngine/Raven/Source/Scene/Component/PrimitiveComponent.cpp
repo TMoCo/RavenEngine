@@ -5,7 +5,6 @@
 #pragma once
 
 #include "PrimitiveComponent.h"
-#include "MeshRenderer.h"
 
 #include "ResourceManager/ResourceManager.h"
 
@@ -13,8 +12,6 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity/EntityManager.h"
 #include "Utilities/StringUtils.h"
-#include "Animation/SkeletonCache.h"
-#include "MeshRenderer.h"
 
 #include "Engine.h"
 

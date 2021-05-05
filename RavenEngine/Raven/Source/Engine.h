@@ -16,6 +16,12 @@
 #include "Event/EventDispatcher.h"
 
 
+
+#define DEFAULT_SCENE "./scenes/Default.raven"
+
+
+
+
 namespace Raven 
 {
 
@@ -51,6 +57,9 @@ namespace Raven
 
 		// Function for running engine
 		int Run();
+
+		// Set should close flag to close the engine.
+		void Exit();
 
 		// Return a pointer to a module of type TModule from std::array of modules
 		template<class TModule>

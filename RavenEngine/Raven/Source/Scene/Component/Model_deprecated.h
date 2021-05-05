@@ -24,14 +24,13 @@ namespace Raven
 	class Entity;
 	class Mesh;
 	class Material;
-	class MeshRenderer;
-	class SkinnedMeshRenderer;
 	class Scene;
 
 
 	// Data of MeshRenderer as viewed by the model
 	struct ModelMeshRendererData
 	{
+#if 0
 		MeshRenderer* mesh;
 		SkinnedMeshRenderer* skinned;
 
@@ -41,6 +40,7 @@ namespace Raven
 		{
 
 		}
+#endif
 	};
 
 

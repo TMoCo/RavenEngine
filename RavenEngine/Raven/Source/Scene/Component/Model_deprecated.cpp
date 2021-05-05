@@ -5,15 +5,12 @@
 #pragma once
 
 #include "Scene/Component/Model_deprecated.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity/EntityManager.h"
 #include "ResourceManager/FbxLoader_deprecated.h"
 #include "Utilities/StringUtils.h"
-#include "Animation/SkeletonCache.h"
-#include "MeshRenderer.h"
 
 #include "Engine.h"
 
@@ -192,6 +189,7 @@ namespace Raven
 
 	void Model_deprecated::GetMeshRenderersImp(std::vector<ModelMeshRendererData>& outMesRenderers, Entity& ent)
 	{
+#if 0
 		// Try to get mesh renderer.
 		auto* rmesh = ent.TryGetComponent<MeshRenderer>();
 		if (rmesh)
@@ -209,6 +207,7 @@ namespace Raven
 		{
 			GetMeshRenderersImp(outMesRenderers, childEntt);
 		}
+#endif
 	}
 
 

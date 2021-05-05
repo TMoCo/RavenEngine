@@ -9,7 +9,6 @@
 #include <imgui.h>
 #include <IconsMaterialDesignIcons.h>
 #include "Animation.h"
-#include "AnimationCache.h"
 #include "Logger/Console.h"
 
 #include "Engine.h"
@@ -19,17 +18,17 @@
 
 namespace Raven
 {
-	AnimationController::AnimationController(const std::string& fileName)
-		:fileName(fileName)
+	AnimationController::AnimationController()
 	{
-		Load();
+		type = AnimationController::StaticGetType();
+
 		iterId = linkInfo.begin();
 	}
 
 	const std::string AnimationController::GetCurrentAnimationName() const
 	{
 		if (auto anim = animatorNodes.find(currentNodeId); anim != animatorNodes.end()) {
-			return anim->second.shortName;
+			return anim->second.name;
 		}
 		return "";
 	}
@@ -194,18 +193,20 @@ namespace Raven
 	}
 
 
-	void AnimationController::Connect(const std::string& fromName, 
+	void AnimationController::Connect(const ResourceRef& fromAnimClip,
 		int32_t fromId, int32_t fromIn, int32_t fromOut,
-		const std::string& toName, int32_t toId, int32_t toIn, int32_t toOut, int32_t linkId)
+		const ResourceRef& toAnimClip, int32_t toId, int32_t toIn, int32_t toOut, int32_t linkId)
 	{
 		auto& first = animatorNodes[fromId];
-		first.name = fromName;
+		first.name = fromAnimClip.GetPath();
+		first.animClip = fromAnimClip;
 		first.nodeId = fromId;
 		first.in = fromIn;
 		first.out = fromOut;
 
 		auto& second = animatorNodes[toId];
-		second.name = toName;
+		second.name = toAnimClip.GetPath();
+		second.animClip = toAnimClip;
 		second.nodeId = toId;
 
 		second.in =  toIn;
@@ -222,40 +223,6 @@ namespace Raven
 		linkInfo.erase(link);
 	}
 
-	std::string AnimationController::GetName()
-	{
-		return StringUtils::GetFileNameWithoutExtension(fileName);
-	}
-
-	void AnimationController::Save()
-	{
-		focusedLink = nullptr;
-		std::ofstream file(fileName, std::ios::binary);
-		cereal::JSONOutputArchive output{ file };
-		output(*this);
-	}
-
-	void AnimationController::Load()
-	{
-		focusedLink = nullptr;
-		std::ifstream in(fileName);
-		if (in.good())
-		{
-			in.seekg(0, std::ios::end);
-			auto len = in.tellg();
-			in.seekg(0, std::ios::beg);
-			if (len > 0)
-			{
-				cereal::JSONInputArchive input(in);
-				input(*this);
-			}
-		}
-		else
-		{
-			LOGE("No saved controller found {0}", fileName);
-		}
-		in.close();
-	}
 
 	void AnimationController::OnUpdate(float dt, SkinnedMeshComponent* skinnedComp)
 	{
@@ -305,10 +272,9 @@ namespace Raven
 
 	void AnimationController::LoadAnimation()
 	{
-		//if(currentNodeId != 0)
-		//	currentAnimation = *AnimationCache::Get().Get(animatorNodes[currentNodeId].name);
-
-		RAVEN_ASSERT(0, "TODO: Use the new Resrouce System.");
+		Ptr<AnimationClip> clip = animatorNodes[currentNodeId].animClip.FindOrLoad<AnimationClip>();
+		currentAnimation = Ptr<Animation>(new Animation());
+		currentAnimation->AddClip(clip);
 	}
 
 };

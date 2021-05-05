@@ -775,12 +775,6 @@ Ptr<Mesh> MeshFactory::GetBasicShape(EBasicShape::Type type)
 	// Try to get the resource.
 	Ptr<Mesh> shape = Engine::GetModule<ResourceManager>()->GetResource<Mesh>(sahpeRscPath);
 
-	// If no resrouce found, Add the resrouce file path to the manager and try again.
-	if (!shape && Engine::GetModule<ResourceManager>()->AddResource(sahpeRscPath))
-	{
-		shape = Engine::GetModule<ResourceManager>()->GetResource<Mesh>(sahpeRscPath);
-	}
-
 	// No shape resrouce found?
 	if (shape != nullptr)
 		return shape;

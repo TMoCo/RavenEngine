@@ -21,8 +21,6 @@ namespace Raven
 {
 	class Mesh;
 	class Material;
-	class MeshRenderer;
-	class SkinnedMeshRenderer;
 	class Scene;
 
 

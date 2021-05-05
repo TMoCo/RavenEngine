@@ -32,34 +32,16 @@ namespace Raven
 			{
 				auto& animator = scene->GetRegistry().get<Animator>(e);
 
+				if (!animator.controller)
+					continue;
+
 				Entity skinnedEnttity{ e, scene };
 				SkinnedMeshComponent* skinnedComp = skinnedEnttity.TryGetComponent<SkinnedMeshComponent>();
 
-				if (animator.isSimpleAnimator)
+				if (skinnedComp)
 				{
-					if (animator.anim)
-					{
-						if (!animator.anim->IsStarted())
-						{
-							animator.anim->Play(0, skinnedComp->GetSkeleton());
-
-							if (animator.offset > 0.000001f)
-								animator.anim->OnUpdate(animator.offset);
-						}
-						else
-						{
-							animator.anim->OnUpdate(dt);
-						}
-					}
+					animator.controller->OnUpdate(dt, skinnedComp);
 				}
-				else
-				{
-					if (animator.controller && skinnedComp)
-					{
-						animator.controller->OnUpdate(dt, skinnedComp);
-					}
-				}
-				
 			}
 		}
 	}

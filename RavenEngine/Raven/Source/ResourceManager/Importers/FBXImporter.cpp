@@ -649,7 +649,7 @@ bool FBXImporter::Import(const std::string& path, std::vector< Ptr<IResource> >&
 	else
 	{
 		// Has skinned mesh & skeleton?
-		if (fbx.HasSkin() && fbx.HasBones())
+		if (fbx.HasSkin() && fbx.HasBones() && !settings.importMeshOnly)
 		{
 			skeleton = Ptr<Skeleton>(fbx.ImportSkeleton());
 			skeleton->SetName("SKELETON_" + name);

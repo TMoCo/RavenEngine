@@ -7,7 +7,6 @@
 #include "ResourceManager/ResourceManager.h"
 #include "Scene/Component/Model_deprecated.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "Scene/Entity/EntityManager.h"
 #include "Utilities/StringUtils.h"
 #include "Scene/SceneManager.h"
@@ -15,7 +14,6 @@
 #include "Engine.h"
 #include "Animation/Skeleton.h"
 #include "Animation/Animation.h"
-#include "Animation/SkeletonCache.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
 #include <memory>
@@ -260,10 +258,12 @@ namespace Raven {
 	{
 		if (skeleton == nullptr)
 		{
+#if 0
 			skeleton = SkeletonCache::Get().Save(file, {});
 			//create a skeleton in cache
 			//just keep the skeleton structure
 			//in every skinnedMeshRenderer, it will be copied.
+#endif
 		}
 
 		bones.clear();

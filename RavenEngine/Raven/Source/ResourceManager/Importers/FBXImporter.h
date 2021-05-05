@@ -134,11 +134,14 @@ namespace Raven
 		// Only import animation that use the skeleton
 		bool importAnimationOnly;
 
+		// Import only the mesh even if there is animation and a skeleton.
+		bool importMeshOnly;
 
 		// Construct.
 		FBXImporterSettings()
 			: skeleton(nullptr)
 			, importAnimationOnly(false)
+			, importMeshOnly(false)
 		{
 
 		}

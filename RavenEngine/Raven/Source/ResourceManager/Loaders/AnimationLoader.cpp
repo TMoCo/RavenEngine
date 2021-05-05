@@ -3,6 +3,7 @@
 
 
 #include "Animation/Animation.h"
+#include "Animation/AnimationController.h"
 
 
 
@@ -28,6 +29,13 @@ IResource* AnimationLoader::LoadResource(const ResourceHeaderInfo& info, RavenIn
 		return anime;
 	}
 
+	case EResourceType::RT_AnimationController:
+	{
+		AnimationController* animeController = new AnimationController();
+		archive.ArchiveLoad(*animeController);
+		return animeController;
+	}
+
 	default:
 		RAVEN_ASSERT(0, "Not Supported.");
 		break;
@@ -48,6 +56,13 @@ void AnimationLoader::SaveResource(RavenOutputArchive& archive, IResource* Resou
 	}
 		break;
 
+	case EResourceType::RT_AnimationController:
+	{
+		AnimationController* anime = static_cast<AnimationController*>(Resource);
+		archive.ArchiveSave(*anime);
+	}
+		break;
+
 	default:
 		RAVEN_ASSERT(0, "Not Supported.");
 		break;
@@ -58,6 +73,7 @@ void AnimationLoader::SaveResource(RavenOutputArchive& archive, IResource* Resou
 void AnimationLoader::ListResourceTypes(std::vector<EResourceType>& outRscTypes)
 {
 	outRscTypes.push_back(RT_AnimationClip);
+	outRscTypes.push_back(RT_AnimationController);
 }
 
 

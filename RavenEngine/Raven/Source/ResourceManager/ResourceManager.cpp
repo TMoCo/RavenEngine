@@ -17,6 +17,8 @@
 #include "ResourceManager/Loaders/LayoutLoader.h"
 #include "ResourceManager/Loaders/AnimationLoader.h"
 #include "ResourceManager/Loaders/SkinnedMeshLoader.h"
+#include "ResourceManager/Loaders/SceneLoader.h"
+
 
 
 #include "miniz.h"
@@ -195,6 +197,13 @@ void ResourcesRegistry::RemoveResource(const std::string& path)
 }
 
 
+void ResourcesRegistry::RemoveResource(IResource* rsc)
+{
+	RAVEN_ASSERT(rsc->resourceIndex >= 0 && rsc->resourceIndex < resources.size(), "Error - Trying to remove resource that is not registred.");
+	resources[rsc->resourceIndex].rsc.reset();
+}
+
+
 void ResourcesRegistry::Reset()
 {
 	// Remove all references to the resource, but leave mapping intact
@@ -294,8 +303,10 @@ void ResourceManager::Initialize()
 	RegisterLoader<SkinnedMeshLoader>();
 	RegisterLoader<LayoutLoader>();
 	RegisterLoader<AnimationLoader>();
+	RegisterLoader<SceneLoader>();
 
 	// scan the directory and populate the 
+	ScanDirectory("./");
 
 }
 
@@ -315,24 +326,23 @@ void ResourceManager::ScanDirectory(const std::string& path)
 	{
 		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
 		{
-			// extract file extension 
-			std::string ext = StringUtils::GetExtension(path);
+			if (entry.is_directory())
+			{
+				// recursivivly check for subdirectories
+				ScanDirectory(entry.path().string());
+				continue;
+			}
+
+			std::string ext = entry.path().extension().string();
 
 			// raven extension, load the resource
-			if (ext == std::string("raven"))
+			if (ext == ".raven")
 			{
-				ResourceHeaderInfo info = ILoader::LoadHeader(RavenInputArchive(path));
-				LoadResource(GetLoader(info.GetType()), path);
-			}
+				std::string filePath = entry.path().string();
 
-			// if file extension on is supported (an importer exists), notify the registry
-			if (GetImporter(ext))
-			{
-				registry.AddResource(path, ILoader::LoadHeader(RavenInputArchive(path)), nullptr);
+				ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
+				registry.AddResource(filePath, info, nullptr);
 			}
-
-			// recursivivly check for subdirectories
-			ScanDirectory(entry.path().string());
 		}
 	}
 }
@@ -366,15 +376,22 @@ ILoader* ResourceManager::GetLoader(EResourceType rscType)
 
 bool ResourceManager::HasResource(const std::string& path)
 {
-	RAVEN_ASSERT(0, "TODO Implement HasResource.");
-	return false;
+	const ResourceData* rscData = registry.FindResource(path);
+	return rscData != nullptr;
+}
+
+
+bool ResourceManager::HasResource(Ptr<IResource> rsc)
+{
+	RAVEN_ASSERT(rsc != nullptr, "TODO Implement HasResource.");
+	return registry.GetResource(rsc->resourceIndex) != nullptr;
 }
 
 
 bool ResourceManager::IsResourceLoaded(const std::string& path)
 {
-	RAVEN_ASSERT(0, "TODO Implement HasResource.");
-	return false;
+	const ResourceData* rscData = registry.FindResource(path);
+	return rscData != nullptr && rscData->rsc != nullptr;
 }
 
 
@@ -454,6 +471,12 @@ bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::str
 	{
 		LOGE("Failed to open archive at file {0}.", saveFile.c_str());
 		return false;
+	}
+
+	// No Name?
+	if (newResource->name.empty())
+	{
+		newResource->name = StringUtils::GetFileNameWithoutExtension(saveFile);
 	}
 
 	// Save Header
@@ -589,6 +612,23 @@ Ptr<IResource> ResourceManager::FindOrLoad(const ResourceRef& ref)
 	return rscData->rsc;
 }
 
+
+EResourceType ResourceManager::GetResourceType(const std::string& path)
+{
+	const ResourceData* rscData = registry.FindResource(path);
+
+	if (!rscData)
+		return EResourceType::RT_None;
+
+	return rscData->type;
+}
+
+
+void ResourceManager::UnloadResource(Ptr<IResource> rsc)
+{
+	RAVEN_ASSERT(rsc != nullptr, "Invalid Resource.");
+	registry.RemoveResource(rsc.get());
+}
 
 
 

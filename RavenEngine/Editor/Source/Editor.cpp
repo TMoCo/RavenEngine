@@ -17,6 +17,7 @@
 #include "Scene/Entity/Entity.h"
 #include "Scripts/LuaComponent.h"
 
+#include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/MeshFactory.h"
 
 #include "Devices/Input.h"
@@ -346,41 +347,43 @@ namespace Raven
 
 	void Editor::OpenFile(const std::string& filePath)
 	{
-		if (StringUtils::IsTextFile(filePath)) 
-		{
-			LOGW("OpenFile file : {0} did not implement",filePath);
-		}
-		else if (StringUtils::IsModelFile(filePath))
-		{
-#if 0
-			if (StringUtils::GetExtension(filePath) == "fbx") 
-			{
-				GetWindow<FbxWindow>()->OpenFile(filePath);
-			}
+		EResourceType rscType = Engine::GetModule<ResourceManager>()->GetResourceType(filePath);
 
-			auto modelEntity = GetModule<SceneManager>()->GetCurrentScene()->CreateEntity(StringUtils::GetFileNameWithoutExtension(filePath));
-			auto & model = modelEntity.AddComponent<Model>(filePath);
-			model.LoadFile();
-			selectedNode = modelEntity.GetHandle();
-#endif
-		}
-		else if (StringUtils::IsAudioFile(filePath))
+		switch (rscType)
 		{
-			LOGW("OpenFile file : {0} did not implement", filePath);
-		}
-		else if (StringUtils::IsSceneFile(filePath))
-		{
-			RAVEN_ASSERT(0, "TODO: Add resources to the scene or laod a new scene resrouce.");
-			OpenScene(filePath);
-		}
-		else if (StringUtils::IsTextureFile(filePath))
-		{
-			LOGW("OpenFile file : {0} did not implement", filePath);
-		}
-		else if (StringUtils::IsControllerFile(filePath)) 
-		{
+		case Raven::RT_AnimationController:
 			GetWindow<NodeWindow>()->OpenFile(filePath);
+			break;
+
+		case Raven::RT_Texture2D:
+		case Raven::RT_TextureCube:
+		case Raven::RT_DynamicTexture:
+			LOGW("Editor - Open Texture Not Supported.");
+			break;
+
+		case Raven::RT_MaterialShader:
+		case Raven::RT_Material:
+			LOGW("Editor - Open Materail Not Supported.");
+			break;
+
+		case Raven::RT_Mesh:
+		case Raven::RT_SkinnedMesh:
+			LOGW("Editor - Open Materail Not Supported.");
+			break;
+
+		case Raven::RT_Scene:
+			OpenScene(filePath);
+			break;
+
+		case Raven::RT_Skeleton:
+			LOGW("Editor - Open Skeleton Not Supported.");
+			break;
+
+		case Raven::RT_AnimationClip:
+			LOGW("Editor - Open AnimationClip Not Supported.");
+			break;
 		}
+
 	}
 
 	const char* Editor::GetIconFontIcon(const std::string& filePath)
@@ -426,13 +429,22 @@ namespace Raven
 
 			if (ImGui::BeginMenu("File"))
 			{
+
 				if (ImGui::MenuItem("Exit"))
 				{
+					Engine::Get().Exit();
 				}
 
 				if (ImGui::MenuItem("Open File"))
 				{
+
 				}
+
+				if (ImGui::MenuItem("Save Scene"))
+				{
+					Engine::GetModule<SceneManager>()->SaveCurrentScene();
+				}
+
 				ImGui::EndMenu();
 			}
 
@@ -540,26 +552,18 @@ namespace Raven
 	void Editor::NewSceneForStartPlay()
 	{
 		// Saven Origianl as cache.
-		auto scenePath = "./scenes/" + originalScene->GetName() + "_play_cache.raven";
-		auto originpath = originalScene->path;
-		originalScene->Save(scenePath);
-		originalScene->path = originpath;
+		std::stringstream scene_cache;
+		originalScene->SaveToStream(scene_cache);
 
-		struct stat fileInfo;
-		auto exists = (!stat(scenePath.c_str(), &fileInfo)) != 0;
+		auto newPlayScene = GetModule<SceneManager>()->AddScene<Scene>("Play_Scene");
+		newPlayScene->LoadFromStream(scene_cache);
+		newPlayScene->SetName("Play_Scene");
 
-		if (exists) 
-		{
-			auto newPlayScene = GetModule<SceneManager>()->AddScene<Scene>(originalScene->GetName() + "_Play_Scene");
-			newPlayScene->path = scenePath;
-			newPlayScene->isNeedLoading = true;
+		// Switch to play scene.
+		GetModule<SceneManager>()->SwitchToScene(newPlayScene.get());
+		GetModule<SceneManager>()->Apply();
 
-			// Switch to play scene.
-			GetModule<SceneManager>()->SwitchToScene(newPlayScene->GetName());
-			GetModule<SceneManager>()->Apply();
-
-			playScene = newPlayScene;
-		}
+		playScene = newPlayScene;
 	}
 
 	void Editor::ReloadOriginalScene()
@@ -571,11 +575,11 @@ namespace Raven
 		}
 
 		// Switch to play scene.
-		GetModule<SceneManager>()->SwitchToScene(originalScene->GetName());
+		GetModule<SceneManager>()->SwitchToScene(originalScene);
 		GetModule<SceneManager>()->Apply();
 
 		auto* rmScene = playScene.lock().get();
-		GetModule<SceneManager>()->RemoveScene( rmScene->GetName() );
+		GetModule<SceneManager>()->RemoveScene(rmScene);
 	}
 
 
@@ -619,7 +623,11 @@ namespace Raven
 
 	void Editor::OpenScene(const std::string& file)
 	{
-		RAVEN_ASSERT(0, "TODO: Implement Open Scene.");
+		// First unload all opend scenes...
+		Engine::GetModule<SceneManager>()->UnloadScenes();
+
+		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
+		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
 	}
 
 };

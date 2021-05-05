@@ -68,7 +68,6 @@ namespace Raven
 		{
 			hasRenderResources = true;
 			isGenMipmaps = false;
-			renderRsc = NULL;
 		}
 
 		// Destruct.

@@ -95,17 +95,6 @@ int Engine::Run()
 {
 	auto win = GetModule<Raven::Window>();
 
-
-	// ~TESTING.........................................................
-	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Capsule.raven");
-	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Cube.raven");
-	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Pyramid.raven");
-	GetModule<ResourceManager>()->AddResource("./assets/Basic Shapes/Sphere.raven");
-	// ~TESTING.........................................................
-
-
-	//NewGameScene();
-
 	// Main Loop...
 	while (!win->ShouldClose())
 	{
@@ -260,11 +249,17 @@ void Engine::OnSceneCreated(Scene* scene)
 }
 
 
+void Engine::Exit()
+{
+	// Tell the main window to close.
+	GetModule<Window>()->Close();
+
+}
+
+
 void Engine::NewGameScene()
 {
 	Scene* newScene = new Scene("Physics Test World");
-	newScene->isNeedLoading = false;
-
 
 	// delete previous physics world
 	auto physics = GetModule<PhysicsModule>();
@@ -334,38 +329,15 @@ void Engine::NewGameScene()
 		camera.SetNear(0.01);
 		camera.SetAspectRatio(4 / 3.f);
 
-		// TODO: Use Entity ID.
+		// TODO: Use Entity ID, this reference could be deleted when ett::registry reallocate its containers.
 		//newScene->SetOverrideCamera(&camera);
 		//newScene->SetOverrideTransform(&tr);
 	}
 
 
-#if 0
 	{
-		if (!Engine::GetModule<ResourceManager>()->AddResource("./assets/Meshes/YBot/SKELETON_ybot.raven"))
-		{
-			Engine::GetModule<ResourceManager>()->Import("./assets/ybot.fbx", "./assets/Meshes/YBot/");
-
-			FBXImporter* fbxImporter = Engine::GetModule<ResourceManager>()->GetImporter<FBXImporter>();
-			fbxImporter->settings.importAnimationOnly = true;
-			fbxImporter->settings.skeleton = Engine::GetModule<ResourceManager>()->GetResource<Skeleton>("./assets/Meshes/YBot/SKELETON_ybot.raven");
-			Engine::GetModule<ResourceManager>()->Import("./assets/Walking.fbx", "./assets/Meshes/YBot/");
-
-			fbxImporter->settings.importAnimationOnly = true;
-			fbxImporter->settings.skeleton = Engine::GetModule<ResourceManager>()->GetResource<Skeleton>("./assets/Meshes/YBot/SKELETON_ybot.raven");
-			Engine::GetModule<ResourceManager>()->Import("./assets/Idle.fbx", "./assets/Meshes/YBot/");
-		}
-		else
-		{
-			Engine::GetModule<ResourceManager>()->AddResource("./assets/Meshes/YBot/SKINNEDMESH_ybot.raven");
-			Engine::GetModule<ResourceManager>()->AddResource("./assets/Meshes/YBot/SKELETON_ybot.raven");
-			Engine::GetModule<ResourceManager>()->AddResource("./assets/Meshes/YBot/ANIM_CLIP_Idle_0.raven");
-			Engine::GetModule<ResourceManager>()->AddResource("./assets/Meshes/YBot/ANIM_CLIP_Walking_0.raven");
-		}
-
-		Ptr<SkinnedMesh> skMs = Engine::GetModule<ResourceManager>()->GetResource<SkinnedMesh>("./assets/Meshes/YBot/SKINNEDMESH_ybot.raven");
-		skMs->SetSkeleton(Engine::GetModule<ResourceManager>()->GetResource<Skeleton>("./assets/Meshes/YBot/SKELETON_ybot.raven"));
-		Engine::GetModule<ResourceManager>()->SaveResource(skMs);
+		Ptr<SkinnedMesh> skMs = Engine::GetModule<ResourceManager>()->GetResource<SkinnedMesh>(
+			"./assets/Meshes/YBot/SkMs_YBot.raven");
 
 		auto yBot = newScene->CreateEntity("YBot_SkMesh");
 		auto& skinnedMesh = yBot.GetOrAddComponent<SkinnedMeshComponent>();
@@ -377,18 +349,10 @@ void Engine::NewGameScene()
 		tr.SetPosition(glm::vec3(0.0f, 10.f, 0.0f));
 		tr.SetScale(glm::vec3(0.1f));
 
-		auto& animator = yBot.GetOrAddComponent<Animator>();
-		animator.isSimpleAnimator = true;
-		animator.anim = Ptr<Animation>(new Animation());
-		animator.anim->AddClip(
-			Engine::GetModule<ResourceManager>()->GetResource<AnimationClip>("./assets/Meshes/YBot/ANIM_CLIP_Walking_0.raven")
-		);
-
 	}
-#endif
 
 	// Switch the scene....
-	uint32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
+	int32_t sceneIdx = GetModule<SceneManager>()->AddScene(newScene);
 
 	// load scene using its id
 	GetModule<SceneManager>()->SwitchToScene(sceneIdx);

@@ -72,6 +72,9 @@ namespace Raven
 		// Remove loaded Resource, this will only remove the loaded Resource not its mapping.
 		void RemoveResource(const std::string& path);
 
+		// Remove loaded Resource, this will only remove the loaded Resource not its mapping.
+		void RemoveResource(IResource* rsc);
+
 		// Clear all loaded Resources, this will leave the mapping.
 		void Reset();
 
@@ -129,6 +132,7 @@ namespace Raven
 
 		// Return true if the Resource exist in the Resource registry whether loaded or not.
 		bool HasResource(const std::string& path);
+		bool HasResource(Ptr<IResource> rsc);
 
 		// Return true if the Resource exist in the registry and loaded.
 		bool IsResourceLoaded(const std::string& path);
@@ -136,8 +140,12 @@ namespace Raven
 		// Find or Load the resrouce ResourceRef is currently referencing.
 		Ptr<IResource> FindOrLoad(const ResourceRef& ref);
 
-		// Return the resrouce ResourceRef is currently referencing.
-		Ptr<IResource> GetResource(const ResourceRef& ref);
+		// Return the type of the resource at a relative resource path.
+		EResourceType GetResourceType(const std::string& path);
+
+		// Unload a resource by removing it from registry. if the resoucce is referenced else where
+		// then it will stay alive until no one is referencing it.
+		void UnloadResource(Ptr<IResource> rsc);
 
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
@@ -182,7 +190,6 @@ namespace Raven
 		// Return the loader of type TLoader
 		template <class TLoader>
 		TLoader* GetLoader();
-
 
 		// Return the loader that can load this resource type.
 		ILoader* GetLoader(EResourceType rscType);

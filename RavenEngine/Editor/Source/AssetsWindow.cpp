@@ -14,6 +14,9 @@
 #include "Animation/AnimationController.h"
 #include "Utilities/StringUtils.h"
 #include "Editor.h"
+#include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Resources/MaterialShader.h"
 
 #include <filesystem>
 
@@ -422,15 +425,43 @@ namespace Raven
 	{
 		if (ImGui::BeginPopupContextWindow("AssetsWindow::PopupWindow"))
 		{
+			bool isAdd = false;
+
 			if (ImGui::Selectable("Add Animation Controller"))
 			{
-				LOGV("{0}/", currentDirPath);
-				AnimationController controller(currentDirPath +"/NewAnimController.controller");
-				controller.Save();
+				Ptr<AnimationController> controller(new AnimationController);
+				Engine::GetModule<ResourceManager>()->SaveNewResource(controller,
+					currentDirPath + "/New_Controller.raven");
 
+				isAdd = true;
+			}
+
+
+			if (ImGui::Selectable("Add Material"))
+			{
+				Ptr<Material> material(new Material);
+				Engine::GetModule<ResourceManager>()->SaveNewResource(material,
+					currentDirPath + "/New_Material.raven");
+
+				isAdd = true;
+			}
+
+			if (ImGui::Selectable("Add Shader"))
+			{
+				Ptr<MaterialShader> shader(new MaterialShader);
+				Engine::GetModule<ResourceManager>()->SaveNewResource(shader,
+					currentDirPath + "/New_Material.raven");
+
+				isAdd = true;
+			}
+
+
+			if (isAdd)
+			{
 				baseProjectDir = GetFsContents(baseDirPath);
 				currentDir = baseProjectDir;
 			}
+
 			ImGui::EndPopup();
 		}
 	}

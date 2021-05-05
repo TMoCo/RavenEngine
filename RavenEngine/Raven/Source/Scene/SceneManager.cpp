@@ -5,6 +5,10 @@
 #include "Engine.h"
 #include "Entity/Entity.h"
 
+#include "ResourceManager/ResourceManager.h"
+
+#include <filesystem>
+
 
 
 
@@ -32,51 +36,31 @@ void SceneManager::Destroy()
 {
 	if (currentScene->GetName() == "Default")
 	{
-		currentScene->Save(currentScene->path);
+		SaveCurrentScene();
 	}
 
 	scenes.clear();
 }
 
 
-void SceneManager::AddFileToLoadList(const std::string & filePath)
-{
-	sceneFilePathsToLoad.emplace_back(filePath);
-}
-
-
-void SceneManager::SwitchToScene(const std::string& name)
+void SceneManager::SwitchToScene(const Scene* scene)
 {
 	bool found = false;
 	switchingScenes = true;
-	uint32_t idx = 0;
+	int32_t sceneIndex = GetSceneIndex(scene);
 
-	for (uint32_t i = 0; !found && i < scenes.size(); ++i)
+	if (sceneIndex == -1)
 	{
-		if (!scenes[i])
-			continue;
-
-		if (scenes[i]->GetName() == name)
-		{
-			found = true;
-			idx = i;
-			break;
-		}
+		LOGW("Failed Switch To Scene, scene is not added to the manager.");
+		return;
 	}
 
-	if (found)
-	{
-		SwitchToScene(idx);
-	}
-	else
-	{
-		LOGW("[{0} : {1}] - Unknown Scene : {2}",__FILE__,__LINE__, name.c_str());
-	}
+	SwitchToScene(sceneIndex);
 }
 
 
 
-void SceneManager::SwitchToScene(uint32_t index)
+void SceneManager::SwitchToScene(int32_t index)
 {
 	queuedSceneIndex = index;
 	switchingScenes = true;
@@ -92,22 +76,10 @@ void SceneManager::Apply()
 	// Empty? Create or Default scene...
 	if (scenes.empty())
 	{
-		auto defaultScene = AddScene<Scene>("Default");
-		defaultScene->path = StringUtils::GetCurrentWorkingDirectory() + "/scenes/Default.raven";
-
-		// Exist?
-		struct stat fileInfo;
-		if ((!stat(defaultScene->path.c_str(), &fileInfo)))
-		{
-			defaultScene->isNeedLoading = true;
-		}
-		else
-		{
-			defaultScene->isNeedLoading = false;
-		}
-
+		CreateOrLoadDefaultScene();
 		queuedSceneIndex = 0;
 	}
+
 
 	// Current Scene? Cleanup...
 	if (currentScene != nullptr)
@@ -116,19 +88,13 @@ void SceneManager::Apply()
 		currentScene = nullptr;
 	}
 
+
 	currentSceneIndex = queuedSceneIndex;
 	currentScene = scenes[queuedSceneIndex].get();
-
-	// Does the scene need to be loaded from file.
-	if (currentScene->isNeedLoading)
-	{
-		currentScene->Load( currentScene->path );
-	}
 
 
 	if(Engine::Get().GetEditorState() == EditorState::Play)
 		currentScene->OnInit();
-
 
 	Engine::Get().OnSceneCreated(currentScene);
 
@@ -147,15 +113,6 @@ std::vector<std::string> SceneManager::GetSceneNames()
 }
 
 
-void SceneManager::AddSceneFromFile(const std::string& filePath)
-{
-	sceneFilePaths.emplace_back(filePath);
-	auto name = StringUtils::RemoveExtension(StringUtils::GetFileName(filePath));
-	auto newScene = AddScene<Scene>(name);
-	newScene->isNeedLoading = true;
-}
-
-
 Scene* SceneManager::GetSceneByName(const std::string& sceneName) 
 {
 	for (auto& scene : scenes)
@@ -168,16 +125,6 @@ Scene* SceneManager::GetSceneByName(const std::string& sceneName)
 }
 
 
-void SceneManager::LoadCurrentList()
-{
-	for (auto& filePath : sceneFilePathsToLoad)
-	{
-		AddSceneFromFile(filePath);
-	}
-	sceneFilePathsToLoad.clear();
-}
-
-
 Scene* SceneManager::GetScene(int32_t index)
 {
 	if (index >= 0 && index < scenes.size())
@@ -187,7 +134,7 @@ Scene* SceneManager::GetScene(int32_t index)
 }
 
 
-int32_t SceneManager::GetSceneIndex(Scene* inScene)
+int32_t SceneManager::GetSceneIndex(const Scene* inScene)
 {
 	if (!inScene)
 		return -1;
@@ -222,16 +169,16 @@ int32_t SceneManager::GetSceneIndex(const std::string& sceneName)
 
 int32_t SceneManager::AddScene(Scene* scene)
 {
-	RAVEN_ASSERT(GetSceneIndex(scene->GetName()) == -1, "Scene name already exist.");
 	scenes.emplace_back(scene);
+	return scenes.size() - 1;
 }
 
 
-void SceneManager::RemoveScene(const std::string& name)
+void SceneManager::RemoveScene(const Scene* scene)
 {
-	RAVEN_ASSERT(currentScene->GetName() != name, "Can't remove current scene");
+	RAVEN_ASSERT(currentScene != scene, "Can't remove current scene");
 
-	int32_t index = GetSceneIndex(name);
+	int32_t index = GetSceneIndex(scene);
 
 	if (!GetScene(index))
 		return;
@@ -248,6 +195,71 @@ void SceneManager::RemoveScene(const std::string& name)
 		scenes[index].reset();
 	}
 
+}
+
+
+void SceneManager::SaveCurrentScene()
+{
+	RAVEN_ASSERT(currentScene != nullptr, "Can't save invalid scene");
+
+	// The current scene to save.
+	Ptr<Scene> scene = scenes[GetSceneIndex(currentScene)];
+
+	// New Unsaved Scene
+	if (Engine::GetModule<ResourceManager>()->HasResource(scene))
+	{
+		Engine::GetModule<ResourceManager>()->SaveResource(scenes[GetSceneIndex(currentScene)]);
+	}
+	else
+	{
+		Engine::GetModule<ResourceManager>()->SaveNewResource(scene, "./scenes/" + scene->GetName() + ".raven");
+	}
+	
+}
+
+
+Ptr<Scene> SceneManager::LoadScene(const std::string& path)
+{
+	Ptr<Scene> rscScene = Engine::GetModule<ResourceManager>()->GetResource<Scene>(path);
+	scenes.emplace_back(rscScene);
+
+	return rscScene;
+}
+
+
+void SceneManager::UnloadScenes()
+{
+	// Current Scene? Cleanup...
+	if (currentScene != nullptr)
+	{
+		currentScene->OnClean();
+		currentScene = nullptr;
+		currentSceneIndex = 0;
+	}
+
+	// Unload from Resource Manager.
+	for (auto scene : scenes)
+	{
+		Engine::GetModule<ResourceManager>()->UnloadResource(scene);
+	}
+
+	// Clear all references to the scenes.
+	scenes.clear();
+}
+
+
+void SceneManager::CreateOrLoadDefaultScene()
+{
+	if (Engine::GetModule<ResourceManager>()->HasResource(DEFAULT_SCENE))
+	{
+		Ptr<Scene> defaultScene = Engine::GetModule<ResourceManager>()->GetResource<Scene>(DEFAULT_SCENE);
+		scenes.emplace_back(defaultScene);
+	}
+	else
+	{
+		Ptr<Scene> defaultScene = AddScene<Scene>("Default");
+		scenes.emplace_back(defaultScene);
+	}
 }
 
 

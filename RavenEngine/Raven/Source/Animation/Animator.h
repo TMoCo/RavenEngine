@@ -25,16 +25,19 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("controllerFile", animFile));
 			archive(cereal::make_nvp("rootMotion", rootMotion));
+
+			// Save Resrouce Reference -> AnimationController.
+			ResourceRef::Save(archive, controller.get());
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::make_nvp("controllerFile", animFile));
 			archive(cereal::make_nvp("rootMotion", rootMotion));
-			CreateController();
+
+			// Load Resrouce Reference -> AnimationController.
+			controller = ResourceRef::Load(archive).FindOrLoad<AnimationController>();
 		}
 
 		template<typename T>
@@ -43,15 +46,10 @@ namespace Raven
 		inline auto GetController() { return controller; }
 
 	private:
-		void CreateController();
 		bool rootMotion = false;
-		std::string animFile;
-		std::shared_ptr<AnimationController> controller;
 
-	public:
-		bool isSimpleAnimator = false;
-		float offset = 0.0f;
-		Ptr<Animation> anim = nullptr;
+		// The Animation Controller, its a resource so loading/saving is handled by the Resource Manager.
+		Ptr<AnimationController> controller;
 	};
 
 	template<>

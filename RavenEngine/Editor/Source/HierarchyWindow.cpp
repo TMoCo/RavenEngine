@@ -11,7 +11,6 @@
 #include "Scene/Component/Light.h"
 #include "Scene/Component/MeshComponent.h"
 #include "Scene/Component/SkinnedMeshComponent.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "Scripts/LuaComponent.h"
 #include "Core/Camera.h"
 #include "Scene/Component/Transform.h"

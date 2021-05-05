@@ -35,6 +35,8 @@ namespace Raven
 		void PollEvent();
 		bool ShouldClose();
 		void SwapBuffers();
+		void Close();
+
 	private:
 		GLFWwindow* glfwWindow = nullptr;
 		std::string title;

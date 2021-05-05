@@ -15,13 +15,14 @@ namespace Raven {
 
 
 MaterialShader::MaterialShader()
-	: IResource(EResourceType::RT_Material, true)
+	: IResource()
 	, renderRsc(nullptr)
-	, domain(ERenderShaderDomain::Mesh)
-	, type(ERenderShaderType::Opaque)
+	, sdomain(ERenderShaderDomain::Mesh)
+	, stype(ERenderShaderType::Opaque)
 	, isComputeMaterialVertex(false)
 {
-
+	type = MaterialShader::StaticGetType();
+	hasRenderResources = true;
 }
 
 
@@ -32,10 +33,10 @@ MaterialShader::~MaterialShader()
 
 
 
-void MaterialShader::LoadOnGpu()
+void MaterialShader::LoadRenderResource()
 {
-	RAVEN_ASSERT(!onGPU, "Shader already loaded.");
-	onGPU = true;
+	RAVEN_ASSERT(!isOnGPU, "Shader already loaded.");
+	isOnGPU = true;
 
 
 	// What Stages this materail function support.
@@ -49,9 +50,9 @@ void MaterialShader::LoadOnGpu()
 
 	RenderRscShaderCreateData rscData;
 	rscData.name = name;
-	rscData.type = type;
+	rscData.type = stype;
 	rscData.AddFunction(stages, materialFunction);
-	renderRsc = RenderRscShader::Create(domain, rscData); // Build Shader
+	renderRsc = RenderRscShader::Create(sdomain, rscData); // Build Shader
 
 	// Shader Input...
 	if (blockInput.size != -1)
@@ -86,13 +87,13 @@ void MaterialShader::SetMaterialFunction(const std::string& func, bool hasComput
 void MaterialShader::SetDomain(ERenderShaderDomain val)
 {
 	RAVEN_ASSERT(val != ERenderShaderDomain::Custom, "Custom Domain not supported by shader resource.");
-	domain = val;
+	sdomain = val;
 }
 
 
 void MaterialShader::SetType(ERenderShaderType val)
 {
-	type = val;
+	stype = val;
 }
 
 

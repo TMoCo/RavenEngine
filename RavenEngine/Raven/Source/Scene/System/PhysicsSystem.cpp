@@ -39,24 +39,22 @@ namespace Raven
 	{
 		if (Engine::Get().GetEditorState() == EditorState::Play)
 		{
-			// get all entities with collision bodies and tranforms
-			auto& registry = scene->GetRegistry();
-			auto group = scene->GetRegistry().group<RigidBody>(entt::get<Transform>);
+			// Update physics world, generates new transforms for entities with rigid bodies
+			Engine::Get().GetModule<PhysicsModule>()->Step(dt);
 
-			// loop over them all and update the collision bodies with their transforms
+			// get all entities with collision bodies and tranforms
 			/*
 			*/
-			char buf[128];
-			sprintf(buf, "There are %i entities with rigid bodies and transforms", group.size());
-			LOGV(buf);
-
+			auto& registry = scene->GetRegistry();
+			auto& group = scene->GetRegistry().group<RigidBody, Transform>();
 			for (auto entity : group)
 			{
 				const auto& [rigBod, trans] = group.get<RigidBody, Transform>(entity);
-				trans.SetTransform(Rp3dConvert::ToTransform(rp3d::Transform::interpolateTransforms(rigBod.GetPreviousState(), rigBod.GetCurrentState(), Engine::Get().GetModule<PhysicsModule>()->GetLerpFactor()))); // interpolate states to get transform used in rendering
+				auto scale = rigBod.initTransform.GetScale();
+
+
+				trans.SetTransform(Rp3dConvert::ToTransform(rp3d::Transform::interpolateTransforms(rigBod.GetPreviousState(), rigBod.GetCurrentState(), Engine::Get().GetModule<PhysicsModule>()->GetLerpFactor()), scale)); // interpolate states to get transform used in rendering
 				rigBod.SetPreviousState(rigBod.GetCurrentState()); // set previous state to current state 
-				//sprintf(buf, "Entity has %i colliders", rigBod.GetNumColliders());
-				//LOGV(buf);
 			}
 		}
 	}

@@ -23,10 +23,10 @@ namespace Raven
 	void TerrainComponent::LoadOnGpu()
 	{
 		// load the resources
-		terrain.get()->LoadOnGPU();
+		terrain.get()->LoadRenderResource();
 		for (auto& texturePair : textures)
 		{
-			texturePair.second->LoadOnGpu();
+			texturePair.second->LoadRenderResource();
 		}
 	}
 
@@ -93,9 +93,10 @@ namespace Raven
 	void TerrainComponent::LoadHeightMap(const std::string& path)
 	{
 		auto res = Engine::Get().GetModule<ResourceManager>();
-		res->LoadResource<Texture2D>(path);
+
 		// once the texture has been loaded, try to set it as height map (must be gray scale, will be nullptr otherwise)
 		SetHeightMap(res->GetResource<Texture2D>(path).get());
+
 		// change the file name if height map was accepted
 		if (HasHeightMap())
 		{
@@ -108,7 +109,7 @@ namespace Raven
 	{
 		auto res = Engine::Get().GetModule<ResourceManager>();
 		// use return value to determine if need to process further
-		if (res->LoadResource<Texture2D>(path))
+		if (res->GetResource<Texture2D>(path))
 		{
 			// insert the texture data if loaded
 			auto tex = res->GetResource<Texture2D>(path);

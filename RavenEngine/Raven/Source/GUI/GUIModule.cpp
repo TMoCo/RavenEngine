@@ -1,6 +1,8 @@
 #include "GUIModule.h"
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/Texture2D.h"
+
+#include "Render/RenderResource/RenderRscTexture.h"
 #include "Render/OpenGL/GLTexture.h"
 
 namespace Raven {
@@ -167,15 +169,10 @@ namespace Raven {
 
 		// TODO: Refactor this code when Ammar has fully implemented
 		// the textures
-		if (img->renderRscTexture == NULL)
-		{
-			img->renderRscTexture = new RenderRscTexture();
-		}
-		img->LoadOnGpu();
 
-		auto imgPointer = img->renderRscTexture->GetTexture()->GetID();
-		auto imgW = img->renderRscTexture->GetTexture()->GetWidth();
-		auto imgH = img->renderRscTexture->GetTexture()->GetHeight();
+		auto imgPointer = img->GetRenderRsc()->GetTexture()->GetID();
+		auto imgW = img->GetRenderRsc()->GetTexture()->GetWidth();
+		auto imgH = img->GetRenderRsc()->GetTexture()->GetHeight();
 		ImGui::Image((void*)(intptr_t)imgPointer, pixSize);
 	}
 

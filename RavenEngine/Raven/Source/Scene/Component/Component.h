@@ -5,16 +5,75 @@
 #pragma once
 #include <string>
 #include <entt/entt.hpp>
+
+
+
+
+
+
 namespace Raven 
 {
-	//TODO serialize function is not implementation
+
+// All components types, Please add yours when you create a new one.
+#define ALL_COMPONENTS Transform, \
+	NameComponent, \
+	ActiveComponent, \
+	MeshComponent, \
+	SkinnedMeshComponent, \
+	Hierarchy, \
+	Camera, \
+	Light, \
+	CameraControllerComponent, \
+	LuaComponent, \
+	Animator, \
+	RigidBody
+
+
+
+	// Forward Declaration
+	class Scene;
 	class Entity;
+
+
+	// Component:
+	//		- Parent class for all componenets.
+	//
 	class Component 
 	{
+		friend class Entity;
+
+	private:
+		// Handle to the entity this component is part of.
+		entt::entity entity = entt::null;
+
+		// The scene this component is in and owned by.
+		Scene* sceneOwner = nullptr;
+
 	public:
 		virtual ~Component() = default;
-		entt::entity entity = entt::null;
-		Entity GetEntity();
+		Entity GetEntity() const;
+		entt::entity GetEntityHandle() const;
+
+		// This is an Evil function created to while refactroing old code.
+		inline void SetEntity_Evil(entt::entity inEntity, Scene* inScene)
+		{ 
+			entity = inEntity;
+			sceneOwner = inScene;
+		}
+
+		// serialize save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::make_nvp("Id", entity));
+		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::make_nvp("Id", entity));
+		}
 	};
 
 	class NameComponent : public Component
@@ -24,11 +83,23 @@ namespace Raven
 
 		NameComponent(const std::string & name) :name(name) {}
 
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("Name", name), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Name", name));
 		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Name", name));
+		}
+
+		// Component Name.
 		std::string name;
 	};
 
@@ -38,11 +109,24 @@ namespace Raven
 	public:
 		ActiveComponent() = default;
 		ActiveComponent(bool active) :active(active) {}
+
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("Active", active), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Active", active));
 		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("Active", active));
+		}
+
+
 		bool active = true;
 	};
 
@@ -81,10 +165,30 @@ namespace Raven
 		entt::entity next = entt::null;
 		entt::entity prev = entt::null;
 
+		// serialize save.
 		template<typename Archive>
-		void serialize(Archive& archive)
+		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("First", first), cereal::make_nvp("Next", next), cereal::make_nvp("Previous", prev), cereal::make_nvp("Parent", parent), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(
+				cereal::make_nvp("First", first),
+				cereal::make_nvp("Next", next),
+				cereal::make_nvp("Previous", prev),
+				cereal::make_nvp("Parent", parent)
+			);
+		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+			archive(
+				cereal::make_nvp("First", first),
+				cereal::make_nvp("Next", next),
+				cereal::make_nvp("Previous", prev),
+				cereal::make_nvp("Parent", parent)
+			);
 		}
 	};
 

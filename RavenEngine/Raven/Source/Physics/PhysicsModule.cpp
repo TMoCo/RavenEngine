@@ -68,13 +68,22 @@ namespace Raven
 	{
 		// valid world pointer means we do not have to create one
 		if (world)
-			return;
+			physicsCommon.destroyPhysicsWorld(world);
 		world = physicsCommon.createPhysicsWorld();
+		LOGE("WORLD CREATED");
 	}
 
 	void PhysicsModule::DestroyWorld() // call when destroying a scene
 	{
-		physicsCommon.destroyPhysicsWorld(world);
+		if (world)
+			physicsCommon.destroyPhysicsWorld(world);
 		world = nullptr; // invalidate pointer
+		LOGE("WORLD DESTROYED");
+	}
+
+	void PhysicsModule::RecreateWorld()
+	{
+		DestroyWorld();
+		CreateWorld();
 	}
 }

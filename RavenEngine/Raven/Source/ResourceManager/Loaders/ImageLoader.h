@@ -4,24 +4,34 @@
 
 #pragma once
 
-#include "ResourceManager/Loaders/ILoader.h"
-#include "ResourceManager/ResourceManager.h"
+#include "ILoader.h"
 
-//
-// A class for loading image data
-//
 
 namespace Raven
 {
+	// ImageLoader:
+	//    - loader for texture resources.
+	//
 	class ImageLoader : public ILoader
 	{
 	public:
-		ImageLoader(ResourceManager& initResourceManager);
+		// Construct.
+		ImageLoader();
 
-		inline static auto Type() { return ELoaderType::LT_Image; }
+		// Destruct..
+		virtual ~ImageLoader();
 
-		virtual bool LoadAsset(const std::string& path) override;
+		// Loader Type.
+		inline static ELoaderType Type() { return ELoaderType::LT_Image; }
 
-		virtual bool LoadOnGPU() override { return true; }
+		// Load Resource from archive.
+		virtual IResource* LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive) override;
+
+		// Save Resource into archive.
+		virtual void SaveResource(RavenOutputArchive& archive, IResource* Resource) override;
+
+		// List all resources that supported by this loader.
+		virtual void ListResourceTypes(std::vector<EResourceType>& outRscTypes) override;
+
 	};
 }

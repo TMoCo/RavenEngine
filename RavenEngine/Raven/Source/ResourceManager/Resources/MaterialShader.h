@@ -31,7 +31,7 @@ namespace Raven
 		virtual ~MaterialShader();
 
 		// Return Resrouce Type.
-		inline static EResourceType Type() noexcept { return EResourceType::RT_Shader; }
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_MaterialShader; }
 
 		// Return the materail render resource.
 		inline RenderRscShader* GetRenderRsc() { return renderRsc; }
@@ -53,19 +53,20 @@ namespace Raven
 		void SetDomain(ERenderShaderDomain val);
 
 		// Return the shader domain.
-		inline ERenderShaderDomain GetDomain() const { return domain; }
+		inline ERenderShaderDomain GetDomain() const { return sdomain; }
 
 		// Set Shader Type.
 		void SetType(ERenderShaderType val);
 
 		// Return the shader type.
-		inline ERenderShaderType GetType() const { return type; }
-
-		// Load the shader on GPU.
-		void LoadOnGpu();
+		inline ERenderShaderType GetType() const { return stype; }
 
 		// Return the shader unifrom buffer.
 		inline UniformBuffer* GetUnifromBuffer() const { return materialUBO.get(); }
+
+		// Load the shader on GPU.
+		virtual void LoadRenderResource() override;
+
 
 	private:
 		// The Shader Render Resrouce.
@@ -87,10 +88,10 @@ namespace Raven
 		std::vector<RSInputDescription> samplers;
 
 		// The Shader Domain.
-		ERenderShaderDomain domain;
+		ERenderShaderDomain sdomain;
 
 		// The Shader Type.
-		ERenderShaderType type;
+		ERenderShaderType stype;
 
 		// The uniform buffer for the material data.
 		Ptr<UniformBuffer> materialUBO;

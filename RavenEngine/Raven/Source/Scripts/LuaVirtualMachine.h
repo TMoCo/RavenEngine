@@ -23,6 +23,9 @@ namespace Raven
 		void Initialize() override;
 		void Destroy() override;
 		inline auto GetState() { return L; }
+
+		static auto GetModuleType() { return MT_LuaVirtualMachine; }
+
 	private:
 		void AddSystemPath(const std::string& path);
 		void AddPath(const std::string& path);

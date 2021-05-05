@@ -46,20 +46,44 @@ namespace Raven
 		// Distance from the view used to clip the light.
 		float clipDistance;
 
-		// serialize the light
-		template<class Archive>
-		void serialize(Archive& archive)
+		// serialize save.
+		template<typename Archive>
+		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<Component>(this));
+
 			archive(
-				position, 
-				color, 
-				type, 
-				outerAngle, 
-				direction,intensity, 
-				radius, 
-				entity
+				type,
+				color,
+				intensity,
+				position,
+				direction,
+				radius,
+				innerAngle,
+				outerAngle,
+				clipDistance
 			);
 		}
+
+		// serialize load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<Component>(this));
+
+			archive(
+				type,
+				color,
+				intensity,
+				position,
+				direction,
+				radius,
+				innerAngle,
+				outerAngle,
+				clipDistance
+			);
+		}
+
 	};
 
 };

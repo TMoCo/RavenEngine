@@ -8,10 +8,15 @@
 
 #include <cereal/types/vector.hpp>
 
+#include "Physics/PhysicsModule.h"
 #include "Physics/Collider.h"
 
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Component.h"
+
+#include "Scene/System/PhysicsSystem.h"
+
+#include <glm/gtc/quaternion.hpp> 
 
 //
 // Wrapper component class for rp3d rigid bodies
@@ -35,6 +40,7 @@ namespace Raven
 	class RigidBody : public Component
 	{
 		friend PhysicsModule;
+		friend PhysicsSystem;
 	public:
 		// a collision body needs a transform to exist
 		RigidBody();
@@ -42,6 +48,9 @@ namespace Raven
 		~RigidBody();
 
 		void InitRigidBody();
+		void DestroyRigidBody();
+
+		rp3d::RigidBody* GetBody() { return body; }
 
 		// add a collider to the collision body
 		void AddCollider(Collider* collider);
@@ -50,6 +59,7 @@ namespace Raven
 
 		// get the specified collider from the collision body colliders
 		std::shared_ptr<Collider> GetCollider(uint32_t index);
+		std::vector<std::shared_ptr<Collider>>* GetAllColliders();
 
 		// set the collider at specified index to be a trigger (does not collide, only reports overlap)
 		void SetIsTrigger(uint32_t index, bool b);
@@ -59,9 +69,17 @@ namespace Raven
 		rp3d::Transform GetPreviousState();
 		rp3d::Transform GetCurrentState();
 
-		void SetTransform(const Transform& t);
 		void SetInitTransform(const Transform& t);
+		Transform GetInitTransform();
+		void InitTransform(); // initialises the rigid body's transform
+		void SetTransform(const Transform& t);
 		Transform GetTransform();
+
+		// Get Information About the body's transform
+		glm::quat GetOrientation();
+		glm::vec3 GetForwardVector();
+		glm::vec3 GetRightVector();
+		glm::vec3 GetUpVector();
 
 		uint32_t GetNumColliders();
 
@@ -69,13 +87,22 @@ namespace Raven
 		void EnableGravity(bool b);
 		bool GravityEnabled();
 
+		void EnableTopple(bool t);
+		bool ToppleEnabled();
+
 		void SetMass(float m);
 		float GetMass();
 
 		void SetLinearDamping(float d);
 		void SetAngularDamping(float d);
 		void SetIsAllowedToSleep(bool b);
+		void SetBodyType(RigidBodyType t);
+
+
+		float GetLinearDamping();
+		float GetAngularDamping();
 		bool CanSleep();
+		RigidBodyType GetBodyType();
 
 		// Applies forces to the body
 		void ApplyForce(const glm::vec3& f);
@@ -83,20 +110,34 @@ namespace Raven
 		void ApplyForceAtWorldPos(const glm::vec3& f, const glm::vec3& pos);
 		void ApplyTorque(const glm::vec3& t);
 
+		void RotateBody(const glm::vec3 axis, float deg);
+
 		// load and save the colliders attached to the body
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			LOGV("Calling rigid body serialize function");
-			archive(cereal::make_nvp("Type", static_cast<int>(type)), cereal::make_nvp("Colliders", colliders));
+			archive(cereal::make_nvp("Type", static_cast<int>(type)),
+					cereal::make_nvp("Can sleep", canSleep),
+					cereal::make_nvp("Gravity enabled", gravityEnabled),
+					cereal::make_nvp("Can Topple", canTopple),
+					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Linear Damping", linearDamping),
+					cereal::make_nvp("Angular Damping", angularDamping),
+					cereal::make_nvp("Colliders", colliders));
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			LOGV("Calling rigid body serialize function");
-			// nb, this only loads shape data and creates instances of the collider objects.
-			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), cereal::make_nvp("Colliders", colliders));
+			// nb, this only loads body and shape data. They still need to be initialised (done on scene init)
+			archive(cereal::make_nvp("Type", static_cast<RigidBodyType>(type)), 
+					cereal::make_nvp("Can sleep", canSleep),
+					cereal::make_nvp("Gravity enabled", gravityEnabled),
+					cereal::make_nvp("Can Topple", canTopple),
+					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Linear Damping", linearDamping),
+					cereal::make_nvp("Angular Damping", angularDamping),
+					cereal::make_nvp("Colliders", colliders));
 		}
 
 	private:
@@ -108,10 +149,16 @@ namespace Raven
 		rp3d::RigidBody* body;
 
 		float mass;
+		float linearDamping;
+		float angularDamping;
+
+		bool canSleep;
+		bool gravityEnabled;
+		bool canTopple;
 
 		RigidBodyType type;
 
-		rp3d::Transform initTransform;
+		Transform initTransform;
 
 		// a copy of the previous state, used for slerping 
 		rp3d::Transform previousState;

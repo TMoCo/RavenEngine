@@ -160,4 +160,9 @@ namespace Raven
 		glfwSwapBuffers(glfwWindow);
 	}
 
+	void Window::Close()
+	{
+		glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
+	}
+
 };

@@ -10,8 +10,8 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/CameraControllerComponent.h"
-#include "Scene/Component/Model.h"
-#include "Scene/Component/MeshRenderer.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/RigidBody.h"
 
 #include "Scripts/LuaComponent.h"
@@ -33,20 +33,25 @@
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 
 
 namespace Raven { 
 
 	Scene::Scene(const std::string& initName)
-		:name(initName)
+		: IResource()
+		, name(initName)
 	{
+		type = Scene::StaticGetType();
+
 		LOGV("{0} {1}", __FUNCTION__,initName);
 		entityManager = std::make_shared<EntityManager>(this);
 
 		entityManager->AddDependency<Camera, Transform>();
-		entityManager->AddDependency<Model, Transform>();
+		entityManager->AddDependency<MeshComponent, Transform>();
+		entityManager->AddDependency<SkinnedMeshComponent, Transform>();
 		entityManager->AddDependency<Light, Transform>();
-		entityManager->AddDependency<MeshRenderer, Transform>();
 		entityManager->AddDependency<RigidBody, Transform>();
 
 		sceneGraph = std::make_shared<SceneGraph>();
@@ -64,105 +69,70 @@ namespace Raven {
 		height = h;
 	}
 
-#define ALL_COMPONENTS Transform, NameComponent, ActiveComponent, Hierarchy, Camera, Light, CameraControllerComponent, Model, LuaComponent, MeshRenderer, SkinnedMeshRenderer, Animator
 
-	void Scene::Save(const std::string& filePath, bool binary)
+	void Scene::SaveToStream(std::stringstream& storage)
 	{
 		PRINT_FUNC();
-		// loop through the scene and serialize each entity and its components
-		std::string path = filePath + name;
-		if (binary)
-		{
-			/*path += std::string(".bin");
 
-			std::ofstream file(path, std::ios::binary);
-
-			{
-				// output finishes flushing its contents when it goes out of scope
-				cereal::BinaryOutputAr chive output{ file };
-				output(*this);
-				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-			}
-			file.flush();
-			file.close();*/
-		}
-		else
-		{
-			std::stringstream storage;
-			path += std::string(".raven");
-
-			{
-				cereal::JSONOutputArchive output{ storage };
-				output(*this);
-				entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
-				
-			}
-
-			std::ofstream file(path, std::ios::binary);
-
-			file << storage.str();
-
-			file.flush();
-			file.close();
-		}
+		cereal::JSONOutputArchive output{ storage };
+		output(*this);
+		entt::snapshot{ entityManager->GetRegistry() }.entities(output).component<ALL_COMPONENTS>(output);
 	}
 
-	void Scene::Load(const std::string& filePath, bool binary)
+
+	void Scene::SaveToFile(const std::string& filePath)
+	{
+		// First save to stream.
+		std::stringstream storage;
+		SaveToStream(storage);
+		std::ofstream file(filePath, std::ios::binary);
+
+		file << storage.str();
+		file.flush();
+		file.close();
+	}
+
+
+	void Scene::LoadFromStream(std::istream& storage)
 	{
 		PRINT_FUNC();
+
 		entityManager->Clear();
 		sceneGraph->DisconnectOnConstruct(true, entityManager->GetRegistry());
-		std::string path = filePath + name;
 
-		if (binary)
+		cereal::JSONInputArchive input(storage);
+		input(*this);
+		entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
+
+		sceneGraph->DisconnectOnConstruct(false, entityManager->GetRegistry());
+	}
+
+
+	void Scene::LoadFromFile(const std::string& filePath)
+	{
+		std::ifstream in(filePath);
+		if (in.good())
 		{
-			/*path += std::string(".bin");
-			std::ifstream file(path, std::ios::binary);
-			if (!file.good())
-			{
-				LOGE("No saved scene file found {0}", path);
-				return;
-			}
+			std::string data;
+			in.seekg(0, std::ios::end);
+			auto len = in.tellg();
+			in.seekg(0, std::ios::beg);
+			data.resize(len);
+			in.read(data.data(), len);
+			in.close();
 
-			cereal::BinaryInputArchive input(file);
-			input(*this);
-	
-			entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);*/
+			std::istringstream istr;
+			istr.str(data);
+
+			LoadFromStream(istr);
 		}
 		else
 		{
-			path += std::string(".raven");
-
-			std::ifstream in(path);
-			if (in.good())
-			{
-				LOGC("LOADING...");
-				std::string data;
-				in.seekg(0, std::ios::end);
-				auto len = in.tellg();
-				in.seekg(0, std::ios::beg);
-				data.resize(len);
-				in.read(data.data(), len);
-				in.close();
-
-				std::istringstream istr;
-				istr.str(data);
-				cereal::JSONInputArchive input(istr);
-				input(*this);
-				LOGC("LOADED!");
-				entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
-				LOGC("CREATED SCENE.");
-			}
-			else 
-			{
-				LOGE("No saved scene file found {0}", path);
-				in.close();
-			}
+			LOGE("No saved scene file found {0}", filePath);
+			in.close();
 		}
-
-		sceneGraph->DisconnectOnConstruct(false,entityManager->GetRegistry());
-
 	}
+
 
 	Raven::Entity Scene::CreateEntity()
 	{
@@ -228,18 +198,34 @@ namespace Raven {
 		{
 			initCallback(this);
 		}
-		auto view = GetRegistry().view<LuaComponent>();
-		for (auto v : view)
+		auto luaView = GetRegistry().view<LuaComponent>();
+		for (auto v : luaView)
 		{
 			auto& lua = GetRegistry().get<LuaComponent>(v);
 			lua.OnInit();
 		}
-
+		// on scene init, we need to initialise the physics engine
+		auto view = entityManager->GetRegistry().view<RigidBody>();
+		for (auto v : view)
+		{
+			auto& rb = entityManager->GetRegistry().get<RigidBody>(v);
+			// initialise the body
+			rb.InitRigidBody();
+			// initialise the start transform in the rigid body engine to be the entity's current transform
+			rb.SetInitTransform(GetRegistry().get<Transform>(v)); // rigid body needs transform to exist so this should never fail
+			rb.InitTransform();
+			// initialise the colliders attached to the body (if any)
+			for (auto& collider : *rb.GetAllColliders())
+			{
+				collider->SetBody(rb.GetBody());
+				collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
+			}
+		}
 	}
 
 	void Scene::OnClean()
 	{
-
+		LOGE("CLEANING");
 	}
 
 	auto Scene::UpdateCameraController(float dt)

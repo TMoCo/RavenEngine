@@ -11,9 +11,12 @@ namespace Raven
 		focalPoint = Raven::ZERO;
 		velocity = glm::vec3(0.0f);
 		mouseSensitivity = 0.00001f;
-        zoomDampeningFactor = 0.00001f;
-        dampeningFactor = 0.00001f;
-        rotateDampeningFactor = 0.0000001f;
+		zoomDampeningFactor = 0.00001f;
+		dampeningFactor = 0.00001f;
+		rotateDampeningFactor = 0.0000001f;
+
+		pitch = 0.0f;
+		yaw = 0.0f;
 	}
 
 	EditorCameraController::~EditorCameraController()
@@ -23,23 +26,22 @@ namespace Raven
 	void EditorCameraController::HandleMouse(Transform& transform, float dt, float xpos, float ypos)
 	{
         
-		if(Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight))
+		if (Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight))
 		{
-			mouseSensitivity = 0.01f;
+			mouseSensitivity = 2.5f * dt;
 			rotateVelocity = rotateVelocity + (glm::vec2{ xpos,ypos } - previousCurserPos) * mouseSensitivity;
-        }
+		}
   
 				
-		glm::vec3 euler = glm::degrees(transform.GetLocalOrientation());
-		float pitch = euler.x - rotateVelocity.y;
-		float yaw = euler.y - rotateVelocity.x;
+		pitch -= rotateVelocity.y;
+		yaw -= rotateVelocity.x;
 			
 		pitch = std::min(pitch, 89.0f);
 		pitch = std::max(pitch, -89.0f);
 
-        previousCurserPos = glm::vec2(xpos, ypos);
+		previousCurserPos = glm::vec2(xpos, ypos);
 
-		transform.SetLocalOrientation(glm::radians(glm::vec3{ pitch, yaw, 0.0f }));
+		transform.SetRotationEuler(glm::radians(pitch), glm::radians(yaw), 0.0f);
 
 		rotateVelocity = rotateVelocity * std::pow(rotateDampeningFactor, dt);
 
@@ -54,7 +56,7 @@ namespace Raven
 
 		if (Input::GetInput()->IsKeyHeld(KeyCode::Id::LeftShift))
 		{
-			multiplier = 2000.0f;
+			multiplier = 500.0f;
 		}
 
 		cameraSpeed = multiplier * dt;
@@ -94,9 +96,9 @@ namespace Raven
 
 		if (!MathUtils::Equals(velocity, Raven::ZERO))
 		{
-			glm::vec3 position = transform.GetLocalPosition();
+			glm::vec3 position = transform.GetPosition();
 			position += velocity * dt;
-			transform.SetLocalPosition(position);
+			transform.SetPosition(position);
 			velocity = velocity * std::pow(dampeningFactor, dt);
 		}
 	}
@@ -110,11 +112,11 @@ namespace Raven
 
 		if(!MathUtils::Equals(zoomVelocity, 0.0f))
 		{
-			glm::vec3 pos = transform.GetLocalPosition();
+			glm::vec3 pos = transform.GetPosition();
 			pos += transform.GetForwardDirection() * zoomVelocity;
 			zoomVelocity = zoomVelocity * std::pow(zoomDampeningFactor, dt);
 
-			transform.SetLocalPosition(pos);
+			transform.SetPosition(pos);
 		}
 	}
 }

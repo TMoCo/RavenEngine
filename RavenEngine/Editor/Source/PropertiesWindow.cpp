@@ -15,9 +15,9 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/Model.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/CameraControllerComponent.h"
-#include "Scene/Component/MeshRenderer.h"
 #include "Scene/Component/RigidBody.h"
 
 #include "Scripts/LuaComponent.h"
@@ -35,6 +35,7 @@
 #include "Animation/AnimationController.h"
 
 
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
@@ -48,9 +49,9 @@ namespace MM
 	{
 		auto& transform = reg.get<Transform>(e);
 
-		auto rotation = glm::degrees(transform.GetLocalOrientation());
-		auto position = transform.GetLocalPosition();
-		auto scale = transform.GetLocalScale();
+		auto rotation = glm::degrees(transform.GetRotationEuler());
+		auto position = transform.GetPosition();
+		auto scale = transform.GetScale();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
@@ -62,7 +63,7 @@ namespace MM
 
 		if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.05))
 		{
-			transform.SetLocalPosition(position);
+			transform.SetPosition(position);
 		}
 
 		ImGui::PopItemWidth();
@@ -75,7 +76,8 @@ namespace MM
 
 		if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation),0.1))
 		{
-			transform.SetLocalOrientation(glm::radians(rotation));
+			rotation = glm::radians(rotation);
+			transform.SetRotationEuler(rotation.x, rotation.y, rotation.z);
 		}
 
 		ImGui::PopItemWidth();
@@ -86,7 +88,7 @@ namespace MM
 		ImGui::PushItemWidth(-1);
 		if (ImGui::DragFloat3("##Scale", glm::value_ptr(scale), 0.05))
 		{
-			transform.SetLocalScale(scale);
+			transform.SetScale(scale);
 		}
 
 		ImGui::PopItemWidth();
@@ -95,6 +97,14 @@ namespace MM
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
+
+		// also update the rigid body if available
+		auto rb = reg.try_get<RigidBody>(e);
+		if (rb)
+		{
+			rb->SetInitTransform(transform);
+		}
+
 	}
 
 	template<>
@@ -206,7 +216,6 @@ namespace MM
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
-
 		const std::array<std::string,2> controllerTypes = { "FPS" ,"Editor"};
 		std::string currentController = CameraControllerComponent::TypeToString(controllerComp.GetType());
 		if (ImGui::BeginCombo("", currentController.c_str(), 0)) // The second parameter is the label previewed before opening the combo.
@@ -233,21 +242,21 @@ namespace MM
 	}
 
 	template<>
-	void ComponentEditorWidget<Model>(entt::registry& reg, entt::registry::entity_type e)
+	void ComponentEditorWidget<MeshComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
-		auto& model = reg.get<Model>(e);
-		auto& meshes = model.GetMeshes();
+		auto& model = reg.get<MeshComponent>(e);
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
 
 	
-		ImGui::TextUnformatted("Primitive Type");
 
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
 
+#if 0
+		auto& meshes = model.GetMeshes();
 		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
 
 		std::string shapeCurrent = PrimitiveType::GetPrimativeName(model.GetPrimitiveType());
@@ -307,17 +316,14 @@ namespace MM
 			}
 
 		}
+#endif
+
+
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 
 	}
 
-	template<>
-	void ComponentEditorWidget<SkinnedMeshRenderer>(entt::registry& reg, entt::registry::entity_type e) 
-	{
-		auto& model = reg.get<SkinnedMeshRenderer>(e);
-		model.OnImGui();
-	}
 
 	template<>
 	void ComponentEditorWidget<Animator>(entt::registry& reg, entt::registry::entity_type e)
@@ -338,6 +344,9 @@ namespace MM
 	template<>
 	void ComponentEditorWidget<RigidBody>(entt::registry& reg, entt::registry::entity_type e)
 	{
+		//
+		// Edit rigid body properties
+		//
 		auto& rigidBody = reg.get<RigidBody>(e);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
@@ -370,24 +379,187 @@ namespace MM
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 
+		bool toppleEnabled = rigidBody.ToppleEnabled();
+
+		ImGui::TextUnformatted("Enable toppling");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::Checkbox("##Enable toppling", &toppleEnabled))
+		{
+			rigidBody.EnableTopple(toppleEnabled);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
 		float mass = rigidBody.GetMass();
 
 		ImGui::TextUnformatted("Set mass");
 		ImGui::NextColumn();
 		ImGui::PushItemWidth(-1);
-		if (ImGui::DragFloat("##Set mass", &mass, 0.05f))
+		if (ImGui::DragFloat("##Set mass", &mass, 0.05f, 0.0f, 100000.0f))
 		{
-			rigidBody.SetMass(mass < 0.0f ? 0.0f : mass);
+			rigidBody.SetMass(mass);
 		}
 		
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 
+		float lDamping = rigidBody.GetLinearDamping();
+
+		ImGui::TextUnformatted("Linear damping");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Linear damping", &lDamping, 0.05f, 0.0f, 1.0f))
+		{
+			rigidBody.SetLinearDamping(lDamping);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		float aDamping = rigidBody.GetAngularDamping();
+
+		ImGui::TextUnformatted("Angular damping");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		if (ImGui::DragFloat("##Angular damping", &aDamping, 0.05f, 0.0f, 1.0f))
+		{
+			rigidBody.SetAngularDamping(aDamping);
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+		static const char* types[3] = { "Static", "Kinematic", "Dynamic"};
+		int selected = static_cast<int>(rigidBody.GetBodyType());
+
+		ImGui::TextUnformatted("Set body type");
+		ImGui::NextColumn();
+		ImGui::PushItemWidth(-1);
+		ImGui::ListBox("##Set body type", &selected, types, IM_ARRAYSIZE(types), 3);
+		if (selected != static_cast<int>(rigidBody.GetBodyType()))
+		{
+			rigidBody.SetBodyType(static_cast<RigidBodyType>(selected));
+		}
+
+		ImGui::PopItemWidth();
+		ImGui::NextColumn();
+
+				
+		//
+		// Edit rigid body's colliders
+		//
+
+
+		if (rigidBody.GetNumColliders() != 0)
+		{
+			ImGui::Separator();
+			ImGui::TextUnformatted("Select collider");
+			ImGui::NextColumn();
+
+			ImGui::PushItemWidth(-1);
+			ImGui::ListBoxHeader("##Select collider", rigidBody.GetNumColliders(), 1);
+
+			static int colliderIdx  = 0;
+			auto colliders = rigidBody.GetAllColliders(); // ptr to the body's colliders
+			// loop over all the body's colliders
+			for (int i = 0; i < rigidBody.GetNumColliders(); i++)
+			{
+				const bool isSelected = colliderIdx == i;
+				if (ImGui::Selectable(ColliderPrimitive::GetColliderPrimitiveName((*colliders)[i]->GetColliderType()).c_str(), isSelected))
+				{
+					colliderIdx = i;
+				}
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+
+			}
+			ImGui::ListBoxFooter();
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			auto& collider = (*colliders)[colliderIdx];
+
+			// ui for editing the type of collider
+			collider->OnImGui();
+
+			// ui for editing the collider's relative transform to the body it belongs to
+			auto& transform = collider->GetRelativeTransform();
+
+			auto rotation = glm::degrees(transform.GetRotationEuler());
+			auto position = transform.GetPosition();
+			// no scaling
+
+			ImGui::TextUnformatted("Position");
+			ImGui::NextColumn();
+			ImGui::PushItemWidth(-1);
+
+			if (ImGui::DragFloat3("##Position", glm::value_ptr(position), 0.05))
+			{
+				// update the tansform
+				transform.SetPosition(position);
+				// in the physics engine as well
+				collider->SetTransform(transform);
+
+			}
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			ImGui::TextUnformatted("Rotation");
+			ImGui::NextColumn();
+			ImGui::PushItemWidth(-1);
+
+
+			if (ImGui::DragFloat3("##Rotation", glm::value_ptr(rotation), 0.1))
+			{
+				transform.SetRotationEuler(glm::radians(rotation));
+				// in the physics engine as well
+				collider->SetTransform(transform);
+			}
+
+			ImGui::PopItemWidth();
+			ImGui::NextColumn();
+
+			ImGui::Columns(1);
+			// button for removing the collider 
+			if (ImGui::Button("Remove collider"))
+			{
+				rigidBody.RemoveCollider(colliderIdx);
+			}
+		}
+
+		// 
+		// Add colliders to the rigid body
+		// 
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+
+		if (ImGui::BeginMenu("Add new collider"))
+		{
+			for (auto& name : ColliderPrimitive::NAMES)
+			{
+				if (ImGui::MenuItem(name.c_str()))
+				{
+					// add a collider to the rigid body
+					rigidBody.AddCollider(ColliderFactory::CreateCollider(ColliderPrimitive::GetColliderPrimitiveType(name)));
+				}
+			}
+			ImGui::EndMenu();
+		}
+		
+		ImGui::Columns(2);
+		ImGui::Separator();
+
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 	}
-
 };
 
 namespace Raven
@@ -421,7 +593,6 @@ namespace Raven
 				ImGui::End();
 				return;
 			}
-
 
 			auto activeComponent = registry.try_get<ActiveComponent>(selected);
 			bool active = activeComponent ? activeComponent->active : true;
@@ -464,7 +635,7 @@ namespace Raven
 					{
 						auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
 						auto name = StringUtils::GetFileName(file);
-						registry.emplace<LuaComponent>(selected, file, scene).entity = selected;
+						registry.emplace<LuaComponent>(selected, file, scene).SetEntity_Evil(selected, scene);
 					}
 				}
 				ImGui::EndDragDropTarget();
@@ -475,11 +646,11 @@ namespace Raven
 
 	void PropertiesWindow::OnSceneCreated(Scene* scene)
 	{
-		if (init)
-			return;
 		auto& editor = static_cast<Editor&>(Engine::Get());
 		auto& iconMap = editor.GetComponentIconMap();
 
+		if (!init)
+		{
 #define TRIVIAL_COMPONENT(ComponentType,show) \
 	{ \
 		std::string name; \
@@ -496,11 +667,14 @@ namespace Raven
 		TRIVIAL_COMPONENT(Light, true);
 		TRIVIAL_COMPONENT(Camera, true);
 		TRIVIAL_COMPONENT(CameraControllerComponent, true);
-		TRIVIAL_COMPONENT(MeshRenderer, false);
-		TRIVIAL_COMPONENT(SkinnedMeshRenderer, false);
+		TRIVIAL_COMPONENT(MeshComponent, false);
+		TRIVIAL_COMPONENT(SkinnedMeshComponent, false);
 		TRIVIAL_COMPONENT(LuaComponent, true);
 		TRIVIAL_COMPONENT(Animator, true);
 		TRIVIAL_COMPONENT(RigidBody, true);
+
+		init = true;
+		}
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
 			auto lua = r.try_get<LuaComponent>(entity);
@@ -516,10 +690,12 @@ namespace Raven
 				// if transform does exists, change the rigidbody's initial transform
 				if (t)
 				{
-					rb->SetInitTransform(*t);
+					LOGV("Has tranform");
+					Transform initT = *t;
+					initT.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+					rb->SetInitTransform(initT);
+					rb->InitRigidBody();
 				}
-				// and initialise the body again
-				rb->InitRigidBody();
 			}
 		});
 	}

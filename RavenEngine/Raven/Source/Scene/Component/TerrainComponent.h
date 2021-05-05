@@ -39,6 +39,8 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<Component>(this));
+
 			// save the terrain height map and associated texture paths
 			archive(cereal::make_nvp("HeightMap"), heightMapPath, cereal::make_nvp("Textures"), GetTexturePaths());
 		}
@@ -46,6 +48,8 @@ namespace Raven
 		template<typename Archive>
 		void load(Archive& archive)
 		{
+			archive(cereal::base_class<Component>(this));
+
 			std::vector<std::string> paths;
 			// load the paths for terrain height map and textures from the serialized file
 			archive(cereal::make_nvp("HeightMap"), heightMapPath, cereal::make_nvp("Textures"), paths);

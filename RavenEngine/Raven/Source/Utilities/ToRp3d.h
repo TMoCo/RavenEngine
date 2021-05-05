@@ -28,6 +28,7 @@ namespace Raven
 		rp3d::Quaternion ToRp3dQuaternion(const glm::quat& q);
 
 		// from physics to engine
-		Transform ToTransform(const rp3d::Transform& other);
+		Transform ToTransform(const rp3d::Transform& other, const glm::vec3& scale);
+		glm::quat ToGLMQuat(const rp3d::Quaternion other);
 	}
 }

@@ -34,9 +34,9 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
+			archive(cereal::base_class<Component>(this));
 			archive(
-				cereal::make_nvp("FilePath", file),
-				cereal::make_nvp("Parent", entity)
+				cereal::make_nvp("FilePath", file)
 			);
 
 			metaFile.Save(this,file + ".meta");
@@ -46,9 +46,9 @@ namespace Raven
 		void load(Archive& archive)
 		{
 			scene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
+			archive(cereal::base_class<Component>(this));
 			archive(
-				cereal::make_nvp("FilePath", file),
-				cereal::make_nvp("Parent", entity)
+				cereal::make_nvp("FilePath", file)
 			);
 			Init();
 		}

@@ -40,6 +40,7 @@ namespace Raven
 		// call these methods when loading in a new scene to initialise the physics world
 		void CreateWorld();
 		void DestroyWorld();
+		void RecreateWorld();
 
 	private:
 		// singleton class for physics library's memory allocation etc

@@ -11,11 +11,13 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Scene/Component/Model.h"
 #include "Scene/Component/RigidBody.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Entity/Entity.h"
 #include "Scripts/LuaComponent.h"
 
+#include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/MeshFactory.h"
 
 #include "Devices/Input.h"
@@ -51,7 +53,8 @@ namespace Raven
 		iconMap[typeid(Editor).hash_code()] = ICON_MDI_SQUARE;
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
-		iconMap[typeid(Model).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(MeshComponent).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(SkinnedMeshComponent).hash_code()] = ICON_MDI_SHAPE;
 		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
 		iconMap[typeid(RigidBody).hash_code()] = ICON_MDI_APPLE;
 
@@ -125,7 +128,8 @@ namespace Raven
 					SetImGuizmoOperation(ImGuizmo::OPERATION::BOUNDS);
 				}
 			}
-			editorCameraTransform.SetWorldMatrix(glm::mat4(1.f));
+			
+			//editorCameraTransform.SetWorldMatrixTransform(glm::mat4(1.f));
 		}
 
 	}
@@ -143,23 +147,28 @@ namespace Raven
 		if (Engine::Get().GetEditorState() == EditorState::Next)
 			Engine::Get().SetEditorState(EditorState::Paused);
 
-		bool selected;
+
+		bool isStartState = Engine::Get().GetEditorState() == EditorState::Play 
+			|| Engine::Get().GetEditorState() == EditorState::Paused;
+
+		bool isPausedState = Engine::Get().GetEditorState() == EditorState::Paused;
+
+
+		// --- -- - --- -- -- - - -- - 
+		// Play/Stop Button...
 		{
-			selected = Engine::Get().GetEditorState() == EditorState::Play;
-			if (selected)
+			if (isStartState)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
 
-			if (ImGui::Button(ICON_MDI_PLAY))
+			if (ImGui::Button(isStartState ? ICON_MDI_STOP : ICON_MDI_PLAY))
 			{
-				Engine::Get().SetEditorState(selected ? EditorState::Preview : EditorState::Play);
-
-				selectedNode = entt::null;
-				if (selected)
-					LoadCachedScene();
+				if (isStartState)
+				{
+					StopPlay();
+				}
 				else
 				{
-					CacheScene();
-					Engine::Get().GetModule<SceneManager>()->GetCurrentScene()->OnInit();
+					StartPlay();
 				}
 			}
 
@@ -167,29 +176,31 @@ namespace Raven
 			ImGuiHelper::Tooltip("Play");
 
 
-			if (selected)
+			if (isStartState)
 				ImGui::PopStyleColor();
 		}
 
-		//ImGui::SameLine();
-
+		// --- -- - --- -- -- - - -- - 
+		// Play/Paused Button...
 		{
-			selected = Engine::Get().GetEditorState() == EditorState::Paused;
-			if (selected)
+
+			if (isPausedState)
 				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.28f, 0.56f, 0.9f, 1.0f));
 
 			if (ImGui::Button(ICON_MDI_PAUSE))
-				Engine::Get().SetEditorState(selected ? EditorState::Play : EditorState::Paused);
+			{
+				PausePlay();
+			}
 
 			ImGuiHelper::Tooltip("Pause");
 
-
-			if (selected)
+			if (isPausedState)
 				ImGui::PopStyleColor();
 		}
 
-		//ImGui::SameLine();
-
+		// --- -- - --- -- -- - - -- - 
+		// Next Button...
+#if 0  // Not Sure what next does to the sceen. purpose in here.
 		{
 			selected = Engine::Get().GetEditorState() == EditorState::Next;
 			if (selected)
@@ -204,6 +215,7 @@ namespace Raven
 			if (selected)
 				ImGui::PopStyleColor();
 		}
+#endif
 
 		//ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 240.0f);
 		ImGui::PopStyleColor();
@@ -264,14 +276,17 @@ namespace Raven
 					{
 						auto mat = glm::make_mat4(delta);
 						
-						transform->SetLocalScale(transform->GetLocalScale() * Transform::GetScaleFromMatrix(mat));
+						transform->SetScale(gizmoOrigScale * Transform::ExtractScale(mat));
 					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
-						transform->SetLocalTransform(mat);
-						//TOOD
+						transform->SetMatrixTransform(mat);
 					}
+				}
+				else
+				{
+					gizmoOrigScale = transform->GetScale();
 				}
 			}
 		}
@@ -332,40 +347,43 @@ namespace Raven
 
 	void Editor::OpenFile(const std::string& filePath)
 	{
-		if (StringUtils::IsTextFile(filePath)) 
-		{
-			LOGW("OpenFile file : {0} did not implement",filePath);
-		}
-		else if (StringUtils::IsModelFile(filePath))
-		{
-			if (StringUtils::GetExtension(filePath) == "fbx") 
-			{
-				GetWindow<FbxWindow>()->OpenFile(filePath);
-			}
+		EResourceType rscType = Engine::GetModule<ResourceManager>()->GetResourceType(filePath);
 
-			auto modelEntity = GetModule<SceneManager>()->GetCurrentScene()->CreateEntity(StringUtils::GetFileNameWithoutExtension(filePath));
-			auto & model = modelEntity.AddComponent<Model>(filePath);
-			model.LoadFile();
-			selectedNode = modelEntity.GetHandle();
-		}
-		else if (StringUtils::IsAudioFile(filePath))
+		switch (rscType)
 		{
-			LOGW("OpenFile file : {0} did not implement", filePath);
-		}
-		else if (StringUtils::IsSceneFile(filePath))
-		{
-			CacheScene();//save 
-			GetModule<SceneManager>()->AddSceneFromFile(filePath);
-			GetModule<SceneManager>()->SwitchScene();
-		}
-		else if (StringUtils::IsTextureFile(filePath))
-		{
-			LOGW("OpenFile file : {0} did not implement", filePath);
-		}
-		else if (StringUtils::IsControllerFile(filePath)) 
-		{
+		case Raven::RT_AnimationController:
 			GetWindow<NodeWindow>()->OpenFile(filePath);
+			break;
+
+		case Raven::RT_Texture2D:
+		case Raven::RT_TextureCube:
+		case Raven::RT_DynamicTexture:
+			LOGW("Editor - Open Texture Not Supported.");
+			break;
+
+		case Raven::RT_MaterialShader:
+		case Raven::RT_Material:
+			LOGW("Editor - Open Materail Not Supported.");
+			break;
+
+		case Raven::RT_Mesh:
+		case Raven::RT_SkinnedMesh:
+			LOGW("Editor - Open Materail Not Supported.");
+			break;
+
+		case Raven::RT_Scene:
+			OpenScene(filePath);
+			break;
+
+		case Raven::RT_Skeleton:
+			LOGW("Editor - Open Skeleton Not Supported.");
+			break;
+
+		case Raven::RT_AnimationClip:
+			LOGW("Editor - Open AnimationClip Not Supported.");
+			break;
 		}
+
 	}
 
 	const char* Editor::GetIconFontIcon(const std::string& filePath)
@@ -411,13 +429,22 @@ namespace Raven
 
 			if (ImGui::BeginMenu("File"))
 			{
+
 				if (ImGui::MenuItem("Exit"))
 				{
+					Engine::Get().Exit();
 				}
 
 				if (ImGui::MenuItem("Open File"))
 				{
+
 				}
+
+				if (ImGui::MenuItem("Save Scene"))
+				{
+					Engine::GetModule<SceneManager>()->SaveCurrentScene();
+				}
+
 				ImGui::EndMenu();
 			}
 
@@ -522,29 +549,87 @@ namespace Raven
 		ImGui::End();
 	}
 
-	void Editor::LoadCachedScene()
+	void Editor::NewSceneForStartPlay()
 	{
-		//load from disk
-		auto name = "./scenes/"+ GetModule<SceneManager>()->GetCurrentScene()->GetName() + ".raven";
-		struct stat fileInfo;
-		auto exists = (!stat(name.c_str(), &fileInfo)) != 0;
-		if (exists) 
-		{
-			GetModule<SceneManager>()->GetCurrentScene()->Load("./scenes/");
-		}
+		// Saven Origianl as cache.
+		std::stringstream scene_cache;
+		originalScene->SaveToStream(scene_cache);
+
+		auto newPlayScene = GetModule<SceneManager>()->AddScene<Scene>("Play_Scene");
+		newPlayScene->LoadFromStream(scene_cache);
+		newPlayScene->SetName("Play_Scene");
+
+		// Switch to play scene.
+		GetModule<SceneManager>()->SwitchToScene(newPlayScene.get());
+		GetModule<SceneManager>()->Apply();
+
+		playScene = newPlayScene;
 	}
 
-	void Editor::CacheScene()
+	void Editor::ReloadOriginalScene()
 	{
 		//Serialize the scene
-	
 		for (auto & win : editorWindows)
 		{
-			win.second->SaveWorkspace();
+			win.second->SaveWorkspace(); // ???
 		}
 
-		GetModule<SceneManager>()->GetCurrentScene()->Save("./scenes/");
+		// Switch to play scene.
+		GetModule<SceneManager>()->SwitchToScene(originalScene);
+		GetModule<SceneManager>()->Apply();
+
+		auto* rmScene = playScene.lock().get();
+		GetModule<SceneManager>()->RemoveScene(rmScene);
 	}
+
+
+	void Editor::StartPlay()
+	{
+		Engine::Get().SetEditorState(EditorState::Play);
+
+		// The original scene we want to revert to when we stop playing.
+		originalScene = Engine::Get().GetModule<SceneManager>()->GetCurrentScene();
+
+		// we reload the scene, so destroy the rigid bodies in the physics engine
+		auto& registry = originalScene->GetRegistry();
+
+		auto view = registry.view<RigidBody>();
+		for (auto v : view)
+		{
+			view.get<RigidBody>(v).DestroyRigidBody();
+		}
+
+		// Create a copy of the original scene to start playing...
+		NewSceneForStartPlay();
+
+	}
+
+
+	void Editor::StopPlay()
+	{
+		Engine::Get().SetEditorState(EditorState::Preview);
+		ReloadOriginalScene();
+	}
+
+
+	void Editor::PausePlay()
+	{
+		if (Engine::Get().GetEditorState() == EditorState::Play)
+			Engine::Get().SetEditorState(EditorState::Paused);
+		else
+			Engine::Get().SetEditorState(EditorState::Play);
+	}
+
+
+	void Editor::OpenScene(const std::string& file)
+	{
+		// First unload all opend scenes...
+		Engine::GetModule<SceneManager>()->UnloadScenes();
+
+		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
+		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
+	}
+
 };
 
 Raven::Engine* CreateEngine() {

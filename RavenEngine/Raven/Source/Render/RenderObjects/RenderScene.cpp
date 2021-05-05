@@ -29,8 +29,8 @@
 #include "Scene/Scene.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Light.h"
-#include "Scene/Component/Model.h"
-#include "Scene/Component/MeshRenderer.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/TerrainComponent.h"
 #include "Scene/Entity/EntityManager.h"
@@ -167,20 +167,23 @@ void RenderScene::TraverseScene(Scene* scene)
 	// Default Materials.
 	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
 
+	// Primitives Collector.
+	RenderPrimitiveCollector collector(this);
 
 	// Get All models in the scene
-	auto group = scene->GetRegistry().group<Model>(entt::get<Transform>);
-	if (group.empty())
-		return; 
+	std::vector<ScenePrimitiveData> outPrimitiveComponents;
+	GatherScenePrimitives(scene, outPrimitiveComponents);
 
 
 	// Iterate over all Models in the scene.
-	for (auto entity : group)
+	for (auto& scenePrim : outPrimitiveComponents)
 	{
-		const auto& [model, trans] = group.get<Model, Transform>(entity);
+		// Primitive Component - Entity Data
+		PrimitiveComponent* primComp = scenePrim.comp;
+		Transform* trComp = scenePrim.tr;
 
 		// Compute World Bounds.
-		MathUtils::BoundingBox bounds = model.GetLocalBounds().Transform(trans.GetWorldMatrix());
+		MathUtils::BoundingBox bounds = primComp->GetLocalBounds().Transform(trComp->GetWorldMatrix());
 
 		float radius;
 		glm::vec3 center;
@@ -193,88 +196,45 @@ void RenderScene::TraverseScene(Scene* scene)
 		}
 
 		// distance to view.
-		glm::vec3 v = (viewPos - trans.GetWorldPosition());
+		glm::vec3 v = (viewPos - trComp->GetWorldPosition());
 		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
 
 
-		// Meshes...
-		const auto& meshes = model.GetMeshes();
-		std::vector<ModelMeshRendererData> meshRenderers;
-		model.GetMeshRenderers(meshRenderers, scene);
+		// Collect Render Render Primitives...
+		collector.Reset();
+		collector.SetTransform(&trComp->GetWorldMatrix(), &trComp->GetWorldMatrix());
+		primComp->CollectRenderPrimitives(collector);
 
 		// Create a RenderPrimitive for each model, and add it to the correct batch.
-		for (uint32_t i = 0; i < meshes.size(); ++i)
+		for (uint32_t i = 0; i < collector.primitive.size(); ++i)
 		{
-			const auto& mesh = meshes[i];
-			RenderPrimitive* rprim = nullptr;
+			RenderPrimitive* rprim = collector.primitive[i];
 
-			// Update Mesh on GPU if not loaded yet.
-			if (!mesh->IsOnGPU())
-				mesh->LoadOnGpu();
-
-
-			if (meshRenderers[i].skinned)
+			// No Material?
+			if (!rprim->GetMaterial())
 			{
-				auto skinned = meshRenderers[i].skinned;
-				skinned->UpdateBones();
-				RAVEN_ASSERT(skinned->bones.size() <= RENDER_SKINNED_MAX_BONES, "");
-
-				RenderSkinnedMesh* rmesh = NewPrimitive<RenderSkinnedMesh>();
-				rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-				rmesh->SetMesh(static_cast<RenderRscSkinnedMesh*>(mesh->renderRscMesh));
-				rmesh->SetBones(&skinned->bones);
-				rprim = rmesh;
-
-			}
-			else
-			{
-				RenderMesh* rmesh = NewPrimitive<RenderMesh>();
-				rmesh->SetWorldMatrix(trans.GetWorldMatrix());
-				rmesh->SetMesh(mesh->renderRscMesh);
-				rprim = rmesh;
-			}
-
-
-
-			// Mesh Materail...
-			RenderRscShader* meshShader = nullptr;
-			Material* meshMaterail = model.GetMaterial(i);
-
-			if (meshMaterail)
-			{
-				// Update Material Paramters if Dirty.
-				if (meshMaterail->IsDirty())
-				{
-					meshMaterail->Update();
-				}
-
-				rprim->SetMaterial( meshMaterail->GetRenderRsc() );
-				meshShader = meshMaterail->GetRenderRsc()->GetShaderRsc();
-			}
-			else
-			{
-				meshMaterail = rprim->isSkinned ? defaultMaterials.skinned.get() : defaultMaterials.mesh.get();
-
-				rprim->SetMaterial(meshMaterail->GetRenderRsc());
-				meshShader = meshMaterail->GetRenderRsc()->GetShaderRsc();
+				Material* defaultMaterial = rprim->isSkinned ? defaultMaterials.skinned.get() : defaultMaterials.mesh.get();
+				rprim->SetMaterial(defaultMaterial->GetRenderRsc());
 			}
 
 
 			// Translucent?
-			if (meshShader->GetType() == ERenderShaderType::Translucent)
+			if (rprim->GetShaderType() == ERenderShaderType::Translucent)
 			{
-				//
+				// Gather lights that affect this translucent primitive.
 				std::vector<RenderLight*> litPrim;
 				GatherLights(center, radius, litPrim);
 
 				for (const auto& lit : litPrim)
 					rprim->AddLight(lit->indexInScene);
 
-				//
+
+				// TRANSLUCENT BATCH.
 				translucentBatch.Add(rprim, viewDist2);
 			}
 			else
 			{
+				// DEFERRED BATCH.
 				deferredBatch.Add(rprim);
 			}
 		}
@@ -391,11 +351,7 @@ void RenderScene::CollectTerrain(Scene* scene)
 	const auto& theTerrain = TerrainEttView.get<TerrainComponent>(entity);
 	auto terrainRsc = theTerrain.GetTerrainResource();
 	
-	if (!terrainRsc->IsOnGPU())
-	{
-		terrainRsc->renderRscTerrain = new RenderRscTerrain();
-		terrainRsc->LoadOnGPU();
-	}
+	RAVEN_ASSERT(terrainRsc->IsOnGPU(), "Terrain Not Loaded on GPU. Make sure its loaded before rendering.");
 	
 	RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
 	renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
@@ -660,6 +616,43 @@ void RenderScene::GatherLights(const glm::vec3& center, float radius, std::vecto
 
 		outLights.push_back(rlights[il]);
 	}
+
+}
+
+
+void RenderScene::GatherScenePrimitives(Scene* scene, std::vector<ScenePrimitiveData>& outPrimitivesComp)
+{
+	// Iterate over all MeshComponent in the scene.
+	{
+		auto meshPrimitives = scene->GetRegistry().group<MeshComponent>(entt::get<Transform>);
+
+		for (auto entity : meshPrimitives)
+		{
+			auto& [mesh, trans] = meshPrimitives.get<MeshComponent, Transform>(entity);
+
+			ScenePrimitiveData scenePrim;
+			scenePrim.comp = &mesh;
+			scenePrim.tr = &trans;
+			outPrimitivesComp.push_back(scenePrim);
+		}
+	}
+
+
+	// Iterate over all SkinnedMeshComponent in the scene.
+	{
+		auto skinnedPrimitives = scene->GetRegistry().group<SkinnedMeshComponent>(entt::get<Transform>);
+
+		for (auto entity : skinnedPrimitives)
+		{
+			auto& [skinned, trans] = skinnedPrimitives.get<SkinnedMeshComponent, Transform>(entity);
+
+			ScenePrimitiveData scenePrim;
+			scenePrim.comp = &skinned;
+			scenePrim.tr = &trans;
+			outPrimitivesComp.push_back(scenePrim);
+		}
+	}
+
 
 }
 

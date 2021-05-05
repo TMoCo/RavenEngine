@@ -38,13 +38,15 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("ControllerType", type), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("ControllerType", type));
 		}
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
-			archive(cereal::make_nvp("ControllerType",type), cereal::make_nvp("Id", entity));
+			archive(cereal::base_class<Component>(this));
+			archive(cereal::make_nvp("ControllerType",type));
 			SetControllerType(type);
 		}
 

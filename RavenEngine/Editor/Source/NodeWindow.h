@@ -37,7 +37,7 @@ namespace Raven
 		void HandleQuery();
 		void HandleDelete();
 		void DrawNode();
-		void AddNode(const std::string& name);
+		void AddNode(Ptr<AnimationClip> animClip);
 
 		void LeftPanel();
 		void RightPanel();
@@ -58,7 +58,7 @@ namespace Raven
 			ed::PinId inputId;
 			ed::PinId outputId;
 			std::string nodeName;
-			std::string filePath;
+			ResourceRef animClip;
 		};
 
 		Node* FindNode(int32_t id);

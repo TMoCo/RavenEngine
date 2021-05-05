@@ -59,7 +59,7 @@ namespace MM {
 	void ComponentAddAction(entt::basic_registry<EntityType>& registry, EntityType entity)
 	{
 		auto & ent = registry.template emplace<Component>(entity);
-		ent.entity = entity;
+		ent.SetEntity_Evil(entity, nullptr);
 	}
 
 	template <class Component, class EntityType>

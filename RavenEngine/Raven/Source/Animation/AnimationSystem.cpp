@@ -6,6 +6,11 @@
 #include "Animation.h"
 #include "AnimationController.h"
 #include "Engine.h"
+
+
+#include "Scene/Component/SkinnedMeshComponent.h"
+
+
 namespace Raven
 {
 
@@ -26,9 +31,16 @@ namespace Raven
 			for (auto e : animators)
 			{
 				auto& animator = scene->GetRegistry().get<Animator>(e);
-				if (animator.controller != nullptr)
+
+				if (!animator.controller)
+					continue;
+
+				Entity skinnedEnttity{ e, scene };
+				SkinnedMeshComponent* skinnedComp = skinnedEnttity.TryGetComponent<SkinnedMeshComponent>();
+
+				if (skinnedComp)
 				{
-					animator.controller->OnUpdate(dt, scene, e);
+					animator.controller->OnUpdate(dt, skinnedComp);
 				}
 			}
 		}

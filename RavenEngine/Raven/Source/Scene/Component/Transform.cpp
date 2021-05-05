@@ -3,162 +3,361 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Transform.h"
+#include "Scene/Entity/Entity.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
+
+
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+
+
 namespace Raven
 {
-	glm::vec3 Transform::GetForwardDirection() const
+
+
+const Transform Transform::Identity( glm::mat4(1.0f) );
+
+
+
+
+Transform::Transform()
+	: position(0.0f)
+	, scale(1.0f)
+	, rotation(1.0f, 0.0f, 0.0f, 0.0f)
+	, isWorldMatrixDiry(true)
+	, isLocalMatrixCacheDiry(true)
+{
+
+}
+
+
+Transform::Transform(const glm::mat4& matrix)
+	: worldMatrix(1.0f)
+	, isWorldMatrixDiry(true)
+	, isLocalMatrixCacheDiry(true)
+{
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(matrix, scale, rotation, position, skew, perspective);
+	UpdateLocalMatrix();
+}
+
+
+Transform::Transform(const glm::vec3& inPosition)
+	: scale(1.0f)
+	, rotation(1.0f, 0.0f, 0.0f, 0.0f)
+	, isWorldMatrixDiry(true)
+	, isLocalMatrixCacheDiry(true)
+
+{
+	position = inPosition;
+	UpdateLocalMatrix();
+}
+
+
+Transform::~Transform()
+{
+
+}
+
+
+void Transform::UpdateLocalMatrix() const
+{
+	localMatrix_cache = glm::translate(glm::mat4(1), position);
+	localMatrix_cache *= glm::toMat4(rotation);
+	localMatrix_cache = glm::scale(localMatrix_cache, scale);
+	isLocalMatrixCacheDiry = false;
+}
+
+
+void Transform::UpdateWorldMatrix() const
+{
+	Entity ent = GetEntity();
+
+	// Is Entity Valid?
+	if (ent.Valid())
 	{
-		return GetWorldOrientation() * FORWARD;
+		Entity parentEnt = ent.GetParent();
+
+		if (parentEnt.Valid())
+		{
+			Transform* parentTransform = parentEnt.TryGetComponent<Transform>();
+
+			if (parentTransform)
+			{
+				worldMatrix = parentTransform->GetWorldMatrix() * GetLocalMatrix();
+			}
+		}
+		else
+		{
+			worldMatrix = GetLocalMatrix();
+		}
+
+		isWorldMatrixDiry = false;
+		return;
+	}
+	else
+	{
+		worldMatrix = GetLocalMatrix();
+		isWorldMatrixDiry = true;
+	}
+}
+
+
+void Transform::UpdateChildrenWorld() const
+{
+	Entity ent = GetEntity();
+
+	// Is Entity Valid?
+	if (!ent.Valid())
+		return;
+
+	std::vector<Entity> children = ent.GetChildren();
+
+	for (auto& child : children)
+	{
+		Transform* childTransform = child.TryGetComponent<Transform>();
+
+		// Only Iterate on transform children.
+		if (!childTransform)
+			continue;
+
+		childTransform->worldMatrix = GetWorldMatrix() * childTransform->GetLocalMatrix();
+		childTransform->UpdateChildrenWorld();
+	}
+}
+
+
+bool Transform::GetParentWorldMatrix(glm::mat4& outMtx) const
+{
+	Entity ent = GetEntity();
+
+	// Is Entity Valid?
+	if (ent.Valid())
+	{
+		Entity parentEnt = ent.GetParent();
+
+		if (parentEnt.Valid())
+		{
+			Transform* parentTransform = parentEnt.TryGetComponent<Transform>();
+
+			if (parentTransform)
+			{
+				outMtx = parentTransform->GetWorldMatrix();
+				return true;
+			}
+		}
 	}
 
-	glm::vec3 Transform::GetRightDirection() const
+	return false;
+}
+
+
+void Transform::ResetTransform()
+{
+	position = glm::vec3(0.0f);
+	scale = glm::vec3(1.0f);
+	rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+	isWorldMatrixDiry = true;
+	isLocalMatrixCacheDiry = true;
+}
+
+
+glm::vec3 Transform::GetForwardDirection() const
+{
+	return GetWorldRotation() * FORWARD;
+}
+
+
+glm::vec3 Transform::GetRightDirection() const
+{
+	return GetWorldRotation() * RIGHT;
+}
+
+
+glm::vec3 Transform::GetUpDirection() const
+{
+	return GetWorldRotation() * UP;
+}
+
+
+void Transform::UpdateDirty()
+{
+	// Not Dirty?
+	if (!isWorldMatrixDiry)
+		return;
+
+	UpdateWorldMatrix();
+	UpdateChildrenWorld();
+}
+
+
+void Transform::Dirty()
+{
+	isWorldMatrixDiry = true;
+	isLocalMatrixCacheDiry = true;
+}
+
+
+void Transform::SetPosition(const glm::vec3& v)
+{
+	position = v;
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetScale(const glm::vec3& v)
+{
+	scale = v;
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetRotation(const glm::quat& v)
+{
+	rotation = v;
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetRotationEuler(float pitch, float yaw, float roll)
+{
+	// Make quat that does this order v' = Yaw * Pitch * Roll * v;
+	rotation = 
+		  glm::angleAxis(yaw, UP)
+		* glm::angleAxis(pitch, RIGHT)
+		* glm::angleAxis(roll, FORWARD);
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetWorldPosition(const glm::vec3& v)
+{
+	glm::mat4 mtx;
+	if ( GetParentWorldMatrix(mtx) )
 	{
-		return GetWorldOrientation() * RIGHT;
+		mtx = glm::inverse(mtx);
+		position = mtx * glm::vec4(v, 1.0f);
+	}
+	else
+	{
+		position = v;
 	}
 
-	glm::vec3 Transform::GetUpDirection() const
+
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetWorldScale(const glm::vec3& v)
+{
+	RAVEN_ASSERT(0, "TODO Implement SetWorldScale.");
+}
+
+
+void Transform::SetWorldRotation(const glm::quat& v)
+{
+	glm::mat4 mtx;
+	if (GetParentWorldMatrix(mtx))
 	{
-		return GetWorldOrientation() * UP;	
+		mtx = glm::inverse(mtx);
+		mtx = mtx * glm::toMat4(v);
+
+		rotation = glm::toQuat(mtx);
+		rotation = glm::normalize(rotation);
+	}
+	else
+	{
+		rotation = v;
 	}
 
 
-	Transform::Transform()
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetWorldRotation(float pitch, float yaw, float roll)
+{
+	// Make quat that does this order v' = Yaw * Pitch * Roll * v;
+	glm::quat q =
+		  glm::angleAxis(yaw, UP)
+		* glm::angleAxis(pitch, RIGHT)
+		* glm::angleAxis(roll, FORWARD);
+
+	SetWorldRotation(q);
+}
+
+
+void Transform::SetMatrixTransform(const glm::mat4& mtx)
+{
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(mtx, scale, rotation, position, skew, perspective);
+
+	Dirty();
+	UpdateDirty();
+}
+
+
+void Transform::SetWorldMatrixTransform(const glm::mat4& mtx)
+{
+	glm::mat4 invWorldMtx;
+	if (GetParentWorldMatrix(invWorldMtx))
 	{
-		localPosition = { 0.0f, 0.0f, 0.0f };
-		localOrientation = {};
-		localScale = { 1.0f, 1.0f, 1.0f };
-		localMatrix = glm::mat4(1.f);
-		worldMatrix = glm::mat4(1.f);
-
-		initLocalPosition = localPosition;
-		initLocalScale = localScale;
-		initLocalOrientation = localOrientation;
+		invWorldMtx = glm::inverse(invWorldMtx);
+		invWorldMtx = invWorldMtx * mtx;
+		SetMatrixTransform(invWorldMtx);
 	}
-
-	Transform::Transform(const glm::mat4& matrix)
+	else
 	{
-		glm::vec3 skew;
-		glm::quat rotation;
-		glm::vec4 perspective;
-		glm::decompose(matrix, localScale, rotation, localPosition, skew, perspective);
-		localOrientation = glm::eulerAngles(rotation);
-		localMatrix = matrix;
-		worldMatrix = matrix;
-
-		initLocalPosition = localPosition;
-		initLocalScale = localScale;
-		initLocalOrientation = localOrientation;
-
+		SetMatrixTransform(mtx);
 	}
+}
 
-	Transform::Transform(const glm::vec3& position)
-	{
-		localPosition = position;
-		localOrientation = {};
-		localScale = { 1.0f, 1.0f, 1.0f };
-		localMatrix = glm::mat4(1.f);
-		worldMatrix = glm::mat4(1.f);
-		SetLocalPosition(position);
 
-		initLocalPosition = localPosition;
-		initLocalScale = localScale;
-		initLocalOrientation = localOrientation;
-	}
+glm::vec3 Transform::ExtractScale(const glm::mat4& mtx)
+{
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::vec3 mtxScale;
+	glm::quat mtxRot;
+	glm::vec3 mtxPosition;
+	glm::decompose(mtx, mtxScale, mtxRot, mtxPosition, skew, perspective);
 
-	Transform::~Transform() = default;
+	return mtxScale;
+}
 
-	void Transform::SetTransform(Transform& other)
-	{
-		localMatrix = other.GetLocalMatrix();
-		worldMatrix = other.GetWorldMatrix();
-		localPosition = other.GetLocalPosition();
-		localOrientation = other.GetLocalOrientation();
-		hasUpdated = other.HasUpdated();
-		dirty = other.IsDirty();
-	}
 
-	void Transform::SetWorldMatrix(const glm::mat4 & mat)
-	{
-		if (dirty)
-			UpdateLocalMatrix();
-		worldMatrix = mat * localMatrix;
-	}
+void Transform::SetTransform(Transform& other)
+{
+	localMatrix_cache = other.GetLocalMatrix();
+	worldMatrix = other.GetWorldMatrix();
+	position = other.GetPosition();
+	rotation = other.GetRotation();
 
-	void Transform::SetLocalTransform(const glm::mat4& localMat)
-	{
-		localMatrix = localMat;
-		hasUpdated = true;
-		ApplyTransform();//decompose 
-	}
+	isLocalMatrixCacheDiry = false;
+	isWorldMatrixDiry = false;
+	UpdateChildrenWorld();
+}
 
-	void Transform::SetLocalPosition(const glm::vec3& localPos)
-	{
-		dirty = true;
-		localPosition = localPos;
-	}
 
-	void Transform::SetLocalScale(const glm::vec3& scale)
-	{
-		dirty = true;
-		localScale = scale;
-	}
 
-	//void Transform::SetLocalOrientation(const glm::quat& quat)
-	void Transform::SetLocalOrientation(const glm::vec3& rotation)
-	{
-		dirty = true;
-		localOrientation = rotation;
-	}
 
-	void Transform::UpdateLocalMatrix()
-	{
-		localMatrix = glm::translate(glm::mat4(1), localPosition);
-		localMatrix *= glm::toMat4(glm::quat(localOrientation));
-		localMatrix = glm::scale(localMatrix,localScale);
-		dirty = false;
-		hasUpdated = true;
-	}
-
-	void Transform::ApplyTransform()
-	{
-		glm::vec3 skew;
-		glm::vec4 perspective;
-		glm::quat rotation;
-		glm::decompose(localMatrix, localScale, rotation, localPosition, skew, perspective);
-		localOrientation = glm::eulerAngles(rotation);
-	}
-
-	glm::vec3 Transform::GetScaleFromMatrix(const glm::mat4& mat)
-	{
-		glm::vec3 skew;
-		glm::vec3 localScale;
-		glm::quat localOrientation;
-		glm::vec3 localPosition;
-		glm::vec4 perspective;
-		glm::decompose(mat, localScale, localOrientation, localPosition, skew, perspective);
-		return localScale;
-	}
-
-	Transform Transform::Identity()
-	{
-		return Transform(glm::mat4(1.0f));
-	}
-	
-	void Transform::SetOffsetTransform(const glm::mat4& localMat)
-	{
-		offsetMatrix = localMat;
-	}
-
-	void Transform::ResetTransform()
-	{
-		dirty = true;
-		localPosition = initLocalPosition;
-		localScale = initLocalScale;
-		localOrientation = initLocalOrientation;
-	}
-};
+} // End of namespace Raven
 

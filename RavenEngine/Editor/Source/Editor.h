@@ -10,6 +10,11 @@
 #include "Core/EditorCamera.h"
 #include "Core/Ray.h"
 
+
+#include "glm/vec3.hpp"
+
+
+
 namespace Raven
 {
 	class Camera;
@@ -52,6 +57,8 @@ namespace Raven
 		const char* GetIconFontIcon(const std::string& filePath);
 
 
+		void OpenScene(const std::string& file);
+
 		template<class T>
 		inline auto GetWindow() { return
 			std::static_pointer_cast<T>(editorWindows[typeid(T).hash_code()]);
@@ -62,8 +69,21 @@ namespace Raven
 		void BeginDockSpace();
 		void EndDockSpace();
 
-		void LoadCachedScene();
-		void CacheScene();
+		// Starting playing current scene.
+		void StartPlay();
+
+		// Stop playing current scene.
+		void StopPlay();
+
+		// Pause playing current scene.
+		void PausePlay();
+
+		// Create new play scene and start playing it.
+		void NewSceneForStartPlay();
+
+		// Reload original scene and destroy cached scene.
+		void ReloadOriginalScene();
+
 
 		std::unordered_map<size_t, std::shared_ptr<EditorWindow>> editorWindows;
 
@@ -77,12 +97,17 @@ namespace Raven
 		uint32_t imGuizmoOperation = 4;
 
 		bool showGizmos = true;
+		glm::vec3 gizmoOrigScale = glm::vec3(1.0f);
 
 		std::unique_ptr<Camera> camera;
 		Transform editorCameraTransform;
 		EditorCameraController editorCameraController;
 
+		// The original scene before loading or any modifcations.
+		Scene* originalScene = nullptr;
 
+		// The dummy scene we created just to play on.
+		WeakPtr<Scene> playScene;
 	};
 
 };

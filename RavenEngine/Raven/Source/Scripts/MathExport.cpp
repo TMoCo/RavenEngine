@@ -73,10 +73,12 @@ namespace Raven
 				return  glm::normalize(*t);
 			}
 
+
 			template <>
 			static glm::vec3 cross(const glm::vec3* t, const glm::vec3* t2) {
 				return glm::cross(*t, *t2);
 			}
+
 		};
 
 
@@ -87,7 +89,6 @@ namespace Raven
 
 				.beginClass <glm::vec2>("vec2")
 				.addConstructor <void (*) (float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec2, 0>, &VecHelper::set <glm::vec2, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec2, 1>, &VecHelper::set <glm::vec2, 1>)
 				.addFunction("__tostring", &VecHelper::toString<glm::vec2>)
@@ -99,7 +100,6 @@ namespace Raven
 
 				.beginClass <glm::vec3>("vec3")
 				.addConstructor <void (*) (float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec3, 0>, &VecHelper::set <glm::vec3, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec3, 1>, &VecHelper::set <glm::vec3, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec3, 2>, &VecHelper::set <glm::vec3, 2>)
@@ -115,7 +115,6 @@ namespace Raven
 
 				.beginClass <glm::vec4>("vec4")
 				.addConstructor <void (*) (float, float, float, float)>()
-				.addConstructor <void (*) (float)>()
 				.addProperty("x", &VecHelper::get <glm::vec4, 0>, &VecHelper::set <glm::vec4, 0>)
 				.addProperty("y", &VecHelper::get <glm::vec4, 1>, &VecHelper::set <glm::vec4, 1>)
 				.addProperty("z", &VecHelper::get <glm::vec4, 2>, &VecHelper::set <glm::vec4, 2>)
@@ -150,22 +149,21 @@ namespace Raven
 				.addConstructor <void (*) (glm::mat4)>()
 				.addConstructor <void (*) ()>()
 
-				.addFunction("GetLocalScale", &Transform::GetLocalScale)
-				.addFunction("GetLocalOrientation", &Transform::GetLocalOrientation)
-				.addFunction("GetLocalPosition", &Transform::GetLocalPosition)
-				.addFunction("ApplyTransform", &Transform::ApplyTransform)
-				.addFunction("UpdateLocalMatrix", &Transform::UpdateLocalMatrix)
-				.addFunction("SetLocalTransform", &Transform::SetLocalTransform)
-				.addFunction("SetLocalPosition", &Transform::SetLocalPosition)
-				.addFunction("SetLocalScale", &Transform::SetLocalScale)
-				.addFunction("SetLocalOrientation", &Transform::SetLocalOrientation)
-				.addFunction("GetWorldPosition", &Transform::GetWorldPosition)
-				.addFunction("GetWorldOrientation", &Transform::GetWorldOrientation)
-				.addFunction("GetForwardDirection", &Transform::GetForwardDirection)
+				.addFunction("GetScale", &Transform::GetScale)
+				.addFunction("GetPosition", &Transform::GetPosition)
+				.addFunction("GetRotation", &Transform::GetRotation)
 
-				.addProperty("localScale", &Transform::GetLocalScale, &Transform::SetLocalScale)
-				.addProperty("localPosition", &Transform::GetLocalPosition, &Transform::SetLocalPosition)
-				.addProperty("localOrientation", &Transform::GetLocalOrientation, &Transform::SetLocalOrientation)
+				.addFunction("Dirty", &Transform::Dirty)
+				.addFunction("UpdateDirty", &Transform::UpdateDirty)
+
+				.addFunction("SetScale", &Transform::SetScale)
+				.addFunction("SetPosition", &Transform::SetPosition)
+				.addFunction("SetRotation", &Transform::SetRotation)
+				.addFunction("SetWorldPosition", &Transform::SetWorldPosition)
+
+				.addProperty("Scale", &Transform::GetScale, &Transform::SetScale)
+				.addProperty("Position", &Transform::GetPosition, &Transform::SetPosition)
+				.addProperty("Rotation", &Transform::GetRotation, &Transform::SetRotation)
 
 				.endClass();
 			

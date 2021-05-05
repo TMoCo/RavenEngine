@@ -59,7 +59,6 @@ namespace Raven
 			// If there is an image to load
 			if (config.image_path != "")
 			{
-				Engine::GetModule<ResourceManager>()->LoadResource<Texture2D>(config.image_path);
 				img = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>(config.image_path);
 			}
 

@@ -1,7 +1,6 @@
-//////////////////////////////////////////////////////////////////////////////
-// This file is part of the Raven Game Engine			                    //
-//////////////////////////////////////////////////////////////////////////////
 #pragma once
+
+
 #include <string>
 #include <queue>
 #include <memory>
@@ -9,73 +8,116 @@
 #include "Utilities/Core.h"
 #include "IModule.h"
 
+
+
+
+
+
 namespace Raven
 {
 	class Scene;
 
+
+	// SceneManager:
+	//    - 
 	class SceneManager final : public IModule
 	{
-	public:
-		SceneManager() = default;
-		void SwitchScene();
-		void SwitchScene(const std::string& name);
-		void SwitchScene(uint32_t index);
+		NOCOPYABLE(SceneManager);
 
+	public:
+		// Construct.
+		SceneManager();
+
+		// Destruct.
+		~SceneManager();
+
+		// Switch to another scene that exist/added to the scene manager.
+		void SwitchToScene(const Scene* scene);
+		void SwitchToScene(int32_t index);
+
+		// Apply any pending changes.
 		void Apply();
 
-		inline auto GetCurrentScene() const { return currentScene; }
+		inline Scene* GetCurrentScene() const { return currentScene; }
+		inline int32_t GetCurrentIndex() const { return currentSceneIndex; }
 
-		inline auto GetCurrentIndex() const { return sceneIdx; }
-
-		inline auto GetSceneCount() const { return static_cast<uint32_t>(allScenes.size()); }
-
-		inline auto& GetScenes() const { return allScenes; }
-
-
-		inline auto & GetSceneFilePaths() const { return sceneFilePaths; }
-
+		//...
+		inline int32_t GetSceneCount() const { return static_cast<int32_t>(scenes.size()); }
+		inline auto& GetScenes() const { return scenes; }
 		std::vector<std::string> GetSceneNames();
 
-		inline auto SetSwitchScene(bool switching){ switchingScenes = switching; }
-
+		// Return true if we have pending scene switch.
 		inline auto IsSwitchingScene() const  { return switchingScenes; }
-
-		void AddSceneFromFile(const std::string& filePath);
-		uint32_t AddScene(Scene* scene);
 		
+		// Get Scene Index, return -1 if not found.
+		int32_t GetSceneIndex(const Scene* inScene);
+		int32_t GetSceneIndex(const std::string& sceneName);
+
+		// Return a scene in the manager with scene name.
 		Scene* GetSceneByName(const std::string& sceneName);
 
-		template<class T>
-		void AddScene(const std::string& name);
+		// Return a scene at index.
+		Scene* GetScene(int32_t index);
 
-		void AddFileToLoadList(const std::string& filePath);
+		// Add new scene to be managed, the scene pointer will be managed by this class.
+		int32_t AddScene(Scene* scene);
 
-		void LoadCurrentList();
+		// Create/Add new scene to the manager.
+		template<class TScene>
+		Ptr<TScene> AddScene(const std::string& name);
 
+		// Remove a scene with this name.
+		void RemoveScene(const Scene* scene);
+
+		// Save the current active scene.
+		void SaveCurrentScene();
+
+		// Load a saved scene from the resource manager and add it to the scene
+		// @param path: relative resource path.
+		Ptr<Scene> LoadScene(const std::string& path);
+
+		// Unload all scenes.
+		void UnloadScenes();
+
+		// ~IModule
 		virtual void Initialize() override;
-
 		virtual void Destroy() override;
-
 		static auto GetModuleType() { return MT_SceneManager; }
 
+	private:
+		// Set switch flag.
+		inline auto SetSwitchScene(bool switching) { switchingScenes = switching; }
+
+		// Create/Load Engine's default scene.
+		void CreateOrLoadDefaultScene();
+
 	protected:
-		uint32_t sceneIdx = 0;
+		// The index of the current active scene.
+		int32_t currentSceneIndex = 0;
+
+		// The Current active scene.
 		Scene* currentScene = nullptr;
-		std::vector<std::shared_ptr<Scene>> allScenes;
-		std::vector<std::string> sceneFilePaths;
-		std::vector<std::string> sceneFilePathsToLoad;
+
+		// all scenes in the Engine.
+		std::vector< Ptr<Scene> > scenes;
 
 	private:
+		// If true there is a pending scene waiting to be applied.
 		bool switchingScenes = false;
+
+		// Pending scene waiting to be applied.
 		int32_t queuedSceneIndex = -1;
-		NOCOPYABLE(SceneManager);
 	};
 
-	template<class T>
-	void Raven::SceneManager::AddScene(const std::string& name)
+
+	template<class TScene>
+	Ptr<TScene> SceneManager::AddScene(const std::string& name)
 	{
+		RAVEN_ASSERT(GetSceneIndex(name) == -1, "Scene name already exist.");
+
 		LOGI("[{0}] - Enqueued scene : {1}", __FILE__, name.c_str());
-		allScenes.emplace_back(std::make_shared<T>(name));
+		Ptr<Scene> newScene = scenes.emplace_back( std::make_shared<TScene>(name) );
+		return std::static_pointer_cast<TScene, Scene>(newScene);
 	}
 
 }

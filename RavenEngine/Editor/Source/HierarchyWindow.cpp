@@ -9,14 +9,17 @@
 #include "Scene/Entity/EntityManager.h"
 #include "Scene/Entity/Entity.h"
 #include "Scene/Component/Light.h"
-#include "Scene/Component/Model.h"
-#include "Scene/Component/MeshRenderer.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scripts/LuaComponent.h"
 #include "Core/Camera.h"
 #include "Scene/Component/Transform.h"
 #include "ImGui/ImGuiHelpers.h"
 #include "IconsMaterialDesignIcons.h"
 #include "Editor.h"
+#include "ResourceManager/Resources/Mesh.h"
+#include "ResourceManager/MeshFactory.h"
+
 
 #include <imgui_internal.h>
 
@@ -88,8 +91,7 @@ namespace Raven
 				entity.GetOrAddComponent<Transform>();
 			}
 
-			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "Quad" };
-
+			const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Quad" };
 
 			if (ImGui::BeginMenu("Add 3D Object"))
 			{
@@ -98,13 +100,11 @@ namespace Raven
 					if (ImGui::MenuItem(name))
 					{
 						auto entity = scene->CreateEntity(name);
-						auto & model = entity.AddComponent<Model>();
-						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(name));
-						Ptr<Mesh> mesh = Ptr<Mesh>(MeshFactory::CreatePrimitive(model.GetPrimitiveType()));
-						model.AddMesh(mesh);
-						auto& render = entity.AddComponent<MeshRenderer>();
-						render.mesh = mesh;
-						render.meshIndex = 0;
+						auto & model = entity.AddComponent<MeshComponent>();
+						auto& tr = entity.GetOrAddComponent<Transform>();
+						
+						auto mesh = Ptr<Mesh>(MeshFactory::GetBasicShape(EBasicShape::GetPrimativeName(name)));
+						model.SetMesh(mesh);
 					}
 				}
 				ImGui::EndMenu();
@@ -201,9 +201,17 @@ namespace Raven
 					auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
 					if (hierarchyComponent)
 					{
+						Transform* tr = registry.try_get<Transform>(entity);
+						glm::mat4 worldMtx = tr ? tr->GetWorldMatrix() : glm::mat4(1.0f);
+
 						Hierarchy::Reparent(entity, entt::null, registry, *hierarchyComponent);
 						Entity e(entity, scene);
 						e.RemoveComponent<Hierarchy>();
+
+						if (tr)
+						{
+							tr->SetWorldMatrixTransform(worldMtx);
+						}
 					}
 				}
 				ImGui::EndDragDropTarget();
@@ -394,12 +402,21 @@ namespace Raven
 					{
 						if (acceptable)
 						{
+							Transform* tr = registry.try_get<Transform>(entity);
+							glm::mat4 worldMtx = tr ? tr->GetWorldMatrix() : glm::mat4(1.0f);
+
 							if (hierarchyComponent)
 								Hierarchy::Reparent(entity, node, registry, *hierarchyComponent);
 							else
 							{
 								registry.emplace<Hierarchy>(entity, node);
 							}
+
+							if (tr)
+							{
+								tr->SetWorldMatrixTransform(worldMtx);
+							}
+
 							droppedEntity = node;
 						}
 					}

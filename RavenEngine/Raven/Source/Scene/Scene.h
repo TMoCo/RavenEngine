@@ -3,12 +3,21 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
+
+#include "ResourceManager/Resources/IResource.h"
+#include "Utilities/Core.h"
+
+
 #include <string>
+#include <sstream>
 #include <memory>
 #include <entt/entt.hpp>
 #include <cereal/cereal.hpp>
 
-#include "Utilities/Core.h"
+
+
+
 namespace Raven
 {
 	class EntityManager;
@@ -17,11 +26,24 @@ namespace Raven
 	class Camera;
 	class Transform;
 
-	class Scene 
+
+	// Scene:
+	//   - 
+	//
+	class Scene : public IResource
 	{
 	public:
 		Scene(const std::string& name);
-		virtual ~Scene() = default;
+
+		// Destruct.
+		virtual ~Scene()
+		{
+
+		}
+
+		// return the resource type
+		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Scene; }
+
 
 		virtual void OnInit();
 		virtual void OnClean();
@@ -38,8 +60,12 @@ namespace Raven
 		void SetSize(uint32_t w, uint32_t h);
 		entt::registry& GetRegistry();
 
-		virtual void Save(const std::string& filePath, bool binary = false);
-		virtual void Load(const std::string& filePath, bool binary = false);
+		// -- -- -- ---- -- - --- --- -
+		// Scene Saving Operations.
+		virtual void SaveToStream(std::stringstream& storage);
+		virtual void LoadFromStream(std::istream& storage);
+		virtual void SaveToFile(const std::string& inFilePath);
+		virtual void LoadFromFile(const std::string& inFilePath);
 
 		Entity CreateEntity();
 		Entity CreateEntity(const std::string & name);
@@ -59,7 +85,7 @@ namespace Raven
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
-			archive(cereal::make_nvp("SceneName",name));
+			archive(cereal::make_nvp("SceneName", name));
 		}
 
 		template<typename Archive>
@@ -76,6 +102,7 @@ namespace Raven
 		std::shared_ptr<SceneGraph> sceneGraph;
 		std::shared_ptr<EntityManager> entityManager;
 		std::string name;
+		std::string loadName;
 		uint32_t width = 0;
 		uint32_t height = 0;
 		NOCOPYABLE(Scene);
@@ -86,7 +113,5 @@ namespace Raven
 		Transform* overrideTransform = nullptr;
 
 		std::function<void(Scene *scene)> initCallback;
-	public:
-		bool dynamic = false;
 	};
 };

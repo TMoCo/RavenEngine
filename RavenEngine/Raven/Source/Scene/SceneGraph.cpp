@@ -30,9 +30,11 @@ namespace Raven
 
 		for (auto entity : nonHierarchyView)
 		{
-			registry.get<Transform>(entity).SetWorldMatrix(glm::mat4{1.f});
+			// Only update if dirty, update this transform and all its children.
+			registry.get<Transform>(entity).UpdateDirty();
 		}
 
+#if 0
 		auto view = registry.view<Transform, Hierarchy>();
 		for (auto entity : view)
 		{
@@ -43,11 +45,14 @@ namespace Raven
 				UpdateTransform(entity, registry);
 			}
 		}
+#endif
 
 	}
 
+
 	void SceneGraph::UpdateTransform(entt::entity entity, entt::registry& registry)
 	{
+#if 0
 		auto hierarchyComponent = registry.try_get<Hierarchy>(entity);
 		if (hierarchyComponent)
 		{
@@ -77,7 +82,10 @@ namespace Raven
 				child = next;
 			}
 		}
+#endif
 	}
+
+
 };
 
 

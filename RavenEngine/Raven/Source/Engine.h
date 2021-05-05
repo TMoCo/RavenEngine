@@ -15,10 +15,12 @@
 
 #include "Event/EventDispatcher.h"
 
-/**
- * Engine:
- *		- 
- */
+
+
+#define DEFAULT_SCENE "./scenes/Default.raven"
+
+
+
 
 namespace Raven 
 {
@@ -35,6 +37,9 @@ namespace Raven
 
 	class Scene;
 
+
+	// Engine:
+	//	- 
 	class Engine
 	{
 	public:
@@ -45,7 +50,7 @@ namespace Raven
 		~Engine();
 
 		// Return engine singleton instance
-		static Engine& Get();
+		inline static Engine& Get() { return *instance; }
 
 		// Initialise the engine
 		virtual void Initialize();
@@ -53,11 +58,14 @@ namespace Raven
 		// Function for running engine
 		int Run();
 
+		// Set should close flag to close the engine.
+		void Exit();
+
 		// Return a pointer to a module of type TModule from std::array of modules
 		template<class TModule>
 		static inline TModule* GetModule()
 		{
-			return static_cast<TModule*>(Get().engineModules[typeid(TModule).hash_code()]);
+			return static_cast<TModule*>(Get().engineModules[TModule::GetModuleType()]);
 		}
 
 		// MainThread Operation
@@ -88,29 +96,28 @@ namespace Raven
 		virtual void OnImGui();
 		virtual void OnUpdate(float dt);
 		virtual void OnRender();
+
 	private:
 		// Create a module and store in array of modules, pass aditional arguments to module constructor
 		template<class TModule, typename...Args>
 		inline void CreateModule(Args&&... args)
 		{
-			//engineModules[TModule::GetModuleType()] = new TModule(std::forward<Args>(args)...);
-			engineModules[typeid(TModule).hash_code()] = new TModule(std::forward<Args>(args)...);
-
+			engineModules[TModule::GetModuleType()] = new TModule(std::forward<Args>(args)...);
 		}
 
 		// Initialise a module
 		template<class TModule>
 		inline void InitializeModule()
 		{
-			engineModules[typeid(TModule).hash_code()]->Initialize();
+			engineModules[TModule::GetModuleType()]->Initialize();
 		}
 
 		// Destroy a module
 		template<class TModule>
 		inline void DestroyModule()
 		{
-			engineModules[typeid(TModule).hash_code()]->Destroy();
-			delete engineModules[typeid(TModule).hash_code()];
+			engineModules[TModule::GetModuleType()]->Destroy();
+			delete engineModules[TModule::GetModuleType()];
 		}
 
 		// Load all modules 
@@ -119,15 +126,21 @@ namespace Raven
 		// Destroy all loaded modules
 		void DestoryModules();	
 
-
 	protected:
-
 		// Main thread -- call Post to post callback to main-thread if you are in other threads.
 		std::queue<std::pair<std::promise<bool>, std::function<bool()>>> executeQueue;
 		std::mutex executeMutex;
 
 		// Modules in the engine
-		std::unordered_map<size_t, IModule*> engineModules;
+		//    - We use std::array and EModuleType as its indices for each module.
+		//
+		//    - While this is not flexible for adding new modules its much faster, GetModule<>() will be used
+		//      many times in the engine and we want to reduce the cost of it.
+		//
+		std::array<IModule*, MT_MAX> engineModules;
+
+		// The Singleton instance.
+		static Engine* instance;
 
 		EditorState state = EditorState::Play; //default as Play, if editor is loaded, the state will be set as preview.
 
@@ -141,6 +154,7 @@ namespace Raven
 		double engineTime;
 	};
 };
+
 
 Raven::Engine* CreateEngine();
 

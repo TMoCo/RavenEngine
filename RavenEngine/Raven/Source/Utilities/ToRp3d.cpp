@@ -38,7 +38,7 @@ namespace Raven
 
 			glm::mat4 scaleMat(scale.x, 0, 0, 0, 0, scale.y, 0, 0, 0, 0, scale.z, 0, 0, 0, 0, 1);
 			// a new Raven::Transform with the rp3d transform data
-			return Transform(scaleMat * t);
+			return Transform(t*scaleMat);
 		}
 
 		glm::quat ToGLMQuat(const rp3d::Quaternion other)

@@ -5,6 +5,12 @@
 
 namespace Raven
 {
+
+	luabridge::RefCountedPtr<AudioSource> AudioSource::CreateLuaObj()
+	{
+		return new ALAudioSource();
+	}
+
 	AudioSource* AudioSource::Create()
 	{
 		return new ALAudioSource();

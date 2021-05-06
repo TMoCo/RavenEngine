@@ -3,7 +3,7 @@
 #include "AudioClip.h"
 #include "OpenAL/ALAudioClip.h"
 #include "Utilities/StringUtils.h"
-
+#include "Logger/Console.h"
 namespace Raven
 {
 	AudioClip::AudioClip()
@@ -20,7 +20,7 @@ namespace Raven
 		return new ALAudioClip(name, extension);
 	}
 
-	AudioClip* AudioClip::CreateWithFile(const std::string& name)
+	luabridge::RefCountedPtr<AudioClip> AudioClip::CreateLuaObj(const std::string& name)
 	{
 		return new ALAudioClip(name, StringUtils::GetExtension(name));
 	}

@@ -17,7 +17,7 @@ namespace Raven
 		{
 			luabridge::getGlobalNamespace(L)
 				.beginClass<AudioSource>("AudioSource")
-				.addStaticFunction("new", &AudioSource::Create)
+				.addStaticFunction("new", &AudioSource::CreateLuaObj)
 				.addFunction("SetAudioClip", &AudioSource::SetAudioClip)
 				.addFunction("Play", &AudioSource::Resume)
 				.addFunction("Resume", &AudioSource::Resume)
@@ -27,7 +27,7 @@ namespace Raven
 				.endClass()
 
 				.beginClass<AudioClip>("AudioClip")
-				.addStaticFunction("new", &AudioClip::CreateWithFile)
+				.addStaticFunction("new", &AudioClip::CreateLuaObj)
 				.endClass();
 				
 		}

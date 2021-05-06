@@ -2,6 +2,7 @@
 
 #include "AudioData.h"
 #include <string>
+#include <LuaBridge/RefCountedPtr.h>
 
 namespace Raven
 {
@@ -17,7 +18,7 @@ namespace Raven
 
 	public:
 		static AudioClip* Create(const std::string& name, const std::string& extension);
-		static AudioClip* CreateWithFile(const std::string& name);
+		static luabridge::RefCountedPtr<AudioClip> CreateLuaObj(const std::string& name);
 		virtual ~AudioClip();
 
 		inline auto GetData() const

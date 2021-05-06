@@ -3,6 +3,7 @@
 #include "AudioClip.h"
 #include "Utilities/StringUtils.h"
 #include <glm/glm.hpp>
+#include <LuaBridge/RefCountedPtr.h>
 
 namespace Raven
 {
@@ -10,6 +11,7 @@ namespace Raven
 	{
 	public:
 
+		static luabridge::RefCountedPtr<AudioSource> CreateLuaObj();
 		static AudioSource* Create();
 		AudioSource();
 		virtual ~AudioSource();

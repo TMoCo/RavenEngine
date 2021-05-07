@@ -29,6 +29,7 @@ project "RavenEditor"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.NodeEditor}"
 	}
 
@@ -41,6 +42,7 @@ project "RavenEditor"
 		"%{IncludeDir.Dependencies}",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.cereal}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
@@ -86,10 +88,12 @@ project "RavenEditor"
 		libdirs
 		{
 			--"../RAVEN/Dependencies/libs" 
+			"../Dependencies/OpenAL/libs/Win32"
 		}
 
 		links
 		{
+			"OpenAL32",
 			"glfw",
 			"OpenGL32","lua","openfbx","node-editor"
 			

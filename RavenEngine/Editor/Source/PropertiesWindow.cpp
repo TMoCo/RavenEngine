@@ -19,6 +19,7 @@
 #include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/RigidBody.h"
+#include "Scene/Component/SoundComponent.h"
 
 #include "Scripts/LuaComponent.h"
 
@@ -44,6 +45,14 @@
 namespace MM 
 {
 	using namespace Raven;
+
+	template<>
+	void ComponentEditorWidget<SoundComponent>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& sound = reg.get<SoundComponent>(e);
+		sound.OnImGui();
+	}
+
 	template<>
 	void ComponentEditorWidget<Transform>(entt::registry& reg, entt::registry::entity_type e)
 	{
@@ -784,6 +793,7 @@ namespace Raven
 		TRIVIAL_COMPONENT(LuaComponent, true);
 		TRIVIAL_COMPONENT(Animator, true);
 		TRIVIAL_COMPONENT(RigidBody, true);
+		TRIVIAL_COMPONENT(SoundComponent, true);
 
 		init = true;
 		}

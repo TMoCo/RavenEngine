@@ -71,7 +71,8 @@ project "RavenEngine"
 	links
 	{
 		"imgui",
-		"spdlog"
+		"spdlog",
+		"imguiFD"
 	}
 
 	defines

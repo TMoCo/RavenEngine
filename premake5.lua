@@ -64,8 +64,8 @@ workspace( settings.workspace_name )
 			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/node-editor/premake5")
 			SetRecommendedSettings()
-		--require("RavenEngine/Dependencies/ImGuiFD/premake5")
-		--	SetRecommendedSettings()			
+		require("RavenEngine/Dependencies/ImGuiFD/premake5")
+			SetRecommendedSettings()			
 
 	filter {}
 	group ""

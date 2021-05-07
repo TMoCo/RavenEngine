@@ -5,6 +5,7 @@
 
 
 #include "MaterialShader.h"
+#include "Material.h"
 #include "Render/RenderResource/Shader/UniformBuffer.h"
 
 
@@ -20,6 +21,7 @@ MaterialShader::MaterialShader()
 	, sdomain(ERenderShaderDomain::Mesh)
 	, stype(ERenderShaderType::Opaque)
 	, isComputeMaterialVertex(false)
+	, samplersStartIndex(-1)
 {
 	type = MaterialShader::StaticGetType();
 	hasRenderResources = true;
@@ -36,8 +38,9 @@ MaterialShader::~MaterialShader()
 void MaterialShader::LoadRenderResource()
 {
 	RAVEN_ASSERT(!isOnGPU, "Shader already loaded.");
-	isOnGPU = true;
 
+	if (!HasValidData())
+		return;
 
 	// What Stages this materail function support.
 	EGLShaderStageBit stages = EGLShaderStageBit::FragmentBit;
@@ -54,6 +57,10 @@ void MaterialShader::LoadRenderResource()
 	rscData.AddFunction(stages, materialFunction);
 	renderRsc = RenderRscShader::Create(sdomain, rscData); // Build Shader
 
+	// Failed to build shader
+	if (!renderRsc)
+		return;
+
 	// Shader Input...
 	if (blockInput.size != -1)
 	{
@@ -64,10 +71,33 @@ void MaterialShader::LoadRenderResource()
 		materialUBO = Ptr<UniformBuffer>(UniformBuffer::Create(blockInput, false));
 	}
 
+
+	samplersStartIndex = renderRsc->GetInput().GetNumSamplers();
 	renderRsc->GetInput().AddSamplerInputs(samplers);
 	renderRsc->BindBlockInputs();
 	renderRsc->BindSamplers();
 
+	UpdateMaterials();
+	isOnGPU = true;
+}
+
+
+void MaterialShader::UpdateRenderResource()
+{
+	RAVEN_ASSERT(isOnGPU, "");
+
+	if (!HasValidData())
+		return;
+
+	delete renderRsc;
+	isOnGPU = false;
+	LoadRenderResource();
+}
+
+
+bool MaterialShader::HasValidData()
+{
+	return !materialFunction.empty();
 }
 
 
@@ -91,19 +121,63 @@ void MaterialShader::SetDomain(ERenderShaderDomain val)
 }
 
 
-void MaterialShader::SetType(ERenderShaderType val)
+void MaterialShader::SetShaderType(ERenderShaderType val)
 {
 	stype = val;
 }
 
 
-void MaterialShader::AddSampler(const std::string& name)
+void MaterialShader::AddSampler(const std::string& name, ESInputDefaultFlag flag)
 {
 	RSInputDescription inputSampler;
 	inputSampler.uniformType = EShaderUniformType::Sampler;
 	inputSampler.inputType = EShaderInputType::Int;
 	inputSampler.name = name;
+	inputSampler.flag = flag;
 	samplers.push_back(inputSampler);
+}
+
+
+void MaterialShader::RemoveSampler(int32_t index)
+{
+	if (index >= 0 && index < samplers.size())
+	{
+		auto iter = samplers.begin() + index;
+		samplers.erase(iter);
+	}
+}
+
+
+void MaterialShader::AddRef(Material* inMat)
+{
+	// Exist?
+	auto iter = std::find(materials.begin(), materials.end(), inMat);
+	if (iter != materials.end())
+		return;
+
+	materials.push_back(inMat);
+}
+
+
+void MaterialShader::RemoveRef(Material* inMat)
+{
+	// Exist?
+	auto iter = std::find(materials.begin(), materials.end(), inMat);
+	if (iter == materials.end())
+	{
+		// Remove.
+		materials.erase(iter);
+	}
+
+}
+
+
+void MaterialShader::UpdateMaterials()
+{
+	for (auto mat : materials)
+	{
+		mat->ReloadShader();
+	}
 }
 
 

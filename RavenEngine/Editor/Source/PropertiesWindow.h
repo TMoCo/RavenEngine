@@ -22,6 +22,9 @@ namespace Raven
 		virtual void OnImGui() override;
 		virtual void OnSceneCreated(Scene* scene) override;
 		inline void SetController(AnimationController* con) { controller = con; }
+
+		static std::string ImGuiDragDropAssetsTarget();
+
 	private:
 		bool init = false;
 		MM::EntityEditor<entt::entity> enttEditor;

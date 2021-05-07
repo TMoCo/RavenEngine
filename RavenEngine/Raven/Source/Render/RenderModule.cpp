@@ -276,14 +276,14 @@ void RenderModule::CreateDefaultMaterials()
 		Ptr<MaterialShader> matShader( new MaterialShader() );
 		matShader->SetName("Default_Mesh");
 		matShader->SetDomain(ERenderShaderDomain::Mesh);
-		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
-		matShader->AddSampler("inCheckerTexture");
+		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
 		mat->SetMaterialShader(matShader);
-		mat->SetTexture("inCheckerTexture", checkerTexture.get());
+		mat->SetTexture("inCheckerTexture", checkerTexture);
 		mat->LoadRenderResource();
 		
 		defaultMaterials.mesh = mat;
@@ -295,14 +295,14 @@ void RenderModule::CreateDefaultMaterials()
 		Ptr<MaterialShader> matShader(new MaterialShader());
 		matShader->SetName("Default_Skinned");
 		matShader->SetDomain(ERenderShaderDomain::Skinned);
-		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
-		matShader->AddSampler("inCheckerTexture");
+		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
 		mat->SetMaterialShader(matShader);
-		mat->SetTexture("inCheckerTexture", checkerTexture.get());
+		mat->SetTexture("inCheckerTexture", checkerTexture);
 		mat->LoadRenderResource();
 
 		defaultMaterials.skinned = mat;
@@ -314,9 +314,9 @@ void RenderModule::CreateDefaultMaterials()
 		Ptr<MaterialShader> matShader(new MaterialShader());
 		matShader->SetName("Default_Terrain");
 		matShader->SetDomain(ERenderShaderDomain::Terrain);
-		matShader->SetType(ERenderShaderType::Opaque);
+		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/TerrainMaterial.glsl");
-		matShader->AddSampler("inCheckerTexture");
+		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());

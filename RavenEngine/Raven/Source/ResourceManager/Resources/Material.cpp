@@ -25,7 +25,7 @@ Material::~Material()
 }
 
 
-int32_t Material::SetTexture(const std::string& name, Texture2D* texture)
+int32_t Material::SetTexture(const std::string& name, Ptr<ITexture> texture)
 {
 	int32_t idx = GetTextureIndex(name);
 
@@ -95,7 +95,7 @@ int32_t Material::SetColor(const std::string& name, const glm::vec4& color)
 
 
 
-void Material::SetTexture(int32_t idx, Texture2D* texture)
+void Material::SetTexture(int32_t idx, Ptr<ITexture> texture)
 {
 	DirtyUpdate();
 	textures[idx].second = texture;
@@ -155,7 +155,7 @@ int32_t Material::GetColorIndex(const std::string& name) const
 }
 
 
-bool Material::GetTexture(const std::string& name, Texture2D*& outTexture) const
+bool Material::GetTexture(const std::string& name, Ptr<ITexture>& outTexture) const
 {
 	int32_t idx = GetTextureIndex(name);
 	if (idx == -1)
@@ -201,23 +201,51 @@ void Material::DirtyRemap()
 }
 
 
+void Material::RebuildParamters()
+{
+	// Rebuild Textures...
+	for (size_t i = 0; i < textures.size(); ++i)
+	{
+		texturesMap.insert(std::make_pair(textures[i].first, i));
+	}
+
+	// Rebuild Scalars...
+	for (size_t i = 0; i < scalars.size(); ++i)
+	{
+		scalarsMap.insert(std::make_pair(scalars[i].first, i));
+	}
+
+	// Rebuild Colors...
+	for (size_t i = 0; i < colors.size(); ++i)
+	{
+		colorsMap.insert(std::make_pair(colors[i].first, i));
+	}
+
+}
+
+
 void Material::LoadRenderResource()
 {
 	RAVEN_ASSERT(!isOnGPU, "Material already loaded.");
-	isOnGPU = true;
+
+	if (!shader || !shader->IsOnGPU())
+		return;
 
 	// Render Material
 	renderRsc = new RenderRscMaterial(shader->GetRenderRsc());
-	renderRsc->LoadInputBlock(shader->GetBlockInput().name);
+	renderRsc->LoadInputBlock(shader->GetBlockInput().name, shader->GetSamplersStartIndex());
 	renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
 
+	isOnGPU = true;
+	dirtyFlag = EMaterialDirtyFlag::Remap;
 	UpdateRenderResource();
 }
 
 
 void Material::UpdateRenderResource()
 {
-	RAVEN_ASSERT(isOnGPU, "Material not loaded on gpu.");
+	if (!IsOnGPU())
+		return;
 
 	// Remapping...
 	if (dirtyFlag == EMaterialDirtyFlag::Remap)
@@ -244,20 +272,92 @@ void Material::UpdateRenderResource()
 
 void Material::SetMaterialShader(Ptr<MaterialShader> inShader)
 {
+	// Remove from referenced shader.
+	if (shader)
+	{
+		shader->RemoveRef(this);
+	}
+
+	// Set..
 	shader = inShader;
+
+	// Is Null?
+	if (!shader)
+	{
+		if (IsOnGPU())
+		{
+			delete renderRsc;
+			renderRsc = NULL;
+			isOnGPU = false;
+		}
+
+		return;
+	}
+
+	shader->AddRef(this);
 
 	if (isOnGPU)
 	{
-		// Reload Render Shader Resource.
-		renderRsc->ReloadShader(shader->GetRenderRsc());
-		renderRsc->LoadInputBlock(shader->GetBlockInput().name);
-		renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
+		if (shader->IsOnGPU())
+		{
+			// Reload Render Shader Resource.
+			renderRsc->ReloadShader(shader->GetRenderRsc());
+			renderRsc->LoadInputBlock(shader->GetBlockInput().name, shader->GetSamplersStartIndex());
+			renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
 
-		DirtyRemap();
+			DirtyRemap();
+		}
+		else
+		{
+			delete renderRsc;
+			renderRsc = NULL;
+			isOnGPU = false;
+		}
 	}
 
 }
 
+
+void Material::ReloadShader()
+{
+	SetMaterialShader(shader);
+}
+
+
+void Material::ClearAllParamters()
+{
+	texturesMap.clear();
+	scalarsMap.clear();
+	colorsMap.clear();
+
+	textures.clear();
+	scalars.clear();
+	colors.clear();
+
+	DirtyRemap();
+}
+
+
+void Material::LoadDefaulFromShader(const std::string& name)
+{
+	if (!shader)
+		return;
+
+	for (const auto& input : shader->GetBlockInput().inputs)
+	{
+		if (input.first.name == name)
+		{
+			if (input.first.inputType == EShaderInputType::Float)
+			{
+				SetScalar(input.first.name, input.first.flag == ESInputDefaultFlag::Black ? 0.0 : 1.0f);
+			}
+			else if (input.first.inputType == EShaderInputType::Vec4)
+			{
+				SetColor(input.first.name, input.first.flag == ESInputDefaultFlag::Black ? glm::vec4(0.0f) : glm::vec4(1.0f));
+			}
+		}
+	}
+}
 
 
 } // End of namespace Raven.

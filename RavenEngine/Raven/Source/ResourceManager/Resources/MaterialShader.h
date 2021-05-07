@@ -8,6 +8,9 @@
 #include "Render/RenderResource/Shader/RenderRscShader.h"
 
 
+#include "Utilities/Serialization.h"
+
+
 
 namespace Raven
 {
@@ -22,6 +25,8 @@ namespace Raven
 	class MaterialShader : public IResource
 	{
 		NOCOPYABLE(MaterialShader)
+
+		friend class Material;
 
 	public:
 		// Construct.
@@ -42,12 +47,28 @@ namespace Raven
 		// Set the material function.
 		void SetMaterialFunction(const std::string& func, bool hasComputeVertex = false);
 
+		// Get material function.
+		inline const auto& GetMaterialFunction() const { return materialFunction; }
+
+		// Get material function hasComputeVertex.
+		inline const auto& HasComputeVertex() { return isComputeMaterialVertex; }
+
 		// Return the block description, which the expected input of our material shader.
 		inline RSInputBlockDescription& GetBlockInput() { return blockInput; }
 		inline const RSInputBlockDescription& GetBlockInput() const { return blockInput; }
 
 		// Add sampler description as expected input for this shader.
-		void AddSampler(const std::string& name);
+		void AddSampler(const std::string& name, ESInputDefaultFlag flag);
+
+		// Return all samplers.
+		inline auto& GetSamplers() { return samplers; }
+		inline const auto& GetSamplers() const { return samplers; }
+
+		// Get the start index of the samplers in the shader.
+		inline auto& GetSamplersStartIndex() { return samplersStartIndex; }
+
+		// Remove sampler.
+		void RemoveSampler(int32_t index);
 
 		// Set Shader Domain.
 		void SetDomain(ERenderShaderDomain val);
@@ -56,10 +77,10 @@ namespace Raven
 		inline ERenderShaderDomain GetDomain() const { return sdomain; }
 
 		// Set Shader Type.
-		void SetType(ERenderShaderType val);
+		void SetShaderType(ERenderShaderType val);
 
 		// Return the shader type.
-		inline ERenderShaderType GetType() const { return stype; }
+		inline ERenderShaderType GetShaderType() const { return stype; }
 
 		// Return the shader unifrom buffer.
 		inline UniformBuffer* GetUnifromBuffer() const { return materialUBO.get(); }
@@ -67,6 +88,55 @@ namespace Raven
 		// Load the shader on GPU.
 		virtual void LoadRenderResource() override;
 
+		// Update the render resource.
+		virtual void UpdateRenderResource() override;
+
+		// Does this shader contain the valid data to be loaded to GPU.
+		bool HasValidData();
+
+		// Serialization Save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(cereal::base_class<IResource>(this));
+
+			archive(
+				name,
+				materialFunction,
+				isComputeMaterialVertex,
+				blockInput,
+				EnumAsInt<const ERenderShaderDomain>(sdomain),
+				EnumAsInt<const ERenderShaderType>(stype)
+			);
+
+			SaveVector(archive, samplers);
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(cereal::base_class<IResource>(this));
+
+			archive(
+				name,
+				materialFunction,
+				isComputeMaterialVertex,
+				blockInput,
+				EnumAsInt<ERenderShaderDomain>(sdomain),
+				EnumAsInt<ERenderShaderType>(stype)
+			);
+
+			LoadVector(archive, samplers);
+		}
+
+	private:
+		// Only for use by the Material.
+		void AddRef(Material* inMat);
+		void RemoveRef(Material* inMat);
+
+		// Update all materials that reference this shader.
+		void UpdateMaterials();
 
 	private:
 		// The Shader Render Resrouce.
@@ -78,7 +148,7 @@ namespace Raven
 		// Path to the material function to load.
 		std::string materialFunction;
 
-		// if true then the we have material function for computing vertex.
+		// if true then we have material function for computing vertex.
 		bool isComputeMaterialVertex;
 
 		// The block description, which the expected input of our material shader.
@@ -95,5 +165,12 @@ namespace Raven
 
 		// The uniform buffer for the material data.
 		Ptr<UniformBuffer> materialUBO;
+
+		// The materials that reference this shader.
+		std::vector<Material*> materials;
+
+		// The start index of samplers.
+		int32_t samplersStartIndex;
 	};
+
 }

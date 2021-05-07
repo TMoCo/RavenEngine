@@ -23,6 +23,7 @@ namespace Raven
 	class UniformBuffer;
 	class RenderShadowCascade;
 	class RenderPrimitiveCollector;
+	class ITexture;
 
 
 
@@ -240,6 +241,9 @@ namespace Raven
 
 		// Draw Sky.
 		bool isSky;
+
+		// Default textures assigned to materials.
+		std::vector< Ptr<ITexture> > defaultTextures;
 	};
 
 

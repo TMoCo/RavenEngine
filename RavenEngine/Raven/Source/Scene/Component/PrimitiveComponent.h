@@ -1,8 +1,8 @@
 #pragma once
 
 
-
 #include "Utilities/Core.h"
+#include "ResourceManager/RavenVersion.h"
 #include "Component.h"
 
 #include "Math/BoundingBox.h"
@@ -66,6 +66,19 @@ namespace Raven
 		{
 			archive(cereal::base_class<Component>(this));
 			archive(clipDistance);
+
+			// Saving Reference to materials.
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10001)
+			{
+				uint32_t matCount = materials.size();
+				archive(matCount);
+
+				for (uint32_t i = 0; i < matCount; ++i)
+				{
+					// Save Resrouce Reference -> Material.
+					ResourceRef::Save(archive, materials[i].get());
+				}
+			}
 		}
 
 		template<typename Archive>
@@ -73,6 +86,20 @@ namespace Raven
 		{
 			archive(cereal::base_class<Component>(this));
 			archive(clipDistance);
+
+			// Load Reference to materials.
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10001)
+			{
+				uint32_t matCount = 0;
+				archive(matCount);
+				materials.resize(matCount);
+
+				for (uint32_t i = 0; i < matCount; ++i)
+				{
+					// Load Resrouce Reference -> Material.
+					materials[i] = ResourceRef::Load(archive).FindOrLoad<Material>();
+				}
+			}
 		}
 
 

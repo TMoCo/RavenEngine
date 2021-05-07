@@ -21,6 +21,7 @@
 #include "Render/OpenGL/GLShader.h"
 
 
+#include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/Resources/Material.h"
 
@@ -41,6 +42,7 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/type_ptr.hpp"
+
 
 
 
@@ -120,6 +122,16 @@ void RenderScene::Setup()
 	RAVEN_ASSERT(transformUniform->GetDescription().size == sizeof(TransformVertexData), "Invalid Size.");
 	RAVEN_ASSERT(transformBoneUniform->GetDescription().size == sizeof(TransformBoneVertexData), "Invalid Size.");
 
+	// Default Textures...
+	defaultTextures.resize(3);
+	defaultTextures[(int32_t)ESInputDefaultFlag::Normal] =
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_Normal.raven");
+
+	defaultTextures[(int32_t)ESInputDefaultFlag::White] =
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_White.raven");
+
+	defaultTextures[(int32_t)ESInputDefaultFlag::Black] =
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_Black.raven");
 }
 
 
@@ -417,7 +429,7 @@ void RenderScene::DrawDeferred()
 
 			// The Material
 			RenderRscMaterial* material = materialBatch.material;
-			material->MakeTexturesActive();
+			material->MakeTexturesActive(defaultTextures);
 
 			if (material->HasMaterialData())
 			{
@@ -518,7 +530,7 @@ void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
 
 		// The Material
 		RenderRscMaterial* material = prim.primitive->GetMaterial();
-		material->MakeTexturesActive();
+		material->MakeTexturesActive(defaultTextures);
 
 		if (material->HasMaterialData())
 		{

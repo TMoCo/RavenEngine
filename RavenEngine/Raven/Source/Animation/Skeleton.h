@@ -138,25 +138,14 @@ namespace Raven
 		template<typename Archive>
 		void SaveTransformHierarchy(Archive& archive) const
 		{
-			uint32_t count = (uint32_t)skeletonTransforms.size();
-			for (uint32_t i = 0; i < count; ++i)
-			{
-				archive(skeletonTransforms[i]);
-			}
+			SaveVector(archive, skeletonTransforms);
 		}
 
 		// Save transformation hierarchy.
 		template<typename Archive>
 		void LoadTransformHierarchy(Archive& archive)
 		{
-			uint32_t count = 0;
-			archive(count);
-			skeletonTransforms.resize(count);
-
-			for (uint32_t i = 0; i < count; ++i)
-			{
-				archive(skeletonTransforms[i]);
-			}
+			LoadVector(archive, skeletonTransforms);
 		}
 
 	private:

@@ -36,7 +36,7 @@ void SceneManager::Destroy()
 {
 	if (currentScene->GetName() == "Default")
 	{
-		SaveCurrentScene();
+		//SaveCurrentScene();
 	}
 
 	scenes.clear();

@@ -4,12 +4,21 @@
 
 
 // The Current Raven Files Version.
-#define RAVEN_VERSION 10000
+#define RAVEN_VERSION 10001
 
 
 
 // The First version in the engine.
 #define RAVEN_FIRST_VERSION 10000
+
+
+// Global variables are set by archive or loader for saving and load.
+struct RavenVersionGlobals
+{
+	// Version of the scene that is currently being loaded.
+	static unsigned int SCENE_ARCHIVE_VERSION;
+
+};
 
 
 
@@ -24,3 +33,4 @@
 
 
 // 10000 - 28/04/2021 - Initial Version.
+// 10001 - 06/05/2021 - Start saving referenced material in Primitve Components.

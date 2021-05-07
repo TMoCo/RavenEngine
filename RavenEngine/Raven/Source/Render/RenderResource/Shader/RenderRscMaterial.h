@@ -15,7 +15,7 @@
 namespace Raven
 {
 	class RenderRscShader;
-	class Texture2D;
+	class ITexture;
 	class Material;
 	class UniformBuffer;
 
@@ -42,13 +42,13 @@ namespace Raven
 		inline bool HasMaterialData() { return blockIndex != -1 && materialBuffer != nullptr; }
 
 		// Find/Load input block from shader to map our materail paramters to.
-		void LoadInputBlock(const std::string& inBlockName);
+		void LoadInputBlock(const std::string& inBlockName, int32_t inSamplersStartIndex);
 
 		// Clear materail paramters mapping
 		void ClearMapping();
 
 		// Map Paramters.
-		void MapParamter(const std::string& name, Texture2D** texture);
+		void MapParamter(const std::string& name, Ptr<ITexture>* texture);
 		void MapParamter(const std::string& name, const float* scalar);
 		void MapParamter(const std::string& name, const glm::vec4* color);
 
@@ -56,7 +56,7 @@ namespace Raven
 		void FillBuffer();
 
 		// Return textures.
-		const std::vector< std::pair<int32_t, Texture2D**> >& GetTextures() { return matInputTexturesMap; }
+		const std::vector<Ptr<ITexture>*>& GetTextures() { return matInputTexturesMap; }
 
 		// Set the unfirom buffer to update.
 		inline void SetUniformBuffer(UniformBuffer* inUBO) { ubo = inUBO; }
@@ -68,7 +68,7 @@ namespace Raven
 		void UpdateUniformBuffer();
 
 		// Make Material Textures the current active ones.
-		void MakeTexturesActive();
+		void MakeTexturesActive(const std::vector< Ptr<ITexture> >& defaultTextures);
 
 	private:
 		// The shader resource this material is.
@@ -93,7 +93,7 @@ namespace Raven
 		std::vector<MaterialInputMap> matInputMap;
 
 		// Material Input Texture Paramters mapped to their shader input index.
-		std::vector< std::pair<int32_t, Texture2D**> > matInputTexturesMap;
+		std::vector< Ptr<ITexture>* > matInputTexturesMap;
 
 		// The unfirom buffer this material update.
 		UniformBuffer* ubo;
@@ -101,6 +101,9 @@ namespace Raven
 	public:
 		// Render Batch Use Only, index set by the render batch to performs fast mapping during batching.
 		mutable uint32_t renderBatchIndex;
+
+		// The material samplers start index in the shader.
+		int32_t samplersStartIndex;
 	};
 
 }

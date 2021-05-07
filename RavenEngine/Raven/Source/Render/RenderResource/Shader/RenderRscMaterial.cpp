@@ -26,6 +26,7 @@ RenderRscMaterial::RenderRscMaterial(RenderRscShader* inShader)
 	, blockIndex(-1)
 	, ubo(nullptr)
 	, renderBatchIndex((uint32_t)-1)
+	, samplersStartIndex(-1)
 {
 
 }
@@ -42,14 +43,14 @@ void RenderRscMaterial::ReloadShader(RenderRscShader* inShader)
 	if (shader)
 	{
 		ClearMapping();
-		LoadInputBlock("");
+		LoadInputBlock("", -1);
 	}
 
 	shader = inShader;
 }
 
 
-void RenderRscMaterial::LoadInputBlock(const std::string& inBlockName)
+void RenderRscMaterial::LoadInputBlock(const std::string& inBlockName, int32_t inSamplersStartIndex)
 {
 	RAVEN_ASSERT(shader != nullptr, "Updating Render Material with invalid shader.");
 		
@@ -62,28 +63,40 @@ void RenderRscMaterial::LoadInputBlock(const std::string& inBlockName)
 		delete materialBuffer;
 		materialBuffer = nullptr;
 	}
+
+
+	// Default Textures.
+	samplersStartIndex = inSamplersStartIndex;
+
+	if (samplersStartIndex != -1)
+	{
+		uint32_t materialSamplers = shader->GetInput().GetNumSamplers() - samplersStartIndex;
+		matInputTexturesMap.resize(materialSamplers);
+	}
+
 }
 
 
 void RenderRscMaterial::ClearMapping()
 {
 	matInputMap.clear();
-	matInputTexturesMap.clear();
+
+	for (auto& tex : matInputTexturesMap)
+	{
+		tex = nullptr;
+	}
 }
 
 
-void RenderRscMaterial::MapParamter(const std::string& name, Texture2D** texture)
+void RenderRscMaterial::MapParamter(const std::string& name, Ptr<ITexture>* texture)
 {
 	int32_t idx = shader->GetInput().GetSamplerInputIndex(name);
 
 	// No input with that name?
-	if (idx == -1)
+	if (idx == -1 || samplersStartIndex == -1)
 		return;
 
-	std::pair<int32_t, Texture2D**> inputTex;
-	inputTex.first = idx;
-	inputTex.second = texture;
-	matInputTexturesMap.push_back(inputTex);
+	matInputTexturesMap[idx - samplersStartIndex] = texture;
 }
 
 
@@ -156,12 +169,30 @@ void RenderRscMaterial::FillBuffer()
 		materialBuffer = new uint8_t[ blockInput.size ];
 	}
 
+	// Missing Paramters?
+	if (matInputMap.size() != blockInput.inputs.size())
+	{
+		// Set them to default.
+		for (const auto& input : blockInput.inputs)
+		{
+			if (input.first.inputType == EShaderInputType::Float)
+			{
+				float def = input.first.flag == ESInputDefaultFlag::Black ? 0.0f : 1.0f;
+				memcpy(materialBuffer + input.second, &def, sizeof(float));
+			}
+			else
+			{
+				glm::vec4 color = input.first.flag == ESInputDefaultFlag::Black ? glm::vec4(0.0f) : glm::vec4(1.0f);
+				memcpy(materialBuffer + input.second, glm::value_ptr(color), sizeof(glm::vec4));
+			}
+		}
+	}
+
 	// Fill the buffer with materail data.
 	for (const auto& inputParam : matInputMap)
 	{
 		memcpy(materialBuffer + inputParam.offset, inputParam.data, inputParam.size);
 	}
-
 
 }
 
@@ -179,15 +210,34 @@ void RenderRscMaterial::UpdateUniformBuffer()
 }
 
 
-void RenderRscMaterial::MakeTexturesActive()
+void RenderRscMaterial::MakeTexturesActive(const std::vector< Ptr<ITexture> >& defaultTextures)
 {
-	for (const auto& inputTex : matInputTexturesMap)
-	{
-		if (!inputTex.second || !(*inputTex.second))
-			continue;
+	if (samplersStartIndex == -1)
+		return;
 
-		RenderRscTexture* rtex = (*inputTex.second)->GetRenderRsc();
-		rtex->GetTexture()->Active(inputTex.first);
+	for (size_t i = 0; i < matInputTexturesMap.size(); ++i)
+	{
+		auto inputTex = matInputTexturesMap[i];
+		int32_t samplerIndex = i + samplersStartIndex;
+
+		if (inputTex)
+		{
+			RenderRscTexture* rtex = (*inputTex)->GetRenderRsc();
+			rtex->GetTexture()->Active(samplerIndex);
+		}
+		else
+		{
+			if (samplerIndex >= shader->GetInput().GetNumSamplers())
+				continue;
+
+			const auto& samplerInput = shader->GetInput().GetSamplerInput(samplerIndex);
+			auto defaultTex = defaultTextures[static_cast<int32_t>(samplerInput.flag)];
+
+			RenderRscTexture* rtex = defaultTex->GetRenderRsc();
+			rtex->GetTexture()->Active(samplerIndex);
+		}
+
+
 	}
 }
 

@@ -55,7 +55,8 @@ project "Game"
 	{
 		"RavenEngine",
 		"imgui",
-		"spdlog"
+		"spdlog",
+		"imguiFD"
 	}
 
 	defines

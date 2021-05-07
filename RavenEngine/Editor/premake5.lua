@@ -56,8 +56,8 @@ project "RavenEditor"
 	{
 		"RavenEngine",
 		"imgui",
-		"spdlog"
-		--,"imguiFD"
+		"spdlog",
+		"imguiFD"
 	}
 
 	defines
@@ -97,8 +97,8 @@ project "RavenEditor"
 			"OpenGL32",
 			"lua",
 			"openfbx",
-			"node-editor"
-			--,"imguiFD"	
+			"node-editor",
+			"imguiFD"	
 		}
 
 		disablewarnings { 4307 }

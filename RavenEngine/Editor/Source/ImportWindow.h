@@ -25,12 +25,6 @@ namespace Raven
 	private:
 		Ptr<ResourceManager> resourceManager;
 
-		// this library keeps an instance of the file browser dialogue, sort of goes against immediate mode gui but whatever
-		//ImGui::FileBrowser fileDialog;
-
-		// vector of supported extensions
-		//std::vector<std::string> extensions;
-
 		char input[StringUtils::MAX_PATH_LENGTH];
 		
 		bool onlyAnimation;

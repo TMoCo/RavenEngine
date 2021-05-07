@@ -8,7 +8,9 @@
 
 #include "ResourceManager/FileSystem.h"
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/Importers/FBXImporter.h"
 
+#include "Animation/Skeleton.h"
 
 #include "Logger/Console.h"
 
@@ -86,7 +88,12 @@ namespace Raven
 			if (ImGui::Button("Import", ImVec2(w, 0.0f)))
 			{
 				LOGW("Path: {0}", filePath.c_str());
-
+				if (onlyAnimation && dragInfo != "Drag here")
+				{
+					// in case of animation only, change the import settings of the fbx importer
+					resourceManager->GetImporter<FBXImporter>()->settings.skeleton = resourceManager->GetResource<Skeleton>(dragInfo);
+					resourceManager->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
+				}
 				// Imports the resource
 				resourceManager->Import(filePath);
 				selected = false;

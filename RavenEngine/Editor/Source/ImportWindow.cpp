@@ -12,6 +12,7 @@
 
 #include "Logger/Console.h"
 
+#include <imgui.h>
 #include <ImGuiFD/ImGuiFileDialog.h>
 
 namespace Raven
@@ -40,6 +41,11 @@ namespace Raven
 			{
 				// Open a file browser dialogue once library is included
 				filePath = StringUtils::GetCurrentWorkingDirectory().append(input);
+			}
+
+			if (ImGui::Button("Testing file dialog"))
+			{
+				//igfd::ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
 			}
 
 			if (StringUtils::GetExtension(filePath) == "fbx")

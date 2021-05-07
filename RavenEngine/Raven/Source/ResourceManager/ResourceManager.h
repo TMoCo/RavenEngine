@@ -55,7 +55,8 @@ namespace Raven
 	//     - Handle reference and map all the Resources in the Resource manager.
 	class ResourcesRegistry
 	{
-	private:
+	//private:
+	public:	
 		// List of all the resroucs that exist, loaded or not.
 		std::vector<ResourceData> resources;
 
@@ -174,6 +175,9 @@ namespace Raven
 
 		// Return a vector containing all the extensions supported by importers
 		std::vector<std::string> GetSupportedExtensions();
+
+		// return true if the given extension is supported
+		bool IsSupported(const std::string& extension);
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//           Scan directory for resources

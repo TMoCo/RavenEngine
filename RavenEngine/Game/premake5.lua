@@ -29,7 +29,8 @@ project "Game"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}"
 	}
 
 	includedirs
@@ -46,14 +47,15 @@ project "Game"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}"
 	}
 
 	links
 	{
 		"RavenEngine",
 		"imgui",
-		"spdlog",
+		"spdlog"
 	}
 
 	defines
@@ -88,8 +90,10 @@ project "Game"
 		links
 		{
 			"glfw",
-			"OpenGL32","lua","openfbx","node-editor"
-			
+			"OpenGL32",
+			"lua",
+			"openfbx",
+			"node-editor"		
 		}
 
 		disablewarnings { 4307 }

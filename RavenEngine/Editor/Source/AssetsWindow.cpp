@@ -42,7 +42,7 @@ namespace Raven
 		previousDirPath = currentDirPath;
 		lastNavPath = baseDirPath;
 		baseProjectDir = GetFsContents(baseDirPath);
-		currentDir = baseProjectDir;
+		currentDir = ReadDirectory(baseDirPath);
 		basePathLen = baseDirPath.length();
 
 	}
@@ -192,7 +192,7 @@ namespace Raven
 
 	bool AssetsWindow::DrawFile(int32_t dirIndex, bool folder, int32_t shownIndex, bool gridView)
 	{
-		auto fileID = GetParsedAssetID(currentDir[dirIndex].fileType);
+		//auto fileID = GetParsedAssetID(currentDir[dirIndex].fileType);
 		bool doubleClicked = false;
 
 		auto & editor = static_cast<Editor&>(Editor::Get());
@@ -201,9 +201,9 @@ namespace Raven
 		{
 			ImGui::BeginGroup();
 
-			auto fileID = GetParsedAssetID(currentDir[dirIndex].fileType);
+			//auto fileID = GetParsedAssetID(currentDir[dirIndex].fileType);
 
-			if (ImGui::Button(folder ? ICON_MDI_FOLDER : editor.GetIconFontIcon(currentDir[dirIndex].absolutePath), ImVec2(70.0f, 70.0f)))
+			if (ImGui::Button(currentDir[dirIndex].icon, ImVec2(70.0f, 70.0f)))
 			{
 
 			}
@@ -225,7 +225,9 @@ namespace Raven
 		}
 		else
 		{
-			ImGui::TextUnformatted(folder ? ICON_MDI_FOLDER : editor.GetIconFontIcon(currentDir[dirIndex].absolutePath));
+			ImGui::TextUnformatted(currentDir[dirIndex].icon);
+			if (ImGui::IsItemHovered() && currentDir[dirIndex].isFile)
+				ImGui::SetTooltip(ResourceToString( static_cast<EResourceType>(currentDir[dirIndex].type )).c_str());
 			ImGui::SameLine();
 			if (ImGui::Selectable(currentDir[dirIndex].fileName.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick))
 			{
@@ -280,11 +282,12 @@ namespace Raven
 
 		if (!dirInfo.isFile)
 		{
-			auto dirData = ReadDirectory(dirInfo.absolutePath.c_str());
+			//auto dirData = ReadDirectory(dirInfo.absolutePath.c_str());
 
 			bool containsFolder = false;
 
-			for (auto& file : dirData)
+			//for (auto& file : dirData)
+			for (auto& file : currentDir)
 			{
 				if (!file.isFile)
 				{
@@ -305,7 +308,7 @@ namespace Raven
 			{
 				previousDirPath = GetParentPath(currentDirPath);
 				currentDirPath = dirInfo.absolutePath;
-				currentDir = dirData;
+				currentDir = ReadDirectory(dirInfo.absolutePath.c_str());
 			}
 
 			if (isOpen && containsFolder)
@@ -313,16 +316,16 @@ namespace Raven
 				verticalLineStart.x += SmallOffsetX; //to nicely line up with the arrow symbol
 				ImVec2 verticalLineEnd = verticalLineStart;
 
-				for (int i = 0; i < dirData.size(); i++)
+				for (int i = 0; i < currentDir.size(); i++)
 				{
-					if (!dirData[i].isFile)
+					if (!currentDir[i].isFile)
 					{
 						float HorizontalTreeLineSize = 16.0f; //chosen arbitrarily
 						auto currentPos = ImGui::GetCursorScreenPos();
 
 						ImGui::Indent(10.0f);
 
-						auto dirDataTemp = ReadDirectory(dirData[i].absolutePath.c_str());
+						auto dirDataTemp = ReadDirectory(currentDir[i].absolutePath.c_str());
 
 						bool containsFolderTemp = false;
 						for (auto& file : dirDataTemp)
@@ -335,7 +338,7 @@ namespace Raven
 						}
 						if (containsFolderTemp)
 							HorizontalTreeLineSize *= 0.5f;
-						DrawFolder(dirData[i]);
+						DrawFolder(currentDir[i]);
 
 						const ImRect childRect(currentPos, ImVec2{ currentPos.x,  currentPos.y+ImGui::GetFontSize() });
 
@@ -525,6 +528,7 @@ namespace Raven
 	std::vector<FileInfo> AssetsWindow::ReadDirectory(const std::string& path)
 	{
 		std::vector<FileInfo> dInfo;
+		auto rm = Engine::Get().GetModule<ResourceManager>();
 
 		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{
@@ -538,11 +542,16 @@ namespace Raven
 
 			if (isDir)
 			{
-				dInfo.push_back({ dir_data, fileExt, entry.path().string(), false });
+				dInfo.push_back({ StringUtils::RemoveExtension(dir_data), fileExt, entry.path().string(), false, ICON_MDI_FOLDER, ImVec4(1.0f, 1.0f, 1.0f, 1.0f), EResourceType::RT_None });
+				continue; // add continue here so a folder call "raven" isnt considered a resource
 			}
-			else
+			// use the path to determine if a resource or not (see the type)
+			auto type = rm->GetResourceType(entry.path().string());
+			if (type != EResourceType::RT_None)
 			{
-				dInfo.push_back({ dir_data, fileExt, entry.path().string(), true });
+				LOGC("IS RESOURCE: {0}", entry.path().string());
+				// raven resources are , so try to get the resource 
+				dInfo.push_back({ StringUtils::RemoveExtension(dir_data), fileExt, entry.path().string(), true, ResourceToIcon(type), ImVec4(1.0f, 1.0f, 1.0f, 1.0f), type });
 			}
 		}
 

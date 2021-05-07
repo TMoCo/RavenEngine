@@ -18,6 +18,9 @@ namespace Raven
 		std::string fileType;
 		std::string absolutePath;
 		bool isFile;
+		char* icon;
+		ImVec4 colour;
+		int type;
 	};
 
 	class AssetsWindow : public EditorWindow

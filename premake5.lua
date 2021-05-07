@@ -21,7 +21,8 @@ IncludeDir["OpenFBX"] ="%{root_dir}/RavenEngine/Dependencies/OpenFBX/"
 IncludeDir["reactphysics3d"] = "%{root_dir}/RavenEngine/Dependencies/rp3d/include"
 IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
 IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
-IncludeDir["NodeEditor"] ="%{root_dir}/RavenEngine/Dependencies/node-editor"
+IncludeDir["NodeEditor"] = "%{root_dir}/RavenEngine/Dependencies/node-editor"
+IncludeDir["ImGuiFileDialog"] = "%{root_dir}/RavenEngine/Dependencies/ImGuiFD"
 
 workspace( settings.workspace_name )
 	location "build"
@@ -62,7 +63,10 @@ workspace( settings.workspace_name )
 		require("RavenEngine/Dependencies/lua/premake5")
 			SetRecommendedSettings()
 		require("RavenEngine/Dependencies/node-editor/premake5")
-			SetRecommendedSettings()			
+			SetRecommendedSettings()
+		--require("RavenEngine/Dependencies/ImGuiFD/premake5")
+		--	SetRecommendedSettings()			
+
 	filter {}
 	group ""
 

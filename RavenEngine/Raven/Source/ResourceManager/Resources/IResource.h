@@ -7,6 +7,7 @@
 
 #include "Utilities/Core.h"
 
+#include <IconsMaterialDesignIcons.h>
 
 #include "cereal/archives/json.hpp"
 #include "cereal/archives/binary.hpp"
@@ -47,7 +48,7 @@ namespace Raven
 
 
 	// Convert resource type to its name as string.
-	inline std::string ToString(EResourceType type)
+	inline std::string ResourceToString(EResourceType type)
 	{
 		switch (type)
 		{
@@ -81,8 +82,39 @@ namespace Raven
 		RAVEN_ASSERT(0, "Invalid resource Type.");
 	}
 
+	inline char* ResourceToIcon(EResourceType type)
+	{
+		switch (type)
+		{
+			// Textures.
+		case RT_Texture2D: return ICON_MDI_TEXTURE;
+		case RT_TextureCube: return ICON_MDI_TEXTURE;
+		case RT_DynamicTexture: return ICON_MDI_TEXTURE;
 
+			// Materials.
+		case RT_MaterialShader: return ICON_MDI_BRUSH;
+		case RT_Material: return ICON_MDI_BRUSH;
 
+			// Meshes.
+		case RT_Mesh: return ICON_MDI_SHAPE;
+		case RT_SkinnedMesh: return ICON_MDI_SHAPE_PLUS;
+		case RT_Terrain: return ICON_MDI_TERRAIN;
+		case RT_Skeleton: return ICON_MDI_BONE;
+
+			// Scene.
+		case RT_Scene: return ICON_MDI_GLOBE_MODEL;
+
+			// GUI.
+		case RT_GuiLayout: return ICON_MDI_TABLE;
+
+			// Animation.
+		case RT_AnimationClip: return ICON_MDI_ANIMATION;
+		case RT_AnimationController: return ICON_MDI_ANIMATION_PLAY;
+
+		}
+
+		RAVEN_ASSERT(0, "Invalid resource Type.");
+	}
 
 	// IResource:
 	//    - The base resource class, pointers of which are stored in the resource register

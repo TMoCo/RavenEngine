@@ -219,15 +219,17 @@ const ResourceData* ResourcesRegistry::FindResource(const std::string& path) con
 {
 	// Clean the path before searching.
 	std::string cleanPath = CleanRscPath(path);
-
 	// Search...
 	auto iter = resourcePathMap.find(cleanPath);
+	//LOGC(path);
 
 	// Not Found?
 	if (iter == resourcePathMap.end())
 	{
 		return nullptr;
 	}
+
+	LOGC("FOUND");
 
 	return &resources[iter->second];
 }
@@ -321,28 +323,28 @@ void ResourceManager::ScanDirectory(const std::string& path)
 {
 	// construct a path from the input string
 	auto p = std::filesystem::path(path);
+	LOGE(path.c_str());
 	// use the path passed as argument to explore the directory (if it is)
-	if (std::filesystem::is_directory(p))
+	for (const auto& entry : std::filesystem::directory_iterator(path))
 	{
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		if (entry.is_directory())
 		{
-			if (entry.is_directory())
-			{
-				// recursivivly check for subdirectories
-				ScanDirectory(entry.path().string());
-				continue;
-			}
+			// recursivivly check for subdirectories
+			ScanDirectory(entry.path().string());
+		}
 
-			std::string ext = entry.path().extension().string();
+		std::string ext = entry.path().extension().string();
 
-			// raven extension, load the resource
-			if (ext == ".raven")
-			{
-				std::string filePath = entry.path().string();
+		// raven extension, load the resource
+		if (ext == ".raven")
+		{
+			std::string filePath = entry.path().string();
 
-				ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
-				registry.AddResource(filePath, info, nullptr);
-			}
+			ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
+			registry.AddResource(filePath, info, nullptr);
+			LOGW("Size map{0}", registry.resourceMap.size());
+			LOGW("Size path map {0}", registry.resourcePathMap.size());
+			LOGW("Size resources {0}", registry.resources.size());
 		}
 	}
 }
@@ -464,10 +466,16 @@ std::vector<std::string> ResourceManager::GetSupportedExtensions()
 {
 	std::vector<std::string> extensions;
 	for (auto& importer : importers)
-	{
 		importer->ListExtensions(extensions);
-	}
 	return extensions;
+}
+
+bool ResourceManager::IsSupported(const std::string& extension)
+{
+	for (auto& e : GetSupportedExtensions())
+		if (extension == e)
+			return true;
+	return false;
 }
 
 bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile)

@@ -27,6 +27,11 @@ namespace Raven
 		dragInfo("Drag skeleton here")
 	{
 		title = "Import";
+		for (auto& ext : resourceManager->GetSupportedExtensions())
+		{
+			filter.append('.' + ext + ',');
+		}
+		LOGC(filter.c_str());
 	} 
 
 	void ImportWindow::OnImGui()
@@ -47,7 +52,21 @@ namespace Raven
 
 			if (ImGui::Button("Testing file dialog"))
 			{
-				//igfd::ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
+				// TODO: change the extensions to valid resources
+				igfd::ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", filter.c_str(), ".");
+			}
+
+			if (igfd::ImGuiFileDialog::Instance()->FileDialog("ChooseFileDlgKey"))
+			{
+				// action if OK
+				if (igfd::ImGuiFileDialog::Instance()->IsOk == true)
+				{
+					std::string filePathName = igfd::ImGuiFileDialog::Instance()->GetFilePathName();
+					std::string filePath = igfd::ImGuiFileDialog::Instance()->GetCurrentPath(); // will return an absolute path
+					// action
+				}
+				// close
+				igfd::ImGuiFileDialog::Instance()->CloseDialog("ChooseFileDlgKey");
 			}
 
 			if (StringUtils::GetExtension(filePath) == "fbx")
@@ -93,7 +112,7 @@ namespace Raven
 					// in case of animation only, change the import settings of the fbx importer
 					resourceManager->GetImporter<FBXImporter>()->settings.skeleton = resourceManager->GetResource<Skeleton>(dragInfo);
 					resourceManager->GetImporter<FBXImporter>()->settings.importAnimationOnly = true;
-				}
+				}	
 				// Imports the resource
 				resourceManager->Import(filePath);
 				selected = false;

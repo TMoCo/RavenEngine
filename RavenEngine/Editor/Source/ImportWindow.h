@@ -26,6 +26,8 @@ namespace Raven
 		Ptr<ResourceManager> resourceManager;
 
 		char input[StringUtils::MAX_PATH_LENGTH];
+
+		std::string filter;
 		
 		bool onlyAnimation;
 		bool selected;

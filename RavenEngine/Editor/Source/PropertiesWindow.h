@@ -21,13 +21,13 @@ namespace Raven
 		PropertiesWindow();
 		virtual void OnImGui() override;
 		virtual void OnSceneCreated(Scene* scene) override;
-		inline void SetController(AnimationController* con) { controller = con; }
+		inline void SetController(Ptr<AnimationController> con) { controller = con; }
 
 		static std::string ImGuiDragDropAssetsTarget();
 
 	private:
 		bool init = false;
 		MM::EntityEditor<entt::entity> enttEditor;
-		AnimationController* controller = nullptr;
+		WeakPtr<AnimationController> controller;
 	};
 };

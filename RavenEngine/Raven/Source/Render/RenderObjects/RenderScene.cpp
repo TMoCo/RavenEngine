@@ -222,6 +222,16 @@ void RenderScene::TraverseScene(Scene* scene)
 		{
 			RenderPrimitive* rprim = collector.primitive[i];
 
+			// Vlidate Material.
+			if (rprim->GetMaterial())
+			{
+				// Domain Missmatch?
+				if (rprim->GetMaterialDomain() != rprim->GetDomain())
+				{
+					rprim->SetMaterial(nullptr);
+				}
+			}
+
 			// No Material?
 			if (!rprim->GetMaterial())
 			{

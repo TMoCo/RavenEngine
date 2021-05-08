@@ -55,7 +55,7 @@ namespace Raven
 		Entity GetEntity() const;
 		entt::entity GetEntityHandle() const;
 
-		// This is an Evil function created to while refactroing old code.
+		// This is an Evil function created to handle extreme situations.
 		inline void SetEntity_Evil(entt::entity inEntity, Scene* inScene)
 		{ 
 			entity = inEntity;

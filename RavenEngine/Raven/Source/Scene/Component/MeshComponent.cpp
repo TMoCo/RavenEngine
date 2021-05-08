@@ -39,6 +39,12 @@ void MeshComponent::SetMesh(Ptr<Mesh> newMesh)
 
 void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector)
 {
+	// Invalid Mesh?
+	if (!mesh)
+	{
+		return;
+	}
+
 	MeshLOD* meshLOD;
 
 	// Has LODs?
@@ -96,16 +102,6 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 
 			rmesh->SetMaterial( mat->GetRenderRsc() );
 		}
-		//else
-		//{
-		//	auto& defaultMaterial = meshSection->defaultMaterial;
-
-		//	// Has Default Material?
-		//	if (defaultMaterial.IsValid())
-		//	{
-		//		mat = defaultMaterial.GetWeak<Material>();
-		//	}
-		//}
 	}
 }
 

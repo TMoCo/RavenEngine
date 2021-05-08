@@ -82,6 +82,9 @@ namespace Raven
 		inline auto SetForceCamera(bool forceShow) { this->forceShow = forceShow; }
 		inline auto IsPreviewMainCamera() const { return forceShow; }
 
+		// Make sure that all components in this entity has a valid reference to their entity id and scene.
+		void ValidateEntityComponents(entt::registry& reg, entt::entity entity);
+
 		template<typename Archive>
 		void save(Archive& archive) const
 		{

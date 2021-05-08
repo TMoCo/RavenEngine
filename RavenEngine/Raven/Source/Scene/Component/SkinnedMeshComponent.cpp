@@ -14,6 +14,7 @@ namespace Raven {
 
 SkinnedMeshComponent::SkinnedMeshComponent()
 	: isLoading(false)
+	, isHierarchyDirty(false)
 {
 	
 }
@@ -53,6 +54,10 @@ void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 			skeleton->BuildTransformHierarchy();
 			skeleton->UpdateBones();
 		}
+		else
+		{
+			isHierarchyDirty = true;
+		}
 	}
 
 	localBounds = mesh->GetBounds();
@@ -61,6 +66,19 @@ void SkinnedMeshComponent::SetMesh(Ptr<SkinnedMesh> newMesh)
 
 void SkinnedMeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector)
 {
+	// Invalid Mesh?
+	if (!mesh)
+	{
+		return;
+	}
+
+	if (isHierarchyDirty)
+	{
+		skeleton->SetScene(GetEntity().GetScene());
+		skeleton->UpdateBones();
+		isHierarchyDirty = false;
+	}
+
 	for (uint32_t i = 0; i < mesh->GetNumSections(); ++i)
 	{
 		SkinnedMeshSection* meshSection = mesh->GetMeshSection(i);
@@ -70,8 +88,6 @@ void SkinnedMeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rco
 		{
 			continue;
 		}
-
-
 
 		// Add mesh section to be render.
 		RenderSkinnedMesh* rmesh = rcollector.NewSkinnedMesh();

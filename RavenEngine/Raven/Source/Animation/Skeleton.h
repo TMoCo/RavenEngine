@@ -4,6 +4,7 @@
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "Bone.h"
+#include "Scene/Entity/Entity.h"
 
 
 
@@ -22,7 +23,6 @@
 
 namespace Raven 
 {
-	class Entity;
 	class Scene;
 	class Transform;
 	class SkinnedMeshComponent;
@@ -134,6 +134,9 @@ namespace Raven
 		// Destroy transformation hierarchy.
 		void DestroyTransformHierarchy();
 
+		// Some times the scene is not set because of loading.
+		void SetScene(Scene* scene);
+
 		// Load transformation hierarchy.
 		template<typename Archive>
 		void SaveTransformHierarchy(Archive& archive) const
@@ -159,7 +162,7 @@ namespace Raven
 		std::vector<entt::entity> skeletonTransforms;
 
 		// The skinned mesh component that ownes this class
-		SkinnedMeshComponent* owner;
+		Entity owner;
 	};
 
 }

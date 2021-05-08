@@ -88,6 +88,9 @@ namespace Raven
 
 		// if true we are currently loading the skinned mesh component.
 		bool isLoading;
+
+		// The Hierarchy is dirty and need updating, this is set while loading because we don't have the entities created at this point.
+		bool isHierarchyDirty;
 	};
 
 };

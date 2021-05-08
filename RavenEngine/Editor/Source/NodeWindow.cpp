@@ -44,9 +44,14 @@ namespace Raven
 			if (entity.Valid())
 			{
 				auto animator = entity.TryGetComponent<Animator>();
-				if (animator && animator->GetController() != controller)
+
+				if (animator)
 				{
-					OpenController(animator->GetController());
+					auto ctrlInstance =  animator->GetController();
+					if (ctrlInstance || ctrlInstance->GetParentController() != controller)
+					{
+						OpenController(ctrlInstance->Get());
+					}
 				}
 			}
 		}
@@ -634,7 +639,7 @@ namespace Raven
 			{
 				auto& link = controller->GetTransition(selectedLinks[0].Get());
 				controller->FocusTransition(&link);
-				editor.GetWindow<PropertiesWindow>()->SetController(controller.get());
+				editor.GetWindow<PropertiesWindow>()->SetController(controller);
 			}
 			else if (controller)
 			{

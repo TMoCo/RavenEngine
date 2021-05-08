@@ -42,6 +42,55 @@
 
 namespace Raven { 
 
+
+
+	// --- -- - --- - --- -- ---- - - - -- --- - - --- --- -- ---- -- --
+
+	// Allow us to iterate on components of an entity.
+	struct IEnttCompGetter
+	{
+		virtual Component* GetComp(entt::registry& r, entt::entity entity) = 0;
+	};
+
+	// Allow us to iterate on this component type.
+	template<class CompType>
+	struct EnttCompGetter : public IEnttCompGetter
+	{
+		virtual Component* GetComp(entt::registry& r, entt::entity entity) override { return r.try_get<CompType>(entity); }
+	};
+
+	// Store all components getter.
+	static std::vector< Ptr<IEnttCompGetter> > entt_comp_getters;
+
+	// Register getter for a component type.
+	template<class ...Args>
+	struct EnttCompGetterRegister;
+
+	// Register getter for a component type.
+	template<>
+	struct EnttCompGetterRegister<>
+	{
+		static void Register()
+		{
+
+		}
+	};
+
+	// Register a gtter for an argument of components.
+	template<class CompType, class ...CompArgs>
+	struct EnttCompGetterRegister<CompType, CompArgs...>
+	{
+		static void Register()
+		{
+			entt_comp_getters.emplace_back(new EnttCompGetter<CompType>());
+			EnttCompGetterRegister<CompArgs...>::Register();
+		}
+	};
+
+	// --- -- - --- - --- -- ---- - - - -- --- - - --- --- -- ---- -- --
+
+
+
 	Scene::Scene(const std::string& initName)
 		: IResource()
 		, name(initName)
@@ -59,6 +108,12 @@ namespace Raven {
 
 		sceneGraph = std::make_shared<SceneGraph>();
 		sceneGraph->Init(entityManager->GetRegistry());
+
+		// Register Enttity Components Getter...
+		if (entt_comp_getters.empty())
+		{
+			EnttCompGetterRegister<ALL_COMPONENTS>::Register();
+		}
 	}
 
 	entt::registry& Scene::GetRegistry()
@@ -70,6 +125,19 @@ namespace Raven {
 	{
 		width = w;
 		height = h;
+	}
+
+
+	void Scene::ValidateEntityComponents(entt::registry& reg, entt::entity entity)
+	{
+		for (auto getter : entt_comp_getters)
+		{
+			auto* comp = getter->GetComp(reg, entity);
+			if (comp)
+			{
+				comp->SetEntity_Evil(entity, this);
+			}
+		}
 	}
 
 
@@ -108,6 +176,16 @@ namespace Raven {
 		entt::snapshot_loader{ entityManager->GetRegistry() }.entities(input).component<ALL_COMPONENTS>(input);
 
 		sceneGraph->DisconnectOnConstruct(false, entityManager->GetRegistry());
+
+		// Make sure all loaded components have valid scene/entity.
+		{
+			auto* scene = this;
+
+			scene->GetRegistry().each([scene](auto entity) {
+				scene->ValidateEntityComponents(scene->GetRegistry(), entity);
+			});
+		}
+	
 	}
 
 

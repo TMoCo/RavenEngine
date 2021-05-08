@@ -43,6 +43,8 @@ namespace Raven
 		//
 		virtual void Draw(GLShader* shader) const override;
 
+		// Return Expected Domain of this primitive.
+		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Custom; }
 
 	private:
 		// The Color.

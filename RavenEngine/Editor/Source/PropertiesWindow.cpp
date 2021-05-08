@@ -41,6 +41,10 @@
 
 #include <filesystem>
 #include <functional>
+#include <vector>
+#include <memory>
+
+
 
 namespace MM 
 {
@@ -682,7 +686,8 @@ namespace MM
 };
 
 namespace Raven
-{	
+{
+
 	constexpr size_t INPUT_BUFFER = 256;
 	PropertiesWindow::PropertiesWindow()
 	{
@@ -700,9 +705,10 @@ namespace Raven
 
 		if (ImGui::Begin(title.c_str(), &active))
 		{
-			if (controller != nullptr)
+			auto ctrlPtr = controller.lock();
+			if (ctrlPtr != nullptr)
 			{
-				controller->OnImGui();
+				ctrlPtr->OnImGui();
 				ImGui::End();
 				return;
 			}
@@ -772,6 +778,7 @@ namespace Raven
 
 		if (!init)
 		{
+
 #define TRIVIAL_COMPONENT(ComponentType,show) \
 	{ \
 		std::string name; \
@@ -799,16 +806,20 @@ namespace Raven
 		}
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
+
+			// The Current Scene.
+			Scene* scene = editor.GetModule<SceneManager>()->GetCurrentScene();
+
 			auto lua = r.try_get<LuaComponent>(entity);
 			if (lua) 
 			{
-				lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
+				lua->SetScene(scene);
 			}
 
-			auto tr = r.try_get<Transform>(entity);
-			if (tr)
+			// Validate Components.
+			if (scene)
 			{
-				tr->SetEntity_Evil(entity, editor.GetModule<SceneManager>()->GetCurrentScene());
+				scene->ValidateEntityComponents(r, entity);
 			}
 
 			auto rb = r.try_get<RigidBody>(entity);

@@ -77,8 +77,8 @@ void MaterialShader::LoadRenderResource()
 	renderRsc->BindBlockInputs();
 	renderRsc->BindSamplers();
 
-	UpdateMaterials();
 	isOnGPU = true;
+	UpdateMaterials();
 }
 
 
@@ -176,6 +176,7 @@ void MaterialShader::UpdateMaterials()
 {
 	for (auto mat : materials)
 	{
+		bool wasLoaded = mat->IsOnGPU();
 		mat->ReloadShader();
 	}
 }

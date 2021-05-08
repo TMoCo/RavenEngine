@@ -616,7 +616,7 @@ void ResourceWindow::OnImGuiMaterial()
 
 
 	// Input Samplers.
-	if (rscShader->GetBlockInput().binding != -1)
+	if (rscShader->GetSamplers().size() > 0)
 	{
 		for (size_t i = 0; i < rscShader->GetSamplers().size(); ++i)
 		{

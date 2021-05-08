@@ -42,7 +42,7 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 	outParams.alpha = 1.0;
 #endif
 	
-	// Default...
+	// Normal Map...
 	vec3 normal = SampleNormalMap(NormalTexture, inData.texCoord);
 	outParams.normal = TangentToWorld(normal, inData.normal, inData.tangent);
 }

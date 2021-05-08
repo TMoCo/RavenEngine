@@ -29,6 +29,7 @@ project "Game"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.NodeEditor}"
 	}
 
@@ -43,6 +44,7 @@ project "Game"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
@@ -83,11 +85,13 @@ project "Game"
 		libdirs
 		{
 			--"../RAVEN/Dependencies/libs" 
+			"../Dependencies/OpenAL/libs/Win32"
 		}
 
 		links
 		{
 			"glfw",
+			"OpenAL32",
 			"OpenGL32","lua","openfbx","node-editor"
 			
 		}

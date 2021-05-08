@@ -343,6 +343,8 @@ namespace Raven
 #endif
 
 			RAVEN_ASSERT(0, "Not Implemented.");
+
+			return nullptr;
 		}
 	}
 

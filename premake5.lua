@@ -22,6 +22,8 @@ IncludeDir["reactphysics3d"] = "%{root_dir}/RavenEngine/Dependencies/rp3d/includ
 IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
 IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
 IncludeDir["NodeEditor"] ="%{root_dir}/RavenEngine/Dependencies/node-editor"
+IncludeDir["OpenAL"] = "%{root_dir}/RavenEngine/Dependencies/OpenAL/include/"
+
 
 workspace( settings.workspace_name )
 	location "build"

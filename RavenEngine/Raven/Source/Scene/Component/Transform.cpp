@@ -204,30 +204,42 @@ void Transform::Dirty()
 }
 
 
-void Transform::SetPosition(const glm::vec3& v)
+void Transform::SetPosition(const glm::vec3& v, bool update)
 {
 	position = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
-void Transform::SetScale(const glm::vec3& v)
+void Transform::SetScale(const glm::vec3& v, bool update)
 {
 	scale = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
-void Transform::SetRotation(const glm::quat& v)
+void Transform::SetRotation(const glm::quat& v, bool update)
 {
 	rotation = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
@@ -357,6 +369,16 @@ void Transform::SetTransform(Transform& other)
 }
 
 
+glm::vec3 Transform::GetRotationEuler() const
+{
+	glm::vec3 euler;
+
+	euler.x = glm::yaw(rotation);
+	euler.y = glm::pitch(rotation);
+	euler.z = glm::roll(rotation);
+
+	return euler;
+}
 
 
 } // End of namespace Raven

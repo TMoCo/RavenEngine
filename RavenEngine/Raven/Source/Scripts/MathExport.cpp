@@ -156,9 +156,9 @@ namespace Raven
 				.addFunction("Dirty", &Transform::Dirty)
 				.addFunction("UpdateDirty", &Transform::UpdateDirty)
 
-				.addFunction("SetScale", &Transform::SetScale)
-				.addFunction("SetPosition", &Transform::SetPosition)
-				.addFunction("SetRotation", &Transform::SetRotation)
+				.addFunction("SetScale", static_cast<void(Transform::*)(const glm::vec3&)>(&Transform::SetScale))
+				.addFunction("SetPosition", static_cast<void(Transform::*)(const glm::vec3&)>(&Transform::SetPosition))
+				.addFunction("SetRotation", static_cast<void(Transform::*)(const glm::quat&)>(&Transform::SetRotation))
 				.addFunction("SetWorldPosition", &Transform::SetWorldPosition)
 
 				.addProperty("Scale", &Transform::GetScale, &Transform::SetScale)

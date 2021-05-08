@@ -57,7 +57,7 @@ namespace Raven
 		case RT_DynamicTexture: return "DynamicTexture";
 
 		// Materials.
-		case RT_MaterialShader: "MaterialShader";
+		case RT_MaterialShader: return "MaterialShader";
 		case RT_Material: return "Material";
 
 		// Meshes.
@@ -305,7 +305,6 @@ namespace Raven
 				rscPtr = FindOrLoad(); // Find or Load in the resource registry.
 			}
 
-			RAVEN_ASSERT(!rscPtr || TResource::StaticGetType() == rscPtr->GetType(), "Type Mismatch");
 			return std::static_pointer_cast<TResource, IResource>(rscPtr);
 		}
 

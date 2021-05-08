@@ -110,11 +110,11 @@ void Skeleton::Build()
 
 SkeletonInstance::SkeletonInstance(SkinnedMeshComponent* inOwner, Ptr<Skeleton> inParent)
 	: parent(inParent)
-	, owner(inOwner)
 {
 	RAVEN_ASSERT(parent != nullptr, "Invalid Skeleton.");
 
 	bonesTransformation.resize(parent->GetBones().size(), glm::mat4(1.0f));
+	owner = inOwner->GetEntity();
 }
 
 
@@ -126,7 +126,7 @@ SkeletonInstance::~SkeletonInstance()
 
 void SkeletonInstance::UpdateBones()
 {
-	auto& registry = owner->GetEntity().GetScene()->GetRegistry();
+	auto& registry = owner.GetScene()->GetRegistry();
 
 	// First mark all cached transform dirty.
 	DirtyTransforms();
@@ -143,8 +143,19 @@ void SkeletonInstance::UpdateBones()
 		if ( registry.valid(skeletonTransforms[i]) )
 		{
 			Transform& trComp = registry.get<Transform>(skeletonTransforms[i]);
-			trComp.SetPosition( bones[i].GetPosition() );
-			trComp.SetRotation( bones[i].GetRotation() );
+			trComp.SetPosition( bones[i].GetPosition(), false );
+			trComp.SetRotation( bones[i].GetRotation(), false );
+		}
+	}
+
+	// Update Transforms -> World/Children...
+	const auto rootBone = parent->GetRoot();
+	if (rootBone && rootBone->id != -1)
+	{
+		if ( registry.valid(skeletonTransforms[rootBone->id]) )
+		{
+			Transform& trComp = registry.get<Transform>(skeletonTransforms[rootBone->id]);
+			trComp.UpdateDirty();
 		}
 	}
 
@@ -166,8 +177,7 @@ void SkeletonInstance::DirtyTransforms()
 void SkeletonInstance::BuildTransformHierarchy()
 {
 	RAVEN_ASSERT(skeletonTransforms.empty(), "Can't rebuild hierarchy.");
-	Entity entity = owner->GetEntity();
-	Scene* scene = entity.GetScene();
+	Scene* scene = owner.GetScene();
 	const auto& bones = parent->GetBones();
 
 	skeletonTransforms.resize(bones.size());
@@ -184,7 +194,7 @@ void SkeletonInstance::BuildTransformHierarchy()
 
 	// Reparent Transforms...
 	const auto& rootBone = *parent->GetRoot();
-	Entity(skeletonTransforms[rootBone.id], scene).SetParent(entity);
+	Entity(skeletonTransforms[rootBone.id], scene).SetParent(owner);
 
 	for (const auto& bone : bones)
 	{
@@ -202,7 +212,10 @@ void SkeletonInstance::BuildTransformHierarchy()
 
 void SkeletonInstance::DestroyTransformHierarchy()
 {
-	Scene* scene = owner->GetEntity().GetScene();
+	Scene* scene = owner.GetScene();
+
+	if (!scene)
+		return;
 
 	// Destroy Transforms...
 	for (const auto& trComp : skeletonTransforms)
@@ -213,6 +226,11 @@ void SkeletonInstance::DestroyTransformHierarchy()
 	skeletonTransforms.clear();
 }
 
+
+void SkeletonInstance::SetScene(Scene* scene)
+{
+	owner.SetScene(scene);
+}
 
 
 

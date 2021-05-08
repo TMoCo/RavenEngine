@@ -130,7 +130,7 @@ namespace Raven
 		{
 			std::string extension = GetExtension(filePath);
 			Trim(extension);
-			return extension == "ogg" || extension == "wav" || extension == "mp3";
+			return extension == "ogg";
 		}
 
 		bool IsSceneFile(const std::string& filePath)

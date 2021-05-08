@@ -5,6 +5,7 @@
 #include "windows.h"
 #endif
 #include "AssetsWindow.h"
+#include "ResourceWindow.h"
 #include <IconsMaterialDesignIcons.h>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -439,7 +440,7 @@ namespace Raven
 
 			if (ImGui::Selectable("Add Material"))
 			{
-				Ptr<Material> material(new Material);
+				Ptr<Material> material(new Material());
 				Engine::GetModule<ResourceManager>()->SaveNewResource(material,
 					currentDirPath + "/New_Material.raven");
 
@@ -448,9 +449,11 @@ namespace Raven
 
 			if (ImGui::Selectable("Add Shader"))
 			{
-				Ptr<MaterialShader> shader(new MaterialShader);
+				Ptr<MaterialShader> shader(new MaterialShader());
 				Engine::GetModule<ResourceManager>()->SaveNewResource(shader,
-					currentDirPath + "/New_Material.raven");
+					currentDirPath + "/New_Shader.raven");
+
+				static_cast<Editor&>(Editor::Get()).GetWindow<ResourceWindow>()->SetResource(shader);
 
 				isAdd = true;
 			}

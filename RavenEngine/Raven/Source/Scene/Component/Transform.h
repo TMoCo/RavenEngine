@@ -86,12 +86,22 @@ namespace Raven
 		inline auto& GetPosition() const { return position; }
 		inline auto& GetScale() const { return scale; }
 		inline auto& GetRotation() const { return rotation; }
-		inline auto GetRotationEuler() const { return glm::eulerAngles(rotation); } // Order of rotation v' = Yaw * Pitch * Roll * v;
+		glm::vec3 GetRotationEuler() const; // Order of rotation v' = Yaw * Pitch * Roll * v;
 
 		// Set Local...
-		void SetPosition(const glm::vec3& v);
-		void SetScale(const glm::vec3& v);
-		void SetRotation(const glm::quat& v);
+		// @param update: for performance reasons you might want to disable updating and just leave
+		//                the transform dirty for later one pass update. 
+		void SetPosition(const glm::vec3& v, bool update);
+		void SetScale(const glm::vec3& v, bool update);
+		void SetRotation(const glm::quat& v, bool update);
+
+
+		// Set Local...
+		inline void SetPosition(const glm::vec3& v) { SetPosition(v, true); }
+		inline void SetScale(const glm::vec3& v)    { SetScale(v, true);    }
+		inline void SetRotation(const glm::quat& v) { SetRotation(v, true); }
+
+
 
 		// Set Euler Angles:
 		//     Order of rotation v' = Yaw * Pitch * Roll * v;

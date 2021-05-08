@@ -14,6 +14,7 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 	outParams.metallic = 0.0;
 	outParams.specular = 1.0;
 	
+	// Default...
 	outParams.normal = inData.normal;
 }
 

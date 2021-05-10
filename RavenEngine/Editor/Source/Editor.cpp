@@ -278,6 +278,11 @@ namespace Raven
 						
 						transform->SetScale(gizmoOrigScale * Transform::ExtractScale(mat));
 					}
+					else if (static_cast<ImGuizmo::OPERATION>(imGuizmoOperation) == ImGuizmo::OPERATION::ROTATE)
+					{
+						auto mat = glm::make_mat4(delta) * transform->GetWorldMatrix();
+						transform->SetWorldMatrixTransform(mat);
+					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();

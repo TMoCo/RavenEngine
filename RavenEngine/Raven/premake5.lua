@@ -8,7 +8,10 @@ project "RavenEngine"
 	editandcontinue "Off"
 
 	if Arch == "x64" then
-		postbuildcommands { "powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/x64/glew32.dll' '"..root_dir.."/gameProject/'" }
+		postbuildcommands { 
+			"powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/x64/glew32.dll' '"..root_dir.."/gameProject/'",
+			"powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/OpenAL/libs/Win32/OpenAL32.dll' '"..root_dir.."/gameProject/'" 
+		}
 	else
 		postbuildcommands { "powershell Copy-Item '"..root_dir.."/RavenEngine/Dependencies/glew-2.1.0/bin/Release/win32/glew32.dll' '"..root_dir.."/gameProject/'"}
 	end
@@ -45,6 +48,7 @@ project "RavenEngine"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.NodeEditor}"
 	}
 
@@ -60,6 +64,7 @@ project "RavenEngine"
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
@@ -106,19 +111,21 @@ project "RavenEngine"
 		if Arch == "x64" then
 			libdirs 
 			{
-				"../Dependencies/glew-2.1.0/lib/Release/x64/"
+				"../Dependencies/glew-2.1.0/lib/Release/x64/",
+				"../Dependencies/OpenAL/libs/Win32"
 			}
 		else
 			libdirs 
 			{
 				"../Dependencies/glew-2.1.0/lib/Release/Win32/"
+				
 			}
 		end
 	
 
 		links
 		{
-			"glfw","glew32","lua", "reactphysics3d", "openfbx","node-editor"
+			"glfw","glew32","lua", "reactphysics3d", "openfbx","node-editor","OpenAL32"
 		}
 
 		buildoptions

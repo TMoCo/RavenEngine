@@ -21,7 +21,18 @@ namespace Raven
 	AnimationController::AnimationController()
 	{
 		type = AnimationController::StaticGetType();
+		iterId = linkInfo.begin();
+	}
 
+	AnimationController::AnimationController(const AnimationController& other)
+		: focusedLink(nullptr)
+		, animatorNodes(other.animatorNodes)
+		, linkInfo(other.linkInfo)
+		, conditions(other.conditions)
+		, currentNodeId(other.currentNodeId)
+		, currentLink(0)
+	{
+		type = AnimationController::StaticGetType();
 		iterId = linkInfo.begin();
 	}
 
@@ -226,19 +237,23 @@ namespace Raven
 
 	void AnimationController::OnUpdate(float dt, SkinnedMeshComponent* skinnedComp)
 	{
-		if (!currentAnimation)
-			return;
-
-		if (currentAnimation->GetClipCount() > 0)
+		if (currentAnimation)
 		{
-			if (!currentAnimation->IsStarted()) 
+			if (currentAnimation->GetClipCount() > 0)
 			{
-				currentAnimation->Play(0, skinnedComp->GetSkeleton());
+				if (!currentAnimation->IsStarted())
+				{
+					currentAnimation->Play(0, skinnedComp->GetSkeleton());
+				}
+				currentAnimation->OnUpdate(dt);
 			}
-			currentAnimation->OnUpdate(dt);
+		}
+		else
+		{
+			LoadAnimation();
 		}
 
-
+		
 		if (iterId != linkInfo.end()) 
 		{
 			if (iterId->second.from == currentNodeId) {
@@ -253,8 +268,8 @@ namespace Raven
 						break;
 					}
 				}
-
-//pass all conditions.. executue next animation
+				
+				//pass all conditions.. executue next animation
 				if (passCount != 0 && passCount == iterId->second.conditions.size()) 
 				{
 					currentNodeId = iterId->second.to;
@@ -276,5 +291,20 @@ namespace Raven
 		currentAnimation = Ptr<Animation>(new Animation());
 		currentAnimation->AddClip(clip);
 	}
+
+	//----- --- ------ - -- - -- -- - ----- - -- -- -- - -- --  -- - -- -- --- - --- 
+
+
+	AnimationControllerInstance::AnimationControllerInstance(Ptr<AnimationController> parentController)
+	{
+		controller = parentController;
+		instance = Ptr<AnimationController>(new AnimationController(*controller)); // Copy.
+	}
+
+	void AnimationControllerInstance::OnUpdate(float dt, SkinnedMeshComponent* skinnedComp)
+	{
+		instance->OnUpdate(dt, skinnedComp);
+	}
+
 
 };

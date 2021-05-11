@@ -28,6 +28,11 @@ function ScriptBehavior:GetTransform()
 	return self.entity:GetTransform()
 end
 
+function ScriptBehavior:GetSound()
+	return self.entity:GetSoundComponent()
+end
+
+
 function ScriptBehavior:GetTransform()
 	return self.entity:GetTransform()
 end

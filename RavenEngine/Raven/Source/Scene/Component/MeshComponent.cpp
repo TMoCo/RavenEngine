@@ -9,6 +9,7 @@
 #include "MeshComponent.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Resources/MaterialShader.h"
 #include "Render/RenderObjects/Primitives/RenderMesh.h"
 
 
@@ -38,6 +39,12 @@ void MeshComponent::SetMesh(Ptr<Mesh> newMesh)
 
 void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector)
 {
+	// Invalid Mesh?
+	if (!mesh)
+	{
+		return;
+	}
+
 	MeshLOD* meshLOD;
 
 	// Has LODs?
@@ -84,23 +91,16 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 		// Has Material?
 		if (mat)
 		{
-			// Update Material Paramters if Dirty.
-			if (mat->IsDirty())
+			if (mat->GetMaterialShader() && mat->GetMaterialShader()->IsOnGPU())
 			{
-				mat->UpdateRenderResource();
+				// Update Material Paramters if Dirty.
+				if (mat->IsDirty())
+				{
+					mat->UpdateRenderResource();
+				}
 			}
 
 			rmesh->SetMaterial( mat->GetRenderRsc() );
-		}
-		else
-		{
-			auto& defaultMaterial = meshSection->defaultMaterial;
-
-			// Has Default Material?
-			if (defaultMaterial.IsValid())
-			{
-				mat = defaultMaterial.GetWeak<Material>();
-			}
 		}
 	}
 }

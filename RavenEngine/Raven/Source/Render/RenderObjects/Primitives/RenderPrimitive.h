@@ -37,6 +37,9 @@ namespace Raven
 		// Return the primitive resource.
 		virtual RenderRscPrimitive* GetRsc() = 0;
 
+		// Return Expected Domain of this primitive.
+		virtual ERenderShaderDomain GetDomain() = 0;
+
 		// Return material.
 		inline RenderRscMaterial* GetMaterial() { return material; }
 

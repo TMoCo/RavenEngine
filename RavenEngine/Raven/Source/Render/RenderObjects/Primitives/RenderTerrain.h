@@ -33,6 +33,9 @@ namespace Raven
 		// Draw the terrain.
 		virtual void Draw(GLShader* shader) const override;
 
+		// Return Expected Domain of this primitive.
+		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Terrain; }
+
 	private:
 		// Terrain Render Resrouce.
 		RenderRscTerrain* terrainRsc;

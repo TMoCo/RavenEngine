@@ -19,6 +19,7 @@
 #include "Scene/Component/SkinnedMeshComponent.h"
 #include "Scene/Component/CameraControllerComponent.h"
 #include "Scene/Component/RigidBody.h"
+#include "Scene/Component/SoundComponent.h"
 
 #include "Scripts/LuaComponent.h"
 
@@ -40,10 +41,22 @@
 
 #include <filesystem>
 #include <functional>
+#include <vector>
+#include <memory>
+
+
 
 namespace MM 
 {
 	using namespace Raven;
+
+	template<>
+	void ComponentEditorWidget<SoundComponent>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& sound = reg.get<SoundComponent>(e);
+		sound.OnImGui();
+	}
+
 	template<>
 	void ComponentEditorWidget<Transform>(entt::registry& reg, entt::registry::entity_type e)
 	{
@@ -244,84 +257,194 @@ namespace MM
 	template<>
 	void ComponentEditorWidget<MeshComponent>(entt::registry& reg, entt::registry::entity_type e)
 	{
-		auto& model = reg.get<MeshComponent>(e);
-		
+		auto& meshComp = reg.get<MeshComponent>(e);
+
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
 		ImGui::Columns(2);
 		ImGui::Separator();
 
-	
 
-		ImGui::NextColumn();
-		ImGui::PushItemWidth(-1);
 
-#if 0
-		auto& meshes = model.GetMeshes();
-		const char* shapes[] = { "Sphere", "Cube", "Pyramid", "Capsule", "Cylinder", "Terrain", "File", "Quad" };
-
-		std::string shapeCurrent = PrimitiveType::GetPrimativeName(model.GetPrimitiveType());
-		if (ImGui::BeginCombo("", shapeCurrent.c_str(), 0))
+		// The Mesh Resoruce.
 		{
-			for (auto n = 0; n < 8; n++)
+			ImGui::Text("Mesh");
+			ImGui::NextColumn();
+
+			if (!meshComp.GetMesh())
 			{
-				bool isSelected = (shapeCurrent.c_str() == shapes[n]);
-				if (ImGui::Selectable(shapes[n], shapeCurrent.c_str()))
+				ImGui::InputText("###meshresource", "", 0);
+			}
+			else
+			{
+				std::string editTextValue;
+				editTextValue.append(meshComp.GetMesh()->GetResourcePath());
+				editTextValue.resize(260);
+				ImGui::InputText("###meshresource", editTextValue.data(), editTextValue.size());
+			}
+
+			// Drag and Drop mesh file...
+			std::string shaderAsset = PropertiesWindow::ImGuiDragDropAssetsTarget();
+			if (Engine::GetModule<ResourceManager>()->GetResourceType(shaderAsset) == RT_Mesh)
+			{
+				Ptr<Mesh> meshRsc = Engine::GetModule<ResourceManager>()->GetResource<Mesh>(shaderAsset);
+				meshComp.SetMesh(meshRsc);
+			}
+		}
+
+		
+		// Iterate on mesh sections.
+		if (meshComp.GetMesh())
+		{
+			auto meshRsc = meshComp.GetMesh();
+
+			for (int32_t i = 0; i < meshRsc->GetMeshLOD(0).sections.size(); ++i)
+			{
+				ImGui::PushID(500);
+
+				// Materials...
+				auto mat = meshComp.GetMaterial(i);
+				ImGui::NextColumn();
+				ImGui::Text("Material (%d)", i);
+				ImGui::NextColumn();
+
+				if (!mat)
 				{
-					meshes.clear();
-					if (strcmp(shapes[n], "File") != 0)
-					{
-							//add new mesh here..
-						meshes.emplace_back(MeshFactory::CreatePrimitive(PrimitiveType::GetPrimativeName(shapes[n])));
-						model.SetPrimitiveType(PrimitiveType::GetPrimativeName(shapes[n]));
-					}
-					else
-						model.SetPrimitiveType(PrimitiveType::File);
+					ImGui::InputText("###meshmaterial", "", 0);
 				}
-				if (isSelected)
-					ImGui::SetItemDefaultFocus();
+				else
+				{
+					std::string editTextValue;
+					editTextValue.append(mat->GetResourcePath());
+					editTextValue.resize(260);
+					ImGui::InputText("###meshmaterial", editTextValue.data(), editTextValue.size());
+				}
+
+				// Drag and Drop materail file...
+				std::string shaderAsset = PropertiesWindow::ImGuiDragDropAssetsTarget();
+				if (Engine::GetModule<ResourceManager>()->GetResourceType(shaderAsset) == RT_Material)
+				{
+					Ptr<Material> matRsc = Engine::GetModule<ResourceManager>()->GetResource<Material>(shaderAsset);
+					meshComp.SetMaterial(i, matRsc);
+				}
+
+				ImGui::PopID();
 			}
-			ImGui::EndCombo();
 		}
 
-		ImGui::PopItemWidth();
+
+
+		ImGui::NextColumn();
+		ImGui::TextUnformatted("ClipDistance");
 		ImGui::NextColumn();
 
-		if (model.GetPrimitiveType() == PrimitiveType::File)
+		float ClipDistance = meshComp.GetClipDistance();
+		if (ImGui::InputFloat("###clipdistance", &ClipDistance))
 		{
-			ImGui::TextUnformatted("FilePath");
-
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			ImGui::TextUnformatted(model.GetFileName().c_str());
-
-		/*	
-			static char buffer[128] = {};
-			if (ImGui::InputText("filePath", buffer,128))
-			{
-				//model.AddMesh(Engine::Get().GetModule<ResourceManager>()->GetResource<Mesh>(buffer));
-			}*/
-
-			//model.AddMesh(Engine::Get().GetModule<ResourceManager>()->GetResource<Mesh>(buffer));
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-			ImGui::Columns(1);
-			int32_t i = 0;
-			for (auto & mesh : model.GetMeshes())
-			{
-				ImGui::Separator();
-				
-				ImGui::TextUnformatted((mesh->name + " : " + std::to_string(i++)).c_str());
-			}
-
+			meshComp.SetClipDistance(ClipDistance);
 		}
-#endif
 
 
+		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
 
+	}
+
+
+	template<>
+	void ComponentEditorWidget<SkinnedMeshComponent>(entt::registry& reg, entt::registry::entity_type e)
+	{
+		auto& skinnedComp = reg.get<SkinnedMeshComponent>(e);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+
+
+		// The Mesh Resoruce.
+		{
+			ImGui::Text("Mesh");
+			ImGui::NextColumn();
+
+			if (!skinnedComp.GetMesh())
+			{
+				ImGui::InputText("###meshresource", "", 0);
+			}
+			else
+			{
+				std::string editTextValue;
+				editTextValue.append(skinnedComp.GetMesh()->GetResourcePath());
+				editTextValue.resize(260);
+				ImGui::InputText("###meshresource", editTextValue.data(), editTextValue.size());
+			}
+
+			// Drag and Drop mesh file...
+			std::string shaderAsset = PropertiesWindow::ImGuiDragDropAssetsTarget();
+			if (Engine::GetModule<ResourceManager>()->GetResourceType(shaderAsset) == RT_SkinnedMesh)
+			{
+				Ptr<SkinnedMesh> meshRsc = Engine::GetModule<ResourceManager>()->GetResource<SkinnedMesh>(shaderAsset);
+				skinnedComp.SetMesh(meshRsc);
+			}
+		}
+
+
+		// Iterate on mesh sections.
+		if (skinnedComp.GetMesh())
+		{
+			auto meshRsc = skinnedComp.GetMesh();
+
+			for (int32_t i = 0; i < meshRsc->GetMeshSections().size(); ++i)
+			{
+				ImGui::PushID(500);
+
+				// Materials...
+				auto mat = skinnedComp.GetMaterial(i);
+				ImGui::NextColumn();
+				ImGui::Text("Material (%d)", i);
+				ImGui::NextColumn();
+
+				if (!mat)
+				{
+					ImGui::InputText("###meshmaterial", "", 0);
+				}
+				else
+				{
+					std::string editTextValue;
+					editTextValue.append(mat->GetResourcePath());
+					editTextValue.resize(260);
+					ImGui::InputText("###meshmaterial", editTextValue.data(), editTextValue.size());
+				}
+
+				// Drag and Drop materail file...
+				std::string shaderAsset = PropertiesWindow::ImGuiDragDropAssetsTarget();
+				if (Engine::GetModule<ResourceManager>()->GetResourceType(shaderAsset) == RT_Material)
+				{
+					Ptr<Material> matRsc = Engine::GetModule<ResourceManager>()->GetResource<Material>(shaderAsset);
+					skinnedComp.SetMaterial(i, matRsc);
+				}
+
+				ImGui::PopID();
+			}
+		}
+
+
+
+		ImGui::NextColumn();
+		ImGui::TextUnformatted("ClipDistance");
+		ImGui::NextColumn();
+
+		float ClipDistance = skinnedComp.GetClipDistance();
+		if (ImGui::InputFloat("###clipdistance", &ClipDistance))
+		{
+			skinnedComp.SetClipDistance(ClipDistance);
+		}
+
+
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
 	}
 
 
@@ -563,7 +686,8 @@ namespace MM
 };
 
 namespace Raven
-{	
+{
+
 	constexpr size_t INPUT_BUFFER = 256;
 	PropertiesWindow::PropertiesWindow()
 	{
@@ -581,9 +705,10 @@ namespace Raven
 
 		if (ImGui::Begin(title.c_str(), &active))
 		{
-			if (controller != nullptr)
+			auto ctrlPtr = controller.lock();
+			if (ctrlPtr != nullptr)
 			{
-				controller->OnImGui();
+				ctrlPtr->OnImGui();
 				ImGui::End();
 				return;
 			}
@@ -593,6 +718,8 @@ namespace Raven
 				ImGui::End();
 				return;
 			}
+
+			auto scene = editor.GetModule<SceneManager>()->GetCurrentScene();
 
 			auto activeComponent = registry.try_get<ActiveComponent>(selected);
 			bool active = activeComponent ? activeComponent->active : true;
@@ -651,6 +778,7 @@ namespace Raven
 
 		if (!init)
 		{
+
 #define TRIVIAL_COMPONENT(ComponentType,show) \
 	{ \
 		std::string name; \
@@ -667,21 +795,33 @@ namespace Raven
 		TRIVIAL_COMPONENT(Light, true);
 		TRIVIAL_COMPONENT(Camera, true);
 		TRIVIAL_COMPONENT(CameraControllerComponent, true);
-		TRIVIAL_COMPONENT(MeshComponent, false);
-		TRIVIAL_COMPONENT(SkinnedMeshComponent, false);
+		TRIVIAL_COMPONENT(MeshComponent, true);
+		TRIVIAL_COMPONENT(SkinnedMeshComponent, true);
 		TRIVIAL_COMPONENT(LuaComponent, true);
 		TRIVIAL_COMPONENT(Animator, true);
 		TRIVIAL_COMPONENT(RigidBody, true);
+		TRIVIAL_COMPONENT(SoundComponent, true);
 
 		init = true;
 		}
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
+
+			// The Current Scene.
+			Scene* scene = editor.GetModule<SceneManager>()->GetCurrentScene();
+
 			auto lua = r.try_get<LuaComponent>(entity);
 			if (lua) 
 			{
-				lua->SetScene(editor.GetModule<SceneManager>()->GetCurrentScene());
+				lua->SetScene(scene);
 			}
+
+			// Validate Components.
+			if (scene)
+			{
+				scene->ValidateEntityComponents(r, entity);
+			}
+
 			auto rb = r.try_get<RigidBody>(entity);
 			if (rb)
 			{
@@ -698,6 +838,24 @@ namespace Raven
 				}
 			}
 		});
+	}
+
+
+	std::string PropertiesWindow::ImGuiDragDropAssetsTarget()
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			auto data = ImGui::AcceptDragDropPayload("AssetFile");
+			if (data)
+			{
+				std::string file = (char*)data->Data;
+				return file;
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		return "";
 	}
 
 };

@@ -9,6 +9,7 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Light.h"
 #include "Scene/Component/RigidBody.h"
+#include "Scene/Component/SoundComponent.h"
 #include "Animation/Animator.h"
 
 #include "LuaComponent.h"
@@ -62,6 +63,7 @@ namespace Raven
 				.EXPORT_COMPONENTS(Animator)
 				.EXPORT_COMPONENTS(LuaComponent)
 				.EXPORT_COMPONENTS(RigidBody)
+				.EXPORT_COMPONENTS(SoundComponent)
 
 				.endClass()
 
@@ -89,6 +91,10 @@ namespace Raven
 				.beginClass<ActiveComponent>("ActiveComponent")
 				.addProperty("active", &ActiveComponent::active)
 				.addFunction("GetEntity", &ActiveComponent::GetEntity)
+				.endClass()
+
+				.beginClass<SoundComponent>("SoundComponent")
+				.addFunction("GetAudioSource", &SoundComponent::GetAudioSource)
 				.endClass()
 
 				.beginClass<LuaComponent>("LuaComponent")

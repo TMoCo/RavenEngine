@@ -97,6 +97,9 @@ namespace Raven
 		// Update the texture render resrouce.
 		virtual void UpdateRenderResource() override;
 
+		// Update the texture paramters in render resrouce.
+		virtual void UpdateParamters();
+
 		// Set a new Image 2D data to this texture.
 	  void SetImageData(ETextureFormat imgFormat, const glm::ivec2& imgSize, uint8_t* imgData);
 

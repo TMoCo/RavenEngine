@@ -59,6 +59,11 @@
 #endif
 
 
+#ifndef RENDER_SHADER_TYPE_SHADOW
+#define RENDER_SHADER_TYPE_SHADOW 0
+#endif
+
+
 #ifndef RENDER_SHADER_CUSTOM
 #define RENDER_SHADER_CUSTOM 0
 #endif

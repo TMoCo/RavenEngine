@@ -39,13 +39,24 @@ namespace Raven
 
 		// Create Texture 2D Render Resrouce.
 		static RenderRscTexture* CreateTexture2D(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
-			const glm::ivec2& size, uint8_t* data, bool isGenMipmaps);
+			const glm::ivec2& size, void* data, bool isGenMipmaps);
+
+		// Create Texture Cube Mpa.
+		// @param data: contain all the faces of a cube contiguous in a single buffer.
+		static RenderRscTexture* CreateTextureCube(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
+			const glm::ivec2& size, void* data, bool isGenMipmaps);
 
 		// Update a single texture level and layer.
-		void UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, uint8_t* data);
+		void UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, void* data);
+
+		// Update a reagion of the texture.
+		void UpdateSubData(int32_t level, int32_t layer, const glm::ivec2& offset, const glm::ivec2& size, void* data);
 
 		// Update
 		void UpdateParamters(ETextureFilter filter, ETextureWrap wrap);
+
+		// Return the current format of the opengl texture.
+		ETextureFormat GetTexFormat();
 
 	public:
 		// Conver to format to opengl format.

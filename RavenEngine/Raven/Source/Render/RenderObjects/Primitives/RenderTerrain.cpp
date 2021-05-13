@@ -1,5 +1,9 @@
 #include "RenderTerrain.h"
 #include "Render/RenderResource/Primitives/RenderRscTerrain.h"
+#include "Render/RenderResource/Shader/RenderRscMaterial.h"
+#include "Render/RenderResource/Shader/UniformBuffer.h"
+
+#include "ResourceManager/Resources/DynamicTexture.h"
 
 #include "Render/OpenGL/GLShader.h"
 #include "Render/OpenGL/GLVertexArray.h"
@@ -11,11 +15,25 @@
 
 namespace Raven {
 
+// --- --- --- --- ---- ---- ---- 
+
+struct TerrainBinData
+{
+	glm::vec2 scale;
+	glm::vec2 height;
+	glm::vec2 offset;
+	glm::vec2 uvScale;
+}binData;
+
+
+
+// --- --- --- --- ---- ---- ---- 
 
 
 
 RenderTerrain::RenderTerrain()
 	: terrainRsc(nullptr)
+	, binIndex(0)
 {
 
 }
@@ -39,20 +57,34 @@ void RenderTerrain::SetTerrainRsc(RenderRscTerrain* terrain)
 }
 
 
-
 void RenderTerrain::Draw(GLShader* shader) const
 {
-	//
-	shader->SetUniform("inScale", terrainRsc->GetScale());
-	shader->SetUniform("inHeight", glm::vec2(terrainRsc->GetMinHeight(), terrainRsc->GetMaxHeight()));
-	shader->SetUniform("inHeightMap", 0);
+	// Quads Tesselation Patches
+	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	//
-	terrainRsc->GetHeightMap()->Active(0);
+	//glDisable(GL_CULL_FACE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
+	// Binding...
+	DynamicTexture* heightMap = terrainRsc->GetHeightMap();
+	heightMap->GetRenderRsc()->GetTexture()->Active(0);
+
+	// Draw Terrain Bins...
+	const auto& bin = (*terrainRsc->GetBins())[binIndex];
+
+	binData.height = terrainRsc->GetHeight();
+	binData.scale = terrainRsc->GetScale();
+	binData.offset = bin.offset;
+	binData.uvScale = bin.uvScale;
+
+	terrainRsc->GetBinUB()->BindBase();
+	terrainRsc->GetBinUB()->UpdateData(sizeof(binData), 0, &binData);
+
+	// Draw Tesselation Patches...
 	terrainRsc->GetArray()->Bind();
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)terrainRsc->GetNumVerts());
-	terrainRsc->GetArray()->Bind();
+	glDrawElements(GL_PATCHES, (GLsizei)terrainRsc->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
+
 }
 
 

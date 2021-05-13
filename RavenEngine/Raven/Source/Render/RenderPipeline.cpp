@@ -7,6 +7,7 @@
 #include "RenderObjects/RenderSphere.h"
 #include "RenderObjects/RenderPass.h"
 #include "RenderObjects/RenderGrid.h"
+#include "RenderObjects/RenderShadow.h"
 #include "RenderResource/Shader/UniformBuffer.h"
 #include "RenderResource/Shader/RenderRscShader.h"
 
@@ -53,7 +54,9 @@ void RenderPipeline::Initialize()
 	// Uniforms...
 	uniforms.common = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::CommonBlock, true) );
 	uniforms.light_DEFERRED = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightingBlock_DEFERRED, true) );
-	uniforms.light_FORWARD = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightingBlock_FORWARD, true) );
+	uniforms.light_FORWARD = Ptr<UniformBuffer>(UniformBuffer::Create(RenderShaderInput::LightingBlock_FORWARD, true));
+	uniforms.shadow = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::ShadowBlock, true) );
+	uniforms.lightShadow = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightShadowBlock, true) );
 
 
 	//
@@ -66,6 +69,8 @@ void RenderPipeline::Destroy()
 	uniforms.common.reset();
 	uniforms.light_DEFERRED.reset();
 	uniforms.light_FORWARD.reset();
+	uniforms.shadow.reset();
+	uniforms.lightShadow.reset();
 
 
 }
@@ -133,12 +138,19 @@ void RenderPipeline::Render()
 {
 	RAVEN_ASSERT(rtarget != nullptr && rscene != nullptr, "Can't render a pipeline without starting one.");
 
-
 	// Global OpenGL States...
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_BLEND);
+
+	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
+	// Shadow: Draw Shadow Maps.
+	{
+		glEnable(GL_CULL_FACE);
+		rscene->DrawShadow(uniforms.shadow.get());
+	}
+
 
 
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
@@ -154,11 +166,14 @@ void RenderPipeline::Render()
 		rscene->DrawDeferred();
 
 		// Draw debug
+#if RAVEN_DEBUG
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glDisable(GL_CULL_FACE);
 			rscene->DrawDebug();
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
+#endif
 	}
 
 
@@ -180,9 +195,13 @@ void RenderPipeline::Render()
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_ONE, GL_ONE);
 
+
 		// ...
 		UpdateLights_DEFERRED();
+		UpdateShadows();
 		uniforms.light_DEFERRED->BindBase();
+		uniforms.lightShadow->BindBase();
+
 		
 		gbufferPass->GetTexture(0)->Active(0); // Albedo + Specular.
 		gbufferPass->GetTexture(1)->Active(1); // Normal.
@@ -193,6 +212,9 @@ void RenderPipeline::Render()
 		testEnv->Active(4);
 		testBRDF->Active(5);
 		// ~ITERATION_0----------------------------------------------------------------------------
+
+		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
+			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(6+i);
 
 		rscreen->Draw(shader);
 	}
@@ -227,6 +249,9 @@ void RenderPipeline::Render()
 		testBRDF->Active(1);
 		// ~ITERATION_0----------------------------------------------------------------------------
 
+		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
+			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(6 + i);
+
 		// Draw translucent scene...
 		rscene->DrawTranslucent(uniforms.light_FORWARD.get());
 
@@ -256,6 +281,9 @@ void RenderPipeline::DoPostProcessFinal(int32_t hdrTargetIndex)
 	finalPostProcessShader->GetShader()->Use();
 
 	hdrTarget[hdrTargetIndex]->Active(0);
+
+	finalPostProcessShader->GetShader()->SetUniform("temp", 1);
+	rscene->GetEnvironment().sunShadow->GetCascade(0).shadowMap->Active(1);
 
 	rscreen->Draw(finalPostProcessShader->GetShader());
 
@@ -409,9 +437,12 @@ void RenderPipeline::SetupShaders()
 		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/ScreenTriangleVert.glsl");
 		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/DeferredLighting.glsl");
 		shaderDomainData.AddImport(EGLShaderStageBit::FragmentBit, "shaders/CommonLight.glsl");
+		shaderDomainData.AddImport(EGLShaderStageBit::FragmentBit, "shaders/CommonShadow.glsl");
 		shaderDomainData.AddImport(EGLShaderStageBit::FragmentBit, "shaders/Lighting.glsl");
 		shaderDomainData.AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_DEFERRED_MAX_LIGHTS));
 		shaderDomainData.AddPreprocessor("#define SCALE_UV_WITH_TARGET 1");
+		shaderDomainData.AddPreprocessor("#define MAX_SHADOW_CASCADE " + std::to_string(RENDER_MAX_SHADOW_CASCADE));
+
 
 		// Shader Type Data
 		RenderRscShaderCreateData shaderData;
@@ -421,12 +452,20 @@ void RenderPipeline::SetupShaders()
 		lightingShader = Ptr<RenderRscShader>( RenderRscShader::CreateCustom(shaderDomainData, shaderData) );
 		lightingShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
 		lightingShader->GetInput().AddBlockInput(RenderShaderInput::LightingBlock_DEFERRED);
+		lightingShader->GetInput().AddBlockInput(RenderShaderInput::LightShadowBlock);
 		lightingShader->GetInput().AddSamplerInput("inAlbedo");
 		lightingShader->GetInput().AddSamplerInput("inNormal");
 		lightingShader->GetInput().AddSamplerInput("inBRDF");
 		lightingShader->GetInput().AddSamplerInput("inDepth");
 		lightingShader->GetInput().AddSamplerInput("inSkyEnvironment");
 		lightingShader->GetInput().AddSamplerInput("inEnvBRDF");
+
+		// Add sun shadow samplers...
+		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
+		{
+			lightingShader->GetInput().AddSamplerInput("inSunShadow[" + std::to_string(i) + "]");
+		}
+
 		lightingShader->BindBlockInputs();
 		lightingShader->BindSamplers();
 	}
@@ -475,7 +514,6 @@ void RenderPipeline::SetupShaders()
 		fxaaShader->BindBlockInputs();
 		fxaaShader->BindSamplers();
 		fxaaShader->GetShader()->SetUniform("fxaaQualityRcpFrame", glm::vec2(1.0f / (float)size.x, 1.0f / (float)size.y));
-
 	}
 
 }
@@ -517,6 +555,31 @@ void RenderPipeline::UpdateLights_DEFERRED()
 	uniforms.light_DEFERRED->SetDataValues(3, lightData);
 	uniforms.light_DEFERRED->Update();
 }
+
+
+void RenderPipeline::UpdateShadows()
+{
+	struct LightShadowBlock
+	{
+		// View Projection matrix from sun light point of view.
+		glm::mat4 sunViewProj[RENDER_MAX_SHADOW_CASCADE];
+		glm::vec4 cascadeRanges[RENDER_MAX_SHADOW_CASCADE + 1];
+	} shadowData;
+
+	static std::vector<glm::mat4> shadowsViewProj(RENDER_MAX_SHADOW_CASCADE);
+	const auto& sunShadow = rscene->GetEnvironment().sunShadow;
+	shadowData.cascadeRanges[0].x = sunShadow->GetCascadeRanges()[0];
+
+	for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
+	{
+		shadowData.sunViewProj[i] = sunShadow->GetCascade(i).viewProj;
+		shadowData.cascadeRanges[i+1].x = sunShadow->GetCascadeRanges()[i+1];
+	}
+
+	uniforms.lightShadow->UpdateData(sizeof(LightShadowBlock), 0, &shadowData);
+
+}
+
 
 
 

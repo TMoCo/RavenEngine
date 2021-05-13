@@ -27,6 +27,7 @@ RenderRscMaterial::RenderRscMaterial(RenderRscShader* inShader)
 	, ubo(nullptr)
 	, renderBatchIndex((uint32_t)-1)
 	, samplersStartIndex(-1)
+	, shadowShader(nullptr)
 {
 
 }

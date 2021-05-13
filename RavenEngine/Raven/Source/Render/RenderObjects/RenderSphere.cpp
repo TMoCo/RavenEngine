@@ -128,14 +128,14 @@ RenderSphere* RenderSphere::Create()
 
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
-		{
+		GLVABuildAttribData(
 			scr->vxBuffer,         // Buffers
 			0,                     // Index
 			3,                     // Type-Size
 			EGLTypes::Float,       // Type
 			sizeof(glm::vec3),     // Stride
 			0                      // offset
-		}
+		)
 	};
 
 

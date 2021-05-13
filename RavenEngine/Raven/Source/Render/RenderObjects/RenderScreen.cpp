@@ -49,24 +49,24 @@ RenderScreen* RenderScreen::Create()
 
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
-		{
+		GLVABuildAttribData(
 			scr->vxBuffer,         // Buffers
 			0,                     // Index
 			2,                     // Type-Size
 			EGLTypes::Float,       // Type
 			sizeof(glm::vec2) * 2, // Stride
 			0                      // offset
-		},
+		),
 
 		// Attribute 1 - Texture Coordinate
-		{
+		GLVABuildAttribData(
 			scr->vxBuffer,         // Buffers
 			1,                     // Index
 			2,                     // Type-Size
 			EGLTypes::Float,       // Type
 			sizeof(glm::vec2) * 2, // Stride
 			sizeof(glm::vec2)      // offset
-		}
+		)
 	};
 
 

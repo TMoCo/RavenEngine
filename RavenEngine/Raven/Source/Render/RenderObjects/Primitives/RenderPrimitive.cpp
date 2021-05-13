@@ -56,5 +56,11 @@ ERenderShaderType RenderPrimitive::GetShaderType() const
 }
 
 
+bool RenderPrimitive::IsCastShadow()
+{
+	return GetShaderType() != ERenderShaderType::Translucent;
+}
+
+
 } // End of namespace Raven.
 

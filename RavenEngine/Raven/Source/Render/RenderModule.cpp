@@ -205,7 +205,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 #endif
 
 	rscene->SetView(view);
-	rscene->SetProjection(proj, near, far);
+	rscene->SetProjection(proj, glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 
 	// ~TESTING-------------------------------------------------------
 
@@ -279,6 +279,7 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
@@ -298,6 +299,7 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
@@ -315,8 +317,9 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetName("Default_Terrain");
 		matShader->SetDomain(ERenderShaderDomain::Terrain);
 		matShader->SetShaderType(ERenderShaderType::Opaque);
-		matShader->SetMaterialFunction("shaders/Materials/TerrainMaterial.glsl");
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());

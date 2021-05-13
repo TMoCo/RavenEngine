@@ -11,6 +11,7 @@
 #include "ImGui/ImGuiEngine.h"
 #include "GUI/GUIModule.h"
 #include "ProceduralGenerator/TerrainGeneration.h"
+#include "ProceduralGenerator/ProceduralGenerator.h"
 
 
 
@@ -94,6 +95,16 @@ void Engine::Initialize()
 int Engine::Run()
 {
 	auto win = GetModule<Raven::Window>();
+
+
+#if 0
+	glm::vec2 sceneSize = glm::vec2(1000.0f, 1000.0f);
+	glm::vec2 sceneHeight = glm::vec2(-10.0f, 100.0f);
+	Scene* scene = Engine::GetModule<ProceduralGenerator>()->GenerateNewScene(sceneSize, sceneHeight);
+	Engine::GetModule<SceneManager>()->AddScene(scene);
+	Engine::GetModule<SceneManager>()->SwitchToScene(scene);
+#endif
+
 
 
 	// Main Loop...
@@ -186,7 +197,7 @@ void Engine::LoadModules()
 	CreateModule<Raven::Window>("Raven");
 	CreateModule<Raven::SceneManager>();
 	CreateModule<Raven::GUIModule>();
-	CreateModule<Raven::TerrainGeneration>();
+	CreateModule<Raven::ProceduralGenerator>();
 	CreateModule<Raven::PhysicsModule>();
 	
 
@@ -201,7 +212,7 @@ void Engine::LoadModules()
 	InitializeModule<Raven::ImGuiEngine>();
 	InitializeModule<Raven::SceneManager>();
 	InitializeModule<Raven::GUIModule>();
-	InitializeModule<Raven::TerrainGeneration>();
+	InitializeModule<Raven::ProceduralGenerator>();
 	InitializeModule<Raven::PhysicsModule>();
 
 	//############	Register your system here ######################
@@ -227,7 +238,7 @@ void Engine::LoadModules()
 void Engine::DestoryModules()
 {
 	// Destroy - Here order matter.
-	DestroyModule<TerrainGeneration>();
+	DestroyModule<ProceduralGenerator>();
 	DestroyModule<RenderModule>();
 	DestroyModule<SceneManager>();
 	DestroyModule<GUIModule>();

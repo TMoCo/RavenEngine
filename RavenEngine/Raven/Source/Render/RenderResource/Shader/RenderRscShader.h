@@ -63,7 +63,7 @@ namespace Raven
 		Translucent,
 
 		// Post-Processing type shader operation.
-		PostProcessing,
+		PostProcessing
 	};
 
 
@@ -78,6 +78,9 @@ namespace Raven
 
 		// The name of the shader.
 		std::string name;
+
+		// Is this shader used for shadow rendering.
+		bool isShadow;
 
 		// The functions to override for a specific stage, what functions to override depneds on the type and domain.
 		std::pair<EGLShaderStageBit, std::string> materialFunction;
@@ -94,6 +97,7 @@ namespace Raven
 		// Default Construct.
 		RenderRscShaderCreateData()
 			: type(ERenderShaderType::Opaque)
+			, isShadow(false)
 		{
 			materialFunction.first = EGLShaderStageBit::None;
 		}
@@ -197,6 +201,9 @@ namespace Raven
 
 		// The input defined by the shader.
 		RenderShaderInput input;
+
+		// Is this shader for shadow rendering.
+		bool isShadow;
 
 	public:
 		// Render Batch Use Only, index set by the render batch to performs fast mapping during batching.

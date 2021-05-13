@@ -15,6 +15,8 @@
 #define TRANSFROM_BONE_BLOCK_BINDING 3
 #define LIGHTING_BLOCK_BINDING 4
 #define MATERIAL_BLOCK_BINDING 5
+#define TERRAIN_BIN_BLOCK_BINDING 6
+#define SHADOW_BLOCK_BINDING 7
 
 
 
@@ -33,6 +35,10 @@ RSInputBlockDescription RenderShaderInput::TransformBlock = RSInputBlockDescript
 RSInputBlockDescription RenderShaderInput::TransformBoneBlock = RSInputBlockDescription::MakeTransformBoneBlock();
 RSInputBlockDescription RenderShaderInput::LightingBlock_DEFERRED = RSInputBlockDescription::MakeLightingBlock_DEFERRED();
 RSInputBlockDescription RenderShaderInput::LightingBlock_FORWARD = RSInputBlockDescription::MakeLightingBlock_FORWARD();
+RSInputBlockDescription RenderShaderInput::TerrainBinBlock = RSInputBlockDescription::MakeTerrainBinBlock();
+RSInputBlockDescription RenderShaderInput::ShadowBlock = RSInputBlockDescription::MakeShadowBlock();
+RSInputBlockDescription RenderShaderInput::LightShadowBlock = RSInputBlockDescription::LightShadowBlock();
+
 
 int32_t RenderShaderInput::MaterialBlockBinding = MATERIAL_BLOCK_BINDING;
 
@@ -114,7 +120,7 @@ void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const st
 					baseSize = RenderShaderInput::GetSize(EShaderInputType::Vec4);
 
 				// Each element in the array is aligned with vec4.
-				size += prevCount * RenderShaderInput::GetSize(EShaderInputType::Vec4);
+				size += prevCount * baseSize;
 				offset = RenderShaderInput::AlignOffset(size, RenderShaderInput::GetAlignment(EShaderInputType::Vec4));
 			}
 			else
@@ -220,6 +226,46 @@ RSInputBlockDescription RSInputBlockDescription::MakeLightingBlock_DEFERRED()
 	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPos", RENDER_PASS_DEFERRED_MAX_LIGHTS);
 	inputblock.AddInputArray(EShaderInputType::Vec4, "lightPower", RENDER_PASS_DEFERRED_MAX_LIGHTS);
 	inputblock.AddInputArray(EShaderInputType::Vec4, "lightData", RENDER_PASS_DEFERRED_MAX_LIGHTS);
+	inputblock.EndUniformBlock();
+
+	return inputblock;
+}
+
+
+RSInputBlockDescription RSInputBlockDescription::MakeTerrainBinBlock()
+{
+	RSInputBlockDescription inputblock;
+	inputblock.binding = TERRAIN_BIN_BLOCK_BINDING;
+	inputblock.BeginUniformBlock("TerrainBinBlock");
+	inputblock.AddInput(EShaderInputType::Vec2, "inScale");
+	inputblock.AddInput(EShaderInputType::Vec2, "inHeight");
+	inputblock.AddInput(EShaderInputType::Vec2, "inOffset");
+	inputblock.AddInput(EShaderInputType::Vec2, "inUVScale");
+	inputblock.EndUniformBlock();
+
+	return inputblock;
+}
+
+
+RSInputBlockDescription RSInputBlockDescription::MakeShadowBlock()
+{
+	RSInputBlockDescription inputblock;
+	inputblock.binding = SHADOW_BLOCK_BINDING;
+	inputblock.BeginUniformBlock("ShadowBlock");
+	inputblock.AddInput(EShaderInputType::Mat4, "inShadowViewProj");
+	inputblock.EndUniformBlock();
+
+	return inputblock;
+}
+
+
+RSInputBlockDescription RSInputBlockDescription::LightShadowBlock()
+{
+	RSInputBlockDescription inputblock;
+	inputblock.binding = SHADOW_BLOCK_BINDING;
+	inputblock.BeginUniformBlock("LightShadowBlock");
+	inputblock.AddInputArray(EShaderInputType::Mat4, "sunViewProj", RENDER_MAX_SHADOW_CASCADE);
+	inputblock.AddInputArray(EShaderInputType::Float, "cascadeRanges", RENDER_MAX_SHADOW_CASCADE+1);
 	inputblock.EndUniformBlock();
 
 	return inputblock;

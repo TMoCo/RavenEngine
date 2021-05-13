@@ -83,6 +83,9 @@ vec3 Saturation(vec3 color, float sat)
 
 
 
+uniform sampler2D temp;
+
+
 
 void main()
 {
@@ -98,7 +101,16 @@ void main()
 	
 	// Store luma in alpha channel.
 	outFinalColor.a = dot(outFinalColor.rgb, LUMA_FACTORS); 
-
+	
+	
+	vec2 screenCoord = ComputeScreenCoord();
+	
+	if (gl_FragCoord.x < 250 && gl_FragCoord.y < 250)
+	{
+		outFinalColor.rgb = texture(temp, gl_FragCoord.xy / 250.0).rrr;
+		outFinalColor.a = outFinalColor.r;
+	}
+	
 }
 
 

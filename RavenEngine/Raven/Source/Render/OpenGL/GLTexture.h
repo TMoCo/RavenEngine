@@ -43,6 +43,10 @@ namespace Raven
 		// Note: this assume that the texture is currently bounded.
 		void UpdateTexData(int level, int newWidth, int newHeight, int layer, const void* data);
 
+		// Update a part of an existing texture.
+		// Note: this assume that the texture is currently bounded.
+		void UpdateTexSubData(int level, int offsetx, int offsety, int newWidth, int newHeight, int layer, const void* data);
+
 		// Update Texture parameters
 	  // Note: this assume that the texture is currently bounded.
 		void UpdateTexParams();
@@ -92,6 +96,10 @@ namespace Raven
 
 		// Set min & max mip levels.
 		void SetMipLevels(int base, int max);
+
+		// Set the border color for the texture.
+		// Note: this assume that the texture is currently bounded.
+		void BorderColor(float r, float g, float b, float a);
 
 	private:
 		// OpenGL Object ID.

@@ -12,6 +12,7 @@
 #define IMPORT_MATERIAL_FUNCTION_BASE_TAG 2 
 #define IMPORT_COMMON_LIGHTING_TAG 4 
 #define IMPORT_LIGHTING_TAG 5 
+#define IMPORT_SHADOW_TAG 6 
 
 
 
@@ -31,6 +32,7 @@ RenderRscShader::RenderRscShader()
 	: domain(ERenderShaderDomain::Custom)
 	, type(ERenderShaderType::Opaque)
 	, renderBatchIndex((uint32_t)-1)
+	, isShadow(false)
 {
 
 }
@@ -48,7 +50,7 @@ RenderRscShader* RenderRscShader::Create(ERenderShaderDomain domain, const Rende
 	rsc->domain = domain;
 	rsc->type = data.type;
 	rsc->shader = std::shared_ptr<GLShader>( GLShader::Create(data.name) );
-
+	rsc->isShadow = data.isShadow;
 
 	// Default Imports...
 	rsc->shader->AddExSourceFile(IMPORT_COMMON_TAG, EGLShaderStageBit::All, "shaders/Common.glsl");
@@ -170,20 +172,19 @@ void RenderRscShader::SetupShaderForDomain()
 	{
 		RAVEN_ASSERT(type == ERenderShaderType::Opaque, "Terrain can only be Opaque.");
 
-		shader->AddExSourceFile(IMPORT_TRANSFORM_VERTEX_TAG,
-			EGLShaderStageBit::VertexBit,
-			"shaders/VertexTransform.glsl");
-
 		shader->AddExSourceFile(IMPORT_MATERIAL_FUNCTION_BASE_TAG,
 			EGLShaderStageBit::VertexBit | EGLShaderStageBit::FragmentBit,
 			"shaders/Materials/MaterialFunctions.glsl");
 
 		shader->SetSourceFile(EGLShaderStage::Vertex, "shaders/TerrainVert.glsl");
 		shader->SetSourceFile(EGLShaderStage::Fragment, "shaders/TerrainFrag.glsl");
+		shader->SetSourceFile(EGLShaderStage::TessControl, "shaders/TerrainTessellation.glsl");
+		shader->SetSourceFile(EGLShaderStage::TessEvaluation, "shaders/TerrainTessellation.glsl");
 
 		// Add Input...
 		input.AddBlockInput(RenderShaderInput::CommonBlock);
-		input.AddBlockInput(RenderShaderInput::TransformBlock);
+		input.AddBlockInput(RenderShaderInput::TerrainBinBlock);
+		input.AddSamplerInput("inHeightMap");
 	}
 		break;
 
@@ -211,6 +212,17 @@ void RenderRscShader::SetupShaderForDomain()
 		input.AddBlockInput(RenderShaderInput::TransformBoneBlock);
 	}
 		break;
+	}
+
+
+	if (isShadow)
+	{
+		shader->AddExSourceFile(IMPORT_SHADOW_TAG, EGLShaderStageBit::All,
+			"shaders/CommonShadow.glsl");
+
+		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_SHADOW 1");
+		shader->SetSourceFile(EGLShaderStage::Fragment, "shaders/ShadowFrag.glsl");
+		input.AddBlockInput(RenderShaderInput::ShadowBlock);
 	}
 
 }
@@ -246,10 +258,17 @@ void RenderRscShader::SetupShaderForType()
 		shader->AddExSourceFile(IMPORT_LIGHTING_TAG, EGLShaderStageBit::FragmentBit,
 			"shaders/Lighting.glsl");
 
+		shader->AddPreprocessor("#define MAX_SHADOW_CASCADE " + std::to_string(RENDER_MAX_SHADOW_CASCADE));
 		shader->AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_FORWARD_MAX_LIGHTS));
 		input.AddBlockInput(RenderShaderInput::LightingBlock_FORWARD);
 		input.AddSamplerInput("inSkyEnvironment");
 		input.AddSamplerInput("inEnvBRDF");
+
+		// Add sun shadow samplers...
+		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
+		{
+			input.AddSamplerInput("inSunShadow[" + std::to_string(i) + "]");
+		}
 	}
 		break;
 
@@ -260,6 +279,7 @@ void RenderRscShader::SetupShaderForType()
 	}
 		break;
 	}
+
 }
 
 

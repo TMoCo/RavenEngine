@@ -38,6 +38,12 @@ namespace Raven
 
 		// Light framebuffer used for forward lighting data.
 		Ptr<UniformBuffer> light_FORWARD;
+
+		// Shadow Uniform Buffer used while drawing the shadow maps.
+		Ptr<UniformBuffer> shadow;
+
+		// Shadow Uniform Buffer, used in the lighting pass.
+		Ptr<UniformBuffer> lightShadow;
 	};
 
 
@@ -89,6 +95,9 @@ namespace Raven
 
 		// Update Light Unifrom Buffer for deferred lighting.
 		void UpdateLights_DEFERRED();
+		
+		// Update Shadows Unifrom Buffer..
+		void UpdateShadows();
 
 		// Do a final post processing and use the final render target.
 		void DoPostProcessFinal(int32_t hdrTargetIndex);

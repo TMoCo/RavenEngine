@@ -77,7 +77,7 @@ namespace Raven
 
 
 	// Texture2D:
-	//    - 
+	//    - a 2D Texture resource, mostly loaded from an image and saved as a Raven resource.
 	//
 	class Texture2D : public ITexture
 	{
@@ -98,7 +98,7 @@ namespace Raven
 		virtual void UpdateRenderResource() override;
 
 		// Update the texture paramters in render resrouce.
-		virtual void UpdateParamters();
+		virtual void UpdateParamters() override;
 
 		// Set a new Image 2D data to this texture.
 	  void SetImageData(ETextureFormat imgFormat, const glm::ivec2& imgSize, uint8_t* imgData);

@@ -233,6 +233,7 @@ void Material::LoadRenderResource()
 
 	// Render Material
 	renderRsc = new RenderRscMaterial(shader->GetRenderRsc());
+	renderRsc->SetShadowShader(shader->GetShadowRenderRsc());
 	renderRsc->LoadInputBlock(shader->GetBlockInput().name, shader->GetSamplersStartIndex());
 	renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
 
@@ -302,6 +303,7 @@ void Material::SetMaterialShader(Ptr<MaterialShader> inShader)
 		{
 			// Reload Render Shader Resource.
 			renderRsc->ReloadShader(shader->GetRenderRsc());
+			renderRsc->SetShadowShader(shader->GetShadowRenderRsc());
 			renderRsc->LoadInputBlock(shader->GetBlockInput().name, shader->GetSamplersStartIndex());
 			renderRsc->SetUniformBuffer(shader->GetUnifromBuffer());
 

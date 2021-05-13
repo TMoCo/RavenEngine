@@ -41,6 +41,9 @@ namespace Raven
 		// Return the materail render resource.
 		inline RenderRscShader* GetRenderRsc() { return renderRsc; }
 
+		// Return the materail render resource for shadow calculation.
+		inline RenderRscShader* GetShadowRenderRsc() { return renderShadowRsc; }
+
 		// Set the shader name.
 		void SetName(const std::string& name);
 
@@ -94,6 +97,10 @@ namespace Raven
 		// Does this shader contain the valid data to be loaded to GPU.
 		bool HasValidData();
 
+		// Force shadow shader making even if the material doesn't need to.
+		void SetShadowShader(bool value);
+
+
 		// Serialization Save.
 		template<typename Archive>
 		void save(Archive& archive) const
@@ -138,6 +145,9 @@ namespace Raven
 		// Update all materials that reference this shader.
 		void UpdateMaterials();
 
+		// Create a shadow shader that represent this material.
+		void CreateShadowShader(RenderRscShaderCreateData data);
+
 	private:
 		// The Shader Render Resrouce.
 		RenderRscShader* renderRsc;
@@ -171,6 +181,12 @@ namespace Raven
 
 		// The start index of samplers.
 		int32_t samplersStartIndex;
+
+		// Shadow shader for this material.
+		RenderRscShader* renderShadowRsc;
+
+		// Enable shader shader creation even if the materail doesn't need to.
+		bool isMakeShadowShader;
 	};
 
 }

@@ -59,7 +59,7 @@ namespace Raven
 			bool RayIntersection(const glm::vec3& org, const glm::vec3& dir, float& outAlpha) const;
 
 			// Return the center of the bounding box.
-			inline glm::vec3 GetCentre() const { return (min + max) * 0.5f; }
+			inline glm::vec3 GetCenter() const { return (min + max) * 0.5f; }
 
 			// Return the boudning box extent.
 			inline glm::vec3 GetExtent() const { return (max - min) * 0.5f; }
@@ -67,7 +67,7 @@ namespace Raven
 			// Return the radius of the sphere that contain the bounding box.
 			inline void GetSphere(glm::vec3& outCenter, float& outRadius) const
 			{
-				outCenter = GetCentre();
+				outCenter = GetCenter();
 				outRadius = glm::length(GetExtent());
 			}
 
@@ -79,6 +79,12 @@ namespace Raven
 
 			// Transform the bounding box and return it.
 			BoundingBox Transform(const glm::mat4& mtx) const;
+
+			// Return minimum.
+			inline glm::vec3 GetMin() const { return min; }
+
+			// Return maximum.
+			inline glm::vec3 GetMax() const { return max; }
 
 
 			// Serialization Save.

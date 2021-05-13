@@ -1,4 +1,9 @@
 #include "RenderRscTerrain.h"
+
+#include "ResourceManager/Resources/DynamicTexture.h"
+
+
+#include "Render/RenderResource/Shader/UniformBuffer.h"
 #include "Render/OpenGL/GLTexture.h"
 #include "Render/OpenGL/GLVertexArray.h"
 #include "Render/OpenGL/GLBuffer.h"
@@ -12,13 +17,11 @@ namespace Raven {
 
 
 
-
 RenderRscTerrain::RenderRscTerrain()
-	: heightMap(nullptr)
-	, vertexArray(nullptr)
+	: vertexArray(nullptr)
 	, numVerts(0)
-	, minheight(0.0f)
-	, maxheight(0.0f)
+	, numBins(0)
+	, numIndices(0)
 {
 
 }
@@ -32,53 +35,68 @@ RenderRscTerrain::~RenderRscTerrain()
 }
 
 
-void RenderRscTerrain::LoadHeightMap(int width, int height, const void* data)
+void RenderRscTerrain::Load(DynamicTexture* inHeightMap, int32_t inNumBins,
+	const glm::ivec2& inScale, const glm::vec2& inHeight)
 {
-	heightMap = GLTexture::Create(EGLTexture::Texture2D, EGLFormat::RGB);
-	heightMap->SetFilter(EGLFilter::Linear);
-	heightMap->SetWrap(EGLWrap::Mirror);
+	heightMapTexture = inHeightMap;
+	scale = inScale;
+	height = inHeight;
+	numBins = inNumBins;
 
-	heightMap->Bind();
-	heightMap->UpdateTexData(0, width, height, data);
-	heightMap->UpdateTexParams();
-	heightMap->Unbind();
+	GenerateTerrainMesh();
+
+	binUniform = Ptr<UniformBuffer>(UniformBuffer::Create(RenderShaderInput::TerrainBinBlock, false));
 }
 
 
-void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, float inMinHeight, float inMaxHeight)
+void RenderRscTerrain::GenerateTerrainMesh()
 {
-	scale = inScale;
-	minheight = inMinHeight;
-	maxheight = inMaxHeight;
+	RAVEN_ASSERT(
+		   ( numBins     >=   4         )
+		&& ( scale.x     >   0.0f      )
+		&& ( scale.y     >   0.0f      )
+		&& ( height.y    >   height.x  )
+		, "Invalid Terrain.");
+
+
+	binScale = scale / (float)sqrt(numBins);
+	int32_t res = (int32_t)(glm::length(binScale) / 25.0f);
+	res = pow(2, floor(log2(res)));
+
 	std::vector<glm::vec3> terrainVerts;
+	std::vector<uint32_t> terrainIndices;
 
-	int vcount = glm::max(inRes, 10);
-	terrainVerts.reserve(vcount * vcount * 6);
-	float vof = (1.0f / (float)(vcount - 1));
+	int vcount = res;
+	terrainVerts.reserve((vcount + 1) * (vcount + 1));
+	terrainIndices.reserve(vcount * vcount * 4);
+	float vof = (1.0f / (float)(vcount));
 
-	for (int y = 0; y < vcount; ++y)
+	for (int y = 0; y < vcount + 1; ++y)
 	{
-		float fy = (float)y / (float)(vcount - 1);
+		float fy = (float)y / (float)(vcount);
 
-		for (int x = 0; x < vcount; ++x)
+		for (int x = 0; x < vcount + 1; ++x)
 		{
-			float fx = (float)x / (float)(vcount - 1);
+			float fx = (float)x / (float)(vcount);
 
-			float v0 = scale.x * (fx);
-			float v1 = scale.x * (fx + vof);
-			float y0 = scale.y * (fy);
-			float y1 = scale.y * (fy + vof);
+			float v = binScale.x * (fx);
+			float y = binScale.y * (fy);
 
-			terrainVerts.push_back(glm::vec3(v0, 0.0f, y0));
-			terrainVerts.push_back(glm::vec3(v1, 0.0f, y1));
-			terrainVerts.push_back(glm::vec3(v1, 0.0f, y0));
-
-			terrainVerts.push_back(glm::vec3(v0, 0.0f, y0));
-			terrainVerts.push_back(glm::vec3(v0, 0.0f, y1));
-			terrainVerts.push_back(glm::vec3(v1, 0.0f, y1));
+			terrainVerts.push_back(glm::vec3(v, 0.0f, y));
 		}
 	}
 
+
+	for (int y = 0; y < vcount; ++y)
+	{
+		for (int x = 0; x < vcount; ++x)
+		{
+			terrainIndices.push_back( x      +  y    * (vcount + 1));
+			terrainIndices.push_back((x+1)   +  y    * (vcount + 1));
+			terrainIndices.push_back( x      + (y+1) * (vcount + 1));
+			terrainIndices.push_back((x+1)   + (y+1) * (vcount + 1));
+		}
+	}
 
 	numVerts = static_cast<uint32_t>(terrainVerts.size());
 	positionBuffer = GLBuffer::Create(
@@ -87,25 +105,35 @@ void RenderRscTerrain::GenerateTerrain(int32_t inRes, const glm::vec2& inScale, 
 		terrainVerts.data(),
 		EGLBufferUsage::StaticDraw
 	);
+	
 
+	numIndices = static_cast<uint32_t>(terrainIndices.size());
+	indexBuffer = GLBuffer::Create(
+		EGLBufferType::Element,
+		(int)(terrainIndices.size() * sizeof(uint32_t)),
+		terrainIndices.data(),
+		EGLBufferUsage::StaticDraw
+	);
 
 
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
-		{
+		GLVABuildAttribData(
 			positionBuffer,    // Buffers
 			0,                 // Index
 			3,                 // Type-Size
 			EGLTypes::Float,   // Type
 			sizeof(glm::vec3), // Stride
 			0                  // offset
-		}
+		)
 	};
 
 
 	vertexArray = GLVertexArray::Create();
-	vertexArray->Build(attributes, nullptr);
+	vertexArray->Build(attributes, indexBuffer);
 }
+
+
 
 
 } // End of namespace Raven.

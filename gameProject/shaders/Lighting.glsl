@@ -193,10 +193,16 @@ vec3 ComputeSunLight(in LightSurfaceData surface)
 	// BRDF
 	vec3 brdf = ComputeBRDFLighting(surface, NDotH, surface.NDotV, NDotL, VDotH);
 	
-	// TODO: SUN SHADOW.
+	// SUN SHADOW.
+#ifdef SHADOW_ENABLED
+	float shadow = SunShadowCalculation(surface.p, surface.n, l);
+#else
+	float shadow = 0.0;
+#endif
+	
 	
 	// Return the sun lighting
-	return brdf * inCommon.sunColorAndPower.rgb * inCommon.sunColorAndPower.a;
+	return brdf * inCommon.sunColorAndPower.rgb * inCommon.sunColorAndPower.a * (1.0 - shadow);
 }
 
 

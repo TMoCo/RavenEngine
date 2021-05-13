@@ -37,9 +37,12 @@ void main()
 	vec4 worldPos = inModelMatrix * vec4(inPosition, 1.0);
 	vec4 wolrdNormal = inNormalMatrix * vec4(inNormal, 0.0);
 	vec4 wolrdTangent = inNormalMatrix * vec4(inTangent, 0.0);
-	
-	//
+
+#if RENDER_SHADER_TYPE_SHADOW
+	gl_Position = inShadowViewProj * worldPos;
+#else	
 	gl_Position = inCommon.viewProjMatrix * worldPos;
+#endif
 	
 	// Set Vertex-Output...
 	outVertex.position = worldPos.xyz;

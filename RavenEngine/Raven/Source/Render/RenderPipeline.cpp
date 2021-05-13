@@ -147,7 +147,7 @@ void RenderPipeline::Render()
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Shadow: Draw Shadow Maps.
 	{
-		glEnable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 		rscene->DrawShadow(uniforms.shadow.get());
 	}
 

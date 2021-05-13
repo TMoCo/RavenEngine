@@ -111,7 +111,7 @@ void RenderRscTexture::Load(EGLTexture type, EGLFormat format, const glm::ivec2&
 
 
 RenderRscTexture* RenderRscTexture::CreateTexture2D(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
-	const glm::ivec2& size, void* data, bool isGenMipmaps)
+	const glm::ivec2& size, const void* data, bool isGenMipmaps)
 {
 	EGLFormat formatGL = ToGLType(format);
 	EGLFilter filterGL = ToGLType(filter);
@@ -138,7 +138,7 @@ RenderRscTexture* RenderRscTexture::CreateTexture2D(ETextureFormat format, EText
 
 
 RenderRscTexture* RenderRscTexture::CreateTextureCube(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
-	const glm::ivec2& size, void* data, bool isGenMipmaps)
+	const glm::ivec2& size, const void* data, bool isGenMipmaps)
 {
 	EGLFormat formatGL = ToGLType(format);
 	EGLFilter filterGL = ToGLType(filter);
@@ -177,7 +177,7 @@ RenderRscTexture* RenderRscTexture::CreateTextureCube(ETextureFormat format, ETe
 }
 
 
-void RenderRscTexture::UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, void* data)
+void RenderRscTexture::UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, const void* data)
 {
 	texture->Bind();
 	texture->UpdateTexData(level, size.x, size.y, layer, data);
@@ -185,7 +185,7 @@ void RenderRscTexture::UpdateData(int32_t level, int32_t layer, const glm::ivec2
 }
 
 
-void RenderRscTexture::UpdateSubData(int32_t level, int32_t layer, const glm::ivec2& offset, const glm::ivec2& size, void* data)
+void RenderRscTexture::UpdateSubData(int32_t level, int32_t layer, const glm::ivec2& offset, const glm::ivec2& size, const void* data)
 {
 	texture->Bind();
 	texture->UpdateTexSubData(level, offset.x, offset.y, size.x, size.y, layer, data);

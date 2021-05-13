@@ -48,13 +48,13 @@ Scene* ProceduralGenerator::GenerateNewScene(const glm::vec2& size, const glm::v
 {
 	// --- - -- - --- -- --- --- ---
 	// Terrain.
-	Ptr<HeightMap> heightMap = terrainGen->GenerateHeightMap(1024, 1024);
-	//terrainGen->WriteHeightMap(heightMap.get(), "C:/Temp/heightmap.png");
+	Ptr<HeightMap> heightMap = terrainGen->GenerateHeightMap(512, 512);
+	terrainGen->WriteHeightMap(heightMap.get(), "C:/Temp/heightmap.png");
 
 
 	Ptr<Terrain> terrain( new Terrain() );
 	terrain->SetName("The_Terrain");
-	terrain->SetTerrainData(heightMap, size, 2, height);
+	terrain->SetTerrainData(heightMap, size, 4, height);
 	terrain->LoadRenderResource();
 
 	// --- - -- - --- -- --- --- ---

@@ -44,10 +44,10 @@ namespace Raven
 		inline void SetTexType(EDynamicTexture type) { RAVEN_ASSERT(!isOnGPU, "Can't Change type once loaded."); texType = type; }
 
 		// Update or Create dynamic texture data and loaded the render resrouce directly.
-		void UpdateData(glm::ivec2& size, ETextureFormat format, void* data);
+		void UpdateData(glm::ivec2& size, ETextureFormat format, const void* data);
 
 		// Update a reagion
-		void UpdateSubData(const glm::ivec2& offset, const glm::ivec2& size, void* data);
+		void UpdateSubData(const glm::ivec2& offset, const glm::ivec2& size, const void* data);
 
 		// Update texture paramters for the Render Resrouce.
 		virtual void UpdateParamters() override;

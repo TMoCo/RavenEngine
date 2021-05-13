@@ -36,10 +36,11 @@ Ptr<HeightMap> TerrainGeneration::GenerateHeightMap(int32_t width, int32_t heigh
 	GenerateSquareGradient(width, height);
 	GenerateNoise(width, height);
 
-	const int octaves = 4;
-
 	Ptr<HeightMap> heightMap(new HeightMap());
 	heightMap->Allocate(width, height);
+
+	float min = FLT_MAX;
+	float max =-FLT_MAX;
 
 
 	// add heights from all octaves
@@ -53,11 +54,9 @@ Ptr<HeightMap> TerrainGeneration::GenerateHeightMap(int32_t width, int32_t heigh
 
 			for (int oct = 0; oct < octaves; oct++)
 			{
-				sumHeight += data[((row * width + col) * octaves) + oct];
+				sumHeight += data[((row * width + col) * octaves) + oct] * octavesFactors[oct];
 			}
 
-
-			sumHeight /= 4;
 			heightMap->SetValue(row, col, sumHeight);
 		}
 	}
@@ -68,7 +67,7 @@ Ptr<HeightMap> TerrainGeneration::GenerateHeightMap(int32_t width, int32_t heigh
 		for (int col = 0; col < width; col++)
 		{
 			// subtract square gradient from original height
-			newHeight = heightMap->GetValue(row, col) - squareGradient[row * width + col];
+			newHeight = heightMap->GetValue(row, col) * squareGradient[row * width + col];
 
 			// set negative heights to 0
 			newHeight = newHeight < 0 ? 0 : newHeight;
@@ -76,10 +75,48 @@ Ptr<HeightMap> TerrainGeneration::GenerateHeightMap(int32_t width, int32_t heigh
 			// invert heights (render has 0 as the tallest)
 			//newHeight = 1.0f - newHeight;
 
-
 			heightMap->SetValue(row, col, newHeight);
 		}
 	}
+
+
+	for (int gg = 0; gg < 1; gg++)
+	{
+		for (int row = 0; row < height; row++)
+		{
+			for (int col = 0; col < width; col++)
+			{
+				for (int x = -1; x <= 1; x++)
+				{
+					float s = 0.0f;
+
+					for (int y = -1; y <= 1; y++)
+					{
+						int sx = glm::clamp(row + x, 0, width - 1);
+						int sy = glm::clamp(col + y, 0, height - 1);
+						s += heightMap->GetValue(sx, sy);
+					}
+
+					s /= 9.0f;
+					heightMap->SetValue(row, col, s);
+
+					min = glm::min(min, s);
+					max = glm::max(max, s);
+				}
+			}
+		}
+	}
+	
+	for (int row = 0; row < height; row++)
+	{
+		for (int col = 0; col < width; col++)
+		{
+			newHeight = heightMap->GetValue(row, col);
+			heightMap->SetValue(row, col, (newHeight - min) / (max - min));
+		}
+	}
+
+
 
 
 	// deallocate memory
@@ -114,14 +151,11 @@ void TerrainGeneration::GenerateSquareGradient(int width, int height)
 			int smaller = x < y ? x : y;
 			value = smaller / (float)halfWidth;
 
-			// invert so the edges have the highest value
-			value = 1.0f - value;
-
 			// use a higher power (value^3) to increase the area of the black centre
 			//value *= value * value;
 			value *= value;
 
-			squareGradient[row * width + col] = glm::smoothstep(0.0f, 1.0f, value);
+			squareGradient[row * width + col] = value;
 		}
 	}
 
@@ -133,7 +167,6 @@ void TerrainGeneration::GenerateSquareGradient(int width, int height)
 
 void TerrainGeneration::GenerateNoise(int width, int height)
 {	
-	const int octaves = 4;
 
 
 
@@ -157,7 +190,7 @@ void TerrainGeneration::GenerateNoise(int width, int height)
 			// compute the sum for each octave
 			for (int oct = 0; oct < octaves; oct++)
 			{
-				glm::vec2 p(x * freq, y * freq);
+				glm::vec2 p(x * freq + seedOffset.x, y * freq + seedOffset.y);
 				float val = 0.0f;
 				// periodic for seamless noise
 				if (periodic) {	
@@ -167,11 +200,11 @@ void TerrainGeneration::GenerateNoise(int width, int height)
 				else {
 					val = glm::perlin(p) / scale;
 				}
-				sum += val;
-				float result = (sum + 1.0f) / 2.0f;
+				//sum += val;
+				//float result = (sum + 1.0f) / 2.0f;
 
 				// store in texture buffer
-				data[((row * width + col) * octaves) + oct] = result;
+				data[((row * width + col) * octaves) + oct] = val;
 
 				freq *= freqFactor; // the frequency
 				scale *= b; // next power of b

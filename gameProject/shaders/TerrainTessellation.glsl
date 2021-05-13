@@ -36,11 +36,9 @@ float ComputeTessLevel(vec4 v1, vec4 v2)
     p2 = p2 / p2.w;
     float l = length( 0.5 * inCommon.viewport.zw * ( p1.xy - p2.xy ) );
 	
-#if RENDER_SHADER_TYPE_SHADOW
-	return clamp( l / 16, 1.0, 32.0 );
-#else
-    return clamp( l / 16, 1.0, 64.0 );
-#endif
+	
+    return clamp( l / 32.0, 1.0, 20.0 );
+
 }
 
 
@@ -145,7 +143,7 @@ vec3 Evaluate3D(vec3 v0, vec3 v1, vec3 v2, vec3 v3)
 
 void ComputeNormal()
 {
-	float level = 3.5;
+	float level = 3.7;
 	
 	vec2 texCoord = outTessEval.texCoord;
 	vec2 texelSize = 1.0 / textureSize(inHeightMap, int(level));
@@ -156,7 +154,7 @@ void ComputeNormal()
 	float h2 = textureLod(inHeightMap, texCoord - vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	float h3 = textureLod(inHeightMap, texCoord + vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	
-	outTessEval.normal = normalize( vec3(h0 - h1, 3.7, h2 - h3) * 0.5 );
+	outTessEval.normal = normalize( vec3(h0 - h1, 2.7, h2 - h3) * 0.5 );
 	outTessEval.tangent = normalize( vec3(h0 - h1, 0.0, 0.0) * 0.5 );
 }
 
@@ -172,7 +170,7 @@ void main()
 	
 #if RENDER_SHADER_TYPE_SHADOW
 	gl_Position = inShadowViewProj * vec4(outTessEval.position, 1.0);
-	gl_Position.z += 0.1;
+	gl_Position.z += 0.05;
 #else
 	ComputeNormal();
 	

@@ -42,7 +42,7 @@ void HeightMap::GenerateTexture()
 	heightmapTexture = Ptr<DynamicTexture>(new DynamicTexture());
 	heightmapTexture->SetTexType(EDynamicTexture::Tex2D);
 	heightmapTexture->SetGenMipmaps(true);
-	heightmapTexture->SetFitler(ETextureFilter::Linear);
+	heightmapTexture->SetFitler(ETextureFilter::TriLinear);
 	heightmapTexture->SetWrap(ETextureWrap::Mirror);
 	heightmapTexture->UpdateData(size, ETextureFormat::R8, data);
 

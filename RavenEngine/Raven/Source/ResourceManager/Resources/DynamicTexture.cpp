@@ -21,7 +21,7 @@ DynamicTexture::~DynamicTexture()
 }
 
 
-void DynamicTexture::UpdateData(glm::ivec2& size, ETextureFormat format, void* data)
+void DynamicTexture::UpdateData(glm::ivec2& size, ETextureFormat format, const void* data)
 {
 	RAVEN_ASSERT(texType != EDynamicTexture::None, "Invalid Dynamic Texture Type.");
 
@@ -67,7 +67,7 @@ void DynamicTexture::UpdateData(glm::ivec2& size, ETextureFormat format, void* d
 }
 
 
-void DynamicTexture::UpdateSubData(const glm::ivec2& offset, const glm::ivec2& size, void* data)
+void DynamicTexture::UpdateSubData(const glm::ivec2& offset, const glm::ivec2& size, const void* data)
 {
 	RAVEN_ASSERT(isOnGPU, "Must be updated first. @see DynamicTexture::UpdateData");
 	renderRsc->UpdateSubData(0, 0, glm::ivec2(0), size, data);

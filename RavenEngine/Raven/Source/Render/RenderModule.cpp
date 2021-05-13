@@ -324,6 +324,7 @@ void RenderModule::CreateDefaultMaterials()
 
 		Ptr<Material> mat(new Material());
 		mat->SetMaterialShader(matShader);
+		mat->SetTexture("inCheckerTexture", checkerTexture);
 		mat->LoadRenderResource();
 
 		defaultMaterials.terrain = mat;

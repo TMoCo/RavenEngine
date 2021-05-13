@@ -168,8 +168,8 @@ void RenderShadowCascade::ComputeCascade(const glm::vec3& lightDir, float fov, f
 			 ext.x,
 			-ext.y,
 			 ext.y,
-			-ext.z - lightFar * 0.5f,
-			 ext.z + lightFar * 0.25f
+			-ext.z - lightFar * 0.8f,
+			 ext.z + lightFar * 0.2f
 		);
 
 

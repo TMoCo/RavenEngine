@@ -61,17 +61,23 @@ namespace Raven {
 		// --- - -- - -- - -- - -- - ---
 
 		// higher value increases bumpiness; originally 0.5
-		float a = 7.5;
+		float a = 2.7;
 
 		// a needs to be much higher than b for a bumpy terrain
 		// higher value increases smoothness; originally 1.0
-		float b = 1.5;
+		float b = 2.0;
 
 		// frequency factor, scale frequancy each octave.
-		float freqFactor = 2.0f;
+		float freqFactor = 2.7f;
 
 		// Offset to the noise seed.
-		glm::vec2 seedOffset = glm::vec2(0.0f, 0.0f);
+		glm::vec2 seedOffset = glm::vec2(90.0f, 500.0f);
+
+		// Number of octaves.
+		int octaves = 4;
+
+		//
+		std::vector<float> octavesFactors = { 1.7f, 0.0f, 0.0f, 0.5f };
 	};
 
 }

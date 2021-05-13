@@ -62,8 +62,7 @@ void RenderTerrain::Draw(GLShader* shader) const
 	// Quads Tesselation Patches
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
-	//glDisable(GL_CULL_FACE);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 
 
 	// Binding...
@@ -84,6 +83,12 @@ void RenderTerrain::Draw(GLShader* shader) const
 	// Draw Tesselation Patches...
 	terrainRsc->GetArray()->Bind();
 	glDrawElements(GL_PATCHES, (GLsizei)terrainRsc->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
+
+	//glEnable(GL_POLYGON_MODE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glDrawElements(GL_PATCHES, (GLsizei)terrainRsc->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glEnable(GL_POLYGON_MODE);
 
 }
 

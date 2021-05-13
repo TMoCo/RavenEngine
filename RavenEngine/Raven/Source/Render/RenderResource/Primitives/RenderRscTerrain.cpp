@@ -60,7 +60,7 @@ void RenderRscTerrain::GenerateTerrainMesh()
 
 
 	binScale = scale / (float)sqrt(numBins);
-	int32_t res = (int32_t)(glm::length(binScale) / 25.0f);
+	int32_t res = (int32_t)(glm::length(binScale) / 50.0f);
 	res = pow(2, floor(log2(res)));
 
 	std::vector<glm::vec3> terrainVerts;

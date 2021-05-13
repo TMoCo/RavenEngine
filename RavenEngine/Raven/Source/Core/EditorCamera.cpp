@@ -56,7 +56,7 @@ namespace Raven
 
 		if (Input::GetInput()->IsKeyHeld(KeyCode::Id::LeftShift))
 		{
-			multiplier = 500.0f;
+			multiplier = 1500.0f;
 		}
 
 		cameraSpeed = multiplier * dt;

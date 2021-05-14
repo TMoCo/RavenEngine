@@ -99,7 +99,9 @@ namespace Raven
 
 		// Force shadow shader making even if the material doesn't need to.
 		void SetShadowShader(bool value);
-
+		
+		// The shader will be used to draw object without face culling.
+		void SetTwoSided(bool value);
 
 		// Serialization Save.
 		template<typename Archive>
@@ -187,6 +189,9 @@ namespace Raven
 
 		// Enable shader shader creation even if the materail doesn't need to.
 		bool isMakeShadowShader;
+
+		// if true the shader will be used to draw object without face culling.
+		bool isTwoSided;
 	};
 
 }

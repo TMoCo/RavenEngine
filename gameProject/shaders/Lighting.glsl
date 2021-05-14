@@ -84,6 +84,13 @@ struct LightSurfaceData
 	// Dot product between surface normal and view vector.
 	float NDotV;
 
+	// The surface type.
+	// 0: Default Surface.
+	// 1: Masked Foliage.
+	int type;
+	
+	// Ambient Occlusion.
+	float AO;
 };
 
 
@@ -175,7 +182,7 @@ vec3 ComputeIBL(in LightSurfaceData surface)
 	Kd *= (1.0 - Fr);
 	Kd *= (1.0 - surface.metallic);
 	
-	return Kd * surface.albedo + Ks;
+	return (Kd * surface.albedo + Ks) * surface.AO;
 }
 
 
@@ -183,11 +190,29 @@ vec3 ComputeIBL(in LightSurfaceData surface)
 // Compute The light from the environemnt sun.
 vec3 ComputeSunLight(in LightSurfaceData surface)
 {
+	// ...
+	vec3 multiColor = vec3(1.0);
+	
 	// The Light Data
 	vec3 l = -inCommon.sunDir.xyz;
 	vec3 h = normalize(l + surface.v);
+	float NDotL = dot(surface.n, l);
+	
+	
+	// Is Masked Foliage?
+	if (surface.type == 1)
+	{
+		if (NDotL < 0.0)
+		{
+			NDotL *= -1.0;
+			surface.n *= -1.0;
+			multiColor = mix(surface.albedo, vec3(1.0), 0.24);
+		}
+	}
+	
+	
+	NDotL = max(NDotL, 0.0001);
 	float NDotH = max(dot(surface.n, h), 0.0001);
-	float NDotL = max(dot(surface.n, l), 0.0001);
 	float VDotH = max(dot(surface.v, h), 0.00001);
 	
 	// BRDF
@@ -202,7 +227,7 @@ vec3 ComputeSunLight(in LightSurfaceData surface)
 	
 	
 	// Return the sun lighting
-	return brdf * inCommon.sunColorAndPower.rgb * inCommon.sunColorAndPower.a * (1.0 - shadow);
+	return brdf * inCommon.sunColorAndPower.rgb * multiColor * inCommon.sunColorAndPower.a * (1.0 - shadow);
 }
 
 

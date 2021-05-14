@@ -24,6 +24,7 @@ MaterialShader::MaterialShader()
 	, isComputeMaterialVertex(false)
 	, samplersStartIndex(-1)
 	, isMakeShadowShader(false)
+	, isTwoSided(false)
 {
 	type = MaterialShader::StaticGetType();
 	hasRenderResources = true;
@@ -109,6 +110,12 @@ bool MaterialShader::HasValidData()
 void MaterialShader::SetShadowShader(bool value)
 {
 	isMakeShadowShader = value;
+}
+
+
+void MaterialShader::SetTwoSided(bool value)
+{
+	isTwoSided = value;
 }
 
 
@@ -198,7 +205,9 @@ void MaterialShader::CreateShadowShader(RenderRscShaderCreateData data)
 	if (!isMakeShadowShader)
 	{
 		// Is custom shadow shader needed?
-		if (stype != ERenderShaderType::Masked && !isComputeMaterialVertex)
+		if ( stype != ERenderShaderType::Masked
+			&& stype != ERenderShaderType::MaskedFoliage
+			&& !isComputeMaterialVertex )
 			return;
 	}
 

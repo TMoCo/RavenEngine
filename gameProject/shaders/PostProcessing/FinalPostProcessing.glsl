@@ -105,11 +105,10 @@ void main()
 	
 	vec2 screenCoord = ComputeScreenCoord();
 	
-	if (gl_FragCoord.x < 250 && gl_FragCoord.y < 250)
-	{
-		outFinalColor.rgb = texture(temp, gl_FragCoord.xy / 250.0).rrr;
-		outFinalColor.a = outFinalColor.r;
-	}
+
+	//outFinalColor.rgb = texture(temp, inFrag.rtCoord).rrr;
+	//outFinalColor.a = outFinalColor.r;
+
 	
 }
 

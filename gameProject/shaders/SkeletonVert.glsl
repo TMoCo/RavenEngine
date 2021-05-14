@@ -62,6 +62,10 @@ void main()
 	vec4 wolrdTangent = inNormalMatrix * skinMatrix * vec4(inTangent, 0.0);
 	
 	
+#if MATERIAL_VERTEX_OVERRIDE
+	worldPos.xyz = ComputeMaterialVertex(inPosition, worldPos.xyz, wolrdNormal.xyz);
+#endif
+
 #if RENDER_SHADER_TYPE_SHADOW
 	gl_Position = inShadowViewProj * worldPos;
 #else	

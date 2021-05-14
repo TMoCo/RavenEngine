@@ -20,6 +20,9 @@
 #include "GL/glew.h"
 
 
+#include <random>
+
+
 
 
 namespace Raven {
@@ -59,8 +62,12 @@ void RenderPipeline::Initialize()
 	uniforms.lightShadow = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::LightShadowBlock, true) );
 
 
-	//
+	// Grid.
 	rgrid = Ptr<RenderGrid>( RenderGrid::Create() );
+
+	// 
+	SetupSSAO();
+	
 }
 
 
@@ -147,7 +154,7 @@ void RenderPipeline::Render()
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Shadow: Draw Shadow Maps.
 	{
-		glDisable(GL_CULL_FACE);
+		glEnable(GL_CULL_FACE);
 		rscene->DrawShadow(uniforms.shadow.get());
 	}
 
@@ -174,6 +181,34 @@ void RenderPipeline::Render()
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 #endif
+	}
+
+
+
+	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
+	// SSAO Pass
+	{
+		glDisable(GL_BLEND);
+
+		ssaoPass->Begin(viewport, false);
+		ssaoShader->GetShader()->Use();
+
+		gbufferPass->GetTexture(1)->Active(0); // Normal.
+		gbufferPass->GetDepthTexture()->Active(1); // Depth.
+		ssaoNoiseTexture->Active(2); // Noise.
+		rscreen->Draw(ssaoShader->GetShader());
+
+		// Blending 
+		//glEnable(GL_BLEND);
+		//glDisable(GL_BLEND);
+		//glBlendEquation(GL_FUNC_ADD);
+		//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+
+		ssaoBlurPass->Begin(viewport, false);
+		ssaoBlurShader->GetShader()->Use();
+		ssaoPass->GetTexture(0)->Active(0); // SSAO.
+
+		rscreen->Draw(ssaoBlurShader->GetShader());
 	}
 
 
@@ -207,17 +242,19 @@ void RenderPipeline::Render()
 		gbufferPass->GetTexture(1)->Active(1); // Normal.
 		gbufferPass->GetTexture(2)->Active(2); // BRDF.
 		gbufferPass->GetDepthTexture()->Active(3); // Depth.
+		hdrTarget[1]->Active(4);
 
 		// ~ITERATION_0----------------------------------------------------------------------------
-		testEnv->Active(4);
-		testBRDF->Active(5);
+		testEnv->Active(5);
+		testBRDF->Active(6);
 		// ~ITERATION_0----------------------------------------------------------------------------
 
 		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
-			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(6+i);
+			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(7+i);
 
 		rscreen->Draw(shader);
 	}
+
 
 
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
@@ -242,6 +279,7 @@ void RenderPipeline::Render()
 		}
 
 
+		uniforms.lightShadow->BindBase();
 		uniforms.light_FORWARD->BindBase();
 
 		// ~ITERATION_0----------------------------------------------------------------------------
@@ -250,7 +288,7 @@ void RenderPipeline::Render()
 		// ~ITERATION_0----------------------------------------------------------------------------
 
 		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
-			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(6 + i);
+			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(2 + i);
 
 		// Draw translucent scene...
 		rscene->DrawTranslucent(uniforms.light_FORWARD.get());
@@ -262,8 +300,6 @@ void RenderPipeline::Render()
 
 
 
-	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
-	// Post-Processing.
 
 
 
@@ -282,8 +318,12 @@ void RenderPipeline::DoPostProcessFinal(int32_t hdrTargetIndex)
 
 	hdrTarget[hdrTargetIndex]->Active(0);
 
+	// ~Testig---------------------------
 	finalPostProcessShader->GetShader()->SetUniform("temp", 1);
-	rscene->GetEnvironment().sunShadow->GetCascade(0).shadowMap->Active(1);
+	ssaoPass->GetTexture(0)->Active(1);
+	//rscene->GetEnvironment().sunShadow->GetCascade(0).shadowMap->Active(1);
+	// ~Testig---------------------------
+
 
 	rscreen->Draw(finalPostProcessShader->GetShader());
 
@@ -307,6 +347,8 @@ void RenderPipeline::Resize(const glm::ivec2& newSize)
 	forwardPass->ResizeTargets(size);
 	lightingPass->ResizeTargets(size);
 	finalPostProcessPass->ResizeTargets(size);
+	ssaoPass->ResizeTargets(size);
+	ssaoBlurPass->ResizeTargets(size);
 
 	// Update unfiroms that need the texture size.
 	fxaaShader->GetShader()->Use();
@@ -338,7 +380,7 @@ void RenderPipeline::SetupRenderPasses()
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// G-Buffer Render Pass
 	{
-		// Albedo(RGB) + 
+		// Albedo(RGB) + Materail Type Index.
 		Ptr<GLTexture> target0Albedo = Ptr<GLTexture>(GLTexture::Create2D(
 			EGLFormat::RGBA,
 			size.x, size.y,
@@ -415,6 +457,30 @@ void RenderPipeline::SetupRenderPasses()
 	}
 
 
+	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
+	// SSAO Pass
+	{
+		// SSAO LDR Target...
+		Ptr<GLTexture> ssaoTarget = Ptr<GLTexture>(GLTexture::Create2D(
+			EGLFormat::R,
+			size.x, size.y,
+			EGLFilter::Nearest,
+			EGLWrap::ClampToEdge
+		));
+
+
+		ssaoPass = Ptr<RenderPass>(new RenderPass());
+		ssaoPass->AddTexture(0, ssaoTarget);
+		ssaoPass->SetSize(size);
+		ssaoPass->Build();
+
+
+		ssaoBlurPass = Ptr<RenderPass>(new RenderPass());
+		ssaoBlurPass->AddTexture(0, hdrTarget[1]);
+		ssaoBlurPass->SetSize(size);
+		ssaoBlurPass->Build();
+	}
+
 
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Final Post-Processsing Passe
@@ -457,6 +523,7 @@ void RenderPipeline::SetupShaders()
 		lightingShader->GetInput().AddSamplerInput("inNormal");
 		lightingShader->GetInput().AddSamplerInput("inBRDF");
 		lightingShader->GetInput().AddSamplerInput("inDepth");
+		lightingShader->GetInput().AddSamplerInput("inAO");
 		lightingShader->GetInput().AddSamplerInput("inSkyEnvironment");
 		lightingShader->GetInput().AddSamplerInput("inEnvBRDF");
 
@@ -519,6 +586,91 @@ void RenderPipeline::SetupShaders()
 }
 
 
+void RenderPipeline::SetupSSAO()
+{
+	std::uniform_real_distribution<float> random(0.0, 1.0);
+	std::default_random_engine generator;
+	std::vector<glm::vec3> ssaoKernel;
+	for (unsigned int i = 0; i < 64; ++i)
+	{
+		glm::vec3 sample(
+			random(generator) * 2.0 - 1.0,
+			random(generator) * 2.0 - 1.0,
+			random(generator)
+		);
+		sample = glm::normalize(sample);
+		sample *= random(generator);
+
+		float scale = (float)i / 64.0;
+		scale = glm::mix(0.1f, 1.0f, scale * scale);
+		sample *= scale;
+		ssaoKernel.push_back(sample);
+	}
+
+
+	std::vector<glm::vec3> ssaoNoise;
+	for (unsigned int i = 0; i < 16; i++)
+	{
+		glm::vec3 noise(
+			random(generator) * 2.0 - 1.0,
+			random(generator) * 2.0 - 1.0,
+			0.0f);
+		ssaoNoise.push_back(noise);
+	}
+
+	
+	ssaoNoiseTexture = Ptr<GLTexture>(GLTexture::Create2D(EGLFormat::RGB16F, 4, 4, ssaoNoise.data(), EGLFilter::Nearest, EGLWrap::Repeat));
+
+
+	// -- --- --- ---- -----
+	// SSAO Shader
+	{
+		RenderRscShaderDomainCreateData shaderDomainData;
+		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/ScreenTriangleVert.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/PostProcessing/SSAO.glsl");
+		shaderDomainData.AddPreprocessor("#define SCALE_UV_WITH_TARGET 1");
+		shaderDomainData.AddPreprocessor("#define NUM_SAMPLES " + std::to_string(ssaoKernel.size()));
+
+		// Shader Type Data
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::PostProcessing;
+		shaderData.name = "SSAO_Shader";
+
+		ssaoShader = Ptr<RenderRscShader>(RenderRscShader::CreateCustom(shaderDomainData, shaderData));
+		ssaoShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
+		ssaoShader->GetInput().AddSamplerInput("inNormal");
+		ssaoShader->GetInput().AddSamplerInput("inDepth");
+		ssaoShader->GetInput().AddSamplerInput("inNoise");
+		ssaoShader->BindBlockInputs();
+		ssaoShader->BindSamplers();
+
+		for (uint32_t i = 0; i < ssaoKernel.size(); ++i)
+		{
+			ssaoShader->GetShader()->SetUniform("inSamples[" + std::to_string(i) + "]", ssaoKernel[i]);
+		}
+	}
+
+
+	// -- --- --- ---- -----
+	// SSAO Blur
+	{
+		RenderRscShaderDomainCreateData shaderDomainData;
+		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/ScreenTriangleVert.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/PostProcessing/SSAOBlur.glsl");
+		shaderDomainData.AddPreprocessor("#define SCALE_UV_WITH_TARGET 1");
+
+		// Shader Type Data
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::PostProcessing;
+		shaderData.name = "SSAOBlur_Shader";
+
+		ssaoBlurShader = Ptr<RenderRscShader>(RenderRscShader::CreateCustom(shaderDomainData, shaderData));
+		ssaoBlurShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
+		ssaoBlurShader->GetInput().AddSamplerInput("inSSAO");
+		ssaoBlurShader->BindBlockInputs();
+		ssaoBlurShader->BindSamplers();
+	}
+}
 
 
 void RenderPipeline::UpdateLights_DEFERRED()

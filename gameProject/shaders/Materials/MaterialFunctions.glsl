@@ -26,9 +26,9 @@
 // If no materail function provided use default.
 #if !MATERIAL_VERTEX_OVERRIDE
 // Used by vertex shader to compute 
-vec3 ComputeMaterialVertex(vec3 inPos, vec3 inNormal)
+vec3 ComputeMaterialVertex(vec3 inPos, vec3 inWorldPos, vec3 inNormal)
 {
-	return inPos;
+	return inWorldPos;
 }
 #endif
 
@@ -104,26 +104,6 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 #endif
 
 
-
-
-
-// Compute Tangnet Matrix to World Matrix.
-mat3 ComputeTBNMatrix(vec3 N, vec3 T)
-{
-	// Orthogonalize.
-	T = normalize(T - dot(T, N) * N);
-	
-	// Bi-Tangent.
-    vec3 B = normalize( cross(T, N) );
-	
-	//return mat3(T, B, N);
-	
-	return mat3(
-		vec3(T.x, B.x, N.x),
-		vec3(T.y, B.y, N.y),
-		vec3(T.z, B.z, N.z)
-	);
-}
 
 
 

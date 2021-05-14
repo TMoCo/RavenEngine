@@ -331,16 +331,18 @@ namespace MM
 			}
 		}
 
-
-
-		ImGui::NextColumn();
-		ImGui::TextUnformatted("ClipDistance");
 		ImGui::NextColumn();
 
 		float ClipDistance = meshComp.GetClipDistance();
-		if (ImGui::InputFloat("###clipdistance", &ClipDistance))
+		if (ImGuiHelper::Property("ClipDistance", ClipDistance))
 		{
 			meshComp.SetClipDistance(ClipDistance);
+		}
+
+		bool castShadow = meshComp.IsCastShadow();
+		if (ImGuiHelper::Property("CastShadow", castShadow))
+		{
+			meshComp.SetCastShadow(castShadow);
 		}
 
 

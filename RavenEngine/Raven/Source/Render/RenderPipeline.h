@@ -90,6 +90,9 @@ namespace Raven
 		// Load & Build the shaders of the render pipeline.
 		void SetupShaders();
 
+		// Setup Screen Space Ambient Occlusion.
+		void SetupSSAO();
+
 		// Resize all render passes.
 		void Resize(const glm::ivec2& newSize);
 
@@ -115,6 +118,10 @@ namespace Raven
 		// The final post-processing step.
 		Ptr<RenderPass> finalPostProcessPass;
 
+		// The SSAO pass.
+		Ptr<RenderPass> ssaoPass;
+		Ptr<RenderPass> ssaoBlurPass;
+
 		// Pipeline HDR Render Targets.
 		Ptr<GLTexture> hdrTarget[2];
 
@@ -126,6 +133,12 @@ namespace Raven
 
 		// Fast Approximate Anti-Aliasing executed on the final pos-tprocesing step
 		Ptr<RenderRscShader> fxaaShader;
+
+		// SSAO Shader.
+		Ptr<RenderRscShader> ssaoShader;
+		
+		// SSAO Shader.
+		Ptr<RenderRscShader> ssaoBlurShader;
 
 		// Screen triangle used to render the entire screen, used by render passes and post-processing.
 		Ptr<RenderScreen> rscreen;
@@ -151,6 +164,9 @@ namespace Raven
 		// The Render Grid.
 		Ptr<RenderGrid> rgrid;
 		
+		//
+		Ptr<GLTexture> ssaoNoiseTexture;
+
 	public:
 		// ~ITERATION_0----------------------------------
 		class GLTexture* testEnv;

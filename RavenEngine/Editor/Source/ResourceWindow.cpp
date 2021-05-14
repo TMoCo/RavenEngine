@@ -338,7 +338,7 @@ void ResourceWindow::OnImGuiShader()
 
 	// Type.
 	{
-		static const char* types[4] = { "Opaque", "Masked", "Translucent", nullptr };
+		static const char* types[5] = { "Opaque", "Masked", "Translucent", nullptr, "MaskedFoliage" };
 
 		ImGui::Text("Type: ");
 		ImGui::SameLine();

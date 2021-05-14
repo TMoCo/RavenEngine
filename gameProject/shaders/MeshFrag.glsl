@@ -86,6 +86,8 @@ void main()
 	surface.specular = clamp(matOut.specular, 0.0, 1.0);
 	surface.roughness = max(matOut.roughness, 0.01);
 	surface.metallic = matOut.metallic;
+	surface.type = 0;
+	surface.AO = 1.0;
 	
 	// View Direction Vector.
 	surface.v = normalize(inCommon.viewPos - surface.p);
@@ -113,6 +115,19 @@ void main()
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
 	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
+	
+#if RENDER_SHADER_TYPE_MASKED_FOLIAGE
+	outAlbedo.a = 1.0 / 255.0;
+	
+	if (!gl_FrontFacing)
+	{
+		outNormal.rgb = matOut.normal * -1.0;
+	}
+#else
+	outAlbedo.a = 0.0; // Default.
+#endif
+
+
 #endif
 
 	

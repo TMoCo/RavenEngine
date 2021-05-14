@@ -56,6 +56,10 @@ void main()
 	vec2 uv = vec2(worldPos.x / inScale.x, worldPos.z / inScale.y);
 	worldPos.y = texture(inHeightMap, uv).r * (inHeight.y - inHeight.x) + inHeight.x; 
 	
+#if MATERIAL_VERTEX_OVERRIDE
+#error Terrain does not support materail vertex function.
+#endif
+	
 	gl_Position = vec4(worldPos, 1.0);
 	
 	outVertex.position = worldPos;

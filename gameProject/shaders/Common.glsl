@@ -49,6 +49,11 @@
 #endif
 
 
+#ifndef RENDER_SHADER_TYPE_MASKED_FOLIAGE
+#define RENDER_SHADER_TYPE_MASKED_FOLIAGE 0
+#endif	
+
+
 #ifndef RENDER_SHADER_TYPE_TRANSLUCENT
 #define RENDER_SHADER_TYPE_TRANSLUCENT 0
 #endif
@@ -227,6 +232,24 @@ vec4 sRGBToLinearSample(sampler2D tex, vec2 coord)
 	color.rgb = pow(color.rgb, vec3(2.2));
 	return color;
 }
+
+
+// Compute Tangnet Matrix to World Matrix.
+mat3 ComputeTBNMatrix(vec3 N, vec3 T)
+{
+	// Orthogonalize.
+	T = normalize(T - dot(T, N) * N);
+	
+	// Bi-Tangent.
+    vec3 B = normalize( cross(T, N) );
+	
+	return mat3(
+		vec3(T.x, B.x, N.x),
+		vec3(T.y, B.y, N.y),
+		vec3(T.z, B.z, N.z)
+	);
+}
+
 
 
 

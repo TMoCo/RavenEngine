@@ -320,6 +320,7 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
 		matShader->SetShadowShader(true);
+		matShader->SetTwoSided(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());

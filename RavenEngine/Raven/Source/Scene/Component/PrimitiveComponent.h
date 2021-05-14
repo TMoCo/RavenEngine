@@ -59,6 +59,10 @@ namespace Raven
 		inline float GetClipDistance() { return clipDistance; }
 		inline void SetClipDistance(float distance) { clipDistance = distance; }
 
+		// Get/Set Cast Shadow.
+		inline bool IsCastShadow() { return isCastShadow; }
+		inline void SetCastShadow(bool val) { isCastShadow = val; }
+
 	public:
 		// serialization load and save
 		template<typename Archive>
@@ -113,6 +117,9 @@ namespace Raven
 
 		// The distance this model will be clipped at, if -1 then no clipping.
 		float clipDistance;
+
+		// if true this primitive will cast shadow.
+		bool isCastShadow;
 	};
 
 };

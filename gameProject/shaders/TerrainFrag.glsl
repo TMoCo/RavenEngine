@@ -68,6 +68,7 @@ void main()
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
 	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
+	outAlbedo.a = 0.0; // Default.
 #endif
 
 }

@@ -222,7 +222,11 @@ void RenderScene::TraverseScene(Scene* scene)
 
 		// Shadow Culling...
 		std::vector<uint32_t> shadowCascadeIndices;
-		environment.sunShadow->IsInShadow(center, radius, shadowCascadeIndices);
+
+		if (primComp->IsCastShadow())
+		{
+			environment.sunShadow->IsInShadow(center, radius, shadowCascadeIndices);
+		}
 
 		// Test if its in scene view frustum?
 		if (isViewCulled && shadowCascadeIndices.empty())
@@ -489,6 +493,9 @@ void RenderScene::Clear()
 
 void RenderScene::DrawDeferred()
 {
+	// ...
+	bool isCullFace = true;
+
 	// Bind Transform Uniform Buffer.
 	transformUniform->BindBase();
 	transformBoneUniform->BindBase();
@@ -501,6 +508,24 @@ void RenderScene::DrawDeferred()
 	for (uint32_t is = 0; is < deferredBatch.GetNumShaders(); ++is)
 	{
 		const auto& shaderBatch = deferredBatch.GetShaderBatch(is);
+
+		// Two-Sided?
+		if (shaderBatch.shader->IsTwoSided())
+		{
+			if (isCullFace)
+			{
+				glDisable(GL_CULL_FACE);
+				isCullFace = false;
+			}
+		}
+		else 
+		{
+			if (!isCullFace)
+			{
+				glEnable(GL_CULL_FACE);
+				isCullFace = true;
+			}
+		}
 
 		// The Shader
 		GLShader* shader = shaderBatch.shader->GetShader();
@@ -752,6 +777,9 @@ void RenderScene::GatherScenePrimitives(Scene* scene, std::vector<ScenePrimitive
 
 void RenderScene::DrawShadow(UniformBuffer* shadowUB)
 {
+	// ...
+	bool isCullFace = true;
+
 	// Default Materials.
 	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
 
@@ -804,6 +832,24 @@ void RenderScene::DrawShadow(UniformBuffer* shadowUB)
 				}
 			}
 
+
+			// Two-Sided?
+			if (shaderBatch.shader->IsTwoSided())
+			{
+				if (isCullFace)
+				{
+					glDisable(GL_CULL_FACE);
+					isCullFace = false;
+				}
+			}
+			else
+			{
+				if (!isCullFace)
+				{
+					glEnable(GL_CULL_FACE);
+					isCullFace = true;
+				}
+			}
 
 			// The Shader
 			GLShader* shader = shaderBatch.shader->GetShader();

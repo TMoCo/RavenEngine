@@ -11,8 +11,9 @@
 #define IMPORT_TRANSFORM_VERTEX_TAG 1 
 #define IMPORT_MATERIAL_FUNCTION_BASE_TAG 2 
 #define IMPORT_COMMON_LIGHTING_TAG 4 
-#define IMPORT_LIGHTING_TAG 5 
-#define IMPORT_SHADOW_TAG 6 
+#define IMPORT_COMMON_SHADOW_TAG 5
+#define IMPORT_LIGHTING_TAG 6 
+#define IMPORT_SHADOW_TAG 7
 
 
 
@@ -33,6 +34,7 @@ RenderRscShader::RenderRscShader()
 	, type(ERenderShaderType::Opaque)
 	, renderBatchIndex((uint32_t)-1)
 	, isShadow(false)
+	, isTwoSidedShader(false)
 {
 
 }
@@ -51,6 +53,7 @@ RenderRscShader* RenderRscShader::Create(ERenderShaderDomain domain, const Rende
 	rsc->type = data.type;
 	rsc->shader = std::shared_ptr<GLShader>( GLShader::Create(data.name) );
 	rsc->isShadow = data.isShadow;
+	rsc->isTwoSidedShader = data.isTwoSided;
 
 	// Default Imports...
 	rsc->shader->AddExSourceFile(IMPORT_COMMON_TAG, EGLShaderStageBit::All, "shaders/Common.glsl");
@@ -99,6 +102,8 @@ RenderRscShader* RenderRscShader::CreateCustom(const RenderRscShaderDomainCreate
 	rsc->domain = ERenderShaderDomain::Custom;
 	rsc->type = data.type;
 	rsc->shader = std::shared_ptr<GLShader>(GLShader::Create(data.name));
+	rsc->isShadow = data.isShadow;
+	rsc->isTwoSidedShader = data.isTwoSided;
 
 	// Default Imports...
 	rsc->shader->AddExSourceFile(0, EGLShaderStageBit::All, "shaders/Common.glsl");
@@ -240,9 +245,15 @@ void RenderRscShader::SetupShaderForType()
 		break;
 
 	case ERenderShaderType::Masked:
+	case ERenderShaderType::MaskedFoliage:
 	{
 		shader->AddPreprocessor("#define RENDER_PASS_DEFERRED 1");
 		shader->AddPreprocessor("#define RENDER_SHADER_TYPE_MASKED 1");
+
+		if (type == ERenderShaderType::MaskedFoliage)
+		{
+			shader->AddPreprocessor("#define RENDER_SHADER_TYPE_MASKED_FOLIAGE 1");
+		}
 	}
 		break;
 
@@ -255,12 +266,17 @@ void RenderRscShader::SetupShaderForType()
 		shader->AddExSourceFile(IMPORT_COMMON_LIGHTING_TAG, EGLShaderStageBit::FragmentBit,
 			"shaders/CommonLight.glsl");
 
+		shader->AddExSourceFile(IMPORT_COMMON_SHADOW_TAG, EGLShaderStageBit::FragmentBit,
+			"shaders/CommonShadow.glsl");
+
 		shader->AddExSourceFile(IMPORT_LIGHTING_TAG, EGLShaderStageBit::FragmentBit,
 			"shaders/Lighting.glsl");
+
 
 		shader->AddPreprocessor("#define MAX_SHADOW_CASCADE " + std::to_string(RENDER_MAX_SHADOW_CASCADE));
 		shader->AddPreprocessor("#define MAX_LIGHTS " + std::to_string(RENDER_PASS_FORWARD_MAX_LIGHTS));
 		input.AddBlockInput(RenderShaderInput::LightingBlock_FORWARD);
+		input.AddBlockInput(RenderShaderInput::LightShadowBlock);
 		input.AddSamplerInput("inSkyEnvironment");
 		input.AddSamplerInput("inEnvBRDF");
 
@@ -302,6 +318,12 @@ void RenderRscShader::BindSamplers()
 		const auto& samplers = input.GetSamplerInput(i);
 		shader->SetUniform(samplers.name, static_cast<int32_t>(i));
 	}
+}
+
+
+bool RenderRscShader::IsTwoSided()
+{
+	return type == ERenderShaderType::MaskedFoliage || isTwoSidedShader;
 }
 
 

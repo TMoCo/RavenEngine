@@ -83,6 +83,8 @@ namespace Raven
 
 	class AnimationController : public IResource
 	{
+		AnimationController& operator=(const AnimationController& other) = delete;
+
 	public:
 		struct AnimatorNode
 		{
@@ -116,6 +118,7 @@ namespace Raven
 
 	public:
 		AnimationController();
+		AnimationController(const AnimationController& other);
 
 		// return the resource type
 		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_AnimationController; }
@@ -180,7 +183,7 @@ namespace Raven
 
 		void LoadAnimation();
 
-		Transition * focusedLink = nullptr;
+		Transition* focusedLink = nullptr;
 
 		std::unordered_map<int32_t,AnimatorNode> animatorNodes;
 		std::unordered_map<int32_t, Transition> linkInfo;
@@ -190,9 +193,34 @@ namespace Raven
 		int32_t currentNodeId = 0;
 		int32_t currentLink = 0;
 		Ptr<Animation> currentAnimation;
-
-
 		std::unordered_map<int32_t, Transition>::iterator iterId;
+	};
+
+
+	// AnimationControllerInstance:
+	//     - instance of the AnimationController resrouce.
+	//
+	class AnimationControllerInstance
+	{
+	public:
+		// Construct.
+		AnimationControllerInstance(Ptr<AnimationController> parentController);
+
+		// Return controller instance.
+		inline Ptr<AnimationController> Get() { return instance; }
+
+		// Return the parent controller.
+		inline Ptr<AnimationController> GetParentController() { return controller; }
+
+		// Update the controller instance to play the animation.
+		void OnUpdate(float dt, SkinnedMeshComponent* skinnedComp);
+
+	private:
+		// The original controller.
+		Ptr<AnimationController> controller;
+
+		// a copy of the controller resrouce, only used at run-time.
+		Ptr<AnimationController> instance;
 	};
 
 };

@@ -4,8 +4,9 @@
 #include "HierarchyWindow.h"
 #include "PropertiesWindow.h"
 #include "AssetsWindow.h"
-#include "FbxWindow.h"
+
 #include "ImportWindow.h"
+#include "ResourceWindow.h"
 
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -46,7 +47,7 @@ namespace Raven
 		addWindow(HierarchyWindow);
 		addWindow(PropertiesWindow);
 		addWindow(AssetsWindow);
-		addWindow(FbxWindow);
+		addWindow(ResourceWindow);
 		addWindow(NodeWindow);
 		addWindow(ImportWindow);
 
@@ -56,7 +57,7 @@ namespace Raven
 		iconMap[typeid(Light).hash_code()] = ICON_MDI_LIGHTBULB;
 		iconMap[typeid(Camera).hash_code()] = ICON_MDI_CAMERA;
 		iconMap[typeid(MeshComponent).hash_code()] = ICON_MDI_SHAPE;
-		iconMap[typeid(SkinnedMeshComponent).hash_code()] = ICON_MDI_SHAPE;
+		iconMap[typeid(SkinnedMeshComponent).hash_code()] = ICON_MDI_BONE;
 		iconMap[typeid(LuaComponent).hash_code()] = ICON_MDI_SCRIPT;
 		iconMap[typeid(RigidBody).hash_code()] = ICON_MDI_APPLE;
 
@@ -280,6 +281,11 @@ namespace Raven
 						
 						transform->SetScale(gizmoOrigScale * Transform::ExtractScale(mat));
 					}
+					else if (static_cast<ImGuizmo::OPERATION>(imGuizmoOperation) == ImGuizmo::OPERATION::ROTATE)
+					{
+						auto mat = glm::make_mat4(delta) * transform->GetWorldMatrix();
+						transform->SetWorldMatrixTransform(mat);
+					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
@@ -358,19 +364,13 @@ namespace Raven
 			break;
 
 		case Raven::RT_Texture2D:
-		case Raven::RT_TextureCube:
-		case Raven::RT_DynamicTexture:
-			LOGW("Editor - Open Texture Not Supported.");
-			break;
-
 		case Raven::RT_MaterialShader:
 		case Raven::RT_Material:
-			LOGW("Editor - Open Materail Not Supported.");
-			break;
-
 		case Raven::RT_Mesh:
 		case Raven::RT_SkinnedMesh:
-			LOGW("Editor - Open Materail Not Supported.");
+		{
+			GetWindow<ResourceWindow>()->SetResource(filePath);
+		}
 			break;
 
 		case Raven::RT_Scene:
@@ -431,20 +431,22 @@ namespace Raven
 
 			if (ImGui::BeginMenu("File"))
 			{
-
-				if (ImGui::MenuItem("Exit"))
+				uint32_t size = Engine::GetModule<ResourceManager>()->GetNumPendingSave();
+				std::string save = "Save - Pending(" +std::to_string(size) + ")";
+				if (ImGui::MenuItem(save.c_str()))
 				{
-					Engine::Get().Exit();
+					Engine::GetModule<ResourceManager>()->SavePending();
 				}
 
-				if (ImGui::MenuItem("Open File"))
-				{
-
-				}
 
 				if (ImGui::MenuItem("Save Scene"))
 				{
 					Engine::GetModule<SceneManager>()->SaveCurrentScene();
+				}
+
+				if (ImGui::MenuItem("Exit"))
+				{
+					Engine::Get().Exit();
 				}
 
 				ImGui::EndMenu();
@@ -584,7 +586,6 @@ namespace Raven
 		GetModule<SceneManager>()->RemoveScene(rmScene);
 	}
 
-
 	void Editor::StartPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Play);
@@ -606,13 +607,11 @@ namespace Raven
 
 	}
 
-
 	void Editor::StopPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Preview);
 		ReloadOriginalScene();
 	}
-
 
 	void Editor::PausePlay()
 	{
@@ -622,7 +621,6 @@ namespace Raven
 			Engine::Get().SetEditorState(EditorState::Play);
 	}
 
-
 	void Editor::OpenScene(const std::string& file)
 	{
 		// First unload all opend scenes...
@@ -631,7 +629,6 @@ namespace Raven
 		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
 		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
 	}
-
 };
 
 Raven::Engine* CreateEngine() {

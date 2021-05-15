@@ -204,30 +204,42 @@ void Transform::Dirty()
 }
 
 
-void Transform::SetPosition(const glm::vec3& v)
+void Transform::SetPosition(const glm::vec3& v, bool update)
 {
 	position = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
-void Transform::SetScale(const glm::vec3& v)
+void Transform::SetScale(const glm::vec3& v, bool update)
 {
 	scale = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
-void Transform::SetRotation(const glm::quat& v)
+void Transform::SetRotation(const glm::quat& v, bool update)
 {
 	rotation = v;
 
 	Dirty();
-	UpdateDirty();
+
+	if (update)
+	{
+		UpdateDirty();
+	}
 }
 
 
@@ -357,6 +369,27 @@ void Transform::SetTransform(Transform& other)
 }
 
 
+glm::vec3 Transform::GetRotationEuler() const
+{
+	glm::vec3 euler;
+
+	// Rool Z-Axis
+	float sinr_cosp = 2     * (rotation.w * rotation.z + rotation.x * rotation.y);
+	float cosr_cosp = 1 - 2 * (rotation.z * rotation.z + rotation.x * rotation.x);
+	euler.z = std::atan2(sinr_cosp, cosr_cosp);
+
+	// Pitch X-Axis 
+	float sinp = 2 * (rotation.w * rotation.x - rotation.y * rotation.z);
+	euler.x = std::asin(sinp);
+
+	// Yaw Y-Axis
+	float siny_cosp = 2     * (rotation.w * rotation.y + rotation.z * rotation.x);
+	float cosy_cosp = 1 - 2 * (rotation.x * rotation.x + rotation.y * rotation.y);
+	euler.y = std::atan2(siny_cosp, cosy_cosp);
+	euler.y = euler.y < 0.0f ? glm::two_pi<float>() + euler.y : euler.y;
+
+	return euler;
+}
 
 
 } // End of namespace Raven

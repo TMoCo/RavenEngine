@@ -23,6 +23,8 @@ IncludeDir["lua"] ="%{root_dir}/RavenEngine/Dependencies/lua/src"
 IncludeDir["LuaBridge"] ="%{root_dir}/RavenEngine/Dependencies/LuaBridge"
 IncludeDir["NodeEditor"] = "%{root_dir}/RavenEngine/Dependencies/node-editor"
 IncludeDir["ImGuiFileDialog"] = "%{root_dir}/RavenEngine/Dependencies/ImGuiFD"
+IncludeDir["OpenAL"] = "%{root_dir}/RavenEngine/Dependencies/OpenAL/include/"
+
 
 workspace( settings.workspace_name )
 	location "build"

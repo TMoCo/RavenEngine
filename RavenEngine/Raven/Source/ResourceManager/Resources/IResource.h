@@ -58,7 +58,7 @@ namespace Raven
 		case RT_DynamicTexture: return "DynamicTexture";
 
 		// Materials.
-		case RT_MaterialShader: "MaterialShader";
+		case RT_MaterialShader: return "MaterialShader";
 		case RT_Material: return "Material";
 
 		// Meshes.
@@ -77,6 +77,7 @@ namespace Raven
 		case RT_AnimationClip: return "AnimationClip";
 		case RT_AnimationController: return "AnimationController";
 
+		default: return "Invalid resource Type.";
 		}
 
 		RAVEN_ASSERT(0, "Invalid resource Type.");
@@ -337,7 +338,6 @@ namespace Raven
 				rscPtr = FindOrLoad(); // Find or Load in the resource registry.
 			}
 
-			RAVEN_ASSERT(!rscPtr || TResource::StaticGetType() == rscPtr->GetType(), "Type Mismatch");
 			return std::static_pointer_cast<TResource, IResource>(rscPtr);
 		}
 

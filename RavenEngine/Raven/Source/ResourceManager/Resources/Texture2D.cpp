@@ -82,6 +82,13 @@ void Texture2D::UpdateRenderResource()
 }
 
 
+void Texture2D::UpdateParamters()
+{
+	RAVEN_ASSERT(isOnGPU, "Resrouce not on GPU. use LoadRenderRsc to load it first.");
+	renderRsc->UpdateParamters(filter, wrap);
+}
+
+
 void Texture2D::SetImageData(ETextureFormat imgFormat, const glm::ivec2& imgSize, uint8_t* imgData)
 {
 	format = imgFormat;

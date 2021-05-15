@@ -30,7 +30,8 @@ project "RavenEditor"
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
 		"%{IncludeDir.NodeEditor}",
-		"%{IncludeDir.ImGuiFileDialog}"
+		"%{IncludeDir.ImGuiFileDialog}",
+		"%{IncludeDir.OpenAL}"
 	}
 
 	sysincludedirs
@@ -42,6 +43,7 @@ project "RavenEditor"
 		"%{IncludeDir.Dependencies}",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.cereal}",
+		"%{IncludeDir.OpenAL}",
 		"%{IncludeDir.Raven}",
 		"%{IncludeDir.OpenFBX}",
 		"%{IncludeDir.glm}",
@@ -89,10 +91,12 @@ project "RavenEditor"
 		libdirs
 		{
 			--"../RAVEN/Dependencies/libs" 
+			"../Dependencies/OpenAL/libs/Win32"
 		}
 
 		links
 		{
+			"OpenAL32",
 			"glfw",
 			"OpenGL32",
 			"lua",

@@ -59,7 +59,8 @@ project "glfw"
       "glfw/src/win32_thread.c",
       "glfw/src/wgl_context.c",
       "glfw/src/egl_context.c",
-      "glfw/src/osmesa_context.c"
+      "glfw/src/osmesa_context.c",
+	  "stb/stb_vorbis.c"--write in here, because I'm lazy to write another premake file
     }
 
 

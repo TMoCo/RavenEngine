@@ -80,13 +80,13 @@ void RSInputBlockDescription::EndUniformBlock()
 }
 
 
-void RSInputBlockDescription::AddInput(EShaderInputType inputType, const std::string& inputName, int32_t offset)
+void RSInputBlockDescription::AddInput(EShaderInputType inputType, const std::string& inputName, ESInputDefaultFlag flag, int32_t offset)
 {
-	AddInputArray(inputType, inputName, 1, offset);
+	AddInputArray(inputType, inputName, 1, flag);
 }
 
 
-void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, int32_t offset)
+void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, ESInputDefaultFlag flag, int32_t offset)
 {
 	RAVEN_ASSERT(!name.empty(), "You must begin block to be able to add input.");
 
@@ -131,6 +131,7 @@ void RSInputBlockDescription::AddInputArray(EShaderInputType inputType, const st
 	blockInput.first.inputType = inputType;
 	blockInput.first.name = inputName;
 	blockInput.first.count = count;
+	blockInput.first.flag = flag;
 	blockInput.second = offset;
 	inputs.push_back(blockInput);
 }
@@ -245,7 +246,7 @@ RenderShaderInput::~RenderShaderInput()
 }
 
 
-void RenderShaderInput::AddInput(EShaderInputType inputType, const std::string& name)
+void RenderShaderInput::AddInput(EShaderInputType inputType, const std::string& name, ESInputDefaultFlag flag)
 {
 	// Find index of an input with the same name.
 	int32_t idx = GetInputIndex(name);
@@ -256,6 +257,7 @@ void RenderShaderInput::AddInput(EShaderInputType inputType, const std::string& 
 		// Override.
 		inputs[idx].uniformType = EShaderUniformType::Uniform;
 		inputs[idx].inputType = inputType;
+		inputs[idx].flag = flag;
 	}
 	else
 	{
@@ -264,13 +266,14 @@ void RenderShaderInput::AddInput(EShaderInputType inputType, const std::string& 
 		newInput.uniformType = EShaderUniformType::Uniform;
 		newInput.inputType = inputType;
 		newInput.name = name;
+		newInput.flag = flag;
 		newInput.count = 1;
 		inputs.push_back(newInput);
 	}
 }
 
 
-void RenderShaderInput::AddSamplerInput(const std::string& name)
+void RenderShaderInput::AddSamplerInput(const std::string& name, ESInputDefaultFlag flag)
 {
 	// Find index of an input with the same name.
 	int32_t idx = GetSamplerInputIndex(name);
@@ -281,6 +284,7 @@ void RenderShaderInput::AddSamplerInput(const std::string& name)
 		// Override.
 		samplers[idx].uniformType = EShaderUniformType::Sampler;
 		samplers[idx].inputType = EShaderInputType::Int;
+		samplers[idx].flag = flag;
 	}
 	else
 	{
@@ -289,6 +293,7 @@ void RenderShaderInput::AddSamplerInput(const std::string& name)
 		newInput.uniformType = EShaderUniformType::Sampler;
 		newInput.inputType = EShaderInputType::Int;
 		newInput.name = name;
+		newInput.flag = flag;
 		samplers.push_back(newInput);
 	}
 }
@@ -298,7 +303,7 @@ void RenderShaderInput::AddSamplerInputs(const std::vector<RSInputDescription>& 
 {
 	for (const auto& s : inSamplers)
 	{
-		AddSamplerInput(s.name);
+		AddSamplerInput(s.name, s.flag);
 	}
 }
 

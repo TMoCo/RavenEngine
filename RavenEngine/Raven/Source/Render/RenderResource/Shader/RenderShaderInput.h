@@ -52,6 +52,20 @@ namespace Raven
 	};
 
 
+	// Flag used to know what to set values to if they are not provided by the material.
+	enum class ESInputDefaultFlag
+	{
+		// White: Scalar->1.0, Color->WhiteColor, Texture->WhiteTexture.
+		White,
+
+		// Black: Scalar->0.0,  Color->BlackColor, Texture->BlackTexture.
+		Black,
+
+		// Normal: Texture->NormalTexture).
+		Normal
+	};
+
+
 	// Render Shader Input.
 	struct RSInputDescription
 	{
@@ -66,6 +80,38 @@ namespace Raven
 
 		// If greater than one, it means that this input is an array and this is the size.
 		int32_t count;
+
+		// Flag used to know what to set values to if they are not provided by the material.
+		ESInputDefaultFlag flag;
+
+
+		// Serialization Save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(
+				name,
+				count,
+				EnumAsInt<const EShaderUniformType>(uniformType),
+				EnumAsInt<const EShaderInputType>(inputType),
+				EnumAsInt<const ESInputDefaultFlag>(flag)
+			);
+
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(
+				name,
+				count,
+				EnumAsInt<EShaderUniformType>(uniformType),
+				EnumAsInt<EShaderInputType>(inputType),
+				EnumAsInt<ESInputDefaultFlag>(flag)
+			);
+
+		}
 	};
 
 
@@ -102,11 +148,54 @@ namespace Raven
 
 		// Specify the input in a unifrom block, if offset is -1 then it will compute the offset based on the previous input.
 		// This is called between Begin/End uniform block.
-		void AddInput(EShaderInputType inputType, const std::string& inputName, int32_t offset = -1);
-		void AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, int32_t offset = -1);
+		void AddInput(EShaderInputType inputType, const std::string& inputName, ESInputDefaultFlag flag = ESInputDefaultFlag::White, int32_t offset = -1);
+		void AddInputArray(EShaderInputType inputType, const std::string& inputName, int32_t count, ESInputDefaultFlag flag = ESInputDefaultFlag::White, int32_t offset = -1);
 
 		// Return the index of an input with that name.
 		int32_t GetInputIndex(const std::string& name);
+
+
+		// Serialization Save.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(
+				name,
+				size,
+				binding
+			);
+
+
+			uint32_t inputsCount = inputs.size();
+			archive(inputsCount);
+			for (uint32_t i = 0; i < inputsCount; ++i)
+			{
+				archive(inputs[i].first);
+				archive(inputs[i].second);
+			}
+
+		}
+
+		// Serialization Load.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(
+				name,
+				size,
+				binding
+			);
+
+
+			uint32_t inputsCount = 0;
+			archive(inputsCount);
+			inputs.resize(inputsCount);
+			for (uint32_t i = 0; i < inputsCount; ++i)
+			{
+				archive(inputs[i].first);
+				archive(inputs[i].second);
+			}
+		}
 
 	public:
 		// Utility functions for making specific/global uniform blocks to a shader input.
@@ -132,10 +221,10 @@ namespace Raven
 		~RenderShaderInput();
 
 		// Specify the input of a normal unifrom.
-		void AddInput(EShaderInputType inputType, const std::string& name);
+		void AddInput(EShaderInputType inputType, const std::string& name, ESInputDefaultFlag flag = ESInputDefaultFlag::White);
 
 		// Specify the input of a sampler.
-		void AddSamplerInput(const std::string& name);
+		void AddSamplerInput(const std::string& name, ESInputDefaultFlag flag = ESInputDefaultFlag::White);
 		void AddSamplerInputs(const std::vector<RSInputDescription>& inSamplers);
 
 		// Add unifrom block as input.

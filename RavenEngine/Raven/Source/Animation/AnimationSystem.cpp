@@ -32,7 +32,7 @@ namespace Raven
 			{
 				auto& animator = scene->GetRegistry().get<Animator>(e);
 
-				if (!animator.controller)
+				if (!animator.GetController())
 					continue;
 
 				Entity skinnedEnttity{ e, scene };
@@ -40,7 +40,7 @@ namespace Raven
 
 				if (skinnedComp)
 				{
-					animator.controller->OnUpdate(dt, skinnedComp);
+					animator.GetController()->OnUpdate(dt, skinnedComp);
 				}
 			}
 		}

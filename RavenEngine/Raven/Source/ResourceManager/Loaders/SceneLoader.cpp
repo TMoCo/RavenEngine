@@ -23,30 +23,22 @@ SceneLoader::SceneLoader()
 
 IResource* SceneLoader::LoadResource(const ResourceHeaderInfo& info, RavenInputArchive& archive)
 {
-	switch (info.GetType())
+	RavenVersionGlobals::SCENE_ARCHIVE_VERSION = info.GetVersion();
+	RAVEN_ASSERT(info.GetType() == EResourceType::RT_Scene, "Must be a scene.");
+
+	Scene* scene = new Scene("LOAD_TMP_NAME");
+
+	std::stringstream ss;
 	{
-	case EResourceType::RT_Scene:
-	{
-		Scene* scene = new Scene("LOAD_TMP_NAME");
+		std::string str;
+		archive.ArchiveLoad(str); // Load JSON...
 
-		std::stringstream ss;
-		{
-			std::string str;
-			archive.ArchiveLoad(str); // Load JSON...
-
-			ss << str;
-		}
-
-		scene->LoadFromStream(ss);
-		return scene;
+		ss << str;
 	}
 
-	default:
-		RAVEN_ASSERT(0, "Not Supported.");
-		break;
-	}
-
-	return nullptr;
+	scene->LoadFromStream(ss);
+	RavenVersionGlobals::SCENE_ARCHIVE_VERSION = RAVEN_VERSION;
+	return scene;
 }
 
 
@@ -74,6 +66,7 @@ void SceneLoader::SaveResource(RavenOutputArchive& archive, IResource* Resource)
 		RAVEN_ASSERT(0, "Not Supported.");
 		break;
 	}
+
 }
 
 

@@ -78,7 +78,16 @@ RenderRscShader* RenderRscShader::Create(ERenderShaderDomain domain, const Rende
 	// Build OpenGL Shader/Program.
 	rsc->shader->Build();
 
-	return rsc;
+	// Success?
+	if (rsc->shader->IsValid())
+	{
+		rsc->shader->Use();
+		return rsc;
+	}
+
+	// Failed...
+	delete rsc;
+	return nullptr;
 }
 
 
@@ -118,9 +127,17 @@ RenderRscShader* RenderRscShader::CreateCustom(const RenderRscShaderDomainCreate
 
 	// Build OpenGL Shader/Program.
 	rsc->shader->Build();
-	rsc->shader->Use();
 
-	return rsc;
+	// Success?
+	if (rsc->shader->IsValid())
+	{
+		rsc->shader->Use();
+		return rsc;
+	}
+
+	// Failed...
+	delete rsc;
+	return nullptr;
 }
 
 

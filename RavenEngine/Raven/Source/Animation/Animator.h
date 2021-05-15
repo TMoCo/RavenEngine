@@ -28,7 +28,7 @@ namespace Raven
 			archive(cereal::make_nvp("rootMotion", rootMotion));
 
 			// Save Resrouce Reference -> AnimationController.
-			ResourceRef::Save(archive, controller.get());
+			ResourceRef::Save(archive, controllerInstance ? controllerInstance->GetParentController().get() : nullptr);
 		}
 
 		template<typename Archive>
@@ -37,36 +37,42 @@ namespace Raven
 			archive(cereal::make_nvp("rootMotion", rootMotion));
 
 			// Load Resrouce Reference -> AnimationController.
-			controller = ResourceRef::Load(archive).FindOrLoad<AnimationController>();
+			Ptr<AnimationController> controller = ResourceRef::Load(archive).FindOrLoad<AnimationController>();
+
+			// Create Instance from resrouce...
+			if (controller)
+			{
+				controllerInstance = Ptr<AnimationControllerInstance>(new AnimationControllerInstance(controller));
+			}
 		}
 
 		template<typename T>
 		void SetValue(const std::string& name, const T& value);
 
-		inline auto GetController() { return controller; }
+		inline auto GetController() { return controllerInstance; }
 
 	private:
 		bool rootMotion = false;
 
 		// The Animation Controller, its a resource so loading/saving is handled by the Resource Manager.
-		Ptr<AnimationController> controller;
+		Ptr<AnimationControllerInstance> controllerInstance;
 	};
 
 	template<>
 	inline void Raven::Animator::SetValue(const std::string& name, const std::string& value)
 	{
-		if (controller != nullptr) 
+		if (controllerInstance != nullptr)
 		{
-			controller->SetValue(name, value);
+			controllerInstance->Get()->SetValue(name, value);
 		}
 	}
 
 	template<typename T>
 	inline void Raven::Animator::SetValue(const std::string& name, const T& value)
 	{
-		if (controller != nullptr)
+		if (controllerInstance != nullptr)
 		{
-			controller->SetValue(name, std::to_string(value));
+			controllerInstance->Get()->SetValue(name, std::to_string(value));
 		}
 	}
 

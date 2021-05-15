@@ -18,6 +18,7 @@
 #include "ResourceManager/Loaders/AnimationLoader.h"
 #include "ResourceManager/Loaders/SkinnedMeshLoader.h"
 #include "ResourceManager/Loaders/SceneLoader.h"
+#include "ResourceManager/Loaders/MaterialLoader.h"
 
 
 
@@ -26,6 +27,14 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
+
+
+// -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
+
+// Set to current version.
+unsigned int RavenVersionGlobals::SCENE_ARCHIVE_VERSION = RAVEN_VERSION;
+
+
 
 
 // -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --- -- - --
@@ -306,6 +315,7 @@ void ResourceManager::Initialize()
 	RegisterLoader<LayoutLoader>();
 	RegisterLoader<AnimationLoader>();
 	RegisterLoader<SceneLoader>();
+	RegisterLoader<MaterialLoader>();
 
 	// scan the directory and populate the 
 	ScanDirectory("./");
@@ -552,7 +562,6 @@ bool ResourceManager::LoadResource(ILoader* loader, const std::string& path)
 	IResource* loadedRsc = loader->LoadResource(info, archive);
 	loadedRsc->path = path;
 
-
 	// Load Render Resources...
 	if (loadedRsc->HasRenderResources() && !loadedRsc->IsOnGPU())
 	{
@@ -645,6 +654,39 @@ void ResourceManager::UnloadResource(Ptr<IResource> rsc)
 {
 	RAVEN_ASSERT(rsc != nullptr, "Invalid Resource.");
 	registry.RemoveResource(rsc.get());
+}
+
+
+void ResourceManager::AddPendingSave(Ptr<IResource> resource)
+{
+	pendingSaveRsc.insert(resource);
+}
+
+
+void ResourceManager::RemovePendingSave(Ptr<IResource> resource)
+{
+	pendingSaveRsc.erase(resource);
+}
+
+
+bool ResourceManager::IsPendingSave(Ptr<IResource> resource)
+{
+	return pendingSaveRsc.count(resource);
+}
+
+
+void ResourceManager::SavePending()
+{
+	for (auto& prsc : pendingSaveRsc)
+	{
+		if (!prsc)
+			continue;
+
+		// Edited Resource?
+		SaveResource(prsc);
+	}
+
+	pendingSaveRsc.clear();
 }
 
 

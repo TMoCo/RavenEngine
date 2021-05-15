@@ -38,6 +38,9 @@ namespace Raven
 		// Draw Mesh.
 		void Draw(GLShader* shader) const override;
 
+		// Return Expected Domain of this primitive.
+		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Skinned; }
+
 	private:
 		// The Mesh Render Resource.
 		RenderRscSkinnedMesh* mesh;

@@ -92,6 +92,7 @@ namespace Raven
 
 
 
+
 	// Resource Manager:
 	//   - The resource manager module takes care of providing the resources consumed by the
 	//     game engine, making sure that only a single copy of any data is ever created/loaded.
@@ -120,6 +121,27 @@ namespace Raven
 
 		// Return Module Type.
 		static EModuleType GetModuleType() { return EModuleType::MT_ResourceManager; }
+
+
+		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
+		//               Pending Save Resources
+		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
+
+		// Add a resource that is edited and not saved.
+		void AddPendingSave(Ptr<IResource> resource);
+
+		// Remove resource that was added to the pending save list.
+		void RemovePendingSave(Ptr<IResource> resource);
+
+		// Is resource in the pending save list.
+		bool IsPendingSave(Ptr<IResource> resource);
+
+		// Save all edited pending resources.
+		void SavePending();
+
+		// Has resources edited pending resources.
+		inline uint32_t GetNumPendingSave() { return (uint32_t)pendingSaveRsc.size(); }
+
 
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
@@ -235,6 +257,9 @@ namespace Raven
 
 		// The Resource registry, use for mapping all Resources that can be loaded or already laoded.
 		ResourcesRegistry registry;
+
+		// Resources that are waiting to be saved.
+		std::set< Ptr<IResource> > pendingSaveRsc;
 	};
 
 

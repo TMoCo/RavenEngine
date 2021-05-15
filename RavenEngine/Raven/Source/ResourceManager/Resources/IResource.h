@@ -76,6 +76,7 @@ namespace Raven
 		case RT_AnimationClip: return "AnimationClip";
 		case RT_AnimationController: return "AnimationController";
 
+		default: return "Invalid resource Type.";
 		}
 
 		RAVEN_ASSERT(0, "Invalid resource Type.");

@@ -18,10 +18,16 @@
 #include <imgui_internal.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "Scene/SceneManager.h"
+#include "Scene/Entity/EntityManager.h"
 #include "Devices/Input.h"
 
 #include <ImGuizmo.h>
 
+#include "Scene/Entity/Entity.h"
+#include "Scene/Component/MeshComponent.h"
+#include "Scene/Component/SkinnedMeshComponent.h"
+
+#include "ResourceManager/ResourceManager.h"
 
 
 namespace Raven 
@@ -151,6 +157,29 @@ namespace Raven
 				PRINT_FUNC();
 				LOGV("Receive file from assets window : {0}",file);
 				editor.OpenFile(file);
+				EResourceType rscType = Engine::GetModule<ResourceManager>()->GetResourceType(file);
+
+				Transform newEttTR;
+				auto camTR = currentScene->GetCameraTransform();
+				newEttTR.SetPosition(camTR->GetPosition()-(camTR->GetForwardDirection() * 10.f));
+
+				if (rscType == EResourceType::RT_Mesh)
+				{
+					// Create the new entity
+					auto entity = currentScene->CreateEntity("New Mesh");
+					auto& tr = entity.GetOrAddComponent<Transform>();
+					auto& mesh = entity.GetOrAddComponent<MeshComponent>();
+					tr = newEttTR;
+				}
+
+				if (rscType == EResourceType::RT_SkinnedMesh)
+				{
+					// Create the new entity
+					auto entity = currentScene->CreateEntity("New Skinned Mesh");
+					auto& tr = entity.GetOrAddComponent<Transform>();
+					auto& mesh = entity.GetOrAddComponent<SkinnedMeshComponent>();
+					tr = newEttTR;
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}

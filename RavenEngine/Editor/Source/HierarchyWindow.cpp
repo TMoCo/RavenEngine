@@ -127,8 +127,8 @@ namespace Raven
 				auto entity = scene->CreateEntity("Camera");
 				auto& camera = entity.AddComponent<Camera>();
 				camera.SetFov(45.f);
-				camera.SetFar(100);
-				camera.SetNear(0.01);
+				camera.SetFar(320000.0);
+				camera.SetNear(1.0);
 				camera.SetAspectRatio(4 / 3.f);
 				entity.GetOrAddComponent<Transform>();
 			}

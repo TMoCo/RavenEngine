@@ -60,6 +60,36 @@ namespace Raven
 		// Compute sun direction from angles.
 		glm::vec3 GetSunDir();
 
+
+		// Saving.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(
+				sunAngles,
+				isSun,
+				isSky,
+				sunPower,
+				sunColor
+			);
+
+		}
+
+		// Loading.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(
+				sunAngles,
+				isSun,
+				isSky,
+				sunPower,
+				sunColor
+			);
+
+		}
+
+
 	};
 
 
@@ -132,12 +162,27 @@ namespace Raven
 		void save(Archive& archive) const
 		{
 			archive(cereal::make_nvp("SceneName", name));
+
+			// Start Archiving Global Settngs...
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(globalSettings);
+			}
+
 		}
+
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
 			archive(cereal::make_nvp("SceneName", name));
+
+			// Start Archiving Global Settngs...
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(globalSettings);
+			}
+
 		}
 
 

@@ -83,6 +83,13 @@ namespace Raven
 					ResourceRef::Save(archive, materials[i].get());
 				}
 			}
+
+			// Start Archiving isCastShadow.
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(isCastShadow);
+			}
+
 		}
 
 		template<typename Archive>
@@ -104,6 +111,13 @@ namespace Raven
 					materials[i] = ResourceRef::Load(archive).FindOrLoad<Material>();
 				}
 			}
+
+			// Start Archiving isCastShadow.
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(isCastShadow);
+			}
+
 		}
 
 

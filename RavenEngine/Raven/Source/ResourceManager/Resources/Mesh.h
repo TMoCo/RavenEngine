@@ -73,6 +73,14 @@ namespace Raven
 			LoadVectorBinary(archive, indices);
 			archive(bounds);
 			archive(defaultMaterial);
+
+
+			// If Valid try to loaded it.
+			if (defaultMaterial.IsValid())
+			{
+				defaultMaterial.FindOrLoad<Material>();
+			}
+
 		}
 
 

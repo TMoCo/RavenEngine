@@ -42,6 +42,12 @@ namespace Raven
 		// UI - Material.
 		void OnImGuiMaterial();
 
+		// UI - Mesh
+		void OnImGuiMesh();
+
+		// UI - Skinned
+		void OnImGuiSkinned();
+
 		// ImGui Util function for drag and drop.
 		std::string ImGuiDragDropAssetsTarget();
 

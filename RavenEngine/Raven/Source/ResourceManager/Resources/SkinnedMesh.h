@@ -8,12 +8,12 @@
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h"
 #include "Render/RenderResource/Primitives/RenderRscMesh.h"
+#include "ResourceManager/Resources/Material.h"
 
 #include "Utilities/Serialization.h"
 #include "Math/BoundingBox.h"
 
 
-#include "glm/glm.hpp"
 #include "glm/glm.hpp"
 
 
@@ -100,6 +100,13 @@ namespace Raven
 			LoadVectorBinary(archive, blendWeights);
 			archive(bounds);
 			archive(defaultMaterial);
+
+
+			// If Valid try to loaded it.
+			if (defaultMaterial.IsValid())
+			{
+				defaultMaterial.FindOrLoad<Material>();
+			}
 		}
 
 

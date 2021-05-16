@@ -214,6 +214,27 @@ void RenderScene::TraverseScene(Scene* scene)
 		// Compute World Bounds.
 		MathUtils::BoundingBox bounds = primComp->GetLocalBounds().Transform(trComp->GetWorldMatrix());
 
+		// distance to view.
+		glm::vec3 v = (viewPos - bounds.GetCenter());
+		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+
+		// Clipping based on distance...
+		if (primComp->GetClipDistance() > 0.0)
+		{
+			float clipDist2 = primComp->GetClipDistance();
+			clipDist2 = clipDist2 * clipDist2;
+
+			if (viewDist2 > clipDist2)
+			{
+				// Don't Draw Component...
+				continue;
+			}
+		}
+		
+		
+
+
 		float radius;
 		glm::vec3 center;
 		bounds.GetSphere(center, radius);
@@ -235,10 +256,6 @@ void RenderScene::TraverseScene(Scene* scene)
 			// Don't Draw Component...
 			continue;
 		}
-
-		// distance to view.
-		glm::vec3 v = (viewPos - trComp->GetWorldPosition());
-		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
 
 
 		// Collect Render Render Primitives...

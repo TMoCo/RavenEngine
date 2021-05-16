@@ -173,6 +173,8 @@ namespace Raven
 
 					auto& imported = Engine::GetModule<ResourceManager>()->GetResource<Mesh>(file);
 					mesh.SetMesh(imported);
+
+					editor.SetSelected(entity);
 				}
 
 				if (rscType == EResourceType::RT_SkinnedMesh)
@@ -185,6 +187,8 @@ namespace Raven
 
 					auto& imported = Engine::GetModule<ResourceManager>()->GetResource<SkinnedMesh>(file);
 					mesh.SetMesh(imported);
+
+					editor.SetSelected(entity);
 				}
 			}
 			ImGui::EndDragDropTarget();

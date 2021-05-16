@@ -168,8 +168,11 @@ namespace Raven
 					// Create the new entity
 					auto entity = currentScene->CreateEntity("New Mesh");
 					auto& tr = entity.GetOrAddComponent<Transform>();
-					auto& mesh = entity.GetOrAddComponent<MeshComponent>();
 					tr = newEttTR;
+					auto& mesh = entity.GetOrAddComponent<MeshComponent>();
+
+					auto& imported = Engine::GetModule<ResourceManager>()->GetResource<Mesh>(file);
+					mesh.SetMesh(imported);
 				}
 
 				if (rscType == EResourceType::RT_SkinnedMesh)
@@ -177,8 +180,11 @@ namespace Raven
 					// Create the new entity
 					auto entity = currentScene->CreateEntity("New Skinned Mesh");
 					auto& tr = entity.GetOrAddComponent<Transform>();
-					auto& mesh = entity.GetOrAddComponent<SkinnedMeshComponent>();
 					tr = newEttTR;
+					auto& mesh = entity.GetOrAddComponent<SkinnedMeshComponent>();
+
+					auto& imported = Engine::GetModule<ResourceManager>()->GetResource<SkinnedMesh>(file);
+					mesh.SetMesh(imported);
 				}
 			}
 			ImGui::EndDragDropTarget();

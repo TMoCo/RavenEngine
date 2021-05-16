@@ -287,6 +287,11 @@ namespace Raven
 						
 						transform->SetScale(gizmoOrigScale * Transform::ExtractScale(mat));
 					}
+					else if (static_cast<ImGuizmo::OPERATION>(imGuizmoOperation) == ImGuizmo::OPERATION::ROTATE)
+					{
+						auto mat = glm::make_mat4(delta) * transform->GetWorldMatrix();
+						transform->SetWorldMatrixTransform(mat);
+					}
 					else
 					{
 						auto mat = glm::make_mat4(delta) * transform->GetLocalMatrix();
@@ -593,7 +598,6 @@ namespace Raven
 		GetModule<SceneManager>()->RemoveScene(rmScene);
 	}
 
-
 	void Editor::StartPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Play);
@@ -615,13 +619,11 @@ namespace Raven
 
 	}
 
-
 	void Editor::StopPlay()
 	{
 		Engine::Get().SetEditorState(EditorState::Preview);
 		ReloadOriginalScene();
 	}
-
 
 	void Editor::PausePlay()
 	{
@@ -630,7 +632,6 @@ namespace Raven
 		else
 			Engine::Get().SetEditorState(EditorState::Play);
 	}
-
 
 	void Editor::OpenScene(const std::string& file)
 	{
@@ -642,7 +643,6 @@ namespace Raven
 		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
 		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
 	}
-
 };
 
 Raven::Engine* CreateEngine() {

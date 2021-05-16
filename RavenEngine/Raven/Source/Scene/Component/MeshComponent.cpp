@@ -88,6 +88,18 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 		// Material to use while rendering the mesh section.
 		Material* mat = GetMaterial(i);
 
+		// No Materail? Try get default material.
+		if (!mat)
+		{
+			auto& defaultMaterial = meshSection->defaultMaterial;
+
+			// Has Default Material?
+			if (defaultMaterial.IsValid())
+			{
+				mat = defaultMaterial.GetWeak<Material>();
+			}
+		}
+
 		// Has Material?
 		if (mat)
 		{
@@ -100,7 +112,7 @@ void MeshComponent::CollectRenderPrimitives(RenderPrimitiveCollector& rcollector
 				}
 			}
 
-			rmesh->SetMaterial( mat->GetRenderRsc() );
+			rmesh->SetMaterial(mat->GetRenderRsc());
 		}
 	}
 }

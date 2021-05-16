@@ -18,10 +18,13 @@ namespace Raven {
 MaterialShader::MaterialShader()
 	: IResource()
 	, renderRsc(nullptr)
+	, renderShadowRsc(nullptr)
 	, sdomain(ERenderShaderDomain::Mesh)
 	, stype(ERenderShaderType::Opaque)
 	, isComputeMaterialVertex(false)
 	, samplersStartIndex(-1)
+	, isMakeShadowShader(false)
+	, isTwoSided(false)
 {
 	type = MaterialShader::StaticGetType();
 	hasRenderResources = true;
@@ -31,6 +34,7 @@ MaterialShader::MaterialShader()
 MaterialShader::~MaterialShader()
 {
 	delete renderRsc;
+	delete renderShadowRsc;
 }
 
 
@@ -79,6 +83,7 @@ void MaterialShader::LoadRenderResource()
 
 	isOnGPU = true;
 	UpdateMaterials();
+	CreateShadowShader(rscData);
 }
 
 
@@ -89,6 +94,7 @@ void MaterialShader::UpdateRenderResource()
 	if (!HasValidData())
 		return;
 
+	delete renderShadowRsc;
 	delete renderRsc;
 	isOnGPU = false;
 	LoadRenderResource();
@@ -98,6 +104,18 @@ void MaterialShader::UpdateRenderResource()
 bool MaterialShader::HasValidData()
 {
 	return !materialFunction.empty();
+}
+
+
+void MaterialShader::SetShadowShader(bool value)
+{
+	isMakeShadowShader = value;
+}
+
+
+void MaterialShader::SetTwoSided(bool value)
+{
+	isTwoSided = value;
 }
 
 
@@ -180,6 +198,32 @@ void MaterialShader::UpdateMaterials()
 		mat->ReloadShader();
 	}
 }
+
+
+void MaterialShader::CreateShadowShader(RenderRscShaderCreateData data)
+{
+	if (!isMakeShadowShader)
+	{
+		// Is custom shadow shader needed?
+		if ( stype != ERenderShaderType::Masked
+			&& stype != ERenderShaderType::MaskedFoliage
+			&& !isComputeMaterialVertex )
+			return;
+	}
+
+
+	data.isShadow = true;
+	data.name.append("_Shadow");
+	renderShadowRsc = RenderRscShader::Create(sdomain, data); // Build Shader
+
+	if (blockInput.binding != -1)
+		renderRsc->GetInput().AddBlockInput(blockInput);
+
+	renderRsc->GetInput().AddSamplerInputs(samplers);
+	renderShadowRsc->BindBlockInputs();
+	renderShadowRsc->BindSamplers();
+}
+
 
 
 } // End of namespace Raven.

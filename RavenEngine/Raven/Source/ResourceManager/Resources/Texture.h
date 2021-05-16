@@ -21,14 +21,16 @@ namespace Raven
 	// Texture Formats.
 	enum class ETextureFormat : uint32_t
 	{
-		// 
+		// Int Formats.
 		R8,
 		RGB24,
 		RGBA32,
 
-		//
+		// Float Formats.
 		R_Float,
 		RGB_Float,
+
+		MAX_FORMAT
 	};
 
 
@@ -97,6 +99,8 @@ namespace Raven
 		// Return texture render resource.
 		inline RenderRscTexture* GetRenderRsc() const { return renderRsc.get(); }
 
+		// Update texture paramters for the Render Resrouce.
+		virtual void UpdateParamters() { RAVEN_ASSERT(0, "Not Implemented."); }
 
 
 		// Serialization Save.

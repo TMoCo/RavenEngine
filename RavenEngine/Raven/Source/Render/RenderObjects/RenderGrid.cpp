@@ -77,14 +77,14 @@ RenderGrid* RenderGrid::Create()
 
 	std::vector<GLVABuildAttribData> attributes{
 		// Attribute 0 - Position
-		{
+		GLVABuildAttribData(
 			grid->vxBuffer,        // Buffers
 			0,                     // Index
 			3,                     // Type-Size
 			EGLTypes::Float,       // Type
 			sizeof(glm::vec3),     // Stride
 			0                      // offset
-		}
+		)
 	};
 
 
@@ -126,8 +126,6 @@ void RenderGrid::Draw()
 
 	vxArray->Bind();
 	glDrawArrays(GL_LINES, 0, numVerts);
-
-	glDisable(GL_LINE_SMOOTH);
 }
 
 

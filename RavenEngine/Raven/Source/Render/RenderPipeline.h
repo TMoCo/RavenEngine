@@ -24,6 +24,9 @@ namespace Raven
 	class UniformBuffer;
 	class GLTexture;
 	class GLShader;
+	class RenderTexFilter;
+
+
 
 
 
@@ -38,6 +41,12 @@ namespace Raven
 
 		// Light framebuffer used for forward lighting data.
 		Ptr<UniformBuffer> light_FORWARD;
+
+		// Shadow Uniform Buffer used while drawing the shadow maps.
+		Ptr<UniformBuffer> shadow;
+
+		// Shadow Uniform Buffer, used in the lighting pass.
+		Ptr<UniformBuffer> lightShadow;
 	};
 
 
@@ -84,14 +93,26 @@ namespace Raven
 		// Load & Build the shaders of the render pipeline.
 		void SetupShaders();
 
+		// Setup Screen Space Ambient Occlusion.
+		void SetupSSAO();
+
+		// Setyp Sky & Sky Filter passess.
+		void SetupSky();
+
 		// Resize all render passes.
 		void Resize(const glm::ivec2& newSize);
 
 		// Update Light Unifrom Buffer for deferred lighting.
 		void UpdateLights_DEFERRED();
+		
+		// Update Shadows Unifrom Buffer..
+		void UpdateShadows();
 
 		// Do a final post processing and use the final render target.
 		void DoPostProcessFinal(int32_t hdrTargetIndex);
+
+		// Render the environment sky to match the new updated sky.
+		void RenderEnvSky();
 
 	private:
 		// Deferred Render Pass - G-Buffer.
@@ -106,6 +127,13 @@ namespace Raven
 		// The final post-processing step.
 		Ptr<RenderPass> finalPostProcessPass;
 
+		// The SSAO pass.
+		Ptr<RenderPass> ssaoPass;
+		Ptr<RenderPass> ssaoBlurPass;
+
+		// Pass for drawing the sky into a cubemap.
+		Ptr<RenderPass> skyCubePass;
+
 		// Pipeline HDR Render Targets.
 		Ptr<GLTexture> hdrTarget[2];
 
@@ -118,11 +146,26 @@ namespace Raven
 		// Fast Approximate Anti-Aliasing executed on the final pos-tprocesing step
 		Ptr<RenderRscShader> fxaaShader;
 
+		// SSAO Shader.
+		Ptr<RenderRscShader> ssaoShader;
+		
+		// SSAO Blur Shader.
+		Ptr<RenderRscShader> ssaoBlurShader;
+
+		// Sky Shader, Draw the sky in thee scene.
+		Ptr<RenderRscShader> skyShader;
+
+		// Sky Cube Map, draw the sky for cube map creation.
+		Ptr<RenderRscShader> skyCubeShader;
+
 		// Screen triangle used to render the entire screen, used by render passes and post-processing.
 		Ptr<RenderScreen> rscreen;
 
 		// Sphere.
 		Ptr<RenderSphere> rsphere;
+
+		// Render filter instance.
+		RenderTexFilter* rtFilter;
 
 		// Uniforms of the pipeline.
 		RenderPipelineUniforms uniforms;
@@ -142,12 +185,20 @@ namespace Raven
 		// The Render Grid.
 		Ptr<RenderGrid> rgrid;
 		
-	public:
-		// ~ITERATION_0----------------------------------
-		class GLTexture* testEnv;
-		class GLTexture* testBRDF;
-		// ~ITERATION_0----------------------------------
+		// Noise texture used in SSAO pass.
+		Ptr<GLTexture> ssaoNoiseTexture;
 
+		// Sky Cube Map.
+		Ptr<GLTexture> skyCubeMap;
+
+		// Sky Environment - filterd skyTexture for IBL.
+		Ptr<GLTexture> skyEnv;
+
+		// Current environment map.
+		GLTexture* EnvMap;
+
+		// BRDF Lookup table used form IBL.
+		GLTexture* BRDF;
 	};
 
 

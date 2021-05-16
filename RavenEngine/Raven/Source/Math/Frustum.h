@@ -47,10 +47,10 @@ namespace Raven
 			// Test if a sphere inside or intersect the frustum.
 			bool IsInFrustum(const glm::vec3& center, float radius);
 
-		private:
 			// Extract Frustum Planes from view projection matrix.
 			void ExtractPlanes(const glm::mat4& mtx);
 
+		private:
 			// Normalize the plane.
 			void Normalize(uint32_t i);
 

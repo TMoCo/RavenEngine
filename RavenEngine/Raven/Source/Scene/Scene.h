@@ -27,6 +27,74 @@ namespace Raven
 	class Transform;
 
 
+	// SceneGlobalSettings:
+	//  - 
+	struct SceneGlobalSettings
+	{
+		// Sun Angles in degrees to compute the directoin.
+		glm::vec2 sunAngles;
+
+		// Enable/Disable sun.
+		bool isSun;
+
+		// Enable/Disable Sky.
+		bool isSky;
+
+		// Sun power
+		float sunPower;
+
+		// Sun Color
+		glm::vec3 sunColor;
+
+		// Construct.
+		SceneGlobalSettings()
+			: sunAngles(0.0f, 45.0f)
+			, isSun(true)
+			, isSky(true)
+			, sunPower(1.0f)
+			, sunColor(1.0f)
+		{
+
+		}
+
+		// Compute sun direction from angles.
+		glm::vec3 GetSunDir();
+
+
+		// Saving.
+		template<typename Archive>
+		void save(Archive& archive) const
+		{
+			archive(
+				sunAngles,
+				isSun,
+				isSky,
+				sunPower,
+				sunColor
+			);
+
+		}
+
+		// Loading.
+		template<typename Archive>
+		void load(Archive& archive)
+		{
+			archive(
+				sunAngles,
+				isSun,
+				isSky,
+				sunPower,
+				sunColor
+			);
+
+		}
+
+
+	};
+
+
+
+
 	// Scene:
 	//   - 
 	//
@@ -85,21 +153,43 @@ namespace Raven
 		// Make sure that all components in this entity has a valid reference to their entity id and scene.
 		void ValidateEntityComponents(entt::registry& reg, entt::entity entity);
 
+		// Get Scene Global Settings.
+		SceneGlobalSettings& GetGlobalSettings() { return globalSettings; }
+		const SceneGlobalSettings& GetGlobalSettings() const { return globalSettings; }
+
+
 		template<typename Archive>
 		void save(Archive& archive) const
 		{
 			archive(cereal::make_nvp("SceneName", name));
+
+			// Start Archiving Global Settngs...
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(globalSettings);
+			}
+
 		}
+
 
 		template<typename Archive>
 		void load(Archive& archive)
 		{
 			archive(cereal::make_nvp("SceneName", name));
+
+			// Start Archiving Global Settngs...
+			if (RavenVersionGlobals::SCENE_ARCHIVE_VERSION >= 10002)
+			{
+				archive(globalSettings);
+			}
+
 		}
 
-	private:
 
+
+	private:
 		auto UpdateCameraController(float dt);
+
 
 		bool forceShow = false;
 		std::shared_ptr<SceneGraph> sceneGraph;
@@ -108,6 +198,8 @@ namespace Raven
 		std::string loadName;
 		uint32_t width = 0;
 		uint32_t height = 0;
+		SceneGlobalSettings globalSettings;
+
 		NOCOPYABLE(Scene);
 
 		void CopyComponents(const Entity& from, const Entity& to );

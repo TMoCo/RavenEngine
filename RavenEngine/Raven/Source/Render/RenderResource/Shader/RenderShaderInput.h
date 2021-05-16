@@ -16,6 +16,7 @@
 #define RENDER_PASS_DEFERRED_MAX_LIGHTS 32
 #define RENDER_PASS_FORWARD_MAX_LIGHTS 4
 #define RENDER_SKINNED_MAX_BONES 82
+#define RENDER_MAX_SHADOW_CASCADE 4
 
 
 
@@ -204,7 +205,10 @@ namespace Raven
 		static RSInputBlockDescription MakeTransformBoneBlock();
 		static RSInputBlockDescription MakeLightingBlock_DEFERRED();
 		static RSInputBlockDescription MakeLightingBlock_FORWARD();
-	};
+		static RSInputBlockDescription MakeTerrainBinBlock();
+		static RSInputBlockDescription MakeShadowBlock();
+		static RSInputBlockDescription LightShadowBlock();
+	}; 
 
 
 
@@ -274,6 +278,9 @@ namespace Raven
 		static RSInputBlockDescription TransformBoneBlock;
 		static RSInputBlockDescription LightingBlock_DEFERRED;
 		static RSInputBlockDescription LightingBlock_FORWARD;
+		static RSInputBlockDescription TerrainBinBlock;
+		static RSInputBlockDescription ShadowBlock;
+		static RSInputBlockDescription LightShadowBlock;
 
 		// The binding for the material shader unifrom block input.
 		static int32_t MaterialBlockBinding;

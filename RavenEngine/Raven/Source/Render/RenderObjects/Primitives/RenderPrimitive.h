@@ -70,6 +70,12 @@ namespace Raven
 		// Render Shader Type from the material set to this primitive.
 		ERenderShaderType GetShaderType() const;
 
+		// Return true if skinned mesh.
+		inline bool IsSkinned() const { return isSkinned; }
+
+		// Return true if this primitive cast shadow.
+		bool IsCastShadow();
+
 	private:
 		// The material.
 		RenderRscMaterial* material;

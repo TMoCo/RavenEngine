@@ -77,15 +77,11 @@ void ResourceWindow::OnImGui()
 			break;
 
 		case Raven::RT_Mesh:
-			LOGW("ResourceWindow - RT_Mesh Not Supported.");
-			type = RT_None;
-			resource.reset();
+			OnImGuiMesh();
 			break;
 
 		case Raven::RT_SkinnedMesh:
-			LOGW("ResourceWindow - RT_SkinnedMesh Not Supported.");
-			type = RT_None;
-			resource.reset();
+			OnImGuiSkinned();
 			break;
 		}
 
@@ -157,6 +153,110 @@ void ResourceWindow::SetResource(const std::string& rscPath)
 		return;
 	}
 
+}
+
+
+void ResourceWindow::OnImGuiMesh()
+{
+	Mesh* rscMesh = static_cast<Mesh*>(resource.get());
+	bool isModified = false;
+	//-- --- -- -
+
+
+
+
+	MeshLOD& mesh = rscMesh->GetMeshLOD(0);
+
+	for (size_t i = 0; i < mesh.sections.size(); ++i)
+	{
+
+		auto& section  = mesh.sections[i];
+
+		ImGui::PushID(500 + i);
+
+		ImGui::Separator();
+		ImGui::Text("Section(%d)", i);
+
+		ImGui::Columns(2);
+		std::string path = section->defaultMaterial.GetPath();
+		ImGuiHelper::Property("Default Material", path);
+
+		std::string drop = ImGuiDragDropAssetsTarget();
+		if (!drop.empty())
+		{
+			if (Engine::GetModule<ResourceManager>()->GetResourceType(drop) == RT_Material)
+			{
+				Ptr<Material> mat = Engine::GetModule<ResourceManager>()->GetResource<Material>(drop);
+				section->defaultMaterial = ResourceRef(mat.get());
+				section->defaultMaterial.FindOrLoad<Material>();
+				isModified = true;
+			}
+		}
+
+		ImGui::Columns(1);
+		ImGui::PopID();
+	}
+
+
+
+
+
+	if (isModified)
+	{
+		Engine::GetModule<ResourceManager>()->AddPendingSave(resource);
+	}
+}
+
+
+void ResourceWindow::OnImGuiSkinned()
+{
+	SkinnedMesh* rscMesh = static_cast<SkinnedMesh*>(resource.get());
+	bool isModified = false;
+	//-- --- -- -
+
+
+
+
+	auto& sections = rscMesh->GetMeshSections();
+
+	for (size_t i = 0; i < sections.size(); ++i)
+	{
+
+		auto& section = sections[i];
+
+		ImGui::PushID(500 + i);
+
+		ImGui::Separator();
+		ImGui::Text("Section(%d)", i);
+
+		ImGui::Columns(2);
+		std::string path = section->defaultMaterial.GetPath();
+		ImGuiHelper::Property("Default Material", path);
+
+		std::string drop = ImGuiDragDropAssetsTarget();
+		if (!drop.empty())
+		{
+			if (Engine::GetModule<ResourceManager>()->GetResourceType(drop) == RT_Material)
+			{
+				Ptr<Material> mat = Engine::GetModule<ResourceManager>()->GetResource<Material>(drop);
+				section->defaultMaterial = ResourceRef(mat.get());
+				section->defaultMaterial.FindOrLoad<Material>();
+				isModified = true;
+			}
+		}
+
+		ImGui::Columns(1);
+		ImGui::PopID();
+	}
+
+
+
+
+
+	if (isModified)
+	{
+		Engine::GetModule<ResourceManager>()->AddPendingSave(resource);
+	}
 }
 
 
@@ -337,7 +437,7 @@ void ResourceWindow::OnImGuiShader()
 
 	// Type.
 	{
-		static const char* types[4] = { "Opaque", "Masked", "Translucent", nullptr };
+		static const char* types[5] = { "Opaque", "Masked", "Translucent", nullptr, "MaskedFoliage" };
 
 		ImGui::Text("Type: ");
 		ImGui::SameLine();

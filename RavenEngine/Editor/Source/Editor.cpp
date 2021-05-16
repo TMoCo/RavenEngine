@@ -229,6 +229,15 @@ namespace Raven
 	{
 		prevSelectedNode = selectedNode;
 		selectedNode = node;
+		showGlobalSettings = false;
+	}
+
+
+	void Editor::SelectGlobalSettings()
+	{
+		prevSelectedNode = selectedNode;
+		selectedNode = entt::null;
+		showGlobalSettings = true;
 	}
 
 	void Editor::SetCopiedEntity(const entt::entity& selectedNode,bool cut) 
@@ -432,7 +441,7 @@ namespace Raven
 			if (ImGui::BeginMenu("File"))
 			{
 				uint32_t size = Engine::GetModule<ResourceManager>()->GetNumPendingSave();
-				std::string save = "Save - Pending(" +std::to_string(size) + ")";
+				std::string save = "Save Resources - Pending(" +std::to_string(size) + ")";
 				if (ImGui::MenuItem(save.c_str()))
 				{
 					Engine::GetModule<ResourceManager>()->SavePending();
@@ -443,6 +452,12 @@ namespace Raven
 				{
 					Engine::GetModule<SceneManager>()->SaveCurrentScene();
 				}
+
+
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+
 
 				if (ImGui::MenuItem("Exit"))
 				{
@@ -623,6 +638,8 @@ namespace Raven
 
 	void Editor::OpenScene(const std::string& file)
 	{
+		SetSelected(entt::null);
+
 		// First unload all opend scenes...
 		Engine::GetModule<SceneManager>()->UnloadScenes();
 

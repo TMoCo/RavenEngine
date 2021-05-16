@@ -20,7 +20,7 @@ namespace Raven {
 
 
 
-static std::pair<glm::vec3, glm::vec3> cubeMapViews[6] = {
+std::pair<glm::vec3, glm::vec3> RenderTexFilter::CUBE_MAP_VIEWS[6] = {
 	// +/- X_AXIS
 	std::make_pair( glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f) ),
 	std::make_pair( glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f,-1.0f, 0.0f) ),
@@ -59,6 +59,9 @@ RenderTexFilter::~RenderTexFilter()
 
 void RenderTexFilter::Initialize()
 {
+	// Important for IBL sampling.
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	// Create Filter Shadrs...
 	CreateCubeMapGenShader();
 	CreateIrradainceFilterShader();
@@ -120,7 +123,7 @@ void RenderTexFilter::CreateIrradainceFilterShader()
 void RenderTexFilter::CreateSepcularFilterShader()
 {
 	int32_t numSamples[2] = {
-		512, 2048
+		256, 2048
 	};
 
 	for (int32_t i = 0; i < 2; ++i)
@@ -189,7 +192,7 @@ void RenderTexFilter::GenCubeMap(RenderRscTexture* inTexture, RenderRscTexture* 
 		rsphere->SetProj(glm::perspective(glm::radians(90.0f), 1.0F, 0.01f, 10.0f));
 
 		inTexture->GetTexture()->Active(0);
-		rsphere->SetView(glm::lookAt(glm::vec3(0.0f), cubeMapViews[i].first, cubeMapViews[i].second));
+		rsphere->SetView(glm::lookAt(glm::vec3(0.0f), CUBE_MAP_VIEWS[i].first, CUBE_MAP_VIEWS[i].second));
 		rsphere->Draw(shader);
 	}
 
@@ -205,7 +208,6 @@ void RenderTexFilter::FilterIrradianceIBL(RenderRscTexture* inEnvTexture, Render
 	//
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	glm::ivec4 viewport(0, 0, size.x, size.y);
 	filterPass->SetSize(size);
@@ -219,24 +221,24 @@ void RenderTexFilter::FilterIrradianceIBL(RenderRscTexture* inEnvTexture, Render
 		filterPass->Begin(viewport, false);
 
 		inEnvTexture->GetTexture()->Active(0);
-		rsphere->SetView(glm::lookAt(glm::vec3(0.0f), cubeMapViews[i].first, cubeMapViews[i].second));
+		rsphere->SetView(glm::lookAt(glm::vec3(0.0f), CUBE_MAP_VIEWS[i].first, CUBE_MAP_VIEWS[i].second));
 		rsphere->Draw(shader);
 	}
 
 	RenderPass::End();
+	glBindVertexArray(0);
 }
 
 
 
 void RenderTexFilter::FilterSpecularIBL(RenderRscTexture* inEnvTexture, RenderRscTexture* outSpecular)
 {
-	int32_t numMips = 5;
 	glm::ivec2 size(256, 256);
 	outSpecular->Load(EGLTexture::CubeMap, EGLFormat::RGB, size, nullptr);
 	outSpecular->GetTexture()->Bind();
 	outSpecular->GetTexture()->SetWrap(EGLWrap::ClampToEdge);
 	outSpecular->GetTexture()->SetFilter(EGLFilter::TriLinear);
-	outSpecular->GetTexture()->SetMipLevels(0, numMips);
+	outSpecular->GetTexture()->SetMipLevels(0, NUM_IBL_SPEC_MIPS);
 	outSpecular->GetTexture()->UpdateTexParams();
 	outSpecular->GetTexture()->GenerateMipmaps();
 	outSpecular->GetTexture()->Unbind();
@@ -244,16 +246,15 @@ void RenderTexFilter::FilterSpecularIBL(RenderRscTexture* inEnvTexture, RenderRs
 	//
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	GLShader* shader = filterSpecularShader[1]->GetShader();
 	shader->Use();
 
 	//
 
-	for (int32_t mip = 0; mip < numMips; ++mip)
+	for (int32_t mip = 0; mip < NUM_IBL_SPEC_MIPS; ++mip)
 	{
-		float roughness = (float)mip / (float)(numMips - 1);
+		float roughness = (float)mip / (float)(NUM_IBL_SPEC_MIPS - 1);
 		shader->SetUniform("inRoughness", roughness);
 
 		glm::ivec2 mipSize(size.x >> mip, size.y >> mip);
@@ -266,14 +267,14 @@ void RenderTexFilter::FilterSpecularIBL(RenderRscTexture* inEnvTexture, RenderRs
 			filterPass->Begin(viewport, false);
 
 			inEnvTexture->GetTexture()->Active(0);
-			rsphere->SetView(glm::lookAt(glm::vec3(0.0f), cubeMapViews[i].first, cubeMapViews[i].second));
+			rsphere->SetView(glm::lookAt(glm::vec3(0.0f), CUBE_MAP_VIEWS[i].first, CUBE_MAP_VIEWS[i].second));
 			rsphere->Draw(shader);
 		}
 	}
 
 
 	RenderPass::End();
-
+	glBindVertexArray(0);
 }
 
 
@@ -305,7 +306,78 @@ void RenderTexFilter::GenBRDFLUT(RenderRscTexture* outBRDF)
 	rscreen->Draw(shader);
 
 	RenderPass::End();
+	glBindVertexArray(0);
 }
+
+
+void RenderTexFilter::SetupSkyShader(RenderRscShader* shader)
+{
+	glm::mat4 proj = glm::perspective(glm::radians(90.0f), 1.0F, 0.01f, 10.0f);
+
+	for (int32_t i = 0; i < 6; ++i)
+	{
+		glm::mat4 viewProj = proj* glm::lookAt(glm::vec3(0.0f), CUBE_MAP_VIEWS[i].first, CUBE_MAP_VIEWS[i].second);
+		shader->GetShader()->SetUniform("inLayerViewProjMatrix[" + std::to_string(i) + "]", viewProj);
+	}
+
+}
+
+
+void RenderTexFilter::FilterSky(RenderRscShader* skyShader, RenderPass* skyPass, Ptr<GLTexture> skyEnv)
+{
+	glm::ivec4 viewport(0, 0, skyPass->GetSize().x, skyPass->GetSize().y);
+
+	// 
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
+
+	// Render Sky to CubeMap.
+	skyPass->Begin(viewport, false);
+
+
+	GLShader* shader = skyShader->GetShader();
+	shader->Use();
+	rsphere->Draw(shader);
+	skyPass->GetTexture(0)->Active(0);
+
+	// Filter Sky IBL..
+	shader = filterSpecularShader[0]->GetShader();
+	shader->Use();
+	glm::ivec2 size(skyEnv->GetWidth(), skyEnv->GetHeight());
+
+	for (int32_t mip = 0; mip < NUM_IBL_SPEC_MIPS; ++mip)
+	{
+		float roughness = (float)mip / (float)(NUM_IBL_SPEC_MIPS - 1);
+		shader->SetUniform("inRoughness", roughness);
+
+		if (mip > 3)
+		{
+			shader = filterSpecularShader[1]->GetShader();
+			shader->Use();
+		}
+
+		glm::ivec2 mipSize(size.x >> mip, size.y >> mip);
+		glm::ivec4 viewport(0, 0, mipSize.x, mipSize.y);
+		filterPass->SetSize(mipSize);
+
+		for (int32_t i = 0; i < 6; ++i)
+		{
+			filterPass->ReplaceTarget(0, skyEnv, mip, i);
+			filterPass->Begin(viewport, false);
+
+			rsphere->SetView(glm::lookAt(glm::vec3(0.0f), CUBE_MAP_VIEWS[i].first, CUBE_MAP_VIEWS[i].second));
+			rsphere->Draw(shader);
+		}
+	}
+
+
+	RenderPass::End();
+	glBindVertexArray(0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+}
+
 
 
 } // End of namespace Raven.

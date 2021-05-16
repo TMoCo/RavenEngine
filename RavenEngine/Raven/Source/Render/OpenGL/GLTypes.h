@@ -129,7 +129,10 @@ namespace Raven
 
 		Depth24 = 0x81A6,
 		Depth32 = 0x81A7,
-		DepthStencil = 0x88F0
+		DepthStencil = 0x88F0,
+
+		R32F = 0x822E,
+		RG32F = 0x8230,
 
 	};
 

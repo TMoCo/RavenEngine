@@ -45,7 +45,6 @@ void RenderDebugPrimitive::Draw(GLShader* shader) const
 
 	mesh->GetArray()->Bind();
 	glDrawElements(GL_TRIANGLES, (GLsizei)mesh->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
-	mesh->GetArray()->Bind();
 }
 
 

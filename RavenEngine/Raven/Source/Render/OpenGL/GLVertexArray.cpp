@@ -56,6 +56,11 @@ void GLVertexArray::Build(const std::vector<GLVABuildAttribData>& data, const GL
 			(void*)(std::ptrdiff_t)vd.offset);
 
 		glEnableVertexAttribArray(vd.index);
+
+		if (vd.instance != 0)
+		{
+			glVertexAttribDivisor(vd.index, vd.instance);
+		}
 	}
 
 

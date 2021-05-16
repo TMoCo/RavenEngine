@@ -45,6 +45,12 @@ namespace Raven
 		// The Sun Shadow.
 		Ptr<RenderShadowCascade> sunShadow;
 
+		// if true enable sun.
+		bool isSun;
+
+		// if true enable sky.
+		bool isSky;
+
 		// Reset All Environment Properties.
 		void Reset();
 	};
@@ -93,7 +99,7 @@ namespace Raven
 		void SetView(const glm::mat4& mtx);
 
 		// Set scene projection.
-		void SetProjection(const glm::mat4& mtx, float n, float f);
+		void SetProjection(const glm::mat4& mtx, float projFov, float projAspect, float n, float f);
 
 		// Draw the deferred batch.
 		void DrawDeferred();
@@ -103,6 +109,9 @@ namespace Raven
 
 		// Draw the translucent batch.
 		void DrawTranslucent(UniformBuffer* lightUB);
+
+		// Draw Shadow.
+		void DrawShadow(UniformBuffer* shadowUB);
 
 		// Add primitives to the debug batch to be draw by this scene.
 		void SetDebugPrimitives(const std::vector<RenderPrimitive*>* primitives);
@@ -136,9 +145,6 @@ namespace Raven
 		
 		// Return true if the scene want to draw the 2D grid.
 		inline bool IsGrid() { return isGrid; }
-
-		// Return true if the scene want to draw the sky.
-		inline bool IsSky() { return isSky; }
 
 	private:
 		// Collect view & projection from the scene.
@@ -202,6 +208,9 @@ namespace Raven
 		// View & Projection Matrix
 		glm::mat4 viewProjMatrix;
 
+		// View Matrix Inverse.
+		glm::mat4 viewMatrixInverse;
+
 		// View & Projection Matrix Inverse
 		glm::mat4 viewProjMatrixInverse;
 
@@ -216,6 +225,12 @@ namespace Raven
 
 		// Far Clipping Plane.
 		float far;
+
+		// Field of view of the projection matrix.
+		float fov;
+
+		// Aspect ration of the projecetion matrix.
+		float aspect;
 
 		// The current frustum of the view & projection. Computed in RenderScene::CollectSceneView().
 		MathUtils::Frustum frustum;
@@ -239,11 +254,9 @@ namespace Raven
 		// Draw 2D Grid.
 		bool isGrid;
 
-		// Draw Sky.
-		bool isSky;
-
 		// Default textures assigned to materials.
 		std::vector< Ptr<ITexture> > defaultTextures;
+
 	};
 
 

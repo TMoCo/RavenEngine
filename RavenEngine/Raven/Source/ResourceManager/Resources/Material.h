@@ -57,7 +57,7 @@ namespace Raven
 		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Material; }
 
 		// Return the materail render resource.
-		inline RenderRscMaterial* GetRenderRsc() { return renderRsc; }
+		inline RenderRscMaterial* GetRenderRsc() const { return renderRsc; }
 
 		// Set material paramters by name, Return the index of the paramter.
 		int32_t SetTexture(const std::string& name, Ptr<ITexture> texture);

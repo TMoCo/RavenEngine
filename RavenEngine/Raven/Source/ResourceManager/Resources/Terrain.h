@@ -4,48 +4,48 @@
 
 #pragma once
 
-#include <map>
+#include "Utilities/Core.h"
+#include "ResourceManager/Resources/IResource.h" 
+#include "ResourceManager/Resources/DynamicTexture.h"
+#include "ResourceManager/Resources/Terrain.h"
+#include "Render/RenderResource/Primitives/RenderRscTerrain.h"
+
+#include "ProceduralGenerator/HeightMap.h"
+
+
 
 #include "glm/glm.hpp"
 
-#include "Utilities/Core.h"
-#include "ResourceManager/Resources/IResource.h" 
-#include "ResourceManager/Resources/Texture2D.h" // for height map
-#include "Render/RenderResource/Primitives/RenderRscTerrain.h"
 
-//
-// A class for a Terrain, with height map and other features to come later
-//
 
 namespace Raven
 {
+
+
+	// Terrain:
+	//   - 
+	//
 	class Terrain : public IResource
 	{
-	public:
-		Terrain(Texture2D* initHeight = nullptr) 
-			: IResource(),
-			heightMap(initHeight), // vector for textures, may want to swap container to a map
-			renderRscTerrain(nullptr)
-		{
-			if (!IsValidHeightMap(initHeight))
-			{
-				initHeight = nullptr;
-			}
+		NOCOPYABLE(Terrain);
 
-			type = EResourceType::RT_Terrain;
+	public:
+		Terrain() 
+			: IResource()
+		{
+			type = Terrain::StaticGetType();
 			hasRenderResources = true;
 		}
 		
-		inline virtual ~Terrain()
-		{
-			if (heightMap)
-			{
-				// TODO: free data in memory manager
-				// delete heightMap;
-			}
 
-			delete renderRscTerrain;
+		virtual ~Terrain()
+		{
+			renderRsc.reset();
+			heightMap.reset();
 		}
+
+		// Return the resource type
+		inline static EResourceType StaticGetType() { return EResourceType::RT_Terrain; }
 
 		// Load the render resource.
 		virtual void LoadRenderResource() override
@@ -53,33 +53,95 @@ namespace Raven
 			RAVEN_ASSERT(!isOnGPU, "Resrouce already on GPU. use UpdateRenderRsc to update.");
 			isOnGPU = true;
 
-			// load the height map data
-			renderRscTerrain->LoadHeightMap(
-				heightMap->GetSize().x, 
-				heightMap->GetSize().y, 
-				heightMap->GetData().GetData()
-			);
-
-			renderRscTerrain->GenerateTerrain(500, glm::vec2(1000.0f), -50.0f, 200.0f);
+			// 
+			renderRsc = Ptr<RenderRscTerrain>( new RenderRscTerrain() );
+			renderRsc->Load(heightMap->GetHeightmapTexture(), bins.size(), scale, height);
+			renderRsc->SetBins(&bins);
 		}
+		 
+		// Return Terrain render resource.
+		inline RenderRscTerrain* GetRenderRsc() { return renderRsc.get(); }
+		inline const RenderRscTerrain* GetRenderRsc() const { return renderRsc.get(); }
 
-		static bool IsValidHeightMap(Texture2D* heightMap)
+		// Load Terrain Render Data:
+		// @param inHeightMap: a Height map texture.
+		// @param inScale: the scale in meter for the terrain mesh.
+		// @param inNumBins: num of bins in a single row of the terrain.
+		// @param inHeight: the min/max height of the terrain mesh.
+		void SetTerrainData(Ptr<HeightMap> inHeightMap, const glm::vec2& inScale,
+			int32_t inNumBinsPerRow, const glm::vec2& inHeight)
 		{
-			if (heightMap->GetFormat() != ETextureFormat::R8)
-			{
-				return false;
-			}
-			return true;
+			heightMap = inHeightMap;
+			scale = inScale;
+			height = inHeight;
+
+			// Generate terrain texture if not already.
+			if (!heightMap->GetHeightmapTexture())
+				heightMap->GenerateTexture();
+
+			GenerateBins(inNumBinsPerRow);
 		}
 
-		inline static EResourceType StaticGetType() noexcept { return EResourceType::RT_Terrain; } // return the resource type
+		// Retrun the terrain height map.
+		inline const HeightMap* GetHeightMap() const { return heightMap.get(); }
 
-		// store heights in a texture
-		Texture2D* heightMap;
+		// Return the terrain height min/max.
+		inline const glm::vec2& GetHeight() const { return height; }
 
-		// interface with renderer
-		RenderRscTerrain* renderRscTerrain = nullptr; 
+	private:
+		// Generate Terrain Bins.
+		void GenerateBins(int32_t numBinsPerRow)
+		{
+			RAVEN_ASSERT(numBinsPerRow >= 2, ".");
 
-		NOCOPYABLE(Terrain);
+			binSize = scale * (1.0f / (float)numBinsPerRow);
+			glm::vec2 uvScale = glm::vec2(binSize.x / scale.x, binSize.y / scale.y);
+
+			// Gnerate NxN terrain bins.
+			bins.resize(numBinsPerRow * numBinsPerRow);
+
+			// The bin size.
+			for (uint32_t i = 0; i < bins.size(); ++i)
+			{
+				float fx = (float)(i % numBinsPerRow);
+				float fy = (float)(i / numBinsPerRow);
+
+
+				bins[i].offset = glm::vec2(fx, fy) * binSize;
+				bins[i].uvScale = uvScale;
+
+				bins[i].bounds = MathUtils::BoundingBox(
+					glm::vec3(bins[i].offset.x,             height.x, bins[i].offset.y),
+					glm::vec3(bins[i].offset.x + binSize.x, height.y, bins[i].offset.y + binSize.y));
+			}
+
+			bounds = MathUtils::BoundingBox(glm::vec3(0.0f, 0.0f, height.x), glm::vec3(scale.x, scale.y, height.y));
+		}
+
+	private:
+		// The height map data.
+		Ptr<HeightMap> heightMap;
+
+		// Terrain Render Resrouce.
+		Ptr<RenderRscTerrain> renderRsc;
+
+		// Terrain scale.
+		glm::vec2 scale;
+
+		// Min(x)/Max(y) height of the terrain.
+		glm::vec2 height;
+
+		// Terrain Bins.
+		std::vector<TerrainBin> bins;
+
+		// Single Bine Size.
+		glm::vec2 binSize;
+
+		// Terrain Resolution.
+		int32_t res;
+
+		// The entire terrain bounds.
+		MathUtils::BoundingBox bounds;
+
 	};
 }

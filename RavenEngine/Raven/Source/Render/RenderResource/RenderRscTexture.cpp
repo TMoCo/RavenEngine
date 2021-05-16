@@ -111,7 +111,7 @@ void RenderRscTexture::Load(EGLTexture type, EGLFormat format, const glm::ivec2&
 
 
 RenderRscTexture* RenderRscTexture::CreateTexture2D(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
-	const glm::ivec2& size, uint8_t* data, bool isGenMipmaps)
+	const glm::ivec2& size, const void* data, bool isGenMipmaps)
 {
 	EGLFormat formatGL = ToGLType(format);
 	EGLFilter filterGL = ToGLType(filter);
@@ -137,12 +137,61 @@ RenderRscTexture* RenderRscTexture::CreateTexture2D(ETextureFormat format, EText
 }
 
 
-void RenderRscTexture::UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, uint8_t* data)
+RenderRscTexture* RenderRscTexture::CreateTextureCube(ETextureFormat format, ETextureFilter filter, ETextureWrap wrap,
+	const glm::ivec2& size, const void* data, bool isGenMipmaps)
+{
+	EGLFormat formatGL = ToGLType(format);
+	EGLFilter filterGL = ToGLType(filter);
+	EGLWrap wrapGL = ToGLType(wrap);
+
+	RenderRscTexture* rsc = new RenderRscTexture();
+	rsc->texture = Ptr<GLTexture>(GLTexture::Create(EGLTexture::CubeMap, formatGL));
+	rsc->texture->SetFilter(filterGL);
+	rsc->texture->SetWrap(wrapGL);
+
+	rsc->texture->Bind();
+
+	for (int32_t f = 0; f < 6; ++f)
+	{
+		uint8_t* faceData = (uint8_t*)data;
+
+		// Not Null?
+		if (data)
+		{
+			faceData += f * size.x * size.y * (GLTexture::GetBPP(formatGL) >> 3);
+		}
+
+		rsc->texture->UpdateTexData(0, size.x, size.y, f, faceData);
+	}
+
+	rsc->texture->UpdateTexParams();
+
+	if (isGenMipmaps)
+	{
+		rsc->texture->GenerateMipmaps();
+	}
+
+	rsc->texture->Unbind();
+
+	return rsc;
+}
+
+
+void RenderRscTexture::UpdateData(int32_t level, int32_t layer, const glm::ivec2& size, const void* data)
 {
 	texture->Bind();
 	texture->UpdateTexData(level, size.x, size.y, layer, data);
 	texture->Unbind();
 }
+
+
+void RenderRscTexture::UpdateSubData(int32_t level, int32_t layer, const glm::ivec2& offset, const glm::ivec2& size, const void* data)
+{
+	texture->Bind();
+	texture->UpdateTexSubData(level, offset.x, offset.y, size.x, size.y, layer, data);
+	texture->Unbind();
+}
+
 
 
 void RenderRscTexture::UpdateParamters(ETextureFilter filter, ETextureWrap wrap)
@@ -155,6 +204,22 @@ void RenderRscTexture::UpdateParamters(ETextureFilter filter, ETextureWrap wrap)
 	texture->SetWrap(wrapGL);
 	texture->UpdateTexParams();
 	texture->Unbind();
+}
+
+
+ETextureFormat RenderRscTexture::GetTexFormat()
+{
+	switch (texture->GetFormat())
+	{
+	case Raven::EGLFormat::R: return ETextureFormat::R8;
+	case Raven::EGLFormat::RGB: return ETextureFormat::RGB24;
+	case Raven::EGLFormat::RGBA: return ETextureFormat::RGBA32;
+
+	case Raven::EGLFormat::R16F: return ETextureFormat::R_Float;
+	case Raven::EGLFormat::RGB16F: return ETextureFormat::RGB_Float;
+	}
+
+	return ETextureFormat::MAX_FORMAT;
 }
 
 

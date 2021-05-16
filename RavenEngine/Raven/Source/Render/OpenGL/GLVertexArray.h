@@ -12,8 +12,28 @@
 namespace Raven
 {
 	// Data used by vertex array to build attribute bindings.
-	struct GLVABuildAttribData
+	class GLVABuildAttribData
 	{
+		friend class GLVertexArray;
+
+	public:
+		// Construct.
+		GLVABuildAttribData(
+			const GLBuffer* inBuffer,
+			GLUINT inIndex, int inSize, EGLTypes inType,
+			int inStride, int inOffset, int inInstance = 0 )
+			: buffer(inBuffer)
+			, index(inIndex)
+			, size(inSize)
+			, type(inType)
+			, stride(inStride)
+			, offset(inOffset)
+			, instance(inInstance)
+		{
+
+		}
+
+	private:
 		// The buffer the attribute is bounded to.
 		const GLBuffer* buffer;
 
@@ -31,6 +51,9 @@ namespace Raven
 
 		// Attribute Offset .
 		int offset;
+
+		// Instancing 
+		int instance;
 	};
 
 

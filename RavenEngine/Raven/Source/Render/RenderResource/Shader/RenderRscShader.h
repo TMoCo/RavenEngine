@@ -64,6 +64,9 @@ namespace Raven
 
 		// Post-Processing type shader operation.
 		PostProcessing,
+
+		// The shader render two-sided masked foliage.
+		MaskedFoliage
 	};
 
 
@@ -78,6 +81,12 @@ namespace Raven
 
 		// The name of the shader.
 		std::string name;
+
+		// Is this shader used for shadow rendering.
+		bool isShadow;
+
+		// Is this shader used for shadow rendering.
+		bool isTwoSided;
 
 		// The functions to override for a specific stage, what functions to override depneds on the type and domain.
 		std::pair<EGLShaderStageBit, std::string> materialFunction;
@@ -94,6 +103,8 @@ namespace Raven
 		// Default Construct.
 		RenderRscShaderCreateData()
 			: type(ERenderShaderType::Opaque)
+			, isShadow(false)
+			, isTwoSided(false)
 		{
 			materialFunction.first = EGLShaderStageBit::None;
 		}
@@ -178,6 +189,9 @@ namespace Raven
 		// Bind Samplers Input to their index.
 		void BindSamplers();
 
+		// Is this shader render two sided without face culling.
+		bool IsTwoSided();
+
 	private:
 		// Setup the shader for the current domain.
 		void SetupShaderForDomain();
@@ -197,6 +211,12 @@ namespace Raven
 
 		// The input defined by the shader.
 		RenderShaderInput input;
+
+		// Is this shader for shadow rendering.
+		bool isShadow;
+
+		// Is this shader render twosided fron/back without face culling.
+		bool isTwoSidedShader;
 
 	public:
 		// Render Batch Use Only, index set by the render batch to performs fast mapping during batching.

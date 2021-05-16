@@ -11,7 +11,10 @@
 #include "Primitives/RenderMesh.h"
 #include "Primitives/RenderSkinnedMesh.h"
 #include "Primitives/RenderTerrain.h"
+
+#include "RenderPass.h"
 #include "RenderLight.h"
+#include "RenderShadow.h"
 
 
 #include "Render/RenderResource/Shader/RenderRscShader.h" 
@@ -24,6 +27,7 @@
 #include "ResourceManager/ResourceManager.h"
 #include "ResourceManager/Resources/Mesh.h"
 #include "ResourceManager/Resources/Material.h"
+#include "ResourceManager/Resources/MaterialShader.h"
 
 
 #include "Core/Camera.h"
@@ -84,6 +88,9 @@ void RenderSceneEnvironment::Reset()
 	sunColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	sunDir = glm::normalize(glm::vec4(-1.0f));
 	sunPower = 1.0f;
+	sunShadow->Reset();
+	isSun = false;
+	isSky = false;
 }
 
 
@@ -101,9 +108,9 @@ RenderScene::RenderScene()
 	, far(0.0f)
 	, frustum(glm::mat4(1.0f))
 	, isGrid(true)
-	, isSky(false)
+	, fov(false)
 {
-	environment.Reset();
+
 }
 
 
@@ -131,7 +138,15 @@ void RenderScene::Setup()
 		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/Textures/T_Default_White.raven");
 
 	defaultTextures[(int32_t)ESInputDefaultFlag::Black] =
-		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/Textures/T_Default_Black.raven");
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_Black.raven");
+
+
+	// Sun Shadow Cascade..
+	environment.sunShadow = Ptr<RenderShadowCascade>(new RenderShadowCascade());
+	environment.sunShadow->SetupCascade(RENDER_MAX_SHADOW_CASCADE, glm::ivec2(1024, 1024));
+
+	// Reset the environment to default.
+	environment.Reset();
 }
 
 
@@ -160,11 +175,13 @@ void RenderScene::SetView(const glm::mat4& mtx)
 }
 
 
-void RenderScene::SetProjection(const glm::mat4& mtx, float n, float f)
+void RenderScene::SetProjection(const glm::mat4& mtx, float projFov, float projAspect, float n, float f)
 {
 	projection = mtx;
 	near = n;
 	far = f;
+	fov = projFov;
+	aspect = projAspect;
 }
 
 
@@ -197,19 +214,48 @@ void RenderScene::TraverseScene(Scene* scene)
 		// Compute World Bounds.
 		MathUtils::BoundingBox bounds = primComp->GetLocalBounds().Transform(trComp->GetWorldMatrix());
 
+		// distance to view.
+		glm::vec3 v = (viewPos - bounds.GetCenter());
+		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+
+		// Clipping based on distance...
+		if (primComp->GetClipDistance() > 0.0)
+		{
+			float clipDist2 = primComp->GetClipDistance();
+			clipDist2 = clipDist2 * clipDist2;
+
+			if (viewDist2 > clipDist2)
+			{
+				// Don't Draw Component...
+				continue;
+			}
+		}
+		
+		
+
+
 		float radius;
 		glm::vec3 center;
 		bounds.GetSphere(center, radius);
 
-		// Test if its in scene view frustum?
-		if (!frustum.IsInFrustum(center, radius))
+		// View Culling...
+		bool isViewCulled = !frustum.IsInFrustum2D(center, radius);
+
+		// Shadow Culling...
+		std::vector<uint32_t> shadowCascadeIndices;
+
+		if (primComp->IsCastShadow() && environment.isSun)
 		{
-			continue;
+			environment.sunShadow->IsInShadow(center, radius, shadowCascadeIndices);
 		}
 
-		// distance to view.
-		glm::vec3 v = (viewPos - trComp->GetWorldPosition());
-		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+		// Test if its in scene view frustum?
+		if (isViewCulled && shadowCascadeIndices.empty())
+		{
+			// Don't Draw Component...
+			continue;
+		}
 
 
 		// Collect Render Render Primitives...
@@ -221,6 +267,7 @@ void RenderScene::TraverseScene(Scene* scene)
 		for (uint32_t i = 0; i < collector.primitive.size(); ++i)
 		{
 			RenderPrimitive* rprim = collector.primitive[i];
+			bool isDefaultMat = false;
 
 			// Vlidate Material.
 			if (rprim->GetMaterial())
@@ -237,28 +284,40 @@ void RenderScene::TraverseScene(Scene* scene)
 			{
 				Material* defaultMaterial = rprim->isSkinned ? defaultMaterials.skinned.get() : defaultMaterials.mesh.get();
 				rprim->SetMaterial(defaultMaterial->GetRenderRsc());
+				isDefaultMat = true;
 			}
 
 
 			// Translucent?
-			if (rprim->GetShaderType() == ERenderShaderType::Translucent)
+			if (!isViewCulled)
 			{
-				// Gather lights that affect this translucent primitive.
-				std::vector<RenderLight*> litPrim;
-				GatherLights(center, radius, litPrim);
+				if (rprim->GetShaderType() == ERenderShaderType::Translucent)
+				{
+					// Gather lights that affect this translucent primitive.
+					std::vector<RenderLight*> litPrim;
+					GatherLights(center, radius, litPrim);
 
-				for (const auto& lit : litPrim)
-					rprim->AddLight(lit->indexInScene);
+					for (const auto& lit : litPrim)
+						rprim->AddLight(lit->indexInScene);
 
 
-				// TRANSLUCENT BATCH.
-				translucentBatch.Add(rprim, viewDist2);
+					// TRANSLUCENT BATCH.
+					translucentBatch.Add(rprim, viewDist2);
+				}
+				else
+				{
+					// DEFERRED BATCH.
+					deferredBatch.Add(rprim);
+				}
 			}
-			else
+
+
+			if (!shadowCascadeIndices.empty() && rprim->IsCastShadow())
 			{
-				// DEFERRED BATCH.
-				deferredBatch.Add(rprim);
+				// Add to shadow scene.
+				environment.sunShadow->AddPrimitive(rprim, isDefaultMat, shadowCascadeIndices);
 			}
+
 		}
 	}
 
@@ -273,7 +332,7 @@ void RenderScene::CollectSceneView(Scene* scene)
 	if (scene->GetTargetCamera())
 	{
 		const auto& targetCam = scene->GetTargetCamera();
-		SetProjection(targetCam->GetProjectionMatrix(), targetCam->GetNear(), targetCam->GetFar());
+		SetProjection(targetCam->GetProjectionMatrix(), targetCam->GetFov(), targetCam->GetAspectRatio(), targetCam->GetNear(), targetCam->GetFar());
 		camTr = scene->GetCameraTransform()->GetWorldMatrix();
 		SetView(glm::inverse(camTr));
 	}
@@ -286,6 +345,7 @@ void RenderScene::CollectSceneView(Scene* scene)
 	viewPos = camTr * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	viewProjMatrix = projection * view;
+	viewMatrixInverse = glm::inverse(view);
 	viewProjMatrixInverse = glm::inverse(viewProjMatrix);
 
 	// Set the new Frustum
@@ -295,33 +355,35 @@ void RenderScene::CollectSceneView(Scene* scene)
 
 void RenderScene::CollectSceneLights(Scene* scene)
 {
+	// Collect sun lights from global settings...
+	if (scene->GetGlobalSettings().isSun)
+	{
+		environment.isSun = true;
+		environment.isSky = scene->GetGlobalSettings().isSky;
+		environment.sunDir = scene->GetGlobalSettings().GetSunDir();
+		environment.sunPower = scene->GetGlobalSettings().sunPower;
+		environment.sunColor = scene->GetGlobalSettings().sunColor;
+
+		// Shadow Cascade...
+		environment.sunShadow->ComputeCascade(environment.sunDir, fov, aspect, near, far, viewMatrixInverse);
+
+	}
+	else
+	{
+		environment.isSun = false;
+		environment.isSky = false;
+		environment.sunColor = glm::vec4(0.0f);
+		environment.sunPower = 0.0f;
+	}
+
+
+
+	// Iterate over all lights in the scene...
 	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
 
-	//
-	bool isSearchForSun = true;
-
-
-	// Iterate over all lights in the scene.
 	for (auto entity : lightsEttView)
 	{
 		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
-
-		// TODO: Add Scene Environment Settings to collect sun lights from.
-		if (isSearchForSun && light.type == (int32_t)LightType::DirectionalLight)
-		{
-			// Check if it is the sun
-			const auto nameComponent = scene->GetRegistry().try_get<NameComponent>(entity);
-
-			if (nameComponent && nameComponent->name == "THE_SUN")
-			{
-				environment.sunDir = light.direction;
-				environment.sunColor = light.color;
-				environment.sunPower = light.intensity;
-
-				isSearchForSun = false;
-				continue;
-			}
-		}
 
 		// ...
 		float lightRadius = glm::max(light.radius, 1.0f);
@@ -370,21 +432,60 @@ void RenderScene::CollectTerrain(Scene* scene)
 		return;
 
 	auto entity = TerrainEttView.front();
-	const auto& theTerrain = TerrainEttView.get<TerrainComponent>(entity);
-	auto terrainRsc = theTerrain.GetTerrainResource();
+	const auto& terrainComp = TerrainEttView.get<TerrainComponent>(entity);
+	auto terrain = terrainComp.GetTerrain();
+	RAVEN_ASSERT(terrain->IsOnGPU(), "Terrain Not Loaded on GPU. Make sure its loaded before rendering.");
 	
-	RAVEN_ASSERT(terrainRsc->IsOnGPU(), "Terrain Not Loaded on GPU. Make sure its loaded before rendering.");
-	
-	RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
-	renderTerrain->SetTerrainRsc(terrainRsc->renderRscTerrain);
-	renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
-	
-	// Default Terrain Material.
-	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
-	renderTerrain->SetMaterial(defaultMaterials.terrain->GetRenderRsc());
+	// Iterate on bins...
+	const auto& bins = *(terrain->GetRenderRsc()->GetBins());
+	float binRadius;
+	glm::vec3 binCenter;
 
-	// Add the terrain to the deferred batch.
-	deferredBatch.Add(renderTerrain);
+	for (uint32_t i = 0; i < bins.size(); ++i)
+	{
+		bins[i].bounds.GetSphere(binCenter, binRadius);
+
+		// View Culling...
+		bool isViewCulled = !frustum.IsInFrustum2D(binCenter, binRadius);
+		isViewCulled = false;
+
+		// Shadow Culling...
+		std::vector<uint32_t> shadowCascadeIndices;
+
+		if (environment.isSun)
+			environment.sunShadow->IsInShadow(binCenter, binRadius, shadowCascadeIndices);
+
+		// Clip?
+		if (isViewCulled && shadowCascadeIndices.empty())
+			continue;
+
+		// Render Terrain Object...
+		RenderTerrain* renderTerrain = NewPrimitive<RenderTerrain>();
+		renderTerrain->SetTerrainRsc(terrain->GetRenderRsc());
+		renderTerrain->SetWorldMatrix(glm::mat4(1.0f));
+		renderTerrain->SetBin(i);
+
+		// Default Terrain Material.
+		const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+		renderTerrain->SetMaterial(defaultMaterials.terrain->GetRenderRsc());
+
+		// Add the terrain to the deferred batch.
+		if (!isViewCulled)
+		{
+			deferredBatch.Add(renderTerrain);
+		}
+
+		// Add terrain to shadow rendering.
+		if (!shadowCascadeIndices.empty())
+		{
+			environment.sunShadow->AddPrimitive(renderTerrain, true, shadowCascadeIndices);
+		}
+
+		Engine::GetModule<RenderModule>()->GetDebug()->DrawBox(binCenter, bins[i].bounds.GetExtent() * 2.0f);
+	}
+
+
+
 }
 
 
@@ -409,12 +510,14 @@ void RenderScene::Clear()
 	environment.Reset();
 	near = 0.0f;
 	far = 0.0f;
-	debugPrimitives = nullptr;
 }
 
 
 void RenderScene::DrawDeferred()
 {
+	// ...
+	bool isCullFace = true;
+
 	// Bind Transform Uniform Buffer.
 	transformUniform->BindBase();
 	transformBoneUniform->BindBase();
@@ -428,6 +531,24 @@ void RenderScene::DrawDeferred()
 	{
 		const auto& shaderBatch = deferredBatch.GetShaderBatch(is);
 
+		// Two-Sided?
+		if (shaderBatch.shader->IsTwoSided())
+		{
+			if (isCullFace)
+			{
+				glDisable(GL_CULL_FACE);
+				isCullFace = false;
+			}
+		}
+		else 
+		{
+			if (!isCullFace)
+			{
+				glEnable(GL_CULL_FACE);
+				isCullFace = true;
+			}
+		}
+
 		// The Shader
 		GLShader* shader = shaderBatch.shader->GetShader();
 		shader->Use();
@@ -435,7 +556,7 @@ void RenderScene::DrawDeferred()
 		// Second: iterate on materails...
 		for (uint32_t im = 0; im < shaderBatch.materials.size(); ++im)
 		{
-			const auto& materialBatch = deferredBatch.GetMaterialBatch( shaderBatch.materials[im] );
+			const auto& materialBatch = deferredBatch.GetMaterialBatch(shaderBatch.materials[im]);
 
 			// The Material
 			RenderRscMaterial* material = materialBatch.material;
@@ -451,7 +572,7 @@ void RenderScene::DrawDeferred()
 			// Finally: Draw Primitives...
 			for (uint32_t ip = 0; ip < materialBatch.primitives.size(); ++ip)
 			{
-				RenderPrimitive* prim = primitives[ materialBatch.primitives[ip] ];
+				RenderPrimitive* prim = primitives[materialBatch.primitives[ip]];
 
 				// Transform.
 				if (prim->isSkinned)
@@ -479,7 +600,6 @@ void RenderScene::DrawDeferred()
 		}
 	}
 
-	
 	// End Drawing...
 	glBindVertexArray(0);
 
@@ -502,7 +622,7 @@ void RenderScene::DrawDebug()
 	// All debug primitives have the same shader & materail.
 	RenderRscMaterial* materail = prims[0]->GetMaterial();
 	GLShader* shader = materail->GetShaderRsc()->GetShader();
-
+	shader->Use();
 
 	// Draw Debug Primitives...
 	for (uint32_t ip = 0; ip < prims.size(); ++ip)
@@ -518,7 +638,6 @@ void RenderScene::DrawDebug()
 		prim->Draw(shader);
 	}
 
-	glBindVertexArray(0);
 }
 
 
@@ -675,10 +794,141 @@ void RenderScene::GatherScenePrimitives(Scene* scene, std::vector<ScenePrimitive
 		}
 	}
 
-
 }
 
 
+void RenderScene::DrawShadow(UniformBuffer* shadowUB)
+{
+	// ...
+	bool isCullFace = true;
+
+	// Default Materials.
+	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+
+
+	// Bind Transform Uniform Buffer.
+	shadowUB->BindBase();
+	transformUniform->BindBase();
+	transformBoneUniform->BindBase();
+
+	// Shadow Cascade...
+	RenderShadowCascade* shadow = GetEnvironment().sunShadow.get();
+
+
+	for (uint32_t i = 0; i < shadow->GetNumCascade(); ++i)
+	{
+		ShadowCascadeData& cascade = shadow->GetCascade(i);
+		glm::ivec2 shadowSize = cascade.shadowPass->GetSize();
+
+		// Begin...
+		cascade.shadowPass->Begin(glm::ivec4(0, 0, shadowSize.x, shadowSize.y), true);
+
+		// Shadow Transform...
+		shadowUB->SetDataValue(0, cascade.viewProj);
+		shadowUB->Update();
+
+		// All The Batch Primitives.
+		auto& shadowBatch = cascade.shadowBatch;
+		const auto& primitives = shadowBatch.GetPrimitives();
+
+
+		// First: iterate on shaders...
+		for (uint32_t is = 0; is < shadowBatch.GetNumShaders(); ++is)
+		{
+			const auto& shaderBatch = shadowBatch.GetShaderBatch(is);
+
+			// Default Shadow Shader not assigned?
+			if (!shaderBatch.shader)
+			{
+				switch (shaderBatch.domain)
+				{
+				case Raven::ERenderShaderDomain::Mesh:
+					shadowBatch.SetDefaultShader(is, defaultMaterials.mesh->GetRenderRsc()->GetShadowShaderRsc(), defaultMaterials.mesh->GetRenderRsc());
+					break;
+				case Raven::ERenderShaderDomain::Skinned:
+					shadowBatch.SetDefaultShader(is, defaultMaterials.skinned->GetRenderRsc()->GetShadowShaderRsc(), defaultMaterials.skinned->GetRenderRsc());
+					break;
+				case Raven::ERenderShaderDomain::Terrain:
+					shadowBatch.SetDefaultShader(is, defaultMaterials.terrain->GetRenderRsc()->GetShadowShaderRsc(), defaultMaterials.terrain->GetRenderRsc());
+					break;
+				}
+			}
+
+
+			// Two-Sided?
+			if (shaderBatch.shader->IsTwoSided())
+			{
+				if (isCullFace)
+				{
+					glDisable(GL_CULL_FACE);
+					isCullFace = false;
+				}
+			}
+			else
+			{
+				if (!isCullFace)
+				{
+					glEnable(GL_CULL_FACE);
+					isCullFace = true;
+				}
+			}
+
+			// The Shader
+			GLShader* shader = shaderBatch.shader->GetShader();
+			shader->Use();
+
+			// Second: iterate on materails...
+			for (uint32_t im = 0; im < shaderBatch.materials.size(); ++im)
+			{
+				const auto& materialBatch = shadowBatch.GetMaterialBatch(shaderBatch.materials[im]);
+
+				// The Material
+				RenderRscMaterial* material = materialBatch.material;
+				material->MakeTexturesActive(defaultTextures);
+
+				if (material->HasMaterialData())
+				{
+					material->GetUniformBuffer()->BindBase();
+					material->UpdateUniformBuffer();
+				}
+
+
+				// Finally: Draw Primitives...
+				for (uint32_t ip = 0; ip < materialBatch.primitives.size(); ++ip)
+				{
+					RenderPrimitive* prim = primitives[materialBatch.primitives[ip]];
+
+					// Transform.
+					if (prim->isSkinned)
+					{
+						auto skinned = static_cast<RenderSkinnedMesh*>(prim);
+
+						// Model & Normal & Bones.
+						trBoneData.modelMatrix = prim->GetWorldMatrix();
+						trBoneData.normalMatrix = prim->GetWorldMatrix();
+						memcpy(&trBoneData.bones, skinned->GetBones()->data(), sizeof(glm::mat4) * skinned->GetBones()->size());
+						transformBoneUniform->UpdateData(sizeof(TransformBoneVertexData), 0, (void*)(&trBoneData));
+					}
+					else
+					{
+						// Model & Normal.
+						trData.modelMatrix = prim->GetWorldMatrix();
+						trData.normalMatrix = prim->GetWorldMatrix();
+						transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData);
+					}
+
+
+					// Draw...
+					prim->Draw(shader);
+				}
+			}
+		}
+		
+	}
+
+	glBindVertexArray(0);
+
+}
 
 
 

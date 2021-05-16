@@ -83,44 +83,44 @@ void RenderRscMesh::Load(const std::vector<glm::vec3>& positions,
 	// Build Vertex Input Description...
 	std::vector<GLVABuildAttribData> attributes{
 			// Attribute 0 - Positions
-			{
+			GLVABuildAttribData(
 				positionBuffer,    // Buffer
 				0,                 // Index
 				3,                 // Type-Size
 				EGLTypes::Float,   // Type
 				sizeof(glm::vec3), // Stride
 				0                  // offset
-			},
+			),
 
 			// Attribute 1 - Normals
-			{
+			GLVABuildAttribData(
 				normalBuffer,      // Buffer
 				1,                 // Index
 				3,                 // Type-Size
 				EGLTypes::Float,   // Type
 				sizeof(glm::vec3), // Stride
 				0                  // offset
-			},
+			),
 
 			// Attribute 2 - Tangents
-			{
+			GLVABuildAttribData(
 				tangentBuffer,     // Buffer
 				2,                 // Index
 				3,                 // Type-Size
 				EGLTypes::Float,   // Type
 				sizeof(glm::vec3), // Stride
 				0                  // offset
-			},
+			),
 
 			// Attribute 3 - TexCoords
-			{
+			GLVABuildAttribData(
 				texCoordBuffer,		 // Buffer
 				3,                 // Index
 				2,                 // Type-Size
 				EGLTypes::Float,   // Type
 				sizeof(glm::vec2), // Stride
 				0                  // offset
-			}
+			)
 	};
 
 

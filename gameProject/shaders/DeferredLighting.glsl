@@ -16,6 +16,7 @@ uniform sampler2D inAlbedo;
 uniform sampler2D inNormal;
 uniform sampler2D inBRDF;
 uniform sampler2D inDepth;
+uniform sampler2D inAO;
 
 
 layout(location=0) out vec4 outFinalColor;
@@ -36,6 +37,7 @@ void main()
 	vec4 gAlbedo = texture(inAlbedo, inFrag.rtCoord);
 	vec4 gBRDF = texture(inBRDF, inFrag.rtCoord);
 	float gDepth = texture(inDepth, inFrag.rtCoord).r;
+	float gAO = texture(inAO, inFrag.rtCoord).r;
 	
 	// Surface Data from G-Buffer used for lighting the surface.
 	LightSurfaceData surface;
@@ -44,6 +46,8 @@ void main()
 	surface.specular = gBRDF.b;
 	surface.roughness = max(gBRDF.r, 0.01);
 	surface.metallic = gBRDF.g;
+	surface.type = int(gAlbedo.a * 255.0);
+	surface.AO = gAO;
 	
 	// Reconstruct World Position from depth.
 	surface.p = ComputeWorldPos(screenCoord, gDepth);
@@ -66,7 +70,8 @@ void main()
 	if (gDepth == 1.0)
 	{
 		outFinalColor.rgb = textureLod(inSkyEnvironment, -surface.v, NUM_ENV_MAP_LOD - 1.0).rgb;
-	}	
+	}
+	
 
 }
 

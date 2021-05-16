@@ -22,6 +22,7 @@ namespace Raven {
 
 PrimitiveComponent::PrimitiveComponent()
 	: clipDistance(-1.0f)
+	, isCastShadow(true)
 {
 	
 }

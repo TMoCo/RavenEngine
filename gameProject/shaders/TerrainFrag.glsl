@@ -3,12 +3,14 @@
 
 
 
-// Vertex Shader Output.
-in VertexOutput
+
+// Tess Evaluation Output.
+in TessEvalOutput
 {
 	vec3 position;
-	vec3 normal;
 	vec2 texCoord;
+	vec3 normal;
+	vec3 tangent;
 } inFrag;
 
 
@@ -40,12 +42,16 @@ void main()
 {
 	// Normalize Input Normal
 	vec3 normal = normalize(inFrag.normal);
+	vec3 tangent = normalize(inFrag.tangent);
 
+	
 	// Material Input...
 	MaterialData matIn;
 	matIn.position = inFrag.position;
 	matIn.normal = normal;
+	matIn.tangent = inFrag.tangent;
 	matIn.texCoord = inFrag.texCoord;
+	
 	
 	// Material Compute Output.
 	MaterialOutput matOut;
@@ -58,10 +64,11 @@ void main()
 	// Output G-Buffer...
 	outAlbedo.rgb = matOut.color;
 	outEmission.rgb = matOut.emission;
-	outNormal.rgb = normal;
+	outNormal.rgb = matOut.normal;
 	outBRDF.r = matOut.roughness;
 	outBRDF.g = matOut.metallic;
 	outBRDF.b = clamp(matOut.specular, 0.0, 1.0);
+	outAlbedo.a = 0.0; // Default.
 #endif
 
 }

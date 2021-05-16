@@ -69,6 +69,7 @@ namespace Raven {
 RenderModule::RenderModule()
 	: isRendering(false)
 	, isRTToWindow(true)
+	, isUpdateSky(true)
 {
 	rdebug.reset(new RenderDebug());
 
@@ -103,11 +104,13 @@ void RenderModule::Initialize()
 	Ptr<RenderScreen> rscreen = Ptr<RenderScreen>(RenderScreen::Create());
 	Ptr<RenderSphere> rsphere = Ptr<RenderSphere>(RenderSphere::Create());
 
+	rfilter = Ptr<RenderTexFilter>(new RenderTexFilter(rscreen, rsphere));
+	rfilter->Initialize();
+
 	rpipeline = Ptr<RenderPipeline>(new RenderPipeline(rscreen, rsphere));
+	rpipeline->rtFilter = rfilter.get();
 	rpipeline->Initialize();
 
-	rfilter = Ptr<RenderTexFilter>(new RenderTexFilter(rscreen, rsphere) );
-	rfilter->Initialize();
 
 	CreateDefaultMaterials();
 
@@ -125,25 +128,17 @@ void RenderModule::Initialize()
 	rscene->SetDebugPrimitives( &rdebug->GetRenderPrimitive() );
 
 
+	// Generate BRDF Lookup table...
+	BRDF = Ptr<RenderRscTexture>(new RenderRscTexture());
+	rfilter->GenBRDFLUT(BRDF.get() );
+	rpipeline->BRDF = BRDF->GetTexture().get();
 
-	// ~ITERATION_0----------------------------------------------------------------------------
+	// Default Environment Map.
 	Engine::GetModule<ResourceManager>()->AddResource("./assets/textures/T_Default_Environment_Map.raven");
 	Ptr<Texture2D> envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("./assets/textures/T_Default_Environment_Map.raven");
 
-	RenderRscTexture* envMap = new RenderRscTexture();
-	rfilter->GenCubeMap(envTexture->GetRenderRsc(), envMap, true);
-
-	RenderRscTexture* specularEnvMap = new RenderRscTexture();
-	rfilter->FilterSpecularIBL(envMap, specularEnvMap);
-
-	RenderRscTexture* brdfLUTTex = new RenderRscTexture();
-	rfilter->GenBRDFLUT(brdfLUTTex);
-
-	rpipeline->testEnv = specularEnvMap->GetTexture().get();
-	rpipeline->testBRDF = brdfLUTTex->GetTexture().get();
-	
-	delete envMap;
-	// ~ITERATION_0----------------------------------------------------------------------------
+	GenerateEnvMap(envTexture);
+	rpipeline->EnvMap = environmentMap->GetTexture().get();
 
 
 }
@@ -205,7 +200,7 @@ void RenderModule::BeginRender(Scene* scene, const glm::ivec2& extent)
 #endif
 
 	rscene->SetView(view);
-	rscene->SetProjection(proj, near, far);
+	rscene->SetProjection(proj, glm::radians(45.0f), rtScene->GetAspectRatio(), near, far);
 
 	// ~TESTING-------------------------------------------------------
 
@@ -223,6 +218,13 @@ void RenderModule::Render()
 
 	// Begin The Pipeline for rendering a scene.
 	rpipeline->Begin(rtScene.get(), rscene.get(), time);
+
+	// Does sky needs to be updated?
+	if (isUpdateSky)
+	{
+		rpipeline->RenderEnvSky();
+		isUpdateSky = false;
+	}
 
 	// Rendering...
 	rpipeline->Render();
@@ -279,6 +281,7 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
@@ -298,6 +301,7 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetShaderType(ERenderShaderType::Opaque);
 		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
@@ -315,18 +319,36 @@ void RenderModule::CreateDefaultMaterials()
 		matShader->SetName("Default_Terrain");
 		matShader->SetDomain(ERenderShaderDomain::Terrain);
 		matShader->SetShaderType(ERenderShaderType::Opaque);
-		matShader->SetMaterialFunction("shaders/Materials/TerrainMaterial.glsl");
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
 		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
+		matShader->SetTwoSided(true);
 		matShader->LoadRenderResource();
 
 		Ptr<Material> mat(new Material());
 		mat->SetMaterialShader(matShader);
+		mat->SetTexture("inCheckerTexture", checkerTexture);
 		mat->LoadRenderResource();
 
 		defaultMaterials.terrain = mat;
 	}
 }
 
+
+void RenderModule::GenerateEnvMap(Ptr<Texture2D> texture)
+{
+	Ptr<RenderRscTexture> envCubeMap = Ptr<RenderRscTexture>(new RenderRscTexture());
+	rfilter->GenCubeMap(texture->GetRenderRsc(), envCubeMap.get(), true);
+
+	environmentMap = Ptr<RenderRscTexture>(new RenderRscTexture());
+	rfilter->FilterSpecularIBL(envCubeMap.get(), environmentMap.get());
+}
+
+
+void RenderModule::RequestUpdateSky()
+{
+	isUpdateSky = true;
+}
 
 
 

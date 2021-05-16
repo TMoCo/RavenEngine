@@ -326,21 +326,19 @@ namespace Raven
 			return physicsCommon->createCapsuleShape(collider->GetRadius(), collider->GetHeight());
 		}
 
-		rp3d::CollisionShape* CreateHeightShape(rp3d::PhysicsCommon* physicsCommon, Ptr<TerrainComponent> terrain)
+		rp3d::CollisionShape* CreateHeightShape(rp3d::PhysicsCommon* physicsCommon, Ptr<TerrainComponent> terrainComp)
 		{
-#if 0
-			// TODO: CHANGE MIN AND MAX HEIGHT IN HEIGHT COLLIDER TO REFLECT ACTUAL VALUES
-			// TODO: PROBLEM WITH HEIGHT MAP IN PHYSICS ENGINE MUST BE AT LEAST 32 BYTES
-			auto* heightMap = terrain->GetTerrainResource()->heightMap;
+			Ptr<Terrain> terrain = terrainComp->GetTerrain();
+			const HeightMap* heightMap = terrain->GetHeightMap();
+
 			return physicsCommon->createHeightFieldShape(
-				heightMap->width,		// columns
-				heightMap->height,		// rows
-				0.0f,					// min height
-				100.0f,					// max height
-				heightMap->data,		// ptr to height data
-				rp3d::HeightFieldShape::HeightDataType::HEIGHT_FLOAT_TYPE
+				heightMap->GetSize().x,           // columns
+				heightMap->GetSize().y,           // rows
+				terrain->GetHeight().x,           // min height
+				terrain->GetHeight().y,           // max height
+				heightMap->GetHeightMapData(),    // ptr to height data
+				rp3d::HeightFieldShape::HeightDataType::HEIGHT_FLOAT_TYPE  // Float Data Type.
 			);
-#endif
 
 			RAVEN_ASSERT(0, "Not Implemented.");
 

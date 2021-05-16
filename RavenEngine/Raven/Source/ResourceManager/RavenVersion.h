@@ -4,7 +4,7 @@
 
 
 // The Current Raven Files Version.
-#define RAVEN_VERSION 10001
+#define RAVEN_VERSION 10002
 
 
 
@@ -34,3 +34,5 @@ struct RavenVersionGlobals
 
 // 10000 - 28/04/2021 - Initial Version.
 // 10001 - 06/05/2021 - Start saving referenced material in Primitve Components.
+// 10002 - 16/05/2021 - Cast Shadow boolean in in Primitve Components and Scene Global Settings.
+

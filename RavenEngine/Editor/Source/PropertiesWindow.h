@@ -25,6 +25,9 @@ namespace Raven
 
 		static std::string ImGuiDragDropAssetsTarget();
 
+		//
+		void OnImGUIGlobalSettings();
+
 	private:
 		bool init = false;
 		MM::EntityEditor<entt::entity> enttEditor;

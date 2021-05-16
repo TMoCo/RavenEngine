@@ -106,15 +106,27 @@ void GLFrameBuffer::Update()
 			}
 			else if (texType == EGLTexture::CubeMap)
 			{
-				// Attach CubeMap layer.
-				glFramebufferTexture2D(
-					GL_FRAMEBUFFER,
-					(GLENUM)att.target,
-					GL_TEXTURE_CUBE_MAP_POSITIVE_X + att.layer,
-					att.texRef->GetID(),
-					att.level
-				);
-
+				if (att.layer == -1)
+				{
+					// Attach Entire CubeMap
+					glFramebufferTexture(
+						GL_FRAMEBUFFER,
+						(GLENUM)att.target,
+						att.texRef->GetID(),
+						att.level
+					);
+				}
+				else
+				{
+					// Attach CubeMap layer.
+					glFramebufferTexture2D(
+						GL_FRAMEBUFFER,
+						(GLENUM)att.target,
+						GL_TEXTURE_CUBE_MAP_POSITIVE_X + att.layer,
+						att.texRef->GetID(),
+						att.level
+					);
+				}
 			}
 			else
 			{

@@ -28,6 +28,7 @@ namespace Raven
 		void DrawPlayButtons();
 
 		void SetSelected(const entt::entity& selectedNode);
+		void SelectGlobalSettings();
 		void SetCopiedEntity(const entt::entity& selectedNode,bool cut = false);
 
 		inline auto& GetSelected() const { return selectedNode; }
@@ -63,6 +64,9 @@ namespace Raven
 		inline auto GetWindow() { return
 			std::static_pointer_cast<T>(editorWindows[typeid(T).hash_code()]);
 		}
+
+		//
+		inline bool GetShowGlobalSettings() const{ return showGlobalSettings; }
 
 	private:
 		void DrawMenu();
@@ -108,6 +112,9 @@ namespace Raven
 
 		// The dummy scene we created just to play on.
 		WeakPtr<Scene> playScene;
+
+		// If enable show scene global settings.
+		bool showGlobalSettings = false;
 	};
 
 };

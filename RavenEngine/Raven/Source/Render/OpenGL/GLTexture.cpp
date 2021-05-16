@@ -6,6 +6,7 @@
 
 
 
+
 namespace Raven {
 
 
@@ -121,6 +122,40 @@ void GLTexture::UpdateTexData(int level, int newWidth, int newHeight, int layer,
 	{
 		RAVEN_ASSERT(layer == 0, "Layer should be zero for non-layered textuers.");
 		glTexImage2D((GLENUM)type, level, (GLENUM)format, width, height, 0, pixelFormat, pixelType, data);
+	}
+
+
+	// Reset alignment back to default.
+	if (alignment != 4)
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+}
+
+
+void GLTexture::UpdateTexSubData(int level, int offsetx, int offsety, int newWidth, int newHeight, int layer, const void* data)
+{
+	width = newWidth;
+	height = newHeight;
+
+	// Get pixel information about based on the current format
+	GLENUM pixelFormat;
+	GLENUM pixelType;
+	int alignment = 4;
+	GetPixelInfo(format, pixelFormat, pixelType, alignment);
+
+	// Pixel Data Alignment...
+	if (alignment != 4)
+		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+
+
+	// Update Texture Data...
+	if (type == EGLTexture::CubeMap)
+	{
+		glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, level, offsetx, offsety, width, height, (GLENUM)pixelFormat, pixelType, data);
+	}
+	else
+	{
+		RAVEN_ASSERT(layer == 0, "Layer should be zero for non-layered textuers.");
+		glTexSubImage2D((GLENUM)type, level, offsetx, offsety, width, height, (GLENUM)pixelFormat, pixelType, data);
 	}
 
 
@@ -257,6 +292,13 @@ void GLTexture::SetMipLevels(int base, int max)
 {
 	baseMipLevel = base;
 	maxMipLevel = max;
+}
+
+
+void GLTexture::BorderColor(float r, float g, float b, float a)
+{
+	float color[4] = { r, g, b, a };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 }
 
 

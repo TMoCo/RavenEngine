@@ -33,7 +33,13 @@ namespace Raven
 		~RenderRscMaterial();
 
 		// Return the shader resrouce.
-		inline RenderRscShader* GetShaderRsc() { return shader; }
+		inline RenderRscShader* GetShaderRsc() const { return shader; }
+
+		// Return the custom shadow shader of this material if exist.
+		inline RenderRscShader* GetShadowShaderRsc() const { return shadowShader; }
+
+		// Set the custom shader of this material.
+		inline void SetShadowShader(RenderRscShader* shader) { shadowShader = shader; }
 
 		// Reload shader resrouce and its paramters mapping.
 		void ReloadShader(RenderRscShader* inShader);
@@ -73,6 +79,9 @@ namespace Raven
 	private:
 		// The shader resource this material is.
 		RenderRscShader* shader;
+
+		// The custom shadow shader resource of this material.
+		RenderRscShader* shadowShader;
 
 		// The index of the input block in shader.
 		int32_t blockIndex;

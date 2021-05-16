@@ -43,7 +43,6 @@
 namespace Raven { 
 
 
-
 	// --- -- - --- - --- -- ---- - - - -- --- - - --- --- -- ---- -- --
 
 	// Allow us to iterate on components of an entity.
@@ -337,6 +336,16 @@ namespace Raven {
 	{
 		UpdateCameraController(dt);
 		sceneGraph->Update(entityManager->GetRegistry());
+	}
+
+
+	glm::vec3 SceneGlobalSettings::GetSunDir()
+	{
+		glm::quat rotation =
+				glm::angleAxis(glm::radians(sunAngles.x), UP)
+			* glm::angleAxis(glm::radians(glm::clamp(sunAngles.y, 0.0f, 89.9f)), RIGHT);
+
+		return rotation * FORWARD;
 	}
 
 };

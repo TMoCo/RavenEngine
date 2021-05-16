@@ -79,7 +79,7 @@ namespace Raven
 		inline uint32_t GetNumCascade() const { return cascade.size(); }
 
 		// Test if a sphere is inside the shaodw cascade furstum.
-		bool IsInShadow(const glm::vec3& center, float radius, std::vector<uint32_t>& outIndices);
+		void IsInShadow(const glm::vec3& center, float radius, std::vector<uint32_t>& outIndices);
 
 		// Add primitive to the cascade shadow scene.
 		void AddPrimitive(RenderPrimitive* primitive, bool isDefualtShader, std::vector<uint32_t>& shadowCascadeIndices);

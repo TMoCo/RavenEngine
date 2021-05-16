@@ -18,6 +18,7 @@ namespace Raven
 		inline auto IsDraging() const { return draging; }
 	private:
 		void DrawName();
+		void DrawGlobalSettings();
 		void PopupWindow();
 		void DrawFilter();
 		void DragEntity();

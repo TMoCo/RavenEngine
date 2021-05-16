@@ -75,7 +75,7 @@ void main()
 	//
 	float SSAO = 0.0;
 	float gds = 1.0;// smoothstep(0.05, 1.0, gDepth * 0.5 + 0.25);
-	float radius = 2.5;
+	float radius = 1.2;
 	float bias = 0.025;
 	
 	
@@ -112,7 +112,7 @@ void main()
 		SSAO = 1.0;
 	}
 	
-	outFinalColor.r = smoothstep(0.1, 1.1, SSAO * SSAO);
+	outFinalColor.r = smoothstep(0.01, 1.1, SSAO * SSAO);
 }
 
 

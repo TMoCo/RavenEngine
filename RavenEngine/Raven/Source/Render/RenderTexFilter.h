@@ -7,6 +7,9 @@
 
 
 
+// Number of IBL prefiltered mip maps. 
+#define NUM_IBL_SPEC_MIPS 5
+
 
 
 
@@ -17,6 +20,7 @@ namespace Raven
 	class RenderPass;
 	class RenderRscShader;
 	class RenderRscTexture;
+	class GLTexture;
 
 
 
@@ -56,6 +60,12 @@ namespace Raven
 		// Generate BRDF look up table.
 		void GenBRDFLUT(RenderRscTexture* outBRDF);
 
+		// Setup sky shader for reflection & filtering.
+		void SetupSkyShader(RenderRscShader* shader);
+
+		//
+		void FilterSky(RenderRscShader* skyShader, RenderPass* skyPass, Ptr<GLTexture> skyEnv);
+
 	private:
 		// Create the shader used for converting spherical textures into cubemapss
 		void CreateCubeMapGenShader();
@@ -66,8 +76,9 @@ namespace Raven
 		// Create the shader used for converting environment maps into filterd specular.
 		void CreateSepcularFilterShader();
 
-		//
+		// Create the shader used to create BRDF lookup texture.
 		void CreateBRDFLUTShader();
+
 
 	private:
 		// Screen triangle used to render the entire screen.
@@ -90,6 +101,9 @@ namespace Raven
 
 		// Shader for generating BRDF Look up table.
 		Ptr<RenderRscShader> brdfLUTShader;
+
+		// Cube map views used for rendering sphere from different views.
+		static std::pair<glm::vec3, glm::vec3> CUBE_MAP_VIEWS[6];
 	};
 
 }

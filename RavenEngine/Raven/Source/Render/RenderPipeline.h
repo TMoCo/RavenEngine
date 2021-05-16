@@ -24,6 +24,9 @@ namespace Raven
 	class UniformBuffer;
 	class GLTexture;
 	class GLShader;
+	class RenderTexFilter;
+
+
 
 
 
@@ -93,6 +96,9 @@ namespace Raven
 		// Setup Screen Space Ambient Occlusion.
 		void SetupSSAO();
 
+		// Setyp Sky & Sky Filter passess.
+		void SetupSky();
+
 		// Resize all render passes.
 		void Resize(const glm::ivec2& newSize);
 
@@ -104,6 +110,9 @@ namespace Raven
 
 		// Do a final post processing and use the final render target.
 		void DoPostProcessFinal(int32_t hdrTargetIndex);
+
+		// Render the environment sky to match the new updated sky.
+		void RenderEnvSky();
 
 	private:
 		// Deferred Render Pass - G-Buffer.
@@ -122,6 +131,9 @@ namespace Raven
 		Ptr<RenderPass> ssaoPass;
 		Ptr<RenderPass> ssaoBlurPass;
 
+		// Pass for drawing the sky into a cubemap.
+		Ptr<RenderPass> skyCubePass;
+
 		// Pipeline HDR Render Targets.
 		Ptr<GLTexture> hdrTarget[2];
 
@@ -137,14 +149,23 @@ namespace Raven
 		// SSAO Shader.
 		Ptr<RenderRscShader> ssaoShader;
 		
-		// SSAO Shader.
+		// SSAO Blur Shader.
 		Ptr<RenderRscShader> ssaoBlurShader;
+
+		// Sky Shader, Draw the sky in thee scene.
+		Ptr<RenderRscShader> skyShader;
+
+		// Sky Cube Map, draw the sky for cube map creation.
+		Ptr<RenderRscShader> skyCubeShader;
 
 		// Screen triangle used to render the entire screen, used by render passes and post-processing.
 		Ptr<RenderScreen> rscreen;
 
 		// Sphere.
 		Ptr<RenderSphere> rsphere;
+
+		// Render filter instance.
+		RenderTexFilter* rtFilter;
 
 		// Uniforms of the pipeline.
 		RenderPipelineUniforms uniforms;
@@ -164,15 +185,20 @@ namespace Raven
 		// The Render Grid.
 		Ptr<RenderGrid> rgrid;
 		
-		//
+		// Noise texture used in SSAO pass.
 		Ptr<GLTexture> ssaoNoiseTexture;
 
-	public:
-		// ~ITERATION_0----------------------------------
-		class GLTexture* testEnv;
-		class GLTexture* testBRDF;
-		// ~ITERATION_0----------------------------------
+		// Sky Cube Map.
+		Ptr<GLTexture> skyCubeMap;
 
+		// Sky Environment - filterd skyTexture for IBL.
+		Ptr<GLTexture> skyEnv;
+
+		// Current environment map.
+		GLTexture* EnvMap;
+
+		// BRDF Lookup table used form IBL.
+		GLTexture* BRDF;
 	};
 
 

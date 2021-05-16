@@ -77,11 +77,11 @@ void RenderShadowCascade::SetupCascade(uint32_t numCascade, const glm::ivec2& sh
 	
 	// Ranges...
 	cascadeRanges.resize(numCascade + 1);
-	cascadeRanges[1] = 17.0f; // Start Range
+	cascadeRanges[1] = 7.0f; // Start Range
 
 	for (uint32_t i = 2; i < cascadeRanges.size(); ++i)
 	{
-		cascadeRanges[i] = cascadeRanges[i-1] * 2.5f;
+		cascadeRanges[i] = cascadeRanges[i-1] * 2.6f;
 	}
 
 }
@@ -138,11 +138,6 @@ void RenderShadowCascade::ComputeCascade(const glm::vec3& lightDir, float fov, f
 		glm::vec3 wext = bounds.GetExtent();
 		glm::vec3 wcenter = bounds.GetCenter();
 
-		//glm::mat4 lightView = glm::lookAt(
-		//	-lightDir * lightFar + wcenter,
-		//	glm::vec3(0.0f) + wcenter,
-		//	glm::vec3(0.0f, 1.0f, 0.0f));
-
 
 		glm::mat4 lightView = glm::lookAt(
 			glm::vec3(0.0f) + wcenter,
@@ -174,22 +169,22 @@ void RenderShadowCascade::ComputeCascade(const glm::vec3& lightDir, float fov, f
 
 
 		cascade[i].viewProj = lightProjection * lightView;
+		cascade[i].frustum.ExtractPlanes( cascade[i].viewProj );
 	}
 
 
 }
 
 
-
-bool RenderShadowCascade::IsInShadow(const glm::vec3& center, float radius, std::vector<uint32_t>& outIndices)
+void RenderShadowCascade::IsInShadow(const glm::vec3& center, float radius, std::vector<uint32_t>& outIndices)
 {
 	outIndices.reserve(RENDER_MAX_SHADOW_CASCADE);
 
-	outIndices.push_back(0);
-	outIndices.push_back(1);
-	outIndices.push_back(2);
-	outIndices.push_back(3);
-	return true;
+	for (int32_t ic = 0; ic < cascade.size(); ++ic)
+	{
+		if (cascade[ic].frustum.IsInFrustum(center, radius))
+			outIndices.push_back(ic);
+	}
 }
 
 

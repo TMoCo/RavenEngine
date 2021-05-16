@@ -226,6 +226,15 @@ namespace Raven
 	{
 		prevSelectedNode = selectedNode;
 		selectedNode = node;
+		showGlobalSettings = false;
+	}
+
+
+	void Editor::SelectGlobalSettings()
+	{
+		prevSelectedNode = selectedNode;
+		selectedNode = entt::null;
+		showGlobalSettings = true;
 	}
 
 	void Editor::SetCopiedEntity(const entt::entity& selectedNode,bool cut) 

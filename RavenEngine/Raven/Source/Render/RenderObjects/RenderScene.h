@@ -45,6 +45,12 @@ namespace Raven
 		// The Sun Shadow.
 		Ptr<RenderShadowCascade> sunShadow;
 
+		// if true enable sun.
+		bool isSun;
+
+		// if true enable sky.
+		bool isSky;
+
 		// Reset All Environment Properties.
 		void Reset();
 	};
@@ -139,9 +145,6 @@ namespace Raven
 		
 		// Return true if the scene want to draw the 2D grid.
 		inline bool IsGrid() { return isGrid; }
-
-		// Return true if the scene want to draw the sky.
-		inline bool IsSky() { return isSky; }
 
 	private:
 		// Collect view & projection from the scene.
@@ -250,9 +253,6 @@ namespace Raven
 
 		// Draw 2D Grid.
 		bool isGrid;
-
-		// Draw Sky.
-		bool isSky;
 
 		// Default textures assigned to materials.
 		std::vector< Ptr<ITexture> > defaultTextures;

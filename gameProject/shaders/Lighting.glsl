@@ -206,7 +206,7 @@ vec3 ComputeSunLight(in LightSurfaceData surface)
 		{
 			NDotL *= -1.0;
 			surface.n *= -1.0;
-			multiColor = mix(surface.albedo, vec3(1.0), 0.24);
+			multiColor = mix(surface.albedo, vec3(0.7), 0.24);
 		}
 	}
 	
@@ -290,10 +290,22 @@ vec3 ComputeLight(in LightSurfaceData surface, int lightIdx)
 		lightPower.a *= clamp((a - angles.y) / (angles.x - angles.y), 0.0, 1.0); 
 	}
 	
+	float NDotL = dot(surface.n, l);
 	
+	// Is Masked Foliage?
+	if (surface.type == 1)
+	{
+		if (NDotL < 0.0)
+		{
+			NDotL *= -1.0;
+			surface.n *= -1.0;
+		}
+	}
+	
+	
+	NDotL = max(NDotL, 0.0001);
 	h = normalize(l + surface.v);
 	float NDotH = max(dot(surface.n, h), 0.0001);
-	float NDotL = max(dot(surface.n, l), 0.0001);
 	float VDotH = max(dot(surface.v, h), 0.00001);
 	
 	// BRDF

@@ -81,16 +81,16 @@ float SunShadowCalculation(vec3 p, vec3 n, vec3 l)
 	vec2 texelSize = 1.0 / textureSize(inSunShadow[ci], 0);
 	
 	// PCF...
-	for(int x = -1; x <= 1; ++x)
+	for(float x = -1.5; x <= 1.51; x+=1.0)
 	{
-		for(int y = -1; y <= 1; ++y)
+		for(float y = -1.5; y <= 1.51; y+=1.0)
 		{
 			shadow += texture(inSunShadow[ci], lsPos.xyz + vec3(x * texelSize.x, y * texelSize.y, -bias) ).r;
 		}    
 	}
 	
 
-	shadow /= 9.0;
+	shadow /= 16.0;
 
 
     return 1.0 - shadow;

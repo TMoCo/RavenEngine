@@ -8,6 +8,7 @@
 #include "Editor.h"
 #include "PropertiesWindow.h"
 #include "HierarchyWindow.h"
+#include "Render/RenderModule.h"
 
 #include "Scene/SceneManager.h"
 #include "Scene/Scene.h"
@@ -717,6 +718,11 @@ namespace Raven
 
 			if (selected == entt::null)
 			{
+				if (editor.GetShowGlobalSettings())
+				{
+					OnImGUIGlobalSettings();
+				}
+
 				ImGui::End();
 				return;
 			}
@@ -772,6 +778,46 @@ namespace Raven
 		}
 		ImGui::End();
 	}
+
+
+	void PropertiesWindow::OnImGUIGlobalSettings()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::Columns(2);
+		ImGui::Separator();
+
+
+		auto scene = Engine::GetModule<SceneManager>()->GetCurrentScene();
+		auto& globalSettings = scene->GetGlobalSettings();
+
+		// Sun & Sky Settings...
+		bool dirtySky = ImGuiHelper::Property("Enable Sun", globalSettings.isSun);
+
+		if (globalSettings.isSun)
+		{
+			dirtySky = ImGuiHelper::Property("Enable Sky", globalSettings.isSky) || dirtySky;
+
+			dirtySky = ImGuiHelper::Property("Sun Lambda", globalSettings.sunAngles.x, 0.0f, 360.0f) || dirtySky;
+			dirtySky = ImGuiHelper::Property("Sun Delta", globalSettings.sunAngles.y, 0.0f, 90.0f) || dirtySky;
+			dirtySky = ImGuiHelper::Property("Sun Power", globalSettings.sunPower, 0.0f, 20.0f) || dirtySky;
+			dirtySky = ImGuiHelper::Property("Sun Color", globalSettings.sunColor, 0.0f, 20.0f, ImGuiHelper::PropertyFlag::ColorProperty) || dirtySky;
+
+		}
+
+
+		if (dirtySky)
+		{
+			Engine::GetModule<RenderModule>()->RequestUpdateSky();
+		}
+
+
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::PopStyleVar();
+	}
+
+
 
 	void PropertiesWindow::OnSceneCreated(Scene* scene)
 	{

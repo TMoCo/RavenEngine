@@ -27,6 +27,8 @@ namespace Raven
 	class RenderTexFilter;
 	class RenderRscMaterial;
 	class Material;
+	class RenderRscTexture;
+	class Texture2D;
 
 
 
@@ -95,12 +97,18 @@ namespace Raven
 		// Create/Setup default materials.
 		void CreateDefaultMaterials();
 
+		// Request to updat sky on the next render.
+		void RequestUpdateSky();
+
 	private:
 		// Module Initialize.
 		virtual void Initialize() override;
 
 		// Module Destroy.
 		virtual void Destroy() override;
+
+		// Generate filterd environment map from texture.
+		void GenerateEnvMap(Ptr<Texture2D> texture);
 
 	private:
 		// The context of the render.
@@ -129,6 +137,16 @@ namespace Raven
 
 		// The default materials.
 		RenderDefaultMaterials defaultMaterials;
+
+		// Update sky environment next render.
+		bool isUpdateSky;
+
+		// BRDF Lookup table texture.
+		Ptr<RenderRscTexture> BRDF;
+
+		// Filtered Environment map.
+		Ptr<RenderRscTexture> environmentMap;
+
 	};
 
 }

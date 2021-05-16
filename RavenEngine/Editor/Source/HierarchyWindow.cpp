@@ -45,6 +45,7 @@ namespace Raven
 			PopupWindow();
 		
 			DrawName();
+			DrawGlobalSettings();
 			
 
 			DrawFilter();
@@ -71,6 +72,18 @@ namespace Raven
 		if (ImGui::InputText("##Name", objName, IM_ARRAYSIZE(objName), 0))
 			scene->SetName(objName);
 		ImGui::Separator();
+	}
+
+	void HierarchyWindow::DrawGlobalSettings()
+	{
+		ImGui::Spacing();
+
+		if (ImGui::Button("Global Settings", ImVec2(-1.0f, 0.0f)))
+		{
+			static_cast<Editor&>(Engine::Get()).SelectGlobalSettings();
+		}
+
+		ImGui::Spacing();
 	}
 
 	void HierarchyWindow::PopupWindow()

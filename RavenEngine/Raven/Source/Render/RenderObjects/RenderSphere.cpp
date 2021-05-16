@@ -164,7 +164,14 @@ void RenderSphere::Draw(GLShader* shader)
 	shader->SetUniform("inViewProjMatrix", viewProj);
 
 	vxArray->Bind();
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
+}
+
+
+void RenderSphere::DrawSky(GLShader* shader)
+{
+	vxArray->Bind();
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 

@@ -1,4 +1,5 @@
 #include "RenderPipeline.h"
+#include "RenderTexFilter.h"
 
 #include "RenderTarget.h"
 #include "RenderObjects/RenderScene.h"
@@ -34,6 +35,8 @@ RenderPipeline::RenderPipeline(Ptr<RenderScreen> screen, Ptr<RenderSphere> spher
 	, rscene(nullptr)
 	, rscreen(screen)
 	, rsphere(sphere)
+	, EnvMap(nullptr)
+	, BRDF(nullptr)
 {
 
 }
@@ -53,6 +56,9 @@ void RenderPipeline::Initialize()
 	// Setup...
 	SetupRenderPasses();
 	SetupShaders();
+	SetupSSAO();
+	SetupSky();
+
 
 	// Uniforms...
 	uniforms.common = Ptr<UniformBuffer>( UniformBuffer::Create(RenderShaderInput::CommonBlock, true) );
@@ -65,9 +71,6 @@ void RenderPipeline::Initialize()
 	// Grid.
 	rgrid = Ptr<RenderGrid>( RenderGrid::Create() );
 
-	// 
-	SetupSSAO();
-	
 }
 
 
@@ -153,6 +156,7 @@ void RenderPipeline::Render()
 
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
 	// Shadow: Draw Shadow Maps.
+	if (rscene->GetEnvironment().isSun)
 	{
 		glEnable(GL_CULL_FACE);
 		rscene->DrawShadow(uniforms.shadow.get());
@@ -198,19 +202,12 @@ void RenderPipeline::Render()
 		ssaoNoiseTexture->Active(2); // Noise.
 		rscreen->Draw(ssaoShader->GetShader());
 
-		// Blending 
-		//glEnable(GL_BLEND);
-		//glDisable(GL_BLEND);
-		//glBlendEquation(GL_FUNC_ADD);
-		//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-
 		ssaoBlurPass->Begin(viewport, false);
 		ssaoBlurShader->GetShader()->Use();
 		ssaoPass->GetTexture(0)->Active(0); // SSAO.
 
 		rscreen->Draw(ssaoBlurShader->GetShader());
 	}
-
 
 
 	// --- -- --- -- --- -- --- -- --- -- --- -- --- -- --- -- 
@@ -244,10 +241,17 @@ void RenderPipeline::Render()
 		gbufferPass->GetDepthTexture()->Active(3); // Depth.
 		hdrTarget[1]->Active(4);
 
-		// ~ITERATION_0----------------------------------------------------------------------------
-		testEnv->Active(5);
-		testBRDF->Active(6);
-		// ~ITERATION_0----------------------------------------------------------------------------
+		// IBL...
+		if (rscene->GetEnvironment().isSky)
+		{
+			skyEnv->Active(5);
+		}
+		else
+		{
+			EnvMap->Active(5);
+		}
+		BRDF->Active(6);
+
 
 		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
 			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(7+i);
@@ -262,12 +266,29 @@ void RenderPipeline::Render()
 	{
 		forwardPass->Begin(viewport, false);
 
+
+		// ------------------
+		// Draw Sky...
+		if (rscene->GetEnvironment().isSky)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(GL_FALSE);
+			glDisable(GL_BLEND);
+			GLShader* skys = skyShader->GetShader();
+			skys->Use();
+			rsphere->DrawSky(skys);
+		}
+
+
 		// OpenGL States...
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 
+
+
+		// ------------------
 		// Blending 
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -282,10 +303,17 @@ void RenderPipeline::Render()
 		uniforms.lightShadow->BindBase();
 		uniforms.light_FORWARD->BindBase();
 
-		// ~ITERATION_0----------------------------------------------------------------------------
-		testEnv->Active(0);
-		testBRDF->Active(1);
-		// ~ITERATION_0----------------------------------------------------------------------------
+		// IBL...
+		if (rscene->GetEnvironment().isSky)
+		{
+			skyEnv->Active(0);
+		}
+		else
+		{
+			EnvMap->Active(0);
+		}
+
+		BRDF->Active(1);
 
 		for (int32_t i = 0; i < RENDER_MAX_SHADOW_CASCADE; ++i)
 			rscene->GetEnvironment().sunShadow->GetCascade(i).shadowMap->Active(2 + i);
@@ -492,6 +520,43 @@ void RenderPipeline::SetupRenderPasses()
 	}
 
 
+
+	// ---- ---- ---- --- -- -- ---- 
+	// Sky Update Reflection Pass.
+	{
+		glm::ivec2 reflectionSize(256, 256);
+
+		// Sky CubeMap Target...
+		skyCubeMap = Ptr<GLTexture>( GLTexture::Create(EGLTexture::CubeMap, EGLFormat::RGB16F) );
+		skyCubeMap->Bind();
+		for (int32_t i = 0; i < 6; ++i)
+			skyCubeMap->UpdateTexData(0, reflectionSize.x, reflectionSize.y, i, nullptr);
+		skyCubeMap->SetFilter(EGLFilter::Linear);
+		skyCubeMap->SetWrap(EGLWrap::Mirror);
+		skyCubeMap->UpdateTexParams();
+		skyCubeMap->Unbind();
+
+
+		skyCubePass = Ptr<RenderPass>(new RenderPass());
+		skyCubePass->AddTexture(0, skyCubeMap, 0, -1);
+		skyCubePass->SetSize(reflectionSize);
+		skyCubePass->Build();
+
+		// Sky Filtered Envionment...
+		skyEnv = Ptr<GLTexture>(GLTexture::Create(EGLTexture::CubeMap, EGLFormat::RGB));
+		skyEnv->Bind();
+		for (int32_t i = 0; i < 6; ++i)
+			skyEnv->UpdateTexData(0, reflectionSize.x, reflectionSize.y, i, nullptr);
+		skyEnv->Bind();
+		skyEnv->SetWrap(EGLWrap::ClampToEdge);
+		skyEnv->SetFilter(EGLFilter::TriLinear);
+		skyEnv->SetMipLevels(0, NUM_IBL_SPEC_MIPS);
+		skyEnv->UpdateTexParams();
+		skyEnv->GenerateMipmaps();
+		skyEnv->Unbind();
+	}
+
+
 }
 
 
@@ -673,6 +738,54 @@ void RenderPipeline::SetupSSAO()
 }
 
 
+void RenderPipeline::SetupSky()
+{
+
+	// -- --- --- ---- -----
+	// Sky Shader.
+	{
+		RenderRscShaderDomainCreateData shaderDomainData;
+		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/SphereVert.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/SkyFrag.glsl");
+		shaderDomainData.AddPreprocessor("#define DRAW_SKY 1");
+
+		// Shader Type Data
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::PostProcessing;
+		shaderData.name = "Sky_Shader";
+
+		skyShader = Ptr<RenderRscShader>(RenderRscShader::CreateCustom(shaderDomainData, shaderData));
+		skyShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
+		skyShader->BindBlockInputs();
+		skyShader->BindSamplers();
+	}
+
+	// -- --- --- ---- -----
+  // Sky CubeMap Shader.
+	{
+		RenderRscShaderDomainCreateData shaderDomainData;
+		shaderDomainData.AddSource(EGLShaderStage::Vertex, "shaders/SphereVert.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Geometry, "shaders/SphereGeom.glsl");
+		shaderDomainData.AddSource(EGLShaderStage::Fragment, "shaders/SkyFrag.glsl");
+		shaderDomainData.AddPreprocessor("#define DRAW_SKY_CUBE_MAP 1");
+
+		// Shader Type Data
+		RenderRscShaderCreateData shaderData;
+		shaderData.type = ERenderShaderType::PostProcessing;
+		shaderData.name = "skyCubeShader_Shader";
+
+		skyCubeShader = Ptr<RenderRscShader>(RenderRscShader::CreateCustom(shaderDomainData, shaderData));
+		skyCubeShader->GetInput().AddBlockInput(RenderShaderInput::CommonBlock);
+		skyCubeShader->BindBlockInputs();
+		skyCubeShader->BindSamplers();
+
+		rtFilter->SetupSkyShader(skyCubeShader.get());
+	}
+
+
+}
+
+
 void RenderPipeline::UpdateLights_DEFERRED()
 {
 	static std::vector<glm::vec4> lightPos(RENDER_PASS_DEFERRED_MAX_LIGHTS);
@@ -730,6 +843,12 @@ void RenderPipeline::UpdateShadows()
 
 	uniforms.lightShadow->UpdateData(sizeof(LightShadowBlock), 0, &shadowData);
 
+}
+
+
+void RenderPipeline::RenderEnvSky()
+{
+	rtFilter->FilterSky(skyCubeShader.get(), skyCubePass.get(), skyEnv);
 }
 
 

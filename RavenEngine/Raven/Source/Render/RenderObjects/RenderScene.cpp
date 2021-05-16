@@ -89,6 +89,8 @@ void RenderSceneEnvironment::Reset()
 	sunDir = glm::normalize(glm::vec4(-1.0f));
 	sunPower = 1.0f;
 	sunShadow->Reset();
+	isSun = false;
+	isSky = false;
 }
 
 
@@ -106,7 +108,6 @@ RenderScene::RenderScene()
 	, far(0.0f)
 	, frustum(glm::mat4(1.0f))
 	, isGrid(true)
-	, isSky(false)
 	, fov(false)
 {
 
@@ -223,7 +224,7 @@ void RenderScene::TraverseScene(Scene* scene)
 		// Shadow Culling...
 		std::vector<uint32_t> shadowCascadeIndices;
 
-		if (primComp->IsCastShadow())
+		if (primComp->IsCastShadow() && environment.isSun)
 		{
 			environment.sunShadow->IsInShadow(center, radius, shadowCascadeIndices);
 		}
@@ -337,33 +338,35 @@ void RenderScene::CollectSceneView(Scene* scene)
 
 void RenderScene::CollectSceneLights(Scene* scene)
 {
+	// Collect sun lights from global settings...
+	if (scene->GetGlobalSettings().isSun)
+	{
+		environment.isSun = true;
+		environment.isSky = scene->GetGlobalSettings().isSky;
+		environment.sunDir = scene->GetGlobalSettings().GetSunDir();
+		environment.sunPower = scene->GetGlobalSettings().sunPower;
+		environment.sunColor = scene->GetGlobalSettings().sunColor;
+
+		// Shadow Cascade...
+		environment.sunShadow->ComputeCascade(environment.sunDir, fov, aspect, near, far, viewMatrixInverse);
+
+	}
+	else
+	{
+		environment.isSun = false;
+		environment.isSky = false;
+		environment.sunColor = glm::vec4(0.0f);
+		environment.sunPower = 0.0f;
+	}
+
+
+
+	// Iterate over all lights in the scene...
 	auto lightsEttView = scene->GetRegistry().group<Light>(entt::get<Transform>);
 
-	//
-	bool isSearchForSun = true;
-
-
-	// Iterate over all lights in the scene.
 	for (auto entity : lightsEttView)
 	{
 		const auto& [light, trans] = lightsEttView.get<Light, Transform>(entity);
-
-		// TODO: Add Scene Environment Settings to collect sun lights from.
-		if (isSearchForSun && light.type == (int32_t)LightType::DirectionalLight)
-		{
-			// Check if it is the sun
-			const auto nameComponent = scene->GetRegistry().try_get<NameComponent>(entity);
-
-			if (nameComponent && nameComponent->name == "THE_SUN")
-			{
-				environment.sunDir = light.direction;
-				environment.sunColor = light.color;
-				environment.sunPower = light.intensity;
-				environment.sunShadow->ComputeCascade(environment.sunDir, fov, aspect, near, far, viewMatrixInverse);
-				isSearchForSun = false;
-				continue;
-			}
-		}
 
 		// ...
 		float lightRadius = glm::max(light.radius, 1.0f);
@@ -431,7 +434,9 @@ void RenderScene::CollectTerrain(Scene* scene)
 
 		// Shadow Culling...
 		std::vector<uint32_t> shadowCascadeIndices;
-		environment.sunShadow->IsInShadow(binCenter, binRadius, shadowCascadeIndices);
+
+		if (environment.isSun)
+			environment.sunShadow->IsInShadow(binCenter, binRadius, shadowCascadeIndices);
 
 		// Clip?
 		if (isViewCulled && shadowCascadeIndices.empty())

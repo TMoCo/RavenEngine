@@ -42,6 +42,10 @@ namespace Raven
 		// Draw.
 		void Draw(GLShader* shader);
 
+		// Draw.
+		void DrawSky(GLShader* shader);
+
+
 	private:
 		// Create sphere geometry.
 		static void MakeSphere(std::vector<glm::vec3>& outVerts, std::vector<uint32_t>& outIndices);

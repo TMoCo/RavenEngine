@@ -241,7 +241,4 @@ void RenderRscMaterial::MakeTexturesActive(const std::vector< Ptr<ITexture> >& d
 	}
 }
 
-
-
-
 } // End of namespace Raven.

@@ -125,13 +125,13 @@ void RenderScene::Setup()
 	// Default Textures...
 	defaultTextures.resize(3);
 	defaultTextures[(int32_t)ESInputDefaultFlag::Normal] =
-		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_Normal.raven");
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/Textures/T_Default_Normal.raven");
 
 	defaultTextures[(int32_t)ESInputDefaultFlag::White] =
-		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_White.raven");
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/Textures/T_Default_White.raven");
 
 	defaultTextures[(int32_t)ESInputDefaultFlag::Black] =
-		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/textures/T_Default_Black.raven");
+		Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("assets/Textures/T_Default_Black.raven");
 }
 
 

@@ -42,7 +42,7 @@ namespace Raven
 		currentDirPath = baseDirPath;
 		previousDirPath = currentDirPath;
 		lastNavPath = baseDirPath;
-		baseProjectDir = GetFsContents(baseDirPath);
+		baseProjectDir = ReadDirectory(baseDirPath);
 		currentDir = ReadDirectory(baseDirPath);
 		basePathLen = baseDirPath.length();
 
@@ -186,7 +186,6 @@ namespace Raven
 				ImGui::EndDragDropTarget();
 			}
 
-
 			ImGui::End();
 		}
 	}
@@ -280,15 +279,11 @@ namespace Raven
 		const ImColor TreeLineColor = ImColor(128, 128, 128, 128);
 		const float SmallOffsetX = 6.0f;
 		ImDrawList* drawList = ImGui::GetWindowDrawList();
-
+		/*
 		if (!dirInfo.isFile)
 		{
-			//auto dirData = ReadDirectory(dirInfo.absolutePath.c_str());
-
 			bool containsFolder = false;
-
-			//for (auto& file : dirData)
-			for (auto& file : currentDir)
+			for (auto& file : children)
 			{
 				if (!file.isFile)
 				{
@@ -297,6 +292,9 @@ namespace Raven
 				}
 			}
 			if (!containsFolder)
+		*/
+			auto children = GetChildDirectories(dirInfo.absolutePath);
+			if (children.empty())
 				nodeFlags |= ImGuiTreeNodeFlags_Leaf;
 
 			static std::string folderIcon = ICON_MDI_FOLDER " ";
@@ -312,34 +310,30 @@ namespace Raven
 				currentDir = ReadDirectory(dirInfo.absolutePath.c_str());
 			}
 
-			if (isOpen && containsFolder)
+			if (isOpen)
 			{
 				verticalLineStart.x += SmallOffsetX; //to nicely line up with the arrow symbol
 				ImVec2 verticalLineEnd = verticalLineStart;
 
-				for (int i = 0; i < currentDir.size(); i++)
+				auto children = GetChildDirectories(dirInfo.absolutePath);
+
+				for (int i = 0; i < children.size(); i++)
 				{
+					/*
 					if (!currentDir[i].isFile)
 					{
+						auto dirDataTemp = GetChildDirectories(children[i].absolutePath);
+
+						if (!dirDataTemp.empty())
+							HorizontalTreeLineSize *= 0.5f;
+					}
+					*/
 						float HorizontalTreeLineSize = 16.0f; //chosen arbitrarily
 						auto currentPos = ImGui::GetCursorScreenPos();
 
 						ImGui::Indent(10.0f);
 
-						auto dirDataTemp = ReadDirectory(currentDir[i].absolutePath.c_str());
-
-						bool containsFolderTemp = false;
-						for (auto& file : dirDataTemp)
-						{
-							if (!file.isFile)
-							{
-								containsFolderTemp = true;
-								break;
-							}
-						}
-						if (containsFolderTemp)
-							HorizontalTreeLineSize *= 0.5f;
-						DrawFolder(currentDir[i]);
+						DrawFolder(children[i]); // draw a folder for each child directory
 
 						const ImRect childRect(currentPos, ImVec2{ currentPos.x,  currentPos.y+ImGui::GetFontSize() });
 
@@ -348,17 +342,17 @@ namespace Raven
 						verticalLineEnd.y = midpoint;
 
 						ImGui::Unindent(10.0f);
-					}
 				}
 
 				drawList->AddLine(verticalLineStart, verticalLineEnd, TreeLineColor);
 
 				ImGui::TreePop();
 			}
-
+			/*
 			if (isOpen && !containsFolder)
 				ImGui::TreePop();
-		}
+			*/
+		//}
 
 		if (isDragging && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 		{
@@ -462,7 +456,7 @@ namespace Raven
 
 			if (isAdd)
 			{
-				baseProjectDir = GetFsContents(baseDirPath);
+				baseProjectDir = ReadDirectory(baseDirPath);
 				currentDir = baseProjectDir;
 			}
 
@@ -550,7 +544,6 @@ namespace Raven
 			auto type = rm->GetResourceType(entry.path().string());
 			if (type != EResourceType::RT_None)
 			{
-				LOGC("IS RESOURCE: {0}", entry.path().string());
 				// raven resources are , so try to get the resource 
 				dInfo.push_back({ StringUtils::RemoveExtension(dir_data), fileExt, entry.path().string(), true, ResourceToIcon(type), ImVec4(1.0f, 1.0f, 1.0f, 1.0f), type });
 			}
@@ -559,26 +552,19 @@ namespace Raven
 		return dInfo;
 	}
 
-	std::vector<FileInfo> AssetsWindow::ReadDirectoryRecursive(const std::string& path)
+	std::vector<FileInfo> AssetsWindow::GetChildDirectories(const std::string& path)
 	{
 		std::vector<FileInfo> dInfo;
 
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		for (const auto& entry : std::filesystem::directory_iterator(path))
 		{
-			bool isDir = std::filesystem::is_directory(entry);
-
-			auto test = std::vector<std::string>();
-			const char del = *delimiter.c_str();
-
-			auto dir_data = ParseFilename(entry.path().string(), del, test);
-
-			if (isDir)
+			if (std::filesystem::is_directory(entry))
 			{
+				auto test = std::vector<std::string>();
+				const char del = *delimiter.c_str();
+
+				auto dir_data = ParseFilename(entry.path().string(), del, test);
 				dInfo.push_back({ dir_data, ".raven", entry.path().string(), false });
-			}
-			else
-			{
-				dInfo.push_back({ dir_data, ".raven", entry.path().string(), true });
 			}
 		}
 
@@ -634,5 +620,28 @@ namespace Raven
 		return newFileName;
 	}
 
+	void AssetsWindow::SplitPath(std::string relativePath)
+	{
+		splitPath.clear();
+		// starting from the end of the string, remove elements till there are no separators left (or the relative path is just the base directory)
+		while (relativePath.compare(baseDirPath) != 0)
+		{
+			// find the last occurence of the delimiter in the string
+			auto lastDel = relativePath.find_last_of(delimiter);
+			// extract any character from the string after the delimiter and append it to the split path
+			splitPath.push_back(relativePath.substr(lastDel + 1));
+			// update the relative path by removing the 
+			relativePath.erase(lastDel, lastDel + splitPath.back().size());
+		}
+	}
+
+	bool AssetsWindow::IsInSplitPath(const std::string& dir)
+	{
+		// returns true if the directory name is in the current directory's split relative path
+		for (auto& s : splitPath)
+			if (s.compare(dir) == 0)
+				return true;
+		return false;
+	}
 };
 

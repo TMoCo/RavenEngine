@@ -238,8 +238,6 @@ const ResourceData* ResourcesRegistry::FindResource(const std::string& path) con
 		return nullptr;
 	}
 
-	LOGC("FOUND");
-
 	return &resources[iter->second];
 }
 

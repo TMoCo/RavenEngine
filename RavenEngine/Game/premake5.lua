@@ -94,16 +94,12 @@ project "Game"
 		links
 		{
 			"glfw",
-<<<<<<< HEAD
 			"OpenGL32",
 			"lua",
 			"openfbx",
-			"node-editor"		
-=======
-			"OpenAL32",
-			"OpenGL32","lua","openfbx","node-editor"
+			"node-editor",		
+			"OpenAL32"
 			
->>>>>>> master
 		}
 
 		disablewarnings { 4307 }

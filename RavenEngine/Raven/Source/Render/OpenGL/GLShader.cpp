@@ -407,11 +407,9 @@ void GLShader::SetUniform(const std::string& name, const glm::mat3& value)
 void GLShader::BindUniformBlock(const std::string& blockName, int binding)
 {
 	int blockIdx = glGetUniformBlockIndex(id, blockName.c_str());
-	RAVEN_ASSERT(blockIdx != -1, "Invalid Block Name.");
+	//RAVEN_ASSERT(blockIdx != -1, "Invalid Block Name.");
 
 	glUniformBlockBinding(id, blockIdx, binding);
 }
-
-
 
 } // End of namespace Raven.

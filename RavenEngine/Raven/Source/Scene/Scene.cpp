@@ -265,12 +265,12 @@ namespace Raven {
 		return overrideTransform;
 	}
 
-	
 
 	void Scene::CopyComponents(const Entity& from, const Entity& to)
 	{
 		LOGW("Not implementation {0}", __FUNCTION__);
 	}
+
 
 	void Scene::OnInit()
 	{
@@ -278,35 +278,50 @@ namespace Raven {
 		{
 			initCallback(this);
 		}
+
+		// initialise all rigid bodies in the scene
+		int rbIdx = 0;
+		auto view = GetRegistry().view<RigidBody>();
+		for (auto v : view)
+		{
+			auto& rb = view.get<RigidBody>(v);
+			// set the rigid body index
+			rb.SetBodyIndex(rbIdx);
+
+			Engine::Get().GetModule<PhysicsModule>()->AddRigidBody();
+
+			// when creating a rigid body, we need to set some data... 
+			rb.InitRigidBody(rb.GetBodyIndex());
+
+			// also initialise the colliders
+			for (auto& collider : *rb.GetAllColliders())
+			{
+				collider->SetBody(Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(rbIdx++));
+				collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
+			}
+		}
+
 		auto luaView = GetRegistry().view<LuaComponent>();
 		for (auto v : luaView)
 		{
 			auto& lua = GetRegistry().get<LuaComponent>(v);
 			lua.OnInit();
 		}
-		// on scene init, we need to initialise the physics engine
-		auto view = entityManager->GetRegistry().view<RigidBody>();
-		for (auto v : view)
-		{
-			auto& rb = entityManager->GetRegistry().get<RigidBody>(v);
-			// initialise the body
-			rb.InitRigidBody();
-			// initialise the start transform in the rigid body engine to be the entity's current transform
-			rb.SetInitTransform(GetRegistry().get<Transform>(v)); // rigid body needs transform to exist so this should never fail
-			rb.InitTransform();
-			// initialise the colliders attached to the body (if any)
-			for (auto& collider : *rb.GetAllColliders())
-			{
-				collider->SetBody(rb.GetBody());
-				collider->InitShape(Engine::Get().GetModule<PhysicsModule>()->GetPhysicsCommon());
-			}
-		}
 	}
+
 
 	void Scene::OnClean()
 	{
-		LOGE("CLEANING");
+		// on scene clean, we need to destroy the physics engine
+		auto view = GetRegistry().view<RigidBody>();
+		for (auto v : view)
+		{
+			auto& rb = GetRegistry().get<RigidBody>(v);
+			Engine::Get().GetModule<PhysicsModule>()->DestroyRigidBody(rb.GetBodyIndex());
+		}
+		Engine::Get().GetModule<PhysicsModule>()->ClearRigidBodies();
 	}
+
 
 	auto Scene::UpdateCameraController(float dt)
 	{

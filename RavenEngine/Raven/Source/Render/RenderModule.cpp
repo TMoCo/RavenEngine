@@ -134,7 +134,7 @@ void RenderModule::Initialize()
 	rpipeline->BRDF = BRDF->GetTexture().get();
 
 	// Default Environment Map.
-	Engine::GetModule<ResourceManager>()->AddResource("./assets/textures/T_Default_Environment_Map.raven");
+	Engine::GetModule<ResourceManager>()->AddResource(".\\assets\\textures\\T_Default_Environment_Map.raven");
 	Ptr<Texture2D> envTexture = Engine::GetModule<ResourceManager>()->GetResource<Texture2D>("./assets/textures/T_Default_Environment_Map.raven");
 
 	GenerateEnvMap(envTexture);

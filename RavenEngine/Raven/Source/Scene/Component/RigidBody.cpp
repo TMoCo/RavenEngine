@@ -20,25 +20,23 @@ namespace Raven
 	RigidBody::RigidBody() : 
 		world(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()),
 		initTransform(Transform::Identity),
-		body(nullptr),
 		mass(1.0f),
 		linearDamping(0.0f),
 		angularDamping(0.0f),
 		canTopple(true),
-		type(RigidBodyType::Static)
+		type(RigidBodyType::Static),
+		bodyIdx(0)
 	{}
 
 	RigidBody::~RigidBody()
 	{}
 
-	void RigidBody::InitRigidBody()
+	void RigidBody::InitRigidBody(int index)
 	{
-		
 		// if body already exists, delete it and replace with a new default body
-		if (body)
-			world->destroyRigidBody(body);
+		auto body = Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(index);
+
 		auto initT = Rp3dConvert::ToRp3dTransform(initTransform);
-		body = world->createRigidBody(initT);
 
 		previousState = initT;
 		body->setMass(mass);
@@ -50,14 +48,8 @@ namespace Raven
 		body->setType(static_cast<rp3d::BodyType>(type));
 
 		if (!canTopple) body->setLocalInertiaTensor(rp3d::Vector3(0, 0, 0));
-
 	}
 
-	void RigidBody::DestroyRigidBody()
-	{
-		if (body)
-			world->destroyRigidBody(body);
-	}
 
 	void RigidBody::AddCollider(Collider* collider)
 	{
@@ -103,19 +95,19 @@ namespace Raven
 
 	rp3d::Transform RigidBody::GetCurrentState()
 	{
-		return body->getTransform();
+		return Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->getTransform();
 	}
 
 	void RigidBody::SetTransform(const Transform& t)
 	{
 		// set the underlying rp3d body's transform to specified
-		body->setTransform(Rp3dConvert::ToRp3dTransform(t));
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->setTransform(Rp3dConvert::ToRp3dTransform(t));
 	}
 
 	Transform RigidBody::GetTransform()
 	{
 		float m[16];
-		body->getTransform().getOpenGLMatrix(m); // get transform from physics library
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->getTransform().getOpenGLMatrix(m); // get transform from physics library
 		return Transform(glm::make_mat4(m));
 	}
 
@@ -131,12 +123,12 @@ namespace Raven
 
 	void RigidBody::InitTransform()
 	{
-		body->setTransform(Rp3dConvert::ToRp3dTransform(initTransform));
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->setTransform(Rp3dConvert::ToRp3dTransform(initTransform));
 	}
 
 	glm::quat RigidBody::GetOrientation()
 	{
-		auto& o = body->getTransform().getOrientation();
+		auto& o = Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->getTransform().getOrientation();
 		
 		return Rp3dConvert::ToGLMQuat(o);
 	}
@@ -234,6 +226,16 @@ namespace Raven
 		return type;
 	}
 
+	void RigidBody::SetBodyIndex(int idx)
+	{
+		bodyIdx = idx;
+	}
+	int RigidBody::GetBodyIndex()
+	{
+		return bodyIdx;
+	}
+
+
 	//
 	// Apply forces to the rigid body (only during one call of update world in simulation)
 	//
@@ -241,22 +243,23 @@ namespace Raven
 	// Applies force to the body's centre of mass
 	void RigidBody::ApplyForce(const glm::vec3& f)
 	{
-		body->applyForceToCenterOfMass(Rp3dConvert::ToRp3dVector3(f));
+		//auto b = Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx);
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->applyForceToCenterOfMass(Rp3dConvert::ToRp3dVector3(f));
 	}
 
 	void RigidBody::ApplyForceAtLocalPos(const glm::vec3& f, const glm::vec3& pos)
 	{
-		body->applyForceAtLocalPosition(Rp3dConvert::ToRp3dVector3(f), Rp3dConvert::ToRp3dVector3(pos));
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->applyForceAtLocalPosition(Rp3dConvert::ToRp3dVector3(f), Rp3dConvert::ToRp3dVector3(pos));
 	}
 
 	void RigidBody::ApplyForceAtWorldPos(const glm::vec3& f, const glm::vec3& pos)
 	{
-		body->applyForceAtWorldPosition(Rp3dConvert::ToRp3dVector3(f), Rp3dConvert::ToRp3dVector3(pos));
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->applyForceAtWorldPosition(Rp3dConvert::ToRp3dVector3(f), Rp3dConvert::ToRp3dVector3(pos));
 	}
 
 	void RigidBody::ApplyTorque(const glm::vec3& t)
 	{
-		body->applyTorque(Rp3dConvert::ToRp3dVector3(t));
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->applyTorque(Rp3dConvert::ToRp3dVector3(t));
 	}
 
 	void RigidBody::RotateBody(const glm::vec3 axis, float deg)
@@ -266,9 +269,8 @@ namespace Raven
 		rp3d::Quaternion q = rp3d::Quaternion::fromEulerAngles(Rp3dConvert::ToRp3dVector3(axis * rad));
 
 		// Get the tranform of the rigid body and rotate it
-		rp3d::Transform t = GetBody()->getTransform();
+		rp3d::Transform t = Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->getTransform();
 		t.setOrientation(q * t.getOrientation());
-		GetBody()->setTransform(t);
+		Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx)->setTransform(t);
 	}
-
 }

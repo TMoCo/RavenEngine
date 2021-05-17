@@ -21,7 +21,7 @@ namespace Raven
 {
 	ImportWindow::ImportWindow() :
 		resourceManager(Engine::Get().GetModule<ResourceManager>()), // pointer to resource manager
-		input("/"),
+		input("\\"),
 		onlyAnimation(false),
 		selected(false),
 		dragInfo("Drag skeleton here")
@@ -50,7 +50,7 @@ namespace Raven
 				filePath = StringUtils::GetCurrentWorkingDirectory().append(input);
 			}
 
-			if (ImGui::Button("Testing file dialog"))
+			if (ImGui::Button("Open File Browser Dialog", ImVec2(w, 0.0f)))
 			{
 				// TODO: change the extensions to valid resources
 				igfd::ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", filter.c_str(), ".");

@@ -64,26 +64,25 @@ namespace Raven
 	}
 
 	// call these methods when loading in a new scene to initialise the physics world
-	void PhysicsModule::CreateWorld()
+	void PhysicsModule::ClearRigidBodies()
 	{
-		// valid world pointer means we do not have to create one
-		if (world)
-			physicsCommon.destroyPhysicsWorld(world);
-		world = physicsCommon.createPhysicsWorld();
-		LOGE("WORLD CREATED");
+		rigidBodies.clear();
 	}
 
-	void PhysicsModule::DestroyWorld() // call when destroying a scene
+	void PhysicsModule::AddRigidBody()
 	{
-		if (world)
-			physicsCommon.destroyPhysicsWorld(world);
-		world = nullptr; // invalidate pointer
-		LOGE("WORLD DESTROYED");
+		// initialise a rigid body at the origin and place it in the vector of bodies
+		rigidBodies.push_back(world->createRigidBody(rp3d::Transform::identity()));
 	}
 
-	void PhysicsModule::RecreateWorld()
+	rp3d::RigidBody* PhysicsModule::GetRigidBody(int index)
 	{
-		DestroyWorld();
-		CreateWorld();
+		return rigidBodies[index];
+	}
+
+	void PhysicsModule::DestroyRigidBody(int index)
+	{
+		if (index < rigidBodies.size())
+			world->destroyRigidBody(rigidBodies[index]);
 	}
 }

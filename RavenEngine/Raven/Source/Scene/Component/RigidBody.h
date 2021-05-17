@@ -47,10 +47,9 @@ namespace Raven
 		//RigidBody(Transform& transform = Transform::Identity(), RigidBodyType initType = RigidBodyType::Static);
 		~RigidBody();
 
-		void InitRigidBody();
-		void DestroyRigidBody();
+		void InitRigidBody(int index);
 
-		rp3d::RigidBody* GetBody() { return body; }
+		//rp3d::RigidBody* GetBody() { return Engine::Get().GetModule<PhysicsModule>()->GetRigidBody(bodyIdx); }
 
 		// add a collider to the collision body
 		void AddCollider(Collider* collider);
@@ -97,6 +96,8 @@ namespace Raven
 		void SetAngularDamping(float d);
 		void SetIsAllowedToSleep(bool b);
 		void SetBodyType(RigidBodyType t);
+		void SetBodyIndex(int idx);
+		int GetBodyIndex();
 
 
 		float GetLinearDamping();
@@ -121,6 +122,7 @@ namespace Raven
 					cereal::make_nvp("Gravity enabled", gravityEnabled),
 					cereal::make_nvp("Can Topple", canTopple),
 					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Body Index", bodyIdx),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
 					cereal::make_nvp("Colliders", colliders));
@@ -135,6 +137,7 @@ namespace Raven
 					cereal::make_nvp("Gravity enabled", gravityEnabled),
 					cereal::make_nvp("Can Topple", canTopple),
 					cereal::make_nvp("Mass", mass),
+					cereal::make_nvp("Body Index", bodyIdx),
 					cereal::make_nvp("Linear Damping", linearDamping),
 					cereal::make_nvp("Angular Damping", angularDamping),
 					cereal::make_nvp("Colliders", colliders));
@@ -146,7 +149,6 @@ namespace Raven
 
 		// keep the body as a raw pointer, managed in our deleter to destroy
 		// it in the physics world
-		rp3d::RigidBody* body;
 
 		float mass;
 		float linearDamping;
@@ -159,6 +161,8 @@ namespace Raven
 		RigidBodyType type;
 
 		Transform initTransform;
+
+		int bodyIdx;
 
 		// a copy of the previous state, used for slerping 
 		rp3d::Transform previousState;

@@ -76,9 +76,7 @@ class Stack {
                 // Release memory of the previous array
                 mAllocator.release(mArray, mCapacity * sizeof(T));
             }
-
             mArray = newArray;
-
             mCapacity = capacity;
         }
 

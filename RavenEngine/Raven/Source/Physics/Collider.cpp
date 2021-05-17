@@ -31,9 +31,7 @@ namespace Raven
 
 	// when deleting the collider, remove it from the body it's attached to
 	Collider::~Collider()
-	{
-		//body->removeCollider(collider);
-	}
+	{}
 
 	// call this when creating a collider 
 	void Collider::SetBody(rp3d::CollisionBody* parentBody)

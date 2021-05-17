@@ -230,7 +230,6 @@ const ResourceData* ResourcesRegistry::FindResource(const std::string& path) con
 	std::string cleanPath = CleanRscPath(path);
 	// Search...
 	auto iter = resourcePathMap.find(cleanPath);
-	//LOGC(path);
 
 	// Not Found?
 	if (iter == resourcePathMap.end())
@@ -331,7 +330,6 @@ void ResourceManager::ScanDirectory(const std::string& path)
 {
 	// construct a path from the input string
 	auto p = std::filesystem::path(path);
-	LOGE(path.c_str());
 	// use the path passed as argument to explore the directory (if it is)
 	for (const auto& entry : std::filesystem::directory_iterator(path))
 	{
@@ -350,9 +348,6 @@ void ResourceManager::ScanDirectory(const std::string& path)
 
 			ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
 			registry.AddResource(filePath, info, nullptr);
-			LOGW("Size map{0}", registry.resourceMap.size());
-			LOGW("Size path map {0}", registry.resourcePathMap.size());
-			LOGW("Size resources {0}", registry.resources.size());
 		}
 	}
 }
@@ -610,6 +605,7 @@ Ptr<IResource> ResourceManager::FindOrLoad(const ResourceRef& ref)
 	// Doesn't Exist?
 	if (!rscData)
 	{
+		LOGW(ref.path);
 		LOGW("No Resource found that matches the one in ResourceRef.");
 		return nullptr;
 	}

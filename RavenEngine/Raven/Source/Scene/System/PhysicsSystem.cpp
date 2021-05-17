@@ -42,6 +42,8 @@ namespace Raven
 			// Update physics world, generates new transforms for entities with rigid bodies
 			Engine::Get().GetModule<PhysicsModule>()->Step(dt);
 
+			LOGE(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()->getNbRigidBodies());
+
 			// get all entities with collision bodies and tranforms
 			/*
 			*/

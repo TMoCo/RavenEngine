@@ -456,8 +456,9 @@ namespace Raven
 
 			if (isAdd)
 			{
-				baseProjectDir = ReadDirectory(baseDirPath);
-				currentDir = baseProjectDir;
+				currentDir = ReadDirectory(currentDirPath);
+				//baseProjectDir = ReadDirectory(baseDirPath);
+				//currentDir = baseProjectDir;
 			}
 
 			ImGui::EndPopup();

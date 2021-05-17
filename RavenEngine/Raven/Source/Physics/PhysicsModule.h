@@ -38,15 +38,20 @@ namespace Raven
 		rp3d::PhysicsWorld* GetCurrentWorld();
 
 		// call these methods when loading in a new scene to initialise the physics world
-		void CreateWorld();
-		void DestroyWorld();
-		void RecreateWorld();
+		void ClearRigidBodies();
+
+		void AddRigidBody();
+		rp3d::RigidBody* GetRigidBody(int index);
+		void DestroyRigidBody(int index);
 
 	private:
 		// singleton class for physics library's memory allocation etc
 		rp3d::PhysicsCommon physicsCommon;
 		// physics world where collisions and simulations are run
 		rp3d::PhysicsWorld* world;
+
+		// a list of pointers to rigid bodies
+		std::vector<rp3d::RigidBody*> rigidBodies;
 
 		// where we accumulate time between frames
 		float accumulator;

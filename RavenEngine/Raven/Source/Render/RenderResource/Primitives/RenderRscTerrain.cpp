@@ -22,6 +22,8 @@ RenderRscTerrain::RenderRscTerrain()
 	, numVerts(0)
 	, numBins(0)
 	, numIndices(0)
+	, foliageLayers(nullptr)
+	, bins(nullptr)
 {
 
 }

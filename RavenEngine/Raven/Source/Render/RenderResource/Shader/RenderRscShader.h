@@ -44,7 +44,10 @@ namespace Raven
 		PostProcessing,
 
 		// Custom shader domain, defined and managed outside of the domain system.
-		Custom
+		Custom,
+
+		// The Shaders for rendering a mesh.
+		MeshInstance
 	};
 
 

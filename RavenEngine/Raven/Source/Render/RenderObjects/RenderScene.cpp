@@ -269,7 +269,7 @@ void RenderScene::TraverseScene(Scene* scene)
 			RenderPrimitive* rprim = collector.primitive[i];
 			bool isDefaultMat = false;
 
-			// Vlidate Material.
+			// Validate Material.
 			if (rprim->GetMaterial())
 			{
 				// Domain Missmatch?
@@ -425,6 +425,10 @@ void RenderScene::CollectSceneLights(Scene* scene)
 
 void RenderScene::CollectTerrain(Scene* scene)
 {
+	// Default Materials.
+	const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
+
+
 	auto TerrainEttView = scene->GetRegistry().view<TerrainComponent>();
 
 	// No Terrain Found?
@@ -441,13 +445,16 @@ void RenderScene::CollectTerrain(Scene* scene)
 	float binRadius;
 	glm::vec3 binCenter;
 
+	std::vector< std::pair<bool, bool> > drawnBins; // first:scene, second:shadow]
+	drawnBins.resize(bins.size(), std::make_pair(false, false));
+
+
 	for (uint32_t i = 0; i < bins.size(); ++i)
 	{
 		bins[i].bounds.GetSphere(binCenter, binRadius);
 
 		// View Culling...
 		bool isViewCulled = !frustum.IsInFrustum2D(binCenter, binRadius);
-		isViewCulled = false;
 
 		// Shadow Culling...
 		std::vector<uint32_t> shadowCascadeIndices;
@@ -466,24 +473,116 @@ void RenderScene::CollectTerrain(Scene* scene)
 		renderTerrain->SetBin(i);
 
 		// Default Terrain Material.
-		const auto& defaultMaterials = Engine::GetModule<RenderModule>()->GetDefaultMaterials();
-		renderTerrain->SetMaterial(defaultMaterials.terrain->GetRenderRsc());
+		if (terrain->GetMaterial())
+		{
+			renderTerrain->SetMaterial(terrain->GetMaterial()->GetRenderRsc());
+		}
+		else
+		{
+			renderTerrain->SetMaterial(defaultMaterials.terrain->GetRenderRsc());
+		}
 
 		// Add the terrain to the deferred batch.
 		if (!isViewCulled)
 		{
 			deferredBatch.Add(renderTerrain);
+			drawnBins[i].first = true;
 		}
 
 		// Add terrain to shadow rendering.
 		if (!shadowCascadeIndices.empty())
 		{
 			environment.sunShadow->AddPrimitive(renderTerrain, true, shadowCascadeIndices);
+			drawnBins[i].second = true;
 		}
 
-		Engine::GetModule<RenderModule>()->GetDebug()->DrawBox(binCenter, bins[i].bounds.GetExtent() * 2.0f);
+
+		//Engine::GetModule<RenderModule>()->GetDebug()->DrawBox(binCenter, bins[i].bounds.GetExtent() * 2.0f);
 	}
 
+
+	// For each foliage layer build instance transformation for drawn instances only.
+	const auto& foliageLayers = *(terrain->GetRenderRsc()->GetFoliageLayer());
+	std::vector< std::vector<glm::mat4> > layersInstanceTransforms;
+	layersInstanceTransforms.resize( foliageLayers.size() );
+
+
+	// Iterate on drawn bins only and determine what foliage to draw...
+	for (size_t i = 0; i < drawnBins.size(); ++i)
+	{
+		// Not Drawn?
+		if (!drawnBins[i].first && !drawnBins[i].second)
+			continue;
+
+		const auto& bin = bins[i];
+
+		// Iterate on instances inside this bin...
+		for (const auto& foliageInstance : bin.foliage)
+		{
+			const auto& instanceLayer = foliageLayers[foliageInstance.layer];
+			const auto& instance = instanceLayer.GetInstance(foliageInstance.index);
+			float layerClipDistance = instanceLayer.GetClipDistanceForTesting();
+
+			// distance to view.
+			glm::vec3 v = (viewPos - instance.center);
+			float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
+			float clipDist2 = layerClipDistance;
+			clipDist2 = clipDist2 * clipDist2;
+
+			if (viewDist2 > clipDist2)
+			{
+				// Don't Draw instance...
+				continue;
+			}
+
+			layersInstanceTransforms[foliageInstance.layer].push_back(instance.transform);
+		}
+	}
+
+
+	// Iterate on layers...
+	for (size_t li = 0; li < layersInstanceTransforms.size(); ++li)
+	{
+		const auto& layerTr = layersInstanceTransforms[li];
+
+		// Nothing to draw.
+		if (layerTr.empty())
+			continue;
+
+		const auto& layer = foliageLayers[li];
+		const auto& meshInstances = layer.GetMeshInstances();
+		const auto& meshMaterials = layer.GetMaterials();
+
+		// Update transforms of all drawn instances...
+		if (!meshInstances.empty())
+		{
+			meshInstances[0]->UpdateTransforms(layerTr);
+		}
+		
+		// Create a RenderPrimitive for each instance
+		for (size_t i = 0; i < meshInstances.size(); ++i)
+		{
+			// Render Foliage...
+			RenderTerrainFoliage* renderFoliage = NewPrimitive<RenderTerrainFoliage>();
+			renderFoliage->SetMeshRsc( meshInstances[i].get() );
+			renderFoliage->SetInstanceCount(layerTr.size());
+
+			// Update material if dirty.
+			if (meshMaterials[i]->IsDirty())
+			{
+				meshMaterials[i]->UpdateRenderResource();
+			}
+
+			renderFoliage->SetMaterial( meshMaterials[i]->GetRenderRsc() );
+			deferredBatch.Add(renderFoliage);
+
+			std::vector<uint32_t> tmp = { 0, 1, 2 , 3 };
+			environment.sunShadow->AddPrimitive(renderFoliage, false, tmp);
+		}
+
+
+	}
 
 
 }
@@ -595,7 +694,7 @@ void RenderScene::DrawDeferred()
 
 
 				// Draw...
-				prim->Draw(shader);
+				prim->Draw(shader, false);
 			}
 		}
 	}
@@ -635,7 +734,7 @@ void RenderScene::DrawDebug()
 		transformUniform->UpdateData(sizeof(TransformVertexData), 0, &trData); // Model & Normal Matrix.
 
 		// Draw...
-		prim->Draw(shader);
+		prim->Draw(shader, false);
 	}
 
 }
@@ -691,7 +790,7 @@ void RenderScene::DrawTranslucent(UniformBuffer* lightUB)
 		}
 
 		// Draw...
-		prim.primitive->Draw(shader);
+		prim.primitive->Draw(shader, false);
 	}
 
 }
@@ -919,7 +1018,7 @@ void RenderScene::DrawShadow(UniformBuffer* shadowUB)
 
 
 					// Draw...
-					prim->Draw(shader);
+					prim->Draw(shader, true);
 				}
 			}
 		}

@@ -30,7 +30,7 @@ namespace Raven
 		void SetMesh(RenderRscMesh* inMesh);
 
 		// Draw Mesh.
-		void Draw(GLShader* shader) const override;
+		void Draw(GLShader* shader, bool isShadow) const override;
 
 		// Return Expected Domain of this primitive.
 		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Mesh; }

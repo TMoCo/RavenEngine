@@ -332,6 +332,26 @@ void RenderModule::CreateDefaultMaterials()
 
 		defaultMaterials.terrain = mat;
 	}
+
+
+	// Default MeshInstance Material...
+	{
+		Ptr<MaterialShader> matShader(new MaterialShader());
+		matShader->SetName("Default_Mesh");
+		matShader->SetDomain(ERenderShaderDomain::MeshInstance);
+		matShader->SetShaderType(ERenderShaderType::Opaque);
+		matShader->SetMaterialFunction("shaders/Materials/DefaultMaterial.glsl");
+		matShader->AddSampler("inCheckerTexture", ESInputDefaultFlag::White);
+		matShader->SetShadowShader(true);
+		matShader->LoadRenderResource();
+
+		Ptr<Material> mat(new Material());
+		mat->SetMaterialShader(matShader);
+		mat->SetTexture("inCheckerTexture", checkerTexture);
+		mat->LoadRenderResource();
+
+		defaultMaterials.meshInstance = mat;
+	}
 }
 
 

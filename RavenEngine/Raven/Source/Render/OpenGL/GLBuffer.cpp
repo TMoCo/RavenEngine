@@ -68,7 +68,7 @@ GLBuffer* GLBuffer::Create(EGLBufferType type, int size, const void* data, EGLBu
 }
 
 
-void GLBuffer::UpdateData(int dataSize, void* data)
+void GLBuffer::UpdateData(int dataSize, const void* data)
 {
 	size = dataSize;
 

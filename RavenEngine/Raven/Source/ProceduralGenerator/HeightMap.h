@@ -92,6 +92,9 @@ namespace Raven
 		inline float& GetValue(int32_t x, int32_t y) { return heightField.GetData()[x + y * size.x]; }
 		inline const float& GetValue(int32_t x, int32_t y) const { return heightField.GetData()[x + y * size.x]; }
 
+		// Return the height tangent.
+		inline const glm::vec2& GetTangent(int32_t x, int32_t y) const { return tangents.GetData()[x + y * size.x]; }
+
 		// Return height field data.
 		inline float* GetHeightMapData() { return heightField.GetData(); }
 		inline const float* GetHeightMapData() const { return heightField.GetData(); }
@@ -103,8 +106,30 @@ namespace Raven
 		inline DynamicTexture* GetHeightmapTexture() { return heightmapTexture.get(); }
 		inline const DynamicTexture* GetHeightmapTexture() const { return heightmapTexture.get(); }
 
+		// Compute tangents from height field.
+		void ComputeTangents();
+
 		// Generate Height Map Dynamic Texture to be used in renderings.
 		void GenerateTexture();
+
+		// Get normal vector at a height field location.
+		glm::vec3 GetNormal(int32_t x, int32_t y) const;
+
+		// Get Height.
+		float GetHeight(float x, float y) const;
+
+		// Set the height scale.
+		inline void SetHeightScale(const glm::vec2& inScale) 
+		{ 
+			heightScale = inScale; 
+			scale = inScale.y - inScale.x; 
+		}
+
+		// Set the height field size.
+		inline void SetSizeScale(const glm::vec2& inScale)
+		{
+			sizeScale = inScale;
+		}
 
 	private:
 		// The width and height of the height map.
@@ -112,9 +137,21 @@ namespace Raven
 
 		// The height field in floating points.
 		HeightMapData<float> heightField;
+		 
+		// Tangents of the height field.
+		HeightMapData<glm::vec2> tangents;
 
 		// The height map texture we are going to use for rendering.
 		Ptr<DynamicTexture> heightmapTexture;
+
+		// Min/Max height scale.
+		glm::vec2 heightScale;
+
+		// The scaling applied to the height (Max-Min).
+		float scale;
+
+		//
+		glm::vec2 sizeScale;
 	};
 
 }

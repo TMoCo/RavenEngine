@@ -241,7 +241,7 @@ namespace Raven
 		}
 
 		// Return the bounds of this mesh.
-		inline MathUtils::BoundingBox GetBounds() const { return bounds; }
+		inline const MathUtils::BoundingBox& GetBounds() const { return bounds; }
 
 		// Add new mesh LOD level.
 		inline void AddNewLOD(const std::vector< Ptr<MeshSection> >& lodSections)

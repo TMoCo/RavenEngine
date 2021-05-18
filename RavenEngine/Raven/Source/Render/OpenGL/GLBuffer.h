@@ -33,7 +33,7 @@ namespace Raven
 		static GLBuffer* Create(EGLBufferType type, int size, const void* data, EGLBufferUsage usage);
 
 		// Reallocate and update new data for the buffer.
-		void UpdateData(int dataSize, void* data);
+		void UpdateData(int dataSize, const void* data);
 
 		// Update buffer with a new data.
 		void UpdateSubData(int dataSize, int offset, const void* data);

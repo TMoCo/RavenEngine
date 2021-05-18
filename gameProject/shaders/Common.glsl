@@ -74,6 +74,10 @@
 #endif
 
 
+#ifndef RENDER_SHADER_MESH_INSTANCE
+#define RENDER_SHADER_MESH_INSTANCE 0
+#endif
+
 
 
 

@@ -153,6 +153,7 @@ void RenderRscShader::SetupShaderForDomain()
 	switch (domain)
 	{
 	case ERenderShaderDomain::Mesh:
+	case ERenderShaderDomain::MeshInstance:
 	{
 		shader->AddExSourceFile(IMPORT_TRANSFORM_VERTEX_TAG,
 			EGLShaderStageBit::VertexBit,
@@ -161,6 +162,12 @@ void RenderRscShader::SetupShaderForDomain()
 		shader->AddExSourceFile(IMPORT_MATERIAL_FUNCTION_BASE_TAG,
 			EGLShaderStageBit::VertexBit | EGLShaderStageBit::FragmentBit,
 			"shaders/Materials/MaterialFunctions.glsl");
+
+
+		if (domain == ERenderShaderDomain::MeshInstance)
+		{
+			shader->AddPreprocessor("#define RENDER_SHADER_MESH_INSTANCE 1");
+		}
 		
 		// Main Source...
 		shader->SetSourceFile(EGLShaderStage::Vertex, "shaders/MeshVert.glsl");

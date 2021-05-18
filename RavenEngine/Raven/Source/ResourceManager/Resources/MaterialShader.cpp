@@ -205,8 +205,9 @@ void MaterialShader::CreateShadowShader(RenderRscShaderCreateData data)
 	if (!isMakeShadowShader)
 	{
 		// Is custom shadow shader needed?
-		if ( stype != ERenderShaderType::Masked
-			&& stype != ERenderShaderType::MaskedFoliage
+		if ( stype   != ERenderShaderType::Masked
+			&& stype   != ERenderShaderType::MaskedFoliage
+			&& sdomain != ERenderShaderDomain::MeshInstance
 			&& !isComputeMaterialVertex )
 			return;
 	}

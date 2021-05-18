@@ -51,17 +51,18 @@ namespace Raven {
 
 		// write out image in the specified format
 		bool WriteHeightMap(HeightMap* map, const std::string& path);
+		bool WriteHeightMapNormal(HeightMap* map, const std::string& path);
 
 		// write out image in the specified format
 		void WriteImage(FileFormat type, int width, int height, const uint8_t* data);
 
-	private:
+	public:
 		// --- -- - --- -- - --- -- - --
 		//       Gen-Paramters
 		// --- - -- - -- - -- - -- - ---
 
 		// higher value increases bumpiness; originally 0.5
-		float a = 2.7;
+		float a = 3.7;
 
 		// a needs to be much higher than b for a bumpy terrain
 		// higher value increases smoothness; originally 1.0
@@ -71,13 +72,22 @@ namespace Raven {
 		float freqFactor = 2.7f;
 
 		// Offset to the noise seed.
-		glm::vec2 seedOffset = glm::vec2(90.0f, 500.0f);
+		glm::vec2 seedOffset = glm::vec2(9000.0f, 500.0f);
 
 		// Number of octaves.
 		int octaves = 4;
 
 		//
-		std::vector<float> octavesFactors = { 1.7f, 0.0f, 0.0f, 0.5f };
+		float gradiantS = 0.95f;
+		float gradiantE = 0.6f;
+
+		//
+		std::vector<float> octavesFactors = { 1.7f, 0.9f, 0.2f, 0.04f };
 	};
+
+
+	// Scene 1:
+	// seedOffset = glm::vec2(90.0f, 500.0f);
+	// glm::vec2 seedOffset = glm::vec2(900.0f, 500.0f);
 
 }

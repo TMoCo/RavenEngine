@@ -98,9 +98,9 @@ int Engine::Run()
 
 
 
-#if 0
+#if 1
 	glm::vec2 sceneSize = glm::vec2(1024.0f, 1024.0f);
-	glm::vec2 sceneHeight = glm::vec2(-10.0f, 120.0f);
+	glm::vec2 sceneHeight = glm::vec2(-1.0f, 90.0f);
 	Scene* scene = Engine::GetModule<ProceduralGenerator>()->GenerateNewScene(sceneSize, sceneHeight);
 	Engine::GetModule<SceneManager>()->AddScene(scene);
 	Engine::GetModule<SceneManager>()->SwitchToScene(scene);

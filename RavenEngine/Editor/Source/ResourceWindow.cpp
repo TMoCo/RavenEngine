@@ -404,7 +404,7 @@ void ResourceWindow::OnImGuiShader()
 
 	// Domain.
 	{
-		static const char* types[5] = { "Mesh", nullptr, "Skinned", nullptr, "Custom" };
+		static const char* types[6] = { "Mesh", "Terrain", "Skinned", nullptr, "Custom", "MeshInstance" };
 
 		ImGui::Text("Domain: ");
 		ImGui::SameLine();
@@ -414,7 +414,7 @@ void ResourceWindow::OnImGuiShader()
 
 		if (ImGui::BeginCombo("###domaintype", types[currentItem]))
 		{
-			for (int32_t i = 0; i < 5; ++i)
+			for (int32_t i = 0; i < 6; ++i)
 			{
 				if (!types[i])
 					continue;

@@ -2,6 +2,7 @@
 
 
 #include "RenderRscPrimitive.h"
+#include "ResourceManager/Resources/TerrainData.h"
 #include "Render/RenderResource/RenderRscTexture.h"
 #include "Math/BoundingBox.h"
 
@@ -20,18 +21,9 @@ namespace Raven
 
 
 
-	// a single bin in the terrain.
-	struct TerrainBin
-	{
-		// Bin position offset in world space.
-		glm::vec2 offset;
 
-		// Texture Coordinate Scaling for each bin.
-		glm::vec2 uvScale;
 
-		// Bin Bounding Box, you can ignore the Y-Axis we only care about 2D-Bounds.
-		MathUtils::BoundingBox bounds;
-	};
+
 
 
 
@@ -80,6 +72,10 @@ namespace Raven
 
 		// Bind the bin uniform buffer.
 		inline UniformBuffer* GetBinUB() { return binUniform.get(); }
+
+		// Set/Get terrain foliage layers.
+		inline const std::vector<TerrainFoliageLayer>* GetFoliageLayer() const { return foliageLayers; }
+		inline void SetFoliageLayers(const std::vector<TerrainFoliageLayer>* layers) { foliageLayers = layers; }
 		 
 	private:
 		// Generate Terrain Mesh for a single ben.
@@ -121,6 +117,9 @@ namespace Raven
 
 		// Terrains bins.
 		const std::vector<TerrainBin>* bins;
+
+		// Terrain foliage layers.
+		const std::vector<TerrainFoliageLayer>* foliageLayers;
 	};
 
 

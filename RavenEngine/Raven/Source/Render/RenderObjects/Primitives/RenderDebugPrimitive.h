@@ -41,7 +41,7 @@ namespace Raven
 		void SetDebugMesh(RenderRscDebugMesh* debugMesh);
 
 		//
-		virtual void Draw(GLShader* shader) const override;
+		virtual void Draw(GLShader* shader, bool isShadow) const override;
 
 		// Return Expected Domain of this primitive.
 		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Custom; }

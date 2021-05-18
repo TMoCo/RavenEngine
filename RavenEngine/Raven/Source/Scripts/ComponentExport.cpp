@@ -105,8 +105,13 @@ namespace Raven
 				.addFunction("SetValue", &Animator::SetValue<int32_t>)
 				.addFunction("SetValue", &Animator::SetValue<std::string>)
 				.addFunction("SetValue", &Animator::SetValue<bool>)
+				.addFunction("GetBool",  &Animator::GetValue<bool>)
+				.addFunction("GetInt", &Animator::GetValue<int32_t>)
+				.addFunction("GetFloat", &Animator::GetValue<float>)
 				.addFunction("GetEntity", &Animator::GetEntity)
+				.addFunction("SetWrapMode", &Animator::SetWrapMode)
 				.endClass()
+				
 
 				.beginClass<RigidBody>("RigidBody")
 				//.addProperty("Mass", &RigidBody::GetMass, &RigidBody::SetMass)
@@ -123,6 +128,14 @@ namespace Raven
 				.addFunction("GetEntity", &RigidBody::GetEntity)
 				.endClass();
 				
+
+			auto v1 = luabridge::newTable(L);
+			v1["Default"] = 0;
+			v1["Once"] = 1;
+			v1["Loop"] = 2;
+			v1["PingPong"] = 4;
+			v1["ClampForever"] = 8;
+			luabridge::setGlobal(L, v1, "AnimationWrapMode");
 
 		}
 	};

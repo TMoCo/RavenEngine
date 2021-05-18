@@ -35,13 +35,21 @@ namespace Raven
 
 		std::string GetFileName(const std::string& filePath)
 		{
-			auto pos = filePath.find_last_of('/');
-			if (pos != std::string::npos)
-				return filePath.substr(pos + 1);
+			auto pos1 = filePath.find_last_of('/');
+			auto pos2 = filePath.find_last_of('\\');
 
-			pos = filePath.find_last_of('\\');
-			if (pos != std::string::npos)
-				return filePath.substr(pos + 1);
+			if (pos1 != std::string::npos && pos2 != std::string::npos)
+			{
+				return filePath.substr(std::max(pos1, pos2) + 1);
+			}
+			else if (pos1 != std::string::npos) 
+			{
+				return filePath.substr(pos1 + 1);
+			}
+			else if (pos2 != std::string::npos)
+			{
+				return filePath.substr(pos2 + 1);
+			}
 
 			return filePath;
 		}

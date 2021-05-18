@@ -49,7 +49,12 @@ namespace Raven
 		template<typename T>
 		void SetValue(const std::string& name, const T& value);
 
+		template<typename T>
+		T GetValue(const std::string& name);
+
 		inline auto GetController() { return controllerInstance; }
+
+		void SetWrapMode(const std::string& name, int32_t mode);
 
 	private:
 		bool rootMotion = false;
@@ -57,6 +62,12 @@ namespace Raven
 		// The Animation Controller, its a resource so loading/saving is handled by the Resource Manager.
 		Ptr<AnimationControllerInstance> controllerInstance;
 	};
+
+	template<typename T>
+	T Raven::Animator::GetValue(const std::string& name)
+	{
+		return controllerInstance->Get()->GetValue<T>(name);
+	}
 
 	template<>
 	inline void Raven::Animator::SetValue(const std::string& name, const std::string& value)

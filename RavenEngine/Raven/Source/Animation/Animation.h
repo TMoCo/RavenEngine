@@ -207,6 +207,9 @@ namespace Raven
 		float GetPlayingTime() const;
 		void SetPlayingTime(float time);
 
+
+		void SetPlayMode(AnimationWrapMode mode);
+
 	
 		inline auto IsPaused() const { return paused; }
 		inline auto IsStarted() const { return started; }

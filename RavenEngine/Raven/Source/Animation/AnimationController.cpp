@@ -44,6 +44,24 @@ namespace Raven
 		return "";
 	}
 
+ 
+//could have bug.
+
+	void AnimationController::SetWrapMode(const std::string& name, AnimationWrapMode mode)
+	{
+		for (auto & node : animatorNodes)
+		{
+
+			auto animName = StringUtils::GetFileNameWithoutExtension(node.second.name);
+			if (animName == name)
+			{
+				Ptr<AnimationClip> clip = node.second.animClip.FindOrLoad<AnimationClip>();
+				clip->wrapMode = mode;
+				break;
+			}
+		}
+	}
+
 	void AnimationController::RemoveCondition(const std::string& key)
 	{
 		conditions.erase(key);

@@ -331,10 +331,14 @@ void RenderScene::CollectSceneView(Scene* scene)
 	// Has Camera? 
 	if (scene->GetTargetCamera())
 	{
+#if CAPTURE_SHOT == 0
 		const auto& targetCam = scene->GetTargetCamera();
 		SetProjection(targetCam->GetProjectionMatrix(), targetCam->GetFov(), targetCam->GetAspectRatio(), targetCam->GetNear(), targetCam->GetFar());
 		camTr = scene->GetCameraTransform()->GetWorldMatrix();
 		SetView(glm::inverse(camTr));
+#else
+		camTr = glm::inverse(view);
+#endif
 	}
 	else
 	{
@@ -449,6 +453,10 @@ void RenderScene::CollectTerrain(Scene* scene)
 	drawnBins.resize(bins.size(), std::make_pair(false, false));
 
 
+	// Set last cascade distance for terrain scenes.
+	environment.sunShadow->SetLastCascadeRange(450);
+
+
 	for (uint32_t i = 0; i < bins.size(); ++i)
 	{
 		bins[i].bounds.GetSphere(binCenter, binRadius);
@@ -493,7 +501,6 @@ void RenderScene::CollectTerrain(Scene* scene)
 		if (!shadowCascadeIndices.empty())
 		{
 			environment.sunShadow->AddPrimitive(renderTerrain, true, shadowCascadeIndices);
-			drawnBins[i].second = true;
 		}
 
 
@@ -516,6 +523,10 @@ void RenderScene::CollectTerrain(Scene* scene)
 
 		const auto& bin = bins[i];
 
+		// distance to bin.
+		glm::vec3 v = (viewPos - bin.bounds.GetCenter());
+		float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
+
 		// Iterate on instances inside this bin...
 		for (const auto& foliageInstance : bin.foliage)
 		{
@@ -527,10 +538,7 @@ void RenderScene::CollectTerrain(Scene* scene)
 			glm::vec3 v = (viewPos - instance.center);
 			float viewDist2 = v.x * v.x + v.y * v.y + v.z * v.z;
 
-			float clipDist2 = layerClipDistance;
-			clipDist2 = clipDist2 * clipDist2;
-
-			if (viewDist2 > clipDist2)
+			if (viewDist2 > layerClipDistance)
 			{
 				// Don't Draw instance...
 				continue;
@@ -577,8 +585,14 @@ void RenderScene::CollectTerrain(Scene* scene)
 			renderFoliage->SetMaterial( meshMaterials[i]->GetRenderRsc() );
 			deferredBatch.Add(renderFoliage);
 
+#if RENDER_MAX_SHADOW_CASCADE == 4
 			std::vector<uint32_t> tmp = { 0, 1, 2 , 3 };
 			environment.sunShadow->AddPrimitive(renderFoliage, false, tmp);
+#else
+			std::vector<uint32_t> tmp = { 0 };
+			environment.sunShadow->AddPrimitive(renderFoliage, false, tmp);
+#endif
+
 		}
 
 

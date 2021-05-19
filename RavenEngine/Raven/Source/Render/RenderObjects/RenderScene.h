@@ -12,6 +12,9 @@
 
 
 
+#define CAPTURE_SHOT 0
+
+
 
 
 namespace Raven

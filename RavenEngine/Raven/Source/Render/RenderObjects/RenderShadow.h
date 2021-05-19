@@ -87,6 +87,9 @@ namespace Raven
 		// Return cascade ranges.
 		inline const auto& GetCascadeRanges() const { return cascadeRanges; }
 
+		//
+		void SetLastCascadeRange(float distance);
+
 	private:
 		// Cascades.
 		std::vector<ShadowCascadeData> cascade;

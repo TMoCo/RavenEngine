@@ -99,12 +99,14 @@ namespace Raven
 		inline const glm::vec2& GetHeight() const { return height; }
 
 		// Create a new foliage layer.
-		inline void NewLayer(const std::string& name, Ptr<Mesh> mesh, const std::vector< Ptr<Material> >& materails)
+		inline size_t NewLayer(const std::string& name, Ptr<Mesh> mesh, const std::vector< Ptr<Material> >& materails)
 		{
 			RAVEN_ASSERT(mesh.get(), "");
 
 			TerrainFoliageLayer& newlayer = foliageLayers.emplace_back( TerrainFoliageLayer() );
 			newlayer.Setup(mesh, materails, 100);
+			
+			return foliageLayers.size() - 1;
 		}
 
 		// Add a new foliage instance.
@@ -121,6 +123,12 @@ namespace Raven
 		inline const auto& GetBins()
 		{
 			return bins;
+		}
+
+		//
+		inline auto& GetFoliageLayer(size_t i)
+		{
+			return foliageLayers[i];
 		}
 
 	private:

@@ -84,9 +84,14 @@ void RenderShadowCascade::SetupCascade(uint32_t numCascade, const glm::ivec2& sh
 		cascadeRanges[i] = cascadeRanges[i-1] * 2.6f;
 	}
 
-	cascadeRanges.back() = 450.0f; // End Range
 
 
+}
+
+
+void RenderShadowCascade::SetLastCascadeRange(float distance)
+{
+	cascadeRanges.back() = distance; // End Range
 }
 
 

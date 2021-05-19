@@ -48,9 +48,10 @@ namespace Raven
 				if (animator)
 				{
 					auto ctrlInstance =  animator->GetController();
-					if (ctrlInstance || ctrlInstance->GetParentController() != controller)
+					if (ctrlInstance)
 					{
-						OpenController(ctrlInstance->Get());
+						if(ctrlInstance->Get() != controller)
+							OpenController(ctrlInstance->Get());
 					}
 				}
 			}

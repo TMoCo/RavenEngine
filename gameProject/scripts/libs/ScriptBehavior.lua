@@ -8,7 +8,10 @@ function ScriptBehavior:GetAnimator()
 end
 
 function ScriptBehavior:GetRigidBody()
-	return self.entity:GetRigidBody()
+	if self.entity:HasRigidBody() then
+		return self.entity:GetRigidBody()
+	end
+	return nil
 end
 
 
@@ -30,11 +33,6 @@ end
 
 function ScriptBehavior:GetSound()
 	return self.entity:GetSoundComponent()
-end
-
-
-function ScriptBehavior:GetTransform()
-	return self.entity:GetTransform()
 end
 
 

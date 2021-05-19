@@ -55,7 +55,8 @@ namespace Raven
 	//     - Handle reference and map all the Resources in the Resource manager.
 	class ResourcesRegistry
 	{
-	private:
+	//private:
+	public:	
 		// List of all the resroucs that exist, loaded or not.
 		std::vector<ResourceData> resources;
 
@@ -169,7 +170,6 @@ namespace Raven
 		// then it will stay alive until no one is referencing it.
 		void UnloadResource(Ptr<IResource> rsc);
 
-
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//                 Save/Import resources
 		// --- -- - --- -- - --- -- - --- -- - --- -- - ---
@@ -194,6 +194,12 @@ namespace Raven
 		// Return an importer of type TImporter.
 		template<class TImporter>
 		TImporter* GetImporter();
+
+		// Return a vector containing all the extensions supported by importers
+		std::vector<std::string> GetSupportedExtensions();
+
+		// return true if the given extension is supported
+		bool IsSupported(const std::string& extension);
 
 		// --- -- - --- -- - --- -- - --- -- - --- -- - --- 
 		//           Scan directory for resources
@@ -353,7 +359,6 @@ namespace Raven
 		{
 			importersExtMap.insert( std::make_pair(ext, newImporter) );
 		}
-
 	}
 
 

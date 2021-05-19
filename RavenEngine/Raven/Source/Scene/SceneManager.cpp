@@ -9,6 +9,7 @@
 
 #include <filesystem>
 #include "Engine.h"
+#include "Physics/PhysicsModule.h"
 #include "Scene/System/SystemManager.h"
 #include "Audio/AudioSystem.h"
 
@@ -81,6 +82,7 @@ void SceneManager::Destroy()
 			queuedSceneIndex = 0;
 		}
 
+		LOGE(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()->getNbRigidBodies());
 
 		// Current Scene? Cleanup...
 		if (currentScene != nullptr)
@@ -90,18 +92,16 @@ void SceneManager::Destroy()
 			currentScene = nullptr;
 		}
 
+		LOGE(Engine::Get().GetModule<PhysicsModule>()->GetCurrentWorld()->getNbRigidBodies());
 
 		currentSceneIndex = queuedSceneIndex;
 		currentScene = scenes[queuedSceneIndex].get();
-
-
+		
+		// delete previous physics world
 		if (Engine::Get().GetEditorState() == EditorState::Play) {
 			Engine::Get().GetSystemManager()->GetSystem<AudioSystem>()->SetPaused(false);
 			currentScene->OnInit();
 		}
-
-		Engine::Get().OnSceneCreated(currentScene);
-
 		switchingScenes = false;
 	}
 
@@ -262,7 +262,9 @@ void SceneManager::Destroy()
 		if (Engine::GetModule<ResourceManager>()->HasResource(DEFAULT_SCENE))
 		{
 			Ptr<Scene> defaultScene = Engine::GetModule<ResourceManager>()->GetResource<Scene>(DEFAULT_SCENE);
+			defaultScene->OnInit();
 			scenes.emplace_back(defaultScene);
+			currentScene = scenes[0].get();
 		}
 		else
 		{

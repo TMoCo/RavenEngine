@@ -48,8 +48,9 @@ project "RavenEngine"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.OpenAL}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}",
+		"%{IncludeDir.OpenAL}"
 	}
 
 	sysincludedirs
@@ -68,13 +69,15 @@ project "RavenEngine"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}"
 	}
 
 	links
 	{
 		"imgui",
-		"spdlog"
+		"spdlog",
+		"imguiFD"
 	}
 
 	defines

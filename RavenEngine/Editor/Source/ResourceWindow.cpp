@@ -52,11 +52,10 @@ void ResourceWindow::OnImGui()
 {
 	bool close = ImGui::Begin(title.c_str(), &active);
 
-
 	// Display Resource Properties.
 	if (resource)
 	{
-		ImGui::Text("Type: %s", ToString(type).c_str());
+		ImGui::Text("Type: %s", ResourceToString(type).c_str());
 		ImGui::Text("Path: %s", resource->GetResourcePath().c_str());
 		ImGui::Separator();
 		ImGui::Spacing();

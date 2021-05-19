@@ -228,7 +228,6 @@ const ResourceData* ResourcesRegistry::FindResource(const std::string& path) con
 {
 	// Clean the path before searching.
 	std::string cleanPath = CleanRscPath(path);
-
 	// Search...
 	auto iter = resourcePathMap.find(cleanPath);
 
@@ -332,27 +331,23 @@ void ResourceManager::ScanDirectory(const std::string& path)
 	// construct a path from the input string
 	auto p = std::filesystem::path(path);
 	// use the path passed as argument to explore the directory (if it is)
-	if (std::filesystem::is_directory(p))
+	for (const auto& entry : std::filesystem::directory_iterator(path))
 	{
-		for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+		if (entry.is_directory())
 		{
-			if (entry.is_directory())
-			{
-				// recursivivly check for subdirectories
-				ScanDirectory(entry.path().string());
-				continue;
-			}
+			// recursivivly check for subdirectories
+			ScanDirectory(entry.path().string());
+		}
 
-			std::string ext = entry.path().extension().string();
+		std::string ext = entry.path().extension().string();
 
-			// raven extension, load the resource
-			if (ext == ".raven")
-			{
-				std::string filePath = entry.path().string();
+		// raven extension, load the resource
+		if (ext == ".raven")
+		{
+			std::string filePath = entry.path().string();
 
-				ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
-				registry.AddResource(filePath, info, nullptr);
-			}
+			ResourceHeaderInfo info = ILoader::LoadHeader( RavenInputArchive(filePath) );
+			registry.AddResource(filePath, info, nullptr);
 		}
 	}
 }
@@ -438,7 +433,6 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 		return false;
 	}
 
-
 	// Load render data?
 	for (auto newResource : newResources)
 	{
@@ -470,6 +464,22 @@ bool ResourceManager::Import(const std::string& file, std::string optionalSaveDi
 	return true;
 }
 
+
+std::vector<std::string> ResourceManager::GetSupportedExtensions()
+{
+	std::vector<std::string> extensions;
+	for (auto& importer : importers)
+		importer->ListExtensions(extensions);
+	return extensions;
+}
+
+bool ResourceManager::IsSupported(const std::string& extension)
+{
+	for (auto& e : GetSupportedExtensions())
+		if (extension == e)
+			return true;
+	return false;
+}
 
 bool ResourceManager::SaveNewResource(Ptr<IResource> newResource, const std::string& saveFile)
 {
@@ -595,6 +605,7 @@ Ptr<IResource> ResourceManager::FindOrLoad(const ResourceRef& ref)
 	// Doesn't Exist?
 	if (!rscData)
 	{
+		LOGW(ref.path);
 		LOGW("No Resource found that matches the one in ResourceRef.");
 		return nullptr;
 	}

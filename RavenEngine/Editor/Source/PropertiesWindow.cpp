@@ -1,6 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
 // This file is part of the Raven Game Engine			                    //
-
 //////////////////////////////////////////////////////////////////////////////
 
 #include "Engine.h"
@@ -444,7 +443,6 @@ namespace MM
 		}
 
 
-
 		ImGui::Columns(1);
 		ImGui::Separator();
 		ImGui::PopStyleVar();
@@ -854,36 +852,19 @@ namespace Raven
 		}
 
 		enttEditor.addCreateCallback([&](entt::registry & r, entt::entity entity) {
-
 			// The Current Scene.
 			Scene* scene = editor.GetModule<SceneManager>()->GetCurrentScene();
 
 			auto lua = r.try_get<LuaComponent>(entity);
+
 			if (lua) 
 			{
 				lua->SetScene(scene);
 			}
-
 			// Validate Components.
 			if (scene)
 			{
 				scene->ValidateEntityComponents(r, entity);
-			}
-
-			auto rb = r.try_get<RigidBody>(entity);
-			if (rb)
-			{
-				// when creating a rigid body, we need to set some data... like the object transform (if any)
-				auto t = r.try_get<Transform>(entity);
-				// if transform does exists, change the rigidbody's initial transform
-				if (t)
-				{
-					LOGV("Has tranform");
-					Transform initT = *t;
-					initT.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
-					rb->SetInitTransform(initT);
-					rb->InitRigidBody();
-				}
 			}
 		});
 	}

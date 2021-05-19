@@ -93,6 +93,11 @@ return #name
 
 	void LuaComponent::OnInit()
 	{
+		if (table) 
+		{
+			(*table)["entity"] = GetEntity();
+		}
+
 		//load prev values
 		if (onInitFunc && onInitFunc->isFunction())
 		{
@@ -146,7 +151,7 @@ return #name
 		{
 			LOGE("{0}", e.what());
 		}
-		OnInit();
+		//OnInit();
 	}
 
 	void LuaComponent::OnImGui()

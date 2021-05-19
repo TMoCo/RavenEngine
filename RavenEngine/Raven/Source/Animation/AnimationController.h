@@ -134,9 +134,13 @@ namespace Raven
 		const std::string GetCurrentAnimationName() const;
 		
 
+		void SetWrapMode(const std::string & name, AnimationWrapMode mode);
+
 		void RemoveCondition(const std::string& key);
 		void ChangeConditionName(const std::string& old, const std::string& newName);
 		void SetValue(const std::string& name, const std::string& value);
+		template<typename T>
+		T GetValue(const std::string& name);
 
 		void OnImGui();
 		void AddCondition(Condition::Type type);
@@ -196,6 +200,14 @@ namespace Raven
 		std::unordered_map<int32_t, Transition>::iterator iterId;
 	};
 
+	template<typename T>
+	T Raven::AnimationController::GetValue(const std::string& name)
+	{
+		if (conditions.count(name) > 0)
+			return conditions[name];
+
+		return T(0);
+	}
 
 	// AnimationControllerInstance:
 	//     - instance of the AnimationController resrouce.

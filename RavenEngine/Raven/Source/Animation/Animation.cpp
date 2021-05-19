@@ -74,6 +74,14 @@ namespace Raven
 		}
     }
 
+	void Animation::SetPlayMode(AnimationWrapMode mode)
+	{
+		for (auto clip : clips)
+		{
+			clip->wrapMode = mode;
+		}
+	}
+
 	void Animation::Play(int32_t index, SkeletonInstance* inSkeletonInstance, float fadeLength)
     {
 		started = true;

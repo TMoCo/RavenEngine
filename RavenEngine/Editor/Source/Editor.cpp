@@ -4,6 +4,8 @@
 #include "HierarchyWindow.h"
 #include "PropertiesWindow.h"
 #include "AssetsWindow.h"
+
+#include "ImportWindow.h"
 #include "ResourceWindow.h"
 
 #include "Scene/Scene.h"
@@ -47,6 +49,7 @@ namespace Raven
 		addWindow(AssetsWindow);
 		addWindow(ResourceWindow);
 		addWindow(NodeWindow);
+		addWindow(ImportWindow);
 
 
 		iconMap[typeid(Transform).hash_code()] = ICON_MDI_VECTOR_LINE;
@@ -65,6 +68,8 @@ namespace Raven
 			45, 1.0, 3200000,winSize.x / winSize.y);
 
 		SetEditorState(EditorState::Preview);
+
+		OnSceneCreated(Engine::GetModule<SceneManager>()->GetCurrentScene());
 	}
 
 	void Editor::OnImGui()
@@ -95,7 +100,7 @@ namespace Raven
 
 				editorCameraController.HandleMouse(editorCameraTransform, dt, mousePos.x, mousePos.y);
 				editorCameraController.HandleKeyboard(editorCameraTransform, dt);
-				
+
 			}
 
 			if (!Input::GetInput()->IsMouseHeld(KeyCode::MouseKey::ButtonRight)
@@ -152,7 +157,6 @@ namespace Raven
 			|| Engine::Get().GetEditorState() == EditorState::Paused;
 
 		bool isPausedState = Engine::Get().GetEditorState() == EditorState::Paused;
-
 
 		// --- -- - --- -- -- - - -- - 
 		// Play/Stop Button...
@@ -228,7 +232,6 @@ namespace Raven
 		selectedNode = node;
 		showGlobalSettings = false;
 	}
-
 
 	void Editor::SelectGlobalSettings()
 	{
@@ -579,12 +582,31 @@ namespace Raven
 		GetModule<SceneManager>()->SwitchToScene(newPlayScene.get());
 		GetModule<SceneManager>()->Apply();
 
+		auto rbView = newPlayScene->GetRegistry().view<RigidBody, Transform>();
+
+
+		for (auto& e : rbView)
+		{
+			auto initT = rbView.get<Transform>(e);
+
+			initT.SetScale(glm::vec3(1.0f, 1.0f, 1.0f));
+
+			auto& rb = rbView.get<RigidBody>(e);
+
+			LOGC(rb.GetBodyIndex());
+			rb.SetInitTransform(initT);
+			rb.SetTransform(initT);
+		}
+
+		OnSceneCreated(newPlayScene.get());
+
 		playScene = newPlayScene;
+		LOGI(newPlayScene->GetName().c_str());
 	}
 
 	void Editor::ReloadOriginalScene()
 	{
-		//Serialize the scene
+		// Serialize the scene
 		for (auto & win : editorWindows)
 		{
 			win.second->SaveWorkspace(); // ???
@@ -608,15 +630,8 @@ namespace Raven
 		// we reload the scene, so destroy the rigid bodies in the physics engine
 		auto& registry = originalScene->GetRegistry();
 
-		auto view = registry.view<RigidBody>();
-		for (auto v : view)
-		{
-			view.get<RigidBody>(v).DestroyRigidBody();
-		}
-
 		// Create a copy of the original scene to start playing...
 		NewSceneForStartPlay();
-
 	}
 
 	void Editor::StopPlay()
@@ -642,6 +657,9 @@ namespace Raven
 
 		auto& newScene = Engine::GetModule<SceneManager>()->LoadScene(file);
 		Engine::GetModule<SceneManager>()->SwitchToScene(newScene.get());
+		Engine::GetModule<SceneManager>()->Apply();
+
+		OnSceneCreated(Engine::GetModule<SceneManager>()->GetCurrentScene());
 	}
 };
 

@@ -29,8 +29,9 @@ project "RavenEditor"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.OpenAL}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}",
+		"%{IncludeDir.OpenAL}"
 	}
 
 	sysincludedirs
@@ -49,7 +50,8 @@ project "RavenEditor"
 		"%{IncludeDir.reactphysics3d}",
 		"%{IncludeDir.LuaBridge}",
 		"%{IncludeDir.lua}",
-		"%{IncludeDir.NodeEditor}"
+		"%{IncludeDir.NodeEditor}",
+		"%{IncludeDir.ImGuiFileDialog}"
 	}
 
 	links
@@ -57,6 +59,7 @@ project "RavenEditor"
 		"RavenEngine",
 		"imgui",
 		"spdlog",
+		"imguiFD"
 	}
 
 	defines
@@ -95,8 +98,11 @@ project "RavenEditor"
 		{
 			"OpenAL32",
 			"glfw",
-			"OpenGL32","lua","openfbx","node-editor"
-			
+			"OpenGL32",
+			"lua",
+			"openfbx",
+			"node-editor",
+			"imguiFD"	
 		}
 
 		disablewarnings { 4307 }

@@ -152,6 +152,7 @@ namespace Raven
 				.addFunction("GetScale", &Transform::GetScale)
 				.addFunction("GetPosition", &Transform::GetPosition)
 				.addFunction("GetRotation", &Transform::GetRotation)
+				.addFunction("GetWorldPosition", &Transform::GetWorldPosition)
 
 				.addFunction("Dirty", &Transform::Dirty)
 				.addFunction("UpdateDirty", &Transform::UpdateDirty)

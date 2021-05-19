@@ -18,6 +18,9 @@ namespace Raven
 		std::string fileType;
 		std::string absolutePath;
 		bool isFile;
+		char* icon;
+		ImVec4 colour;
+		int type;
 	};
 
 	class AssetsWindow : public EditorWindow
@@ -52,7 +55,8 @@ namespace Raven
 
 		static std::vector<FileInfo> GetFsContents(const std::string& path);
 		static std::vector<FileInfo> ReadDirectory(const std::string& path);
-		static std::vector<FileInfo> ReadDirectoryRecursive(const std::string& path);
+
+		static std::vector<FileInfo> GetChildDirectories(const std::string& path);
 		static std::string GetParentPath(const std::string& path);
 
 
@@ -62,6 +66,9 @@ namespace Raven
 		static std::string StripExtras(const std::string& filename);
 
 	private:
+		void SplitPath(std::string relativePath);
+		bool IsInSplitPath(const std::string& dir);
+
 		static inline std::vector<std::string> assetTypes = {
 			"fbx", "obj", "wav", "mp3","png","jpg","bmp", "raven", "ogg", "lua" };
 
@@ -90,6 +97,7 @@ namespace Raven
 
 		std::vector<FileInfo> currentDir;
 		std::vector<FileInfo> baseProjectDir;
+		std::vector<std::string> splitPath;
 
 	};
 };

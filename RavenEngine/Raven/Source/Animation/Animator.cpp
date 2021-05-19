@@ -43,4 +43,11 @@ namespace Raven
 	}
 
 
+	void Animator::SetWrapMode(const std::string& name, int32_t mode)
+	{
+		if (GetController()) {
+			GetController()->Get()->SetWrapMode(name, static_cast<AnimationWrapMode>(mode));
+		}
+	}
+
 };

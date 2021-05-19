@@ -6,6 +6,9 @@ namespace Raven
 {
 	namespace StringUtils 
 	{
+
+		constexpr uint32_t MAX_PATH_LENGTH = 2048;
+
 		// later we should use enums to identify formats for faster comparison
 		enum EFileExtensions : uint32_t
 		{

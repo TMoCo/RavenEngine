@@ -261,12 +261,7 @@ std::future<bool> Engine::Post(const std::function<bool()>& callback)
 
 void Engine::OnSceneCreated(Scene* scene)
 {
-	// delete previous physics world
-	auto physics = GetModule<PhysicsModule>();
-	physics->DestroyWorld();
 
-	// now create a new one for the new scene
-	physics->CreateWorld();
 }
 
 
@@ -284,10 +279,8 @@ void Engine::NewGameScene()
 
 	// delete previous physics world
 	auto physics = GetModule<PhysicsModule>();
-	physics->DestroyWorld();
 
 	// now create a new one for the new scene
-	physics->CreateWorld();
 
 	LOGV(physics->GetCurrentWorld()->getNbRigidBodies());
 

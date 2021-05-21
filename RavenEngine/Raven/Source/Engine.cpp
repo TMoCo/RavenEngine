@@ -97,15 +97,6 @@ int Engine::Run()
 	auto win = GetModule<Raven::Window>();
 
 
-#if 0
-	glm::vec2 sceneSize = glm::vec2(1024.0f, 1024.0f);
-	glm::vec2 sceneHeight = glm::vec2(-1.0f, 90.0f);
-	Scene* scene = Engine::GetModule<ProceduralGenerator>()->GenerateNewScene(sceneSize, sceneHeight);
-	Engine::GetModule<SceneManager>()->AddScene(scene);
-	Engine::GetModule<SceneManager>()->SwitchToScene(scene);
-#endif
-
-
 
 	// Main Loop...
 	while (!win->ShouldClose())
@@ -371,6 +362,16 @@ void Engine::NewGameScene()
 	// load scene using its id
 	GetModule<SceneManager>()->SwitchToScene(sceneIdx);
 
+}
+
+
+void Engine::NewProceduralScene()
+{
+	glm::vec2 sceneSize = glm::vec2(1024.0f, 1024.0f);
+	glm::vec2 sceneHeight = glm::vec2(-1.0f, 90.0f);
+	Scene* scene = Engine::GetModule<ProceduralGenerator>()->GenerateNewScene(sceneSize, sceneHeight);
+	Engine::GetModule<SceneManager>()->AddScene(scene);
+	Engine::GetModule<SceneManager>()->SwitchToScene(scene);
 }
 
 

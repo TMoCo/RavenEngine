@@ -23,7 +23,7 @@ in VertexOutput
 void main()
 {
 
-#if RENDER_SHADER_TYPE_MASKED
+#if RENDER_SHADER_TYPE_MASKED || RENDER_SHADER_TYPE_MASKED_FOLIAGE
 	// Normalize Input Normal
 	vec3 normal = normalize(inFrag.normal);
 	vec3 tangent = normalize(inFrag.tangent);

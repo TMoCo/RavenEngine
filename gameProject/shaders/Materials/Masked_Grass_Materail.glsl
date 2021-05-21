@@ -19,7 +19,7 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
 	vec4 grassTex = texture(GrassTexture, inData.texCoord);
 
-	outParams.color = sRGBToLinear(grassTex.rgb);
+	outParams.color = sRGBToLinear(grassTex.rgb) * vec3(0.7, 1.0, 0.0);
 	outParams.emission = vec3(0.0);
 	outParams.roughness = 1.0;
 	outParams.metallic = 0.0;

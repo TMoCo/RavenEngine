@@ -13,7 +13,7 @@ vec3 ComputeMaterialVertex(vec3 inPos, vec3 inWorldPos, vec3 inNormal)
 // Input Textures
 uniform sampler2D LeavsTexture;
 uniform sampler2D LeavsMaskedTexture;
-
+uniform sampler2D LeavsNormalTexture;
 
 
 void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
@@ -26,10 +26,11 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 	outParams.roughness = 1.0;
 	outParams.metallic = 0.0;
 	outParams.specular = 1.0;
-	outParams.alpha = mask.a;
+	outParams.alpha = mask.r;
 	
 	// This is normal in world coord.
-	outParams.normal = inData.normal;
+	vec3 normal = SampleNormalMap(LeavsNormalTexture, inData.texCoord);
+	outParams.normal = TangentToWorld(normal, inData.normal, inData.tangent);
 }
 
 

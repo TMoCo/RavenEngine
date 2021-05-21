@@ -163,7 +163,7 @@ void RenderShadowCascade::ComputeCascade(const glm::vec3& lightDir, float fov, f
 		lightbounds.Add(lightView * glm::vec4(wcenter + glm::vec3( wext.x,  wext.y,  wext.z), 1.0f));
 		lightbounds.Add(lightView * glm::vec4(wcenter + glm::vec3(-wext.x,  wext.y,  wext.z), 1.0f));
 
-		glm::vec3 ext = lightbounds.GetExtent() * 1.1f;
+		glm::vec3 ext = lightbounds.GetExtent() * 1.2f;
 		
 
 		glm::mat4 lightProjection = glm::ortho(

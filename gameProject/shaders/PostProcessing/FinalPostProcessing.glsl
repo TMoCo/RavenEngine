@@ -51,10 +51,10 @@ vec3 Tonemap(vec3 color)
 	
 	
 	// Exposure Bias.
-	float Exp = 3.0;
+	float Exp = 2.5;
 	
-	//A = 0.25;
-	//C = 0.08;
+	A = 0.25;
+	C = 0.08;
 	
 	
 	// Apply Tone Mapping...

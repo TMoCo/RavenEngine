@@ -30,11 +30,13 @@ uniform sampler2D NormalTexture;
 //
 void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 {
-	outParams.color = inMaterial.Color.rgb * sRGBToLinearSample(ColorTexture, inData.texCoord).rgb;
+	vec2 uv = inData.texCoord * inMaterial.Specular;
+
+	outParams.color = inMaterial.Color.rgb * sRGBToLinearSample(ColorTexture, uv).rgb;
 	outParams.emission = inMaterial.Emission.rgb;
-	outParams.roughness = inMaterial.Roughness * texture(RoughnessTexture, inData.texCoord).r;
-	outParams.metallic = inMaterial.Metallic * texture(MetallicTexture, inData.texCoord).r;
-	outParams.specular = inMaterial.Specular;
+	outParams.roughness = inMaterial.Roughness * texture(RoughnessTexture, uv).r;
+	outParams.metallic = inMaterial.Metallic * texture(MetallicTexture, uv).r;
+	outParams.specular = 1.0;
 	
 #if RENDER_SHADER_TYPE_TRANSLUCENT
 	outParams.alpha = inMaterial.Alpha;
@@ -43,7 +45,7 @@ void ComputeMaterial(in MaterialData inData, out MaterialOutput outParams)
 #endif
 	
 	// Normal Map...
-	vec3 normal = SampleNormalMap(NormalTexture, inData.texCoord);
+	vec3 normal = SampleNormalMap(NormalTexture, uv);
 	outParams.normal = TangentToWorld(normal, inData.normal, inData.tangent);
 }
 

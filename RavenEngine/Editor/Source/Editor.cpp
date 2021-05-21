@@ -453,6 +453,14 @@ namespace Raven
 					Engine::GetModule<SceneManager>()->SaveCurrentScene();
 				}
 
+				ImGui::Spacing();
+				ImGui::Separator();
+				ImGui::Spacing();
+
+				if (ImGui::MenuItem("New Procedural Scene"))
+				{
+					Engine::Get().NewProceduralScene();
+				}
 
 				ImGui::Spacing();
 				ImGui::Separator();

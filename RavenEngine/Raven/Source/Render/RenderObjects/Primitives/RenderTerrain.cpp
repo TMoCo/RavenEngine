@@ -1,5 +1,6 @@
 #include "RenderTerrain.h"
 #include "Render/RenderResource/Primitives/RenderRscTerrain.h"
+#include "Render/RenderResource/Primitives/RenderRscMesh.h"
 #include "Render/RenderResource/Shader/RenderRscMaterial.h"
 #include "Render/RenderResource/Shader/UniformBuffer.h"
 
@@ -57,13 +58,16 @@ void RenderTerrain::SetTerrainRsc(RenderRscTerrain* terrain)
 }
 
 
-void RenderTerrain::Draw(GLShader* shader) const
+void RenderTerrain::Draw(GLShader* shader, bool isShadow) const
 {
 	// Quads Tesselation Patches
 	glPatchParameteri(GL_PATCH_VERTICES, 4);
 
 
-
+	if (isShadow)
+	{
+		glEnable(GL_CULL_FACE);
+	}
 
 	// Binding...
 	DynamicTexture* heightMap = terrainRsc->GetHeightMap();
@@ -90,8 +94,56 @@ void RenderTerrain::Draw(GLShader* shader) const
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	//glEnable(GL_POLYGON_MODE);
 
+
+	if (isShadow)
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
+
+
+// ------------------------------------------------------------------------------
+
+
+
+RenderTerrainFoliage::RenderTerrainFoliage()
+	: instanceRsc(nullptr)
+{
+
+}
+
+
+
+RenderTerrainFoliage::~RenderTerrainFoliage()
+{
+
+}
+
+
+void RenderTerrainFoliage::SetMeshRsc(RenderRscMeshInstance* rsc)
+{
+	instanceRsc = rsc;
+}
+
+
+RenderRscPrimitive* RenderTerrainFoliage::GetRsc()
+{
+	return instanceRsc;
+}
+
+
+void RenderTerrainFoliage::SetInstanceCount(int32_t inCount)
+{
+	count = inCount;
+}
+
+
+void RenderTerrainFoliage::Draw(GLShader* shader, bool isShadow) const
+{
+	instanceRsc->GetArray()->Bind();
+	glDrawElementsInstanced(GL_TRIANGLES, instanceRsc->GetNumIndices(), GL_UNSIGNED_INT, nullptr, count);
+}
 
 
 } // End of namespace Raven.

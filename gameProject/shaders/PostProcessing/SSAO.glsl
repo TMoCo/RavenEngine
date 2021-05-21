@@ -112,7 +112,7 @@ void main()
 		SSAO = 1.0;
 	}
 	
-	outFinalColor.r = smoothstep(0.01, 1.1, SSAO * SSAO);
+	outFinalColor.r = smoothstep(0.2, 1.2, SSAO * SSAO);
 }
 
 

@@ -36,7 +36,7 @@ RenderRscPrimitive* RenderMesh::GetRsc()
 }
 
 
-void RenderMesh::Draw(GLShader* shader) const
+void RenderMesh::Draw(GLShader* shader, bool isShadow) const
 {
 	mesh->GetArray()->Bind();
 	glDrawElements(GL_TRIANGLES, mesh->GetNumIndices(), GL_UNSIGNED_INT, nullptr);

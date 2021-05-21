@@ -36,7 +36,7 @@ namespace Raven
 		inline const std::vector<glm::mat4>* GetBones() const { return bones; }
 
 		// Draw Mesh.
-		void Draw(GLShader* shader) const override;
+		void Draw(GLShader* shader, bool isShadow) const override;
 
 		// Return Expected Domain of this primitive.
 		inline virtual ERenderShaderDomain GetDomain() { return ERenderShaderDomain::Skinned; }

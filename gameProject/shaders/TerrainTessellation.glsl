@@ -5,6 +5,10 @@
 
 #if STAGE_TESS_CONTROL_SHADER
 
+//
+#define MAX_TES_LEVEL 42.0
+
+
 // 
 layout (vertices = 4) out;
 
@@ -22,22 +26,30 @@ in VertexOutput
 out TessCtrlOutput
 {
 	vec3 position;
+	float level;
 } outTessCtrl[];
 
 
 
 
-// ComputeTessLevel based on edge length in screen space
+// ComputeTessLevel based on edge bounds length in screen space
 float ComputeTessLevel(vec4 v1, vec4 v2)
 {
-    vec4 p1 = v1;
-    vec4 p2 = v2;
-    p1 = p1 / p1.w;
-    p2 = p2 / p2.w;
-    float l = length( 0.5 * inCommon.viewport.zw * ( p1.xy - p2.xy ) );
+	// Edge Center Point.
+    vec4 c = 0.5 * ( v1 + v2 );
 	
 	
-    return clamp( l / 32.0, 1.0, 20.0 );
+	// Point on edge bounds.
+    vec4 p = c;
+    p.y += length(v1 - v2);
+	
+	// Project.
+	c = c / c.w;
+    p = p / p.w;
+	
+	// Distnace in screen coord.
+    float dist = length( 0.5 * inCommon.viewport.zw * ( p.xy - c.xy ) );
+    return clamp( dist / 22.0, 1.0, MAX_TES_LEVEL );
 
 }
 
@@ -45,15 +57,11 @@ float ComputeTessLevel(vec4 v1, vec4 v2)
 
 void main()
 {
-	 // Set the control points of the output patch
-    outTessCtrl[gl_InvocationID].position = inTessCtrl[gl_InvocationID].position;
-	
-
-
 	vec4 pos0 = inCommon.viewProjMatrix * vec4(inTessCtrl[0].position, 1.0);
 	vec4 pos1 = inCommon.viewProjMatrix * vec4(inTessCtrl[1].position, 1.0);
 	vec4 pos2 = inCommon.viewProjMatrix * vec4(inTessCtrl[2].position, 1.0);
 	vec4 pos3 = inCommon.viewProjMatrix * vec4(inTessCtrl[3].position, 1.0);
+
 	
 	// Calculate the tessellation levels
     gl_TessLevelOuter[0] = ComputeTessLevel(pos0, pos2);
@@ -62,6 +70,11 @@ void main()
 	gl_TessLevelOuter[3] = ComputeTessLevel(pos2, pos3);
     gl_TessLevelInner[0] = max(gl_TessLevelOuter[1], gl_TessLevelOuter[3]);
 	gl_TessLevelInner[1] = max(gl_TessLevelOuter[0], gl_TessLevelOuter[2]);
+	
+	
+	// Set the control points of the output patch
+    outTessCtrl[gl_InvocationID].position = inTessCtrl[gl_InvocationID].position;
+	outTessCtrl[gl_InvocationID].level = (gl_TessLevelOuter[gl_InvocationID] - 1.0) / (float(MAX_TES_LEVEL) - 1.0);
 
 }
 
@@ -83,6 +96,7 @@ layout(quads, fractional_even_spacing, cw) in;
 in TessCtrlOutput
 {
 	vec3 position;
+	float level;
 } inTessEval[];
 
 
@@ -121,6 +135,12 @@ layout(std140) uniform TerrainBinBlock
 uniform sampler2D inHeightMap;
 
 
+float Evaluate1D(float v0, float v1, float v2, float v3)
+{
+	float vx0 = mix(v0, v1, gl_TessCoord.x);
+	float vx1 = mix(v2, v3, gl_TessCoord.x);
+    return mix(vx0, vx1, gl_TessCoord.y);
+}
 
 
 vec2 Evaluate2D(vec2 v0, vec2 v1, vec2 v2, vec2 v3)
@@ -141,21 +161,26 @@ vec3 Evaluate3D(vec3 v0, vec3 v1, vec3 v2, vec3 v3)
 
 
 
+
+
 void ComputeNormal()
 {
-	float level = 3.7;
+	// 
+	float level = Evaluate1D(inTessEval[0].level, inTessEval[1].level, inTessEval[2].level, inTessEval[3].level);
+	//level = mix(1.0, 3.0, (1.0 - level));
+	level = 1.0;
 	
 	vec2 texCoord = outTessEval.texCoord;
 	vec2 texelSize = 1.0 / textureSize(inHeightMap, int(level));
 	
-	float h0 = textureLod(inHeightMap, texCoord - vec2(texelSize.x, 0.0), level).r * (inHeight.y - inHeight.x) + inHeight.x;
-	float h1 = textureLod(inHeightMap, texCoord + vec2(texelSize.x, 0.0), level).r * (inHeight.y - inHeight.x) + inHeight.x;
+	float h0 = textureLod(inHeightMap, texCoord - vec2(texelSize.x, 0.0), level).r * (inHeight.y - inHeight.x);
+	float h2 = textureLod(inHeightMap, texCoord + vec2(texelSize.x, 0.0), level).r * (inHeight.y - inHeight.x);
 	
-	float h2 = textureLod(inHeightMap, texCoord - vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x) + inHeight.x; 
-	float h3 = textureLod(inHeightMap, texCoord + vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x) + inHeight.x; 
+	float h3 = textureLod(inHeightMap, texCoord - vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x); 
+	float h4 = textureLod(inHeightMap, texCoord + vec2(0.0, texelSize.y), level).r * (inHeight.y - inHeight.x); 
 	
-	outTessEval.normal = normalize( vec3(h0 - h1, 2.7, h2 - h3) * 0.5 );
-	outTessEval.tangent = normalize( vec3(h0 - h1, 0.0, 0.0) * 0.5 );
+	outTessEval.normal  = normalize( vec3(h0 - h2, 3.5, h3 - h4) * 0.5  );
+	outTessEval.tangent = vec3(1.0, 0.0, 0.0);
 }
 
 
@@ -166,14 +191,12 @@ void main()
     outTessEval.position = Evaluate3D(inTessEval[0].position, inTessEval[1].position, inTessEval[2].position, inTessEval[3].position);
 	outTessEval.texCoord = vec2(outTessEval.position.x / inScale.x, outTessEval.position.z / inScale.y);;
 	outTessEval.position.y = texture(inHeightMap, outTessEval.texCoord).r * (inHeight.y - inHeight.x) + inHeight.x; 
-	
+	ComputeNormal();
 	
 #if RENDER_SHADER_TYPE_SHADOW
 	gl_Position = inShadowViewProj * vec4(outTessEval.position, 1.0);
-	gl_Position.z += 0.05;
+	//gl_Position.z += 0.05;
 #else
-	ComputeNormal();
-	
 	gl_Position = inCommon.viewProjMatrix * vec4(outTessEval.position, 1.0);
 #endif
 

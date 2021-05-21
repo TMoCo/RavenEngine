@@ -56,7 +56,7 @@ namespace Raven
 		inline const glm::mat4& GetWorldMatrix() const { return worldMatrix; }
 
 		// Draw ths Primitive.
-		virtual void Draw(GLShader* shader) const = 0;
+		virtual void Draw(GLShader* shader, bool isShadow) const = 0;
 
 		// Add a light that is going to lit this primitive.
 		inline void AddLight(uint32_t lightIndex) { lights.push_back(lightIndex); }
@@ -95,6 +95,7 @@ namespace Raven
 	protected:
 		// True if this is a skinned primitive.
 		bool isSkinned;
+
 	};
 
 

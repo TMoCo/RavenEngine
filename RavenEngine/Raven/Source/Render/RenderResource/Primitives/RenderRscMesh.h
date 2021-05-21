@@ -25,6 +25,9 @@ namespace Raven
 	//
 	class RenderRscMesh : public RenderRscPrimitive
 	{
+		// Friend...
+		friend class RenderRscMeshInstance;
+
 	public:
 		// Construct.
 		RenderRscMesh();
@@ -119,6 +122,47 @@ namespace Raven
 
 		// OpenGL Buffer for bone indices.
 		GLBuffer* boneIndicesBuffer;
+	};
+
+
+	// RenderRscMeshInstance:
+	//
+	class RenderRscMeshInstance : public RenderRscPrimitive
+	{
+	public:
+		// Construct.
+		RenderRscMeshInstance();
+
+		// Destruct.
+		~RenderRscMeshInstance();
+
+		// Load MeshInstance from src mesh.
+		void Load(GLBuffer* instanceBuffer, int32_t iniSize, RenderRscMesh* rscMesh);
+
+		// Return the vertex array that defines this mesh Vertex Input.
+		inline GLVertexArray* GetArray() { return vxarray; }
+
+		// Return instance buffer.
+		inline GLBuffer* GetInstanceTransform() { return instanceTransform; }
+
+		// Update the instances with a list of transforms.
+		void UpdateTransforms(const std::vector<glm::mat4>& transforms);
+
+		// Return the number of indices in the mesh.
+		inline int32_t GetNumIndices() const { return mesh->GetNumIndices(); }
+
+	private:
+		// The mesh we are instancing.
+		RenderRscMesh* mesh;
+
+		// The OpenGL Vertex Array of the mesh, defines mesh vertex input.
+		GLVertexArray* vxarray;
+
+		// OpenGL Transform Buffer, for instance transformation.
+		GLBuffer* instanceTransform;
+
+		// Onwer of the instance buffer.
+		bool instanceBufferOwner;
 	};
 
 }

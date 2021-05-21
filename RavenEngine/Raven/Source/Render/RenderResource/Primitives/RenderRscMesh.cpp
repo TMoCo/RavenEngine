@@ -300,4 +300,156 @@ void RenderRscSkinnedMesh::Load(const std::vector<glm::vec3>& positions,
 	vxarray->Build(attributes, indexBuffer);
 }
 
+
+
+RenderRscMeshInstance::RenderRscMeshInstance()
+	: vxarray(nullptr)
+	, mesh(nullptr)
+	, instanceTransform(nullptr)
+	, instanceBufferOwner(false)
+{
+
+}
+
+
+RenderRscMeshInstance::~RenderRscMeshInstance()
+{
+	if (instanceBufferOwner)
+	{
+		delete instanceTransform;
+	}
+
+	delete vxarray;
+}
+
+
+void RenderRscMeshInstance::Load(GLBuffer* instanceBuffer, int32_t iniSize, RenderRscMesh* rscMesh)
+{
+	mesh = rscMesh;
+
+	// Create Transform Buffers.
+	if (instanceBuffer != nullptr)
+	{
+		instanceTransform = instanceBuffer;
+	}
+	else
+	{
+		instanceTransform = GLBuffer::Create(
+			EGLBufferType::Array,
+			(int)(iniSize * sizeof(glm::mat4)),
+			nullptr,
+			EGLBufferUsage::DynamicDraw
+		);
+
+		instanceBufferOwner = true;
+	}
+
+
+
+	// Build Vertex Input Description...
+	std::vector<GLVABuildAttribData> attributes{
+		// Attribute 0 - Positions
+		GLVABuildAttribData(
+			mesh->positionBuffer,   // Buffer
+			0,                      // Index
+			3,                      // Type-Size
+			EGLTypes::Float,        // Type
+			sizeof(glm::vec3),      // Stride
+			0                       // offset
+		),
+
+		// Attribute 1 - Normals
+		GLVABuildAttribData(
+			mesh->normalBuffer,   // Buffer
+			1,                    // Index
+			3,                    // Type-Size
+			EGLTypes::Float,      // Type
+			sizeof(glm::vec3),    // Stride
+			0                     // offset
+		),
+
+		// Attribute 2 - Tangents
+		GLVABuildAttribData(
+			mesh->tangentBuffer,  // Buffer
+			2,                    // Index
+			3,                    // Type-Size
+			EGLTypes::Float,      // Type
+			sizeof(glm::vec3),    // Stride
+			0                     // offset
+		),
+
+		// Attribute 3 - TexCoords
+		GLVABuildAttribData(
+			mesh->texCoordBuffer,	 // Buffer
+			3,                     // Index
+			2,                     // Type-Size
+			EGLTypes::Float,       // Type
+			sizeof(glm::vec2),     // Stride
+			0                      // offset
+		),
+
+		// -- -- -- -- -- -- -- -- -- -- --
+		// Attribute 4,5,6,7 - Instance Transform
+		GLVABuildAttribData(
+			instanceTransform,	          // Buffer
+			4,                            // Index
+			4,                            // Type-Size
+			EGLTypes::Float,              // Type
+			4 * sizeof(glm::vec4),        // Stride
+			0 * sizeof(glm::vec4),        // offset
+			1                             // Instance
+		),
+		GLVABuildAttribData(
+			instanceTransform,	          // Buffer
+			5,                            // Index
+			4,                            // Type-Size
+			EGLTypes::Float,              // Type
+			4 * sizeof(glm::vec4),        // Stride
+			1 * sizeof(glm::vec4) ,       // offset
+			1                             // Instance
+		),
+		GLVABuildAttribData(
+			instanceTransform,	          // Buffer
+			6,                            // Index
+			4,                            // Type-Size
+			EGLTypes::Float,              // Type
+			4 * sizeof(glm::vec4),        // Stride
+			2 * sizeof(glm::vec4),        // offset
+			1                             // Instance
+		),
+		GLVABuildAttribData(
+			instanceTransform,	          // Buffer
+			7,                            // Index
+			4,                            // Type-Size
+			EGLTypes::Float,              // Type
+			4 * sizeof(glm::vec4),        // Stride
+			3 * sizeof(glm::vec4),        // offset
+			1                             // Instance
+		)
+	};
+
+
+
+	vxarray = GLVertexArray::Create();
+	vxarray->Build(attributes, mesh->indexBuffer);
+}
+
+
+void RenderRscMeshInstance::UpdateTransforms(const std::vector<glm::mat4>& transforms)
+{
+	int32_t newSize = transforms.size() * sizeof(glm::mat4);
+
+	if (newSize <= instanceTransform->GetSize())
+	{
+		instanceTransform->UpdateSubData(newSize, 0, &transforms[0]);
+	}
+	else
+	{
+		instanceTransform->UpdateData(newSize, &transforms[0]);
+	}
+
+}
+
+
+
 } // End of namespace Raven.

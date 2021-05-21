@@ -6,8 +6,10 @@
 
 #include "Utilities/Core.h"
 #include "ResourceManager/Resources/IResource.h" 
+#include "ResourceManager/Resources/Material.h" 
+#include "ResourceManager/Resources/Mesh.h" 
+#include "ResourceManager/Resources/TerrainData.h"
 #include "ResourceManager/Resources/DynamicTexture.h"
-#include "ResourceManager/Resources/Terrain.h"
 #include "Render/RenderResource/Primitives/RenderRscTerrain.h"
 
 #include "ProceduralGenerator/HeightMap.h"
@@ -20,6 +22,7 @@
 
 namespace Raven
 {
+
 
 
 	// Terrain:
@@ -57,6 +60,7 @@ namespace Raven
 			renderRsc = Ptr<RenderRscTerrain>( new RenderRscTerrain() );
 			renderRsc->Load(heightMap->GetHeightmapTexture(), bins.size(), scale, height);
 			renderRsc->SetBins(&bins);
+			renderRsc->SetFoliageLayers(&foliageLayers);
 		}
 		 
 		// Return Terrain render resource.
@@ -68,7 +72,7 @@ namespace Raven
 		// @param inScale: the scale in meter for the terrain mesh.
 		// @param inNumBins: num of bins in a single row of the terrain.
 		// @param inHeight: the min/max height of the terrain mesh.
-		void SetTerrainData(Ptr<HeightMap> inHeightMap, const glm::vec2& inScale,
+		inline void SetTerrainData(Ptr<HeightMap> inHeightMap, const glm::vec2& inScale,
 			int32_t inNumBinsPerRow, const glm::vec2& inHeight)
 		{
 			heightMap = inHeightMap;
@@ -82,11 +86,50 @@ namespace Raven
 			GenerateBins(inNumBinsPerRow);
 		}
 
+
+		// Set/Get Material.
+		inline void SetMaterial(Ptr<Material> mat) { material = mat; }
+		inline Ptr<Material> GetMaterial() const { return material; }
+
+
 		// Retrun the terrain height map.
 		inline const HeightMap* GetHeightMap() const { return heightMap.get(); }
 
 		// Return the terrain height min/max.
 		inline const glm::vec2& GetHeight() const { return height; }
+
+		// Create a new foliage layer.
+		inline size_t NewLayer(const std::string& name, Ptr<Mesh> mesh, const std::vector< Ptr<Material> >& materails)
+		{
+			RAVEN_ASSERT(mesh.get(), "");
+
+			TerrainFoliageLayer& newlayer = foliageLayers.emplace_back( TerrainFoliageLayer() );
+			newlayer.Setup(mesh, materails, 100);
+			
+			return foliageLayers.size() - 1;
+		}
+
+		// Add a new foliage instance.
+		inline void AddFoliageInstance(int32_t binIndex, int32_t layer, const glm::mat4& transform)
+		{
+			TerrainBinFoliage foliage;
+			foliage.index = foliageLayers[layer].AddInstance(binIndex, transform);
+			foliage.layer = layer;
+			bins[binIndex].foliage.push_back(foliage);
+		}
+
+
+		//
+		inline const auto& GetBins()
+		{
+			return bins;
+		}
+
+		//
+		inline auto& GetFoliageLayer(size_t i)
+		{
+			return foliageLayers[i];
+		}
 
 	private:
 		// Generate Terrain Bins.
@@ -118,6 +161,8 @@ namespace Raven
 			bounds = MathUtils::BoundingBox(glm::vec3(0.0f, 0.0f, height.x), glm::vec3(scale.x, scale.y, height.y));
 		}
 
+
+
 	private:
 		// The height map data.
 		Ptr<HeightMap> heightMap;
@@ -143,5 +188,10 @@ namespace Raven
 		// The entire terrain bounds.
 		MathUtils::BoundingBox bounds;
 
+		// List of all foliage layers inside the terrain.
+		std::vector<TerrainFoliageLayer> foliageLayers;
+
+		// The terrain material used to render this terrain.
+		Ptr<Material> material;
 	};
 }

@@ -44,6 +44,9 @@ namespace Raven
 
 		// The Default Material for terrain.
 		Ptr<Material> terrain;
+
+		// The Default Material for mesh instances.
+		Ptr<Material> meshInstance;
 	};
 
 

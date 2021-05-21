@@ -39,7 +39,7 @@ void RenderDebugPrimitive::SetDebugMesh(RenderRscDebugMesh* prim)
 
 
 
-void RenderDebugPrimitive::Draw(GLShader* shader) const
+void RenderDebugPrimitive::Draw(GLShader* shader, bool isShadow) const
 {
 	shader->SetUniform("color", color);
 

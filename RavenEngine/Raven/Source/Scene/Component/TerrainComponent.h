@@ -58,8 +58,5 @@ namespace Raven
 		// The Terrain.
 		Ptr<Terrain> terrain;
 
-		//
-
-
 	};
 }
